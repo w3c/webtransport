@@ -23,4 +23,4 @@ It's great for:
 
 See the [explainer](https://github.com/pthatcherg/web-transport/blob/master/explainer.md) for more info.
 
-See the [proposed spec](ttps://pthatcherg.github.io/web-transport/).
+See the [proposed spec](https://pthatcherg.github.io/web-transport/).
