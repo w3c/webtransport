@@ -1,21 +1,25 @@
 # WebTransport
 
-WebTransport is a web API for flexible data transport.
+API that allows web applications to establish interactive, bidirectional, multiplexed network connections
+
+It fills gaps in the web platform:
+- Lack of UDP-like networking API
+- Lack of WebSocket-like API without head-of-line blocking
 
 It provides:
-- APIs for reliable streams 
-- APIs for unreliable datagrams
-- a concrete mapping to client-server QUIC
-- the flexibility to map to other protocols, including p2p ones
-
-It can be used:
-- like a WebSocket that has with multiple streams and server stream push
-- like a UDP socket, but with encryption and congestion control
-- with an existing HTTP/3 connection with both HTTP and non-HTTP data over the same QUIC connection.
+- Reliable streams 
+- Unreliable datagrams
+- Encryption and congestion control
+- An origin-based security model
+- Bindings for QUIC
+- Multiplexing with existing HTTP/3 connections
+- Flexible API that can be extended to other protocols, such as TCP fallback and p2p
+- Ability to change transport without changing application code
 
 It's great for:
 - sending or receiving high-frequency, small messages that don't need to be reliable (like game state)
 - sending or receiving low-latency media
+- transferring files
 
 See the [explainer](https://github.com/pthatcherg/web-transport/blob/master/explainer.md) for more info.
 
