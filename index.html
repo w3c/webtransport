@@ -10,9 +10,9 @@
 <body>
   <section id="abstract">
     <p>This document defines a set of ECMAScript APIs in WebIDL to allow data to be sent
-    and received between a browser and server implementing pluggable
-    protocols underneath with common APIs on top.  APIs specific to QUIC are also provided
-    protocol. This specification is being developed in conjunction with a protocol
+    and received between a browser and server, implementing pluggable
+    protocols underneath with common APIs on top.  APIs specific to QUIC are also provided.
+    This specification is being developed in conjunction with a protocol
     specification developed by the IETF QUIC Working Group.</p>
   </section>
 
@@ -25,7 +25,7 @@
     QUIC [[!QUIC-TRANSPORT]] as one such protocol, to send data
     to and receive data from servers.  It can be used like WebSockets
     but with support for multiple streams, unidirectional streams,
-    out-or-order deliver, and unreliable delivery.</p>
+    out-of-order delivery, and reliable as well as unreliable transport.</p>
     <p class="note">The API presented in this specification
     represents a preliminary proposal based on work-in-progress
     within the IETF QUIC WG. Since the QUIC transport specification is
@@ -1464,7 +1464,7 @@ dictionary StreamWriteParameters {
     <h2>Interface Mixin <dfn>IncomingStream</dfn></h2>
     <p>
         An IncomingStream is a stream that can be read from,
-        as either a <code>ReceiveStream </code>or a <code>BidirectionalStream</code>
+        as either a <code>ReceiveStream</code> or a <code>BidirectionalStream</code>
     </p>
     <div>
       <pre class="idl">
@@ -1850,7 +1850,7 @@ interface mixin IncomingStream {
           <td>The <code><a>WebTransportState</a></code> changed.</td>
         </tr>
         <tr>
-          <td><dfn><code>receivestream</code></dfn></td>
+          <td><code>receivestream</code></td>
           <td><code><a>ReceiveStreamEvent</a></code></td>
           <td>A new <code><a>ReceiveStream</a></code> is dispatched to the
           script in response to the remote peer creating a send-only stream and
@@ -1860,7 +1860,7 @@ interface mixin IncomingStream {
           internal slot.</td>
         </tr>
         <tr>
-          <td><dfn><code>bidirectionalstream</code></dfn></td>
+          <td><code>bidirectionalstream</code></td>
           <td><code><a>BidirectionalStreamEvent</a></code></td>
           <td>A new <code><a>BidirectionalStream</a></code> is dispatched to the
           script in response to the remote peer creating a bidirectional stream and
