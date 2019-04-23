@@ -87,18 +87,18 @@ setInterval(() => {
 }, 100);
 ```
 
-## Example of sending reliable game state to server using QUIC unidirectional send streams
+## Example of sending reliable game state to server using a QUIC unidirectional send stream
 
 ```javascript
 const host = 'example.com';
 const port = 10001;
-const quic = new QuicTransport(host, port);
+const transport = new QuicTransport(host, port);
 
 setInterval(() => {
   // App-specific encoded game state
   const gameState = getGameState();
   const encodeGameState = encodeGameState(gameState);
-  const stream = await quic.createSendStream();
+  const stream = await transport.createSendStream();
   stream.write({data: encodedGameState, finished: true});
 }, 100);
 ```
