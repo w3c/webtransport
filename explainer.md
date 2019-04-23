@@ -92,7 +92,7 @@ setInterval(() => {
 ```javascript
 const host = 'example.com';
 const port = 10001;
-const transport = new QuicTransport(host, port);
+const quic = new QuicTransport(host, port);
 
 setInterval(() => {
   // App-specific encoded game state
