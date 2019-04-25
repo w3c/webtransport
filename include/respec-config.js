@@ -49,7 +49,7 @@ var respecConfig = {
         "E. Kinnear",
         "D. Schinazi"
       ],
-      "status": "10 September 2018. Internet draft (work in progress)",
+      "status": "06 February 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "QUIC-TRANSPORT": {
@@ -59,16 +59,16 @@ var respecConfig = {
         "J. Iyengar",
         "M. Thomson"
       ],
-      "status": "23 October 2018. Internet draft (work in progress)",
+      "status": "11 March 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "TLS13": {
       "title": "The Transport Layer Security (TLS) Protocol Version 1.3",
-      "href": "https://tools.ietf.org/html/draft-ietf-tls-tls13",
+      "href": "https://tools.ietf.org/html/rfc8446",
       "authors": [
         "E. Rescorla"
       ],
-      "status": "20 March 2018. Internet Draft (work in progress)",
+      "status": "Internet Standards Track document",
       "publisher": "IETF"
     },
     "ALPN": {
