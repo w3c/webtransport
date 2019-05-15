@@ -1041,81 +1041,54 @@ interface QuicTransport : QuicTransportBase {
                 <a>throw</a> an <code>NotSupportedError</code> and abort these steps.
             </li>
             <li>
-              Let <var>quictransport</var> be a newly constructed
+              Let <var>transport</var> be a newly constructed
               <code><a>QuicTransport</a></code> object.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\OutgoingStreams]]</dfn>
+            <li>Let <var>transport</var> have a <dfn>[[\OutgoingStreams]]</dfn>
             internal slot representing a sequence of <code><a>OutgoingStream</a></code>
             objects, initialized to empty.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\IncomingStreams]]</dfn>
+            <li>Let <var>transport</var> have a <dfn>[[\IncomingStreams]]</dfn>
             internal slot representing a sequence of <code><a>IncomingStream</a></code>
             objects, initialized to empty.
             </li>
             <li>
-              Let <var>quictransport</var> have a <dfn>[[\WebTransportState]]</dfn>
+              Let <var>transport</var> have a <dfn>[[\WebTransportState]]</dfn>
               internal slot, initialized to <code>"connecting"</code>.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
+            <li>Let <var>transport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
               internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
+            <li>Let <var>transport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
               internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
               initialized to null.
             </li>
             <li>Run these steps in parallel:
               <ol>
-                <!-- TODO: Figure out a way to convey the origin in an encrypted manner
-                           and then use a non-empty value like so:
-                Let <var>serializedOrigin<var> be the empty string ,<code>""</code>.
-                Let <var>serializedOrigin<var> be <var>quictransport<var>'s
-                <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>'s
-                <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin">origin</a>,
-                <a href="https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin">serialized</a>.
-                The user agent MUST include a QUIC transport parameter with ID of web_origin(0x3330)
-                and value of <var>serializedOrigin</var>.
-                -->
-                <li>Establish a QUIC connection to the address identified by the
-                  given host and port.  
-                  During connection establishment, use of this API must be indicated 
-                  by selecting the ALPN [[!ALPN]] token "wq" in the crypto handshake 
-                  and including a QUIC transport parameter with ID web_client(0x333C)
-                  and empty value.
-                  <!-- TODO: register "wq" with IANA. --> 
-                </li>
-                <li>If the connection fails, set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
-                    internal slot to <code>"failed"</code> and abort these steps.
-                </li>
-                <li>Let <var>joinedAcceptedOrigins</var> be the QUIC transport parameter provided
-                    by the server with ID web_accepted_origins(0x333A).  If the transport parameter is
-                    absent, set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
-                    internal slot to <code>"failed"</code> and abort these steps.
-                    <!-- TODO: register 0x333A with IANA -->
-                </li>
                 <li>
-                    Let <var>serializedAcceptedOrigins</var> be
-                    <var>joinedAcceptedOrigins</var> split by the separator
-                    <code>","</code>.
-                </li>
-                <li>
-                    Let <var>serializedOrigin</var> be <var>quictransport</var>'s 
+                    Let <var>clientOrigin</var> be <var>transport</var>'s 
                     <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>'s
                     <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin">origin</a>,
                     <a href="https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin">serialized</a>.
                 </li>
-                <li>If <var>serializedOrigin</var> is a member of <var>serializedAcceptedOrigins</var> 
-                    or <var>joinedAcceptedOrigins</var> is equal to <code>"*"</code>, 
-                    set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
-                    internal slot to <code>"connected"</code> and abort these steps.
+                <li>
+                  Establish a QUIC connection to the address identified by the
+                  given host and port following the procedures in
+                  [[WEB-TRANSPORT-QUIC]] section 3 and using <var>clientOrigin</var>
+                  as the "origin of the client" referenced in section 3.2. 
                 </li>
                 <li>
-                    Set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
-                    internal slot to <code>"failed"</code>.
+                    If the connection fails, set <var>transport</var>'s <a>[[\WebTransportState]]</a>
+                    internal slot to <code>"failed"</code> and abort these steps.
+                </li>
+                <li>
+                    Set <var>transport</var>'s <a>[[\WebTransportState]]</a>
+                    internal slot to <code>"connected"</code>.
                 </li>
               </ol>
             </li>
             <li>
-              Return <var>quictransport</var>.
+              Return <var>transport</var>.
             </li>
           </ol>          
           <dl data-link-for="QuicTransport" data-dfn-for="QuicTransport" class=
