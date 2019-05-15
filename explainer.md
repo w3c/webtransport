@@ -272,7 +272,7 @@ An Http3Transport is a WebTransport that provides QUIC streams and datagrams
 with slightly more overhead vs. a QuicTransport.  It has the advantage that HTTP
 and non-HTTP traffic can share the same network port and congestion control
 context, and it may be pooled with other transports such that the transport may
-be connected more quickly (by resuing an existing HTTP/3 connection).
+be connected more quickly (by reusing an existing HTTP/3 connection).
 
 ## Alternative designs considered
 
