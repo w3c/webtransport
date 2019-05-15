@@ -62,6 +62,13 @@ var respecConfig = {
       "status": "11 March 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
+    "WEB-TRANSPORT-HTTP3": {
+      "title": "WebTransport over HTTP/3"
+      "href": "https://tools.ietf.org/html/draft-vvv-webtransport-http3-00",
+      "authors": [
+        "V. Vasiliev"
+      ]
+    }
     "TLS13": {
       "title": "The Transport Layer Security (TLS) Protocol Version 1.3",
       "href": "https://tools.ietf.org/html/rfc8446",
