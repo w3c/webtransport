@@ -63,18 +63,22 @@ var respecConfig = {
       "publisher": "IETF"
     },
     "WEB-TRANSPORT-QUIC": {
-      "title": "WebTransport over QUIC"
-      "href": "https://tools.ietf.org/html/draft-vvv-webtransport-quic-00",
+      "title": "WebTransport over QUIC",
+      "href": "https://tools.ietf.org/html/draft-vvv-webtransport-quic",
       "authors": [
         "V. Vasiliev"
-      ]
+      ],
+      "status": "03 May 2019. Internet draft (work in progress)",
+      "publisher": "IETF"
     },
     "WEB-TRANSPORT-HTTP3": {
-      "title": "WebTransport over HTTP/3"
-      "href": "https://tools.ietf.org/html/draft-vvv-webtransport-http3-00",
+      "title": "WebTransport over HTTP/3",
+      "href": "https://tools.ietf.org/html/draft-vvv-webtransport-http3",
       "authors": [
         "V. Vasiliev"
-      ]
+      ],
+      "status": "03 May 2019. Internet draft (work in progress)",
+      "publisher": "IETF"
     },
     "TLS13": {
       "title": "The Transport Layer Security (TLS) Protocol Version 1.3",
