@@ -21,6 +21,6 @@ It's great for:
 - sending or receiving low-latency media
 - transferring files
 
-See the [explainer](https://github.com/pthatcherg/web-transport/blob/master/explainer.md) for more info.
+See the [explainer](https://github.com/wicg/web-transport/blob/master/explainer.md) for more info.
 
-See the [proposed spec](https://pthatcherg.github.io/web-transport/).
+See the [proposed spec](https://wicg.github.io/web-transport/).

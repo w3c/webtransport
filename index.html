@@ -733,7 +733,7 @@ interface mixin DatagramTransport {
     </section>
   </section>
 
-  <section id="data-transport*">
+  <section id="web-transport*">
     <h2><dfn>WebTransport</dfn> Mixin</h2>
     <p>
       The <code>WebTransport</code> includes the methods common to all transports,
@@ -1041,81 +1041,54 @@ interface QuicTransport : QuicTransportBase {
                 <a>throw</a> an <code>NotSupportedError</code> and abort these steps.
             </li>
             <li>
-              Let <var>quictransport</var> be a newly constructed
+              Let <var>transport</var> be a newly constructed
               <code><a>QuicTransport</a></code> object.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\OutgoingStreams]]</dfn>
+            <li>Let <var>transport</var> have a <dfn>[[\OutgoingStreams]]</dfn>
             internal slot representing a sequence of <code><a>OutgoingStream</a></code>
             objects, initialized to empty.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\IncomingStreams]]</dfn>
+            <li>Let <var>transport</var> have a <dfn>[[\IncomingStreams]]</dfn>
             internal slot representing a sequence of <code><a>IncomingStream</a></code>
             objects, initialized to empty.
             </li>
             <li>
-              Let <var>quictransport</var> have a <dfn>[[\WebTransportState]]</dfn>
+              Let <var>transport</var> have a <dfn>[[\WebTransportState]]</dfn>
               internal slot, initialized to <code>"connecting"</code>.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
+            <li>Let <var>transport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
               internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
             </li>
-            <li>Let <var>quictransport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
+            <li>Let <var>transport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
               internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
               initialized to null.
             </li>
             <li>Run these steps in parallel:
               <ol>
-                <!-- TODO: Figure out a way to convey the origin in an encrypted manner
-                           and then use a non-empty value like so:
-                Let <var>serializedOrigin<var> be the empty string ,<code>""</code>.
-                Let <var>serializedOrigin<var> be <var>quictransport<var>'s
-                <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>'s
-                <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin">origin</a>,
-                <a href="https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin">serialized</a>.
-                The user agent MUST include a QUIC transport parameter with ID of web_origin(0x3330)
-                and value of <var>serializedOrigin</var>.
-                -->
-                <li>Establish a QUIC connection to the address identified by the
-                  given host and port.  
-                  During connection establishment, use of this API must be indicated 
-                  by selecting the ALPN [[!ALPN]] token "wq" in the crypto handshake 
-                  and including a QUIC transport parameter with ID web_client(0x333C)
-                  and empty value.
-                  <!-- TODO: register "wq" with IANA. --> 
-                </li>
-                <li>If the connection fails, set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
-                    internal slot to <code>"failed"</code> and abort these steps.
-                </li>
-                <li>Let <var>joinedAcceptedOrigins</var> be the QUIC transport parameter provided
-                    by the server with ID web_accepted_origins(0x333A).  If the transport parameter is
-                    absent, set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
-                    internal slot to <code>"failed"</code> and abort these steps.
-                    <!-- TODO: register 0x333A with IANA -->
-                </li>
                 <li>
-                    Let <var>serializedAcceptedOrigins</var> be
-                    <var>joinedAcceptedOrigins</var> split by the separator
-                    <code>","</code>.
-                </li>
-                <li>
-                    Let <var>serializedOrigin</var> be <var>quictransport</var>'s 
+                    Let <var>clientOrigin</var> be <var>transport</var>'s 
                     <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>'s
                     <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin">origin</a>,
                     <a href="https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin">serialized</a>.
                 </li>
-                <li>If <var>serializedOrigin</var> is a member of <var>serializedAcceptedOrigins</var> 
-                    or <var>joinedAcceptedOrigins</var> is equal to <code>"*"</code>, 
-                    set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
-                    internal slot to <code>"connected"</code> and abort these steps.
+                <li>
+                  Establish a QUIC connection to the address identified by the
+                  given host and port following the procedures in
+                  [[WEB-TRANSPORT-QUIC]] section 3 and using <var>clientOrigin</var>
+                  as the "origin of the client" referenced in section 3.2. 
                 </li>
                 <li>
-                    Set <var>quictransport</var>'s <a>[[\WebTransportState]]</a>
-                    internal slot to <code>"failed"</code>.
+                    If the connection fails, set <var>transport</var>'s <a>[[\WebTransportState]]</a>
+                    internal slot to <code>"failed"</code> and abort these steps.
+                </li>
+                <li>
+                    Set <var>transport</var>'s <a>[[\WebTransportState]]</a>
+                    internal slot to <code>"connected"</code>.
                 </li>
               </ol>
             </li>
             <li>
-              Return <var>quictransport</var>.
+              Return <var>transport</var>.
             </li>
           </ol>          
           <dl data-link-for="QuicTransport" data-dfn-for="QuicTransport" class=
@@ -1743,7 +1716,7 @@ interface mixin IncomingStream {
     </div>
   </section>
 
-  <section id="data-transport-stream*">
+  <section id="web-transport-stream*">
     <h2>Interface <dfn>WebTransportStream</dfn></h2>
     <p>A collection of common attributes and methods of all streams.</p>
     <div>
@@ -1809,6 +1782,121 @@ interface mixin IncomingStream {
       ReceiveStream includes IncomingStream;
       </pre>
     </div>
+  </section>
+
+  <section id="http3-transport*">
+    <h2><dfn>Http3Transport</dfn> Interface</h2>
+    <p>The <code>Http3Transport</code> is ***
+    </p>
+    <section id="http3-transport-overview*">
+      <h3>Overview</h3>
+      <p>An <code><a>Http3Transport</a></code> is a
+      <code>UnidirectionalStreamsTransport</code>, a
+      <code>BidirectionalStreamsTransport</code>, and a
+      <code>DatagramTransport</code>.
+      SendStreams, ReceiveStreams, and BidirectionalStreams are implemented with
+      HTTP/3 streams as defined in [[WEB-TRANSPORT-HTTP3]]. Datagrams are
+      implemented with QUIC datagrams as defined in [[WEB-TRANSPORT-HTTP3]].
+      </p>
+    </section>
+    <section id="http3-transport-interface-definition*">
+      <h3>Interface Definition</h3>
+      <div>
+        <pre class="idl">
+[ Constructor (DOMString url), Exposed=Window]
+interface Http3Transport {
+};
+
+Http3Transport includes UnidirectionalStreamsTransport;
+Http3Transport includes BidirectionalStreamsTransport;
+Http3Transport includes DatagramTransport;
+Http3Transport includes WebTransport;</pre>
+      </div>
+        <section>
+          <h2>Constructors</h2>
+          When the <code><a>Http3Transport</a></code> constructor is invoked,
+          the user agent <em class="rfc2119" title="MUST">MUST</em> run the
+          following steps:
+          <ol>
+            <li>
+              Let <var>transport</var> be a newly constructed
+              <code><a>Http3Transport</a></code> object with state "connecting".
+            </li>
+            <li>Let <var>transport</var> have a <a>[[\OutgoingStreams]]</a>
+              internal slot representing a sequence of <code><a>OutgoingStream</a></code>
+              objects, initialized to empty.
+            </li>
+            <li>Let <var>transport</var> have a <a>[[\IncomingStreams]]</a>
+              internal slot representing a sequence of <code><a>IncomingStream</a></code>
+              objects, initialized to empty.
+            </li>
+            <li>Let <var>transport</var> have a <a>[[\ReceivedDatagrams]]</a>
+                internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
+            </li>
+            <li>Let <var>transport</var> have a <a>[[\ReceiveDatagramsPromise]]</a>
+                internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
+                initialized to null.
+            <li>Run these steps in parallel:
+              <ol>
+                <li>
+                  Either establish an HTTP/3 connection or reuse an existing HTTP/3
+                  connection to the host specificed by the url, as specified in [[WEB-TRANSPORT-HTTP3]].
+                </li>
+                <li>
+                  If there is no such HTTP/3 connection to reuse and the establishment of a 
+                  new HTTP/3 connection, set <var>transport</var>'s <a>[[\WebTransportState]]</a>
+                  internal slot to <code>"failed"</code> and abort these steps.
+                </li>
+                <li>
+                  Once a connection an HTTP/3 connection is established, follow the
+                  steps specified in [[WEB-TRANSPORT-HTTP3]] section 4 for
+                  establishing a WebTransport session within the HTTP/3 connection.
+                </li>
+                <li>
+                  If the establishment of the WebTransport session fails, 
+                  set <var>transport</var>'s <a>[[\WebTransportState]]</a>
+                  internal slot to <code>"failed"</code> and abort these steps.
+                </li>
+                <li>
+                  Once a session has been established, set <var>transport</var>'s 
+                  <a>[[\WebTransportState]]</a> internal slot to <code>"connected"</code>
+                  and abort these steps.
+                </li>
+              </ol>
+            </li>
+            <li>
+              Return <var>transport</var>.
+            </li>
+          </ol>          
+          <dl data-link-for="Http3Transport" data-dfn-for="Http3Transport" class=
+          "constructors">
+            <dt><code><a>Http3Transport</a></code></dt>
+            <dd>
+              <table class="parameters">
+                <tbody>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Optional</th>
+                    <th>Description</th>
+                  </tr>
+                  <tr>
+                    <td class="prmName">url</td>
+                    <td class="prmType"><code><a>DOMString</a></code></td>
+                    <td class="prmNullFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmOptFalse"><span role="img" aria-label=
+                    "False">&#10008;</span></td>
+                    <td class="prmDesc">The url specifying the host to connect to and the path to pass to it.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </dd>
+          </dl>
+        </section>
+      </div>
+    </section>
   </section>
 
   <section id="privacy-security">

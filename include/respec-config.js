@@ -2,7 +2,7 @@ var respecConfig = {
   // TODO: Change once in WICG
   specStatus: "base",
   // TODO: Change once in WICG
-  edDraftURI: "https://pthatcherg.github.io/web-transport/",
+  edDraftURI: "https://wicg.github.io/web-transport/",
   shortName: "web-transport",     
   editors: [
     { name: "Peter Thatcher", company: "Google", w3cid: "68236" },
@@ -28,11 +28,11 @@ var respecConfig = {
           value: "Mailing list",
           href: "https://lists.w3.org/Archives/Public/public-webrtc/"
         },
+      */
         {
           value: "Browse open issues",
-          href: "https://github.com/w3c/webrtc-quic/issues"
+          href: "https://github.com/WICG/web-transport"
         },
-      */
         {
           value: "IETF QUIC Working Group",
           href: "https://tools.ietf.org/wg/quic/"
@@ -60,6 +60,24 @@ var respecConfig = {
         "M. Thomson"
       ],
       "status": "11 March 2019. Internet draft (work in progress)",
+      "publisher": "IETF"
+    },
+    "WEB-TRANSPORT-QUIC": {
+      "title": "WebTransport over QUIC",
+      "href": "https://tools.ietf.org/html/draft-vvv-webtransport-quic",
+      "authors": [
+        "V. Vasiliev"
+      ],
+      "status": "03 May 2019. Internet draft (work in progress)",
+      "publisher": "IETF"
+    },
+    "WEB-TRANSPORT-HTTP3": {
+      "title": "WebTransport over HTTP/3",
+      "href": "https://tools.ietf.org/html/draft-vvv-webtransport-http3",
+      "authors": [
+        "V. Vasiliev"
+      ],
+      "status": "03 May 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
     "TLS13": {

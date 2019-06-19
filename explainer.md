@@ -178,7 +178,7 @@ async function readStreamUntilFin(stream) {
 }
 ```
 
-## Example of requesting over HTTP and receiving media pushed out-of-order and unreliably over the same network connection
+## Example of requesting over pooled HTTP and receiving media pushed out-of-order and unreliably over the same network connection
 
 ```javascript
 const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
@@ -186,7 +186,7 @@ const mediaSource = new MediaSource();
 mediaSource.onsourceopen = (e) => {
   const sourceBuffer = mediaSource.addSourceBuffer(mime);
   
-  const transport = PooledHttpTransport.getDatagramTransport();
+  const transport = new Http3Transport("/video");
   if (transport) {
     await fetch('http://example.com/babyshark');
     const reader = transport.receiveDatagrams.getReader();
@@ -198,6 +198,22 @@ mediaSource.onsourceopen = (e) => {
       const chunk = containerizeMedia(datagram);
       sourceBuffer.appendBuffer(chunk);
     }
+  }
+};
+```
+
+## Example of requesting over HTTP and receiving media pushed out-of-order and reliably over the same network connection
+
+```javascript
+const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
+const mediaSource = new MediaSource();
+mediaSource.onsourceopen = (e) => {
+  const sourceBuffer = mediaSource.addSourceBuffer(mime);
+  
+  const transport = new Http3Transport("https://example.com/video");
+  transport.onunidirectionalstream = (e) => {
+    const chunk = await readStreamUntilFin(e.stream);
+    sourceBuffer.appendBuffer(chunk);
   }
 };
 ```
@@ -225,10 +241,11 @@ A QuicTransport is a WebTransport that maps directly to QUIC streams and
 datagrams, which makes it easy to connect to servers that speak QUIC with
 minimum overhead.  It supports all of these capabilities.
 
-A PooledHttpTransport is a WebTransport that provides different subset of these
-capabilities depending on the underlying HTTP protocol (HTTP/3 providing the
-widest support).  It has the advantages that HTTP and non-HTTP traffic can share
-the same network port and congestion control context.
+An Http3Transport is a WebTransport that provides QUIC streams and datagrams
+with slightly more overhead vs. a QuicTransport.  It has the advantage that HTTP
+and non-HTTP traffic can share the same network port and congestion control
+context, and it may be pooled with other transports such that the transport may
+be connected more quickly (by reusing an existing HTTP/3 connection).
 
 ## Alternative designs considered
 
