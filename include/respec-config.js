@@ -1,6 +1,6 @@
 var respecConfig = {
   // TODO: Change once in WICG
-  specStatus: "base",
+  specStatus: "CG-DRAFT",
   // TODO: Change once in WICG
   edDraftURI: "https://wicg.github.io/web-transport/",
   shortName: "web-transport",     
