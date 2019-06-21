@@ -62,6 +62,15 @@ var respecConfig = {
       "status": "11 March 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
+    "WEB-TRANSPORT-OVERVIEW": {
+      "title": "WebTransport Protocol Framework",
+      "href": "https://tools.ietf.org/html/draft-vvv-webtransport-overview",
+      "authors": [
+        "V. Vasiliev"
+      ],
+      "status": "03 May 2019. Internet draft (work in progress)",
+      "publisher": "IETF"
+    },
     "WEB-TRANSPORT-QUIC": {
       "title": "WebTransport over QUIC",
       "href": "https://tools.ietf.org/html/draft-vvv-webtransport-quic",
