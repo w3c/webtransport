@@ -1910,8 +1910,59 @@ Http3Transport includes WebTransport;</pre>
       <p>The fact that communication is taking place cannot be hidden from
       adversaries that can observe the network, so this has to be regarded as
       public information.</p>
-      <p>Since the QUIC protocol utilizes a cryptographic negotiation based on
-      TLS 1.3 [[TLS13]] in order to encrypt communications, it provides confidentiality.</p>
+      <p>All of the transport protocols described in this document use either
+      TLS [[TLS13]] or a semantically equivalent protocol, thus providing all
+      of the security properties of TLS, including confidentiality and
+      integrity of the traffic.  Both QuicTransport and Http3Transport use the
+      same certificate verification mechanism as outbound HTTP requests, thus
+      relying on the same public key infrastructure for authentication of the
+      remote server.  In WebTransport, certificate verification errors are
+      fatal; no interstitial allowing bypassing certificate validation is
+      available.</p>
+    </section>
+    <section>
+      <h2>State Persistence</h2>
+      <p>WebTransport by itself does not create any new unique identifiers or
+      new ways to persistently store state, nor does it automatically expose
+      any of the existing persistent state to the server.  For instance, none
+      of the transports defined in this document automatically send cookies,
+      support HTTP authentication or caching invalidation mechanisms.  Since
+      they use TLS, they may support TLS session tickets, which could be used
+      by the server (though not by passive network observers) to correlate
+      different connections from the same client.  This is not specific to
+      WebTransport by itself, but rather an inherent property of all TLS-based
+      protocols; thus, this is out-of-scope for this specification.</p>
+    </section>
+    <section>
+      <h2>Protocol Security</h2>
+      <p>WebTransport imposes a common set of requirements on all of the
+      protocols, described in [[WEB-TRANSPORT-OVERVIEW]].  Notable ones
+      include:</p>
+      <ol>
+        <li>All transports must ensure that the remote server is aware that the
+          connection in question originates from a Web application; this is
+          required to prevent cross-protocol attacks.  QUIC-based transports
+          use [[ALPN]] for that purpose.</li>
+        <li>All transports must allow the server to filter connections based on
+          the <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin">origin</a>
+          of the resource originating the transport session.</li>
+        <li>All transports require the user agents to continually verify that
+          the server is still interested in talking to them (concept commonly
+          known as "Consent Freshness").</li>
+      </ol>
+      <p>Protocol security considersations related to the individual transports
+      are described in the <i>Security Considerations</i> sections of the
+      corresponding protocol documents, [[WEB-TRANSPORT-QUIC]] and
+      [[WEB-TRANSPORT-HTTP3]].</p>
+      <p>Networking APIs can be commonly used to scan the local network for
+      available hosts, and thus be used for fingerprinting and other forms of
+      attacks.  WebTransport follows the <a
+                 href="https://html.spec.whatwg.org/multipage/web-sockets.html#feedback-from-the-protocol">
+        WebSocket approach</a> to this problem: the specific connection error
+      is not returned until an endpoint is verified to be a WebTransport
+      endpoint; thus, the Web application cannot distinguish between a
+      non-existing endpoint and the endpoint that is not willing to accept
+      connections from the Web.</p>
     </section>
   </section>
 
