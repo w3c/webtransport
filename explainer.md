@@ -94,7 +94,7 @@ const host = 'example.com';
 const port = 10001;
 const transport = new QuicTransport(host, port);
 
-setInterval(() => {
+setInterval(async () => {
   // App-specific encoded game state
   const gameState = getGameState();
   const encodeGameState = encodeGameState(gameState);
@@ -114,22 +114,22 @@ const transport = new QuicTransport(host, port);
 
 const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
-mediaSource.onsourceopen = (e) => {
+mediaSource.onsourceopen = async (e) => {
   const sourceBuffer = mediaSource.addSourceBuffer(mime);
   // App-specific request
   const mediaRequest = Uint8Array.from([1, 2, 3, 4]);
   const requestStream = await transport.createSendStream();
   const writer = requestStream.writable.getWriter();
-  await writer.ready();
   writer.write(mediaRequest);
 
-  transport.onreceivestream = (e) => {
+  transport.onreceivestream = async (e) => {
     const reader = e.stream.readable.getReader();
-    while (!reader.closed()) {
-      const {chunk, done} = await reader.read();
-      if (!done) {
-        sourceBuffer.appendBuffer(chunk);
+    while (true) {
+      const {value: chunk, done} = await reader.read();
+      if (done)  {
+        break;
       }
+      sourceBuffer.appendBuffer(chunk);
     }
   }
 };
@@ -143,8 +143,8 @@ const port = 10001;
 const transport = new QuicTransport(host, port);
 
 // Note that the notifications will arrive out of order
-transport.onbidirectionalstream = (e) => {
-  const notification = readStreamUntilFin(e.stream)
+transport.onbidirectionalstream = async(e) => {
+  const notification = await readStreamUntilFin(e.stream)
 
   if (notification) {
     // App-specific notification encoding
@@ -162,8 +162,11 @@ async function readStreamUntilFin(stream) {
   const reader = stream.readable.getReader();
   const buffers = [];
   let bufferedSize = 0;
-  while (!reader.closed()) {
-    const {chunk, done} = await reader.read();
+  while (true) {
+    const {value: chunk, done} = await reader.read();
+    if (done)  {
+      break;
+    }
     buffers.push(chunk);
     bufferedSize += chunk.byteLength;
   }
@@ -183,7 +186,7 @@ async function readStreamUntilFin(stream) {
 ```javascript
 const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
-mediaSource.onsourceopen = (e) => {
+mediaSource.onsourceopen = async (e) => {
   const sourceBuffer = mediaSource.addSourceBuffer(mime);
   
   const transport = new Http3Transport("/video");
@@ -191,7 +194,7 @@ mediaSource.onsourceopen = (e) => {
     await fetch('http://example.com/babyshark');
     const reader = transport.receiveDatagrams.getReader();
     while (true) {
-      const {datagram, done} = await reader.read();
+      const {value: datagram, done} = await reader.read();
       if (done) {
         break;
       }
@@ -211,7 +214,7 @@ mediaSource.onsourceopen = (e) => {
   const sourceBuffer = mediaSource.addSourceBuffer(mime);
   
   const transport = new Http3Transport("https://example.com/video");
-  transport.onunidirectionalstream = (e) => {
+  transport.onunidirectionalstream = async (e) => {
     const chunk = await readStreamUntilFin(e.stream);
     sourceBuffer.appendBuffer(chunk);
   }
