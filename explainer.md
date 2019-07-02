@@ -74,14 +74,15 @@ encrypted and congestion-controlled communication.
 const host = 'example.com';
 const port = 10001;
 const transport = new QuicTransport(host, port);
+const datagramWritableStream = transport.sendDatagrams();
 
 setInterval(() => {
   // App-specific encoded game state
   const gameState = getGameState();
   const encodeGameState = encodeGameState(gameState);
-  try {
-    transport.sendDatagram(encodedGameState);
-  } catch(err) {
+  if (datagramWritableStream.ready) {
+    datagramWritableStream.getWriter().write(encodedGameState);
+  } else {
     // Ignore; just keep sending anyway
   }
 }, 100);
