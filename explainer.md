@@ -120,18 +120,18 @@ mediaSource.onsourceopen = async (e) => {
   // App-specific request
   const mediaRequest = Uint8Array.from([1, 2, 3, 4]);
   const requestStream = await transport.createSendStream();
-  const writer = requestStream.writable.getWriter();
-  writer.write(mediaRequest);
+  requestStream.writable.getWriter().write(mediaRequest);
 
-  transport.onreceivestream = async (e) => {
-    const reader = e.stream.readable.getReader();
-    while (true) {
-      const {value: chunk, done} = await reader.read();
-      if (done)  {
-        break;
-      }
-      sourceBuffer.appendBuffer(chunk);
+  const streamsReader = transport.receiveStreams().getReader();
+  while (true) {
+    const {value: responseStream, done} = await streamsReader.read();
+    if (done)  {
+      break;
     }
+    (async () => {
+      const chunk = await readStreamUntilFin(responseStream);
+      sourceBuffer.appendBuffer(chunk);
+    })();
   }
 };
 ```
@@ -143,20 +143,25 @@ const host = 'example.com';
 const port = 10001;
 const transport = new QuicTransport(host, port);
 
-// Note that the notifications will arrive out of order
-transport.onbidirectionalstream = async(e) => {
-  const notification = await readStreamUntilFin(e.stream)
-
-  if (notification) {
-    // App-specific notification encoding
-    const notificationMessage = decodeNotification(notification);
-    let n = new Notification(notificationMessage);
-    n.onclick = (e) => {
-      // App-specific click message encoding
-      const clickMessage = encodeClickMessage();
-      e.stream.write(clickMessage);
-    };
+const streamsReader = transport.receiveBidirectionalStreams().getReader();
+while (true) {
+  const {value: stream, done} = await streamsReader.read();
+  if (done) {
+    break;
   }
+  (async () => {
+    const notification = await readStreamUntilFin(stream)
+    if (notification) {
+      // App-specific notification encoding
+      const notificationMessage = decodeNotification(notification);
+      let n = new Notification(notificationMessage);
+      n.onclick = (e) => {
+        // App-specific click message encoding
+        const clickMessage = encodeClickMessage();
+        stream.getWriter().write(clickMessage);
+      };
+    }
+  })();
 }
 
 async function readStreamUntilFin(stream) {
@@ -193,7 +198,7 @@ mediaSource.onsourceopen = async (e) => {
   const transport = new Http3Transport("/video");
   if (transport) {
     await fetch('http://example.com/babyshark');
-    const reader = transport.receiveDatagrams.getReader();
+    const reader = transport.receiveDatagrams().getReader();
     while (true) {
       const {value: datagram, done} = await reader.read();
       if (done) {
@@ -211,13 +216,20 @@ mediaSource.onsourceopen = async (e) => {
 ```javascript
 const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
-mediaSource.onsourceopen = (e) => {
+mediaSource.onsourceopen = async (e) => {
   const sourceBuffer = mediaSource.addSourceBuffer(mime);
   
   const transport = new Http3Transport("https://example.com/video");
-  transport.onunidirectionalstream = async (e) => {
-    const chunk = await readStreamUntilFin(e.stream);
-    sourceBuffer.appendBuffer(chunk);
+  const streamsReader = transport.receiveStreams().getReader();
+  while (true) {
+    const {value: stream, done} = await streamsReader.read();
+    if (done) {
+      break;
+    }
+    (async () => {
+      const chunk = await readStreamUntilFin(e.stream);
+      sourceBuffer.appendBuffer(chunk);
+    })();
   }
 };
 ```
