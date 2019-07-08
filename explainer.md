@@ -82,8 +82,6 @@ setInterval(() => {
   const encodeGameState = encodeGameState(gameState);
   if (datagramWritableStream.ready) {
     datagramWritableStream.getWriter().write(encodedGameState);
-  } else {
-    // Ignore; just keep sending anyway
   }
 }, 100);
 ```
@@ -100,6 +98,7 @@ setInterval(async () => {
   const gameState = getGameState();
   const encodeGameState = encodeGameState(gameState);
   const stream = await transport.createSendStream();
+  await stream.ready;
   const writer = stream.writable.getWriter();
   writer.write(encodedGameState);
   writer.close();
@@ -122,18 +121,19 @@ mediaSource.onsourceopen = async (e) => {
   const requestStream = await transport.createSendStream();
   requestStream.writable.getWriter().write(mediaRequest);
 
-  const streamsReader = transport.receiveStreams().getReader();
+  readAllStreams(transport.receiveStreams, sourceBuffer.appendBuffer);
+};
+
+async function readAllStreams(streams, f) {
+  const streamsReader = streams.getReader();
   while (true) {
     const {value: responseStream, done} = await streamsReader.read();
-    if (done)  {
-      break;
+    if (done) {
+      return;
     }
-    (async () => {
-      const chunk = await readStreamUntilFin(responseStream);
-      sourceBuffer.appendBuffer(chunk);
-    })();
+    readStreamUntilFin(responseStream).then(f);
   }
-};
+}
 ```
 
 ## Example of receiving notifications pushed from the server, with responses
@@ -216,21 +216,10 @@ mediaSource.onsourceopen = async (e) => {
 ```javascript
 const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
-mediaSource.onsourceopen = async (e) => {
+mediaSource.onsourceopen = (e) => {
   const sourceBuffer = mediaSource.addSourceBuffer(mime);
-  
   const transport = new Http3Transport("https://example.com/video");
-  const streamsReader = transport.receiveStreams().getReader();
-  while (true) {
-    const {value: stream, done} = await streamsReader.read();
-    if (done) {
-      break;
-    }
-    (async () => {
-      const chunk = await readStreamUntilFin(e.stream);
-      sourceBuffer.appendBuffer(chunk);
-    })();
-  }
+  readAllStreams(transport.receiveStreams(), sourceBuffer.appendBuffer);
 };
 ```
 
