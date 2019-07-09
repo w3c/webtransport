@@ -12,8 +12,8 @@ var respecConfig = {
   authors: [
   ],
   // TODO: Change once in WICG
-  // wg: "",
-  // wgURI: "",
+  wg: "Web Incubator Community Group",
+  wgURI: "https://wicg.io/",
   // wgPublicList: "",
   wgPatentURI:  "https://www.w3.org/2004/01/pp-impl/47318/status",
   // TODO: Change once in WICG
