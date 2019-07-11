@@ -80,9 +80,10 @@ setInterval(() => {
   // App-specific encoded game state
   const gameState = getGameState();
   const encodeGameState = encodeGameState(gameState);
-  if (datagramWritableStream.ready) {
-    datagramWritableStream.getWriter().write(encodedGameState);
-  }
+
+  // If backpressure is being applied, it will get dropped
+  // But that's OK for this scenario.
+  datagramWritableStream.getWriter().write(encodedGameState);
 }, 100);
 ```
 
