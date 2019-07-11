@@ -74,16 +74,16 @@ encrypted and congestion-controlled communication.
 const host = 'example.com';
 const port = 10001;
 const transport = new QuicTransport(host, port);
+const datagramWritableStream = transport.sendDatagrams();
 
 setInterval(() => {
   // App-specific encoded game state
   const gameState = getGameState();
   const encodeGameState = encodeGameState(gameState);
-  try {
-    transport.sendDatagram(encodedGameState);
-  } catch(err) {
-    // Ignore; just keep sending anyway
-  }
+
+  // If backpressure is being applied, it will get dropped
+  // But that's OK for this scenario.
+  datagramWritableStream.getWriter().write(encodedGameState);
 }, 100);
 ```
 
@@ -94,12 +94,15 @@ const host = 'example.com';
 const port = 10001;
 const transport = new QuicTransport(host, port);
 
-setInterval(() => {
+setInterval(async () => {
   // App-specific encoded game state
   const gameState = getGameState();
   const encodeGameState = encodeGameState(gameState);
   const stream = await transport.createSendStream();
-  stream.write({data: encodedGameState, finished: true});
+  await stream.ready;
+  const writer = stream.writable.getWriter();
+  writer.write(encodedGameState);
+  writer.close();
 }, 100);
 ```
 
@@ -112,49 +115,25 @@ const transport = new QuicTransport(host, port);
 
 const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
-mediaSource.onsourceopen = (e) => {
+mediaSource.onsourceopen = async (e) => {
   const sourceBuffer = mediaSource.addSourceBuffer(mime);
   // App-specific request
   const mediaRequest = Uint8Array.from([1, 2, 3, 4]);
   const requestStream = await transport.createSendStream();
-  requestStream.write(mediaRequest);
+  requestStream.writable.getWriter().write(mediaRequest);
 
-  transport.onreceivestream = (e) => {
-    const size = await readStreamUint32(e.stream);
-    if (!size || size > 512000) {
-      return;
-    }
-    const chunk = await readStreamBytes(e.stream, size);
-    if (!!chunk) {
-      sourceBuffer.appendBuffer(chunk);
-    }
-  }
+  readAllStreams(transport.receiveStreams, sourceBuffer.appendBuffer);
 };
 
-async function readStreamUint32(stream) {
-  await stream.waitForReadable(4);
-  if (!stream.readable) {
-    return null;
-  }
-  const buffer = new Uint8Array(4);
-  const read = stream.readInto(buffer);
-  return new DataView(buffer.array).getUint32(0);
-}
-
-async function readStreamBytes(stream, count) {
-  const buffer = new ArrayBuffer(count);
-  let bufferedAmount = 0;
-  while (bufferedAmount < count) {
-    await stream.waitForReadable(1);
-    if (!stream.readable) {
-      // If waitForReadable resolved but the stream is not readable,
-      // Then the stream must have been closed.
-      return null;
+async function readAllStreams(streams, f) {
+  const streamsReader = streams.getReader();
+  while (true) {
+    const {value: responseStream, done} = await streamsReader.read();
+    if (done) {
+      return;
     }
-    const read = stream.readInto(new Uint8Array(buffer, bufferedAmount));
-    bufferedAmount += read.amount;
+    readStreamUntilFin(responseStream).then(f);
   }
-  return buffer;
 }
 ```
 
@@ -165,37 +144,38 @@ const host = 'example.com';
 const port = 10001;
 const transport = new QuicTransport(host, port);
 
-// Note that the notifications will arrive out of order
-transport.onbidirectionalstream = (e) => {
-  const notification = readStreamUntilFin(e.stream)
-
-  if (notification) {
-    // App-specific notification encoding
-    const notificationMessage = decodeNotification(notification);
-    let n = new Notification(notificationMessage);
-    n.onclick = (e) => {
-      // App-specific click message encoding
-      const clickMessage = encodeClickMessage();
-      e.stream.write(clickMessage);
-    };
+const streamsReader = transport.receiveBidirectionalStreams().getReader();
+while (true) {
+  const {value: stream, done} = await streamsReader.read();
+  if (done) {
+    break;
   }
+  (async () => {
+    const notification = await readStreamUntilFin(stream)
+    if (notification) {
+      // App-specific notification encoding
+      const notificationMessage = decodeNotification(notification);
+      let n = new Notification(notificationMessage);
+      n.onclick = (e) => {
+        // App-specific click message encoding
+        const clickMessage = encodeClickMessage();
+        stream.getWriter().write(clickMessage);
+      };
+    }
+  })();
 }
 
 async function readStreamUntilFin(stream) {
+  const reader = stream.readable.getReader();
   const buffers = [];
   let bufferedSize = 0;
-  let finished = false;
-  while (stream.readable) {
-    await stream.waitForReadable(1);
-    const buffer = new Uint8Array(stream.readableAmount);
-    const read = stream.readInto(readBuffer);
-    buffers.push(buffer);
-    bufferedSize += read.amount;
-    finished = read.finished;
-  }
-  if (!finished) {
-    // Stream was aborted
-    return null;
+  while (true) {
+    const {value: chunk, done} = await reader.read();
+    if (done)  {
+      break;
+    }
+    buffers.push(chunk);
+    bufferedSize += chunk.byteLength;
   }
 
   let joinedBuffer = new Uint8Array(bufferedSize);
@@ -213,17 +193,20 @@ async function readStreamUntilFin(stream) {
 ```javascript
 const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
-mediaSource.onsourceopen = (e) => {
+mediaSource.onsourceopen = async (e) => {
   const sourceBuffer = mediaSource.addSourceBuffer(mime);
   
   const transport = new Http3Transport("/video");
-  while (transport.state == "connecting" || transport.state == "connected") {
-    const datagrams = await transport.receiveDatagrams();
-    for (let data of datagrams) {
-      if (data) {
-        const chunk = ccontainerizeMedia(data);
-        sourceBuffer.appendBuffer(chunk);
+  if (transport) {
+    await fetch('http://example.com/babyshark');
+    const reader = transport.receiveDatagrams().getReader();
+    while (true) {
+      const {value: datagram, done} = await reader.read();
+      if (done) {
+        break;
       }
+      const chunk = containerizeMedia(datagram);
+      sourceBuffer.appendBuffer(chunk);
     }
   }
 };
@@ -236,12 +219,8 @@ const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
 mediaSource.onsourceopen = (e) => {
   const sourceBuffer = mediaSource.addSourceBuffer(mime);
-  
   const transport = new Http3Transport("https://example.com/video");
-  transport.onunidirectionalstream = (e) => {
-    const chunk = await readStreamUntilFin(e.stream);
-    sourceBuffer.appendBuffer(chunk);
-  }
+  readAllStreams(transport.receiveStreams(), sourceBuffer.appendBuffer);
 };
 ```
 
