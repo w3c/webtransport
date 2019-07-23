@@ -987,10 +987,9 @@ dictionary WebTransportCloseInfo {
   </section>
 
   <section id="quic-transport-base*">
-    <h2><dfn>QuicTransportBase</dfn> Interface</h2>
-    <p>The <code>QuicTransportBase</code> is the base interface
-      for <code>QuicTransport</code>.  Most of the functionality of a
-      QuicTransport is in the base class to allow for other
+    <h2><dfn>QuicTransportBase</dfn> Mixin</h2>
+    <p>The <code>QuicTransportBase</code> is the base for <code>QuicTransport</code>.
+      Most of the functionality of a QuicTransport is in the base class to allow for other
       subclasses (such as a p2p variant) to share the same interface.
     </p>
     <section id="quictransportbase-overview*">
@@ -1009,12 +1008,213 @@ dictionary WebTransportCloseInfo {
       <div>
         <pre class="idl">
 interface QuicTransportBase {
+    Promise&lt;QuicTransportStats&gt; getStats();
 };
 
 QuicTransportBase includes UnidirectionalStreamsTransport;
 QuicTransportBase includes BidirectionalStreamsTransport;
 QuicTransportBase includes DatagramTransport;
 QuicTransportBase includes WebTransport;</pre>
+      </div>
+    </section>
+    <section>
+      <h2>Methods</h2>
+      <dl data-link-for="QuicTransportBase" data-dfn-for="QuicTransportBase" class=
+      "methods">
+       <dt><dfn><code>getStats</code></dfn></dt>
+        <dd>
+        <p>Gathers stats for this <code><a>QuicTransportBase</a></code>'s QUIC connection and reports
+        the result asynchronously.</p>
+          <p>When <code>getStats</code> is called, the user agent <em class="rfc2119" title="MUST">MUST</em>
+          run the following steps:</p>
+          <ol>
+            <li>Let <var>transport</var> be the <code><a>QuicTransportBase</a></code>
+            on which <code>getStats</code> is invoked.</li>
+            <li>If <var>transport</var>'s <a>[[\WebTransportState]]</a> is <code>"new"</code>
+            then abort these steps.</li>
+            <li>Return <var>p</var> and continue the following steps in the background.</li>
+            <ol>
+              <li>Gather the stats from the underlying QUIC connection.</li>
+              <li>Once stats have been gathered, resolve <var>p</var> with the
+              <code><a>QuicTransportStats</a></code> object, representing the gathered
+              stats</li>
+            </ol>
+          </ol>
+          <div>
+            <em>No parameters.</em>
+          </div>
+          <div>
+            <em>Return type:</em> <code><a>QuicTransportStats</a></code>
+          </div>
+        </dd>
+    </section>
+    <section id="quictransportstats*">
+      <h3><dfn>QuicTransportStats</dfn> Dictionary</h3>
+      <p>The <code>QuicTransportStats</code> dictionary includes information
+      QUIC connection level stats.
+      <div>
+        <pre class="idl">
+dictionary QuicTransportStats {
+  DOMHighResTimeStamp timestamp;
+  unsigned long long bytesSent;
+  unsigned long long packetsSent;
+  unsigned long long streamBytesSent;
+  unsigned long long streamBytesReceived;
+  unsigned long numOutgoingStreamsCreated;
+  unsigned long numIncomingStreamsCreated;
+  unsigned long long bytesReceived;
+  unsigned long long packetsReceived;
+  unsigned long long packetsProcessed;
+  unsigned long long bytesRetransmitted;
+  unsigned long long packetsRetransmitted;
+  unsigned long long packetsLost;
+  unsigned long long packetsDropped;
+  unsigned long long cryptoRetransmitCount;
+  unsigned long long minRttUs;
+  unsigned long long smoothedRttUs;
+  unsigned short maxPacketSize;
+  unsigned short maxReceivedPacketSize;
+  unsigned long estimatedBandwidthBps;
+  unsigned long long packetsReordered;
+  unsigned long long blockedFramesReceived;
+  unsigned long long blockedFramesSent;
+  unsigned long long connectivityProbingPacketsReceived;
+};</pre>
+        <section>
+          <h2>Dictionary <a class="idlType">QuicTransportStats</a> Members</h2>
+          <dl data-link-for="QuicTransportStats" data-dfn-for="QuicTransportStats" class=
+          "dictionary-members">
+            <dt><dfn><code>timestamp</code></dfn> of type <span class=
+            "idlMemberType"><a>DOMHighResTimeStamp</a></span></dt>
+            <dd>
+              <p>The <code>timestamp</code> for when the stats are gathered, relative to the
+              UNIX epoch (Jan 1, 1970, UTC)</p>
+            </dd>
+            <dt><dfn><code>bytesSent</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of bytes sent on the QUIC connection, including
+              retransmissions.</p>
+            </dd>
+            <dt><dfn><code>packetsSent</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of packets sent</code> on the QUIC connection, including
+              retransmissions.</p>
+            </dd>
+            <dt><dfn><code>streamBytesSent</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of stream bytes sent on the QUIC connection, not including
+              retransmissions.</p>
+            </dd>
+            <dt><dfn><code>streamBytesReceived</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of stream bytes received on the QUIC connection, not including
+              retransmissions.</p>
+            </dd>
+            <dt><dfn><code>numOutgoingStreamsCreated</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long</a></span></dt>
+            <dd>
+              <p>The amount of outgoing QUIC streams created on the QUIC connection.</p>
+            </dd>
+            <dt><dfn><code>numIncomingStreamsCreated</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long</a></span></dt>
+            <dd>
+              <p>The amount of incoming QUIC streams created on the QUIC connection.</p>
+            </dd>
+            <dt><dfn><code>bytesReceived</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of total bytes received on the QUIC connection, including
+              duplicate data for streams.</p>
+            </dd>
+            <dt><dfn><code>packetsReceived</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of total bytes received on the QUIC connection, including
+              packets that were not processable.</p>
+            </dd>
+            <dt><dfn><code>packetsProcessed</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of total packets processed on the QUIC connection.</p>
+            </dd>
+            <dt><dfn><code>bytesRetransmitted</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of bytes retransmitted on the QUIC connection.</p>
+            </dd>
+            <dt><dfn><code>packetsRetransmitted</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of packets retransmitted on the QUIC connection.</p>
+            </dd>
+            <dt><dfn><code>packetsLost</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of packets abandoned as lost determined by the loss detection
+              algorithm.</p>
+            </dd>
+            <dt><dfn><code>packetsDropped</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of packets dropped.</p>
+            </dd>
+            <dt><dfn><code>cryptoRetransmitCount</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The amount of crypto retransmissions.</p>
+            </dd>
+            <dt><dfn><code>minRttUs</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The minimum RTT in microseconds.</p>
+            </dd>
+            <dt><dfn><code>smoothedRttUs</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>The smoothed RTT in microseconds.</p>
+            </dd>
+            <dt><dfn><code>maxPacketSize</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned short</a></span></dt>
+            <dd>
+              <p>The maximum packet size to be sent on a QUIC connection.</p>
+            </dd>
+            <dt><dfn><code>maxReceivedPacketSize</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned short</a></span></dt>
+            <dd>
+              <p>The maximum received packet size on a QUIC connection.</p>
+            </dd>
+            <dt><dfn><code>estimatedBandwidthBps</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long</a></span></dt>
+            <dd>
+              <p>The estimated bandwidth in bits per second determined by the QUIC
+              connection.</p>
+            </dd>
+            <dt><dfn><code>packetsReordered</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>Number of packets received out of packet number order.</p>
+            </dd>
+            <dt><dfn><code>blockedFramesReceived</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>Number of blocked frames received.</p>
+            </dd>
+            <dt><dfn><code>blockedFramesSent</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>Number of blocked frames sent.</p>
+            </dd>
+            <dt><dfn><code>connectivityProbingPacketsReceived</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long long</a></span></dt>
+            <dd>
+              <p>Number of connectivity probing packets received.</p>
+            </dd>
+          </dl>
+        </section>
       </div>
     </section>
   </section>
