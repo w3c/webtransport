@@ -94,7 +94,7 @@
     <pre class="idl">
 interface mixin UnidirectionalStreamsTransport {
   Promise&lt;SendStream&gt; createSendStream (optional SendStreamParameters parameters);
-  ReadableStream receiveStreams ();
+  ReadableStream            receiveStreams ();
 };</pre>
     <section>
       <h2>Methods</h2>
@@ -285,7 +285,7 @@ interface mixin UnidirectionalStreamsTransport {
     <pre class="idl">
 interface BidirectionalStreamsTransport {
     Promise&lt;BidirectionalStream&gt; createBidirectionalStream ();
-    ReadableStream receiveBidirectionalStreams ();
+    ReadableStream                     receiveBidirectionalStreams ();
 };</pre>
     <section>
       <h2>Methods</h2>
@@ -420,6 +420,7 @@ interface BidirectionalStreamsTransport {
             <code><a>BidirectionalStream</a></code> object.</p>
           </li>
           <li>
+            ***
             <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\IncomingStreams]]</a>
             internal slot. </p>
           </li>
@@ -452,8 +453,7 @@ interface mixin DatagramTransport {
     ***
     Promise&lt;void&gt                        readyToSendDatagram ();
     Promise&lt;boolean&gt                     sendDatagram (Uint8Array data);
-    ***
-    Promise&lt;sequence&lt;Uint8Array&gt;&gt; receiveDatagrams ();
+    ReadableStream receiveDatagrams ();
 };</pre>
     <section>
       <h2>Attributes</h2>
@@ -596,19 +596,12 @@ interface mixin DatagramTransport {
         </dd>
         <dt><dfn><code>receiveDatagrams</code></dfn></dt>
         <dd>
-          <p>If datagrams have been received since the last call to receiveDatagrams(),
-             return a new promise resolved with all of the received datagrams. </p>
-          <p>If not, return a new promise that will resolve when more datagrams are received,
-              resolved with all datagrams received. </p>
-          <p>If too many datagrams are queued between calls to receiveDatagrams(),
-             the implementation may drop datagrams and replace them with a null value
-             in the sequence of datagrams returned in the next call to receiveDatagrams().
-             One null value may represent many dropped datagrams.<p>
-          <p>receiveDatagrams() may only be called once at a time.
-             If a promised returned from a previous call is still unresolved,
-             the user agent MUST return a new promise rejected with an InvalidStateError. </p>
+          <p>Return the value of the <dfn>[[\ReceivedDatagrams]]</dfn> internal slot.</p>
+          <p>If too many datagrams are queued in the returned stream because the stream
+             is not being read as quickly as they are received over the network,
+             the implementation may drop datagrams to avoid queueing.<p>
           <div>
-            <em>Return type:</em> <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;</code>
+            <em>Return type:</em> <code>ReadableStream</code>
           </div>
         </dd>
       </dl>
@@ -772,6 +765,7 @@ enum WebTransportState {
                 <ol>
                   <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>.
                   <li>For each <code><a>IncomingStream</a></code> in <var>transport</var>'s
+                  ***
                   <a>[[\IncomingStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
@@ -780,6 +774,7 @@ enum WebTransportState {
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
+                    ***
                     <a>[[\IncomingStreams]]</a> internal slot.
                   </ol>
                   <li>For each <code><a>OutgoingStream</a></code> in <var>transport</var>'s
@@ -808,6 +803,7 @@ enum WebTransportState {
                 <ol>
                   <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>.
                   <li>For each <code><a>IncomingStream</a></code> in <var>transport</var>'s
+                  ***
                   <a>[[\IncomingStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
@@ -816,6 +812,7 @@ enum WebTransportState {
                     <code>false</code>.</li>
                     <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
+                    ***
                     <a>[[\IncomingStreams]]</a> internal slot.
                   </ol>
                   <li>For each <code><a>OutgoingStream</a></code> in <var>transport</var>'s
@@ -930,6 +927,7 @@ interface QuicTransport : QuicTransportBase {
             internal slot representing a sequence of <code><a>OutgoingStream</a></code>
             objects, initialized to empty.
             </li>
+            ***
             <li>Let <var>transport</var> have a <dfn>[[\IncomingStreams]]</dfn>
             internal slot representing a sequence of <code><a>IncomingStream</a></code>
             objects, initialized to empty.
@@ -939,8 +937,10 @@ interface QuicTransport : QuicTransportBase {
               internal slot, initialized to <code>"connecting"</code>.
             </li>
             <li>Let <var>transport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
-              internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
+              internal slot representing a <code>ReadableStream</code> of <code>Uint8Array</code>s,
+              initialized to empty.
             </li>
+            ***
             <li>Let <var>transport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
               internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
               initialized to null.
@@ -1388,6 +1388,7 @@ interface mixin IncomingStream {
               <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
+              ***
               <a>[[\IncomingStreams]]</a> internal slot.</li>
               <li><a>resolve</a> the promise with the resulting
               <code><a>StreamAbortInfo</a></code> with <code>errorCode</code>
@@ -1431,6 +1432,7 @@ interface mixin IncomingStream {
                 <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
                 which the <var>stream</var> was created from.
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
+                ***
                 <a>[[\IncomingStreams]]</a> internal slot.</li>
               </ol>
               <li>Else, set <var>result</var>'s <code>finished</code> to false.</li>
@@ -1477,6 +1479,7 @@ interface mixin IncomingStream {
               <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
+              ***
               <a>[[\IncomingStreams]]</a> internal slot.</li>
               <li>Let <var>abortInfo</var> be the first argument.</li>
               <li>Start the closing procedure by sending a message to the remote side indicating
@@ -1711,13 +1714,16 @@ Http3Transport includes WebTransport;</pre>
               internal slot representing a sequence of <code><a>OutgoingStream</a></code>
               objects, initialized to empty.
             </li>
+            ***
             <li>Let <var>transport</var> have a <a>[[\IncomingStreams]]</a>
               internal slot representing a sequence of <code><a>IncomingStream</a></code>
               objects, initialized to empty.
             </li>
-            <li>Let <var>transport</var> have a <a>[[\ReceivedDatagrams]]</a>
-                internal slot representing a queue of <code>Uint8Array</code>, initialized to empty.
+            <li>Let <var>transport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
+              internal slot representing a <code>ReadableStream</code> of <code>Uint8Array</code>s,
+              initialized to empty.
             </li>
+            ***
             <li>Let <var>transport</var> have a <a>[[\ReceiveDatagramsPromise]]</a>
                 internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
                 initialized to null.
@@ -1880,6 +1886,7 @@ Http3Transport includes WebTransport;</pre>
           script in response to the remote peer creating a send-only stream and
           sending data on it. Prior to <code><a>receivestream</a></code>
           firing, the <code><a>ReceiveStream</a></code> is added to
+          ***
           <code><a>WebTransport</a></code>'s <a>[[\IncomingStreams]]</a>
           internal slot.</td>
         </tr>
@@ -1890,6 +1897,7 @@ Http3Transport includes WebTransport;</pre>
           script in response to the remote peer creating a bidirectional stream and
           sending data on it. Prior to <code><a>bidirectionalstream</a></code>
           firing, the <code><a>BidirectionalStream</a></code> is added to the
+          ***
           <code><a>WebTransport</a></code>'s <a>[[\IncomingStreams]]</a>
           and <a>[[\OutgoingStreams]]</a> internal slots.</td>
         </tr>
