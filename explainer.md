@@ -122,7 +122,7 @@ mediaSource.onsourceopen = async (e) => {
   const requestStream = await transport.createSendStream();
   requestStream.writable.getWriter().write(mediaRequest);
 
-  readAllStreams(transport.receiveStreams, sourceBuffer.appendBuffer);
+  readAllStreams(transport.receiveStreams(), sourceBuffer.appendBuffer);
 };
 
 async function readAllStreams(streams, f) {

@@ -94,24 +94,8 @@
     <pre class="idl">
 interface mixin UnidirectionalStreamsTransport {
   Promise&lt;SendStream&gt; createSendStream (optional SendStreamParameters parameters);
-  attribute EventHandler    onreceivestream;
+  ReadableStream receiveStreams();
 };</pre>
-    <section>
-      <h2>Attributes</h2>
-      <dl data-link-for="UnidirectionalStreamsTransport" data-dfn-for="UnidirectionalStreamsTransport" class=
-      "attributes">
-        <dt><dfn><code>onreceivestream</code></dfn> of type <span class=
-          "idlAttrType"><a>EventHandler</a></span></dt>
-        <dd>
-          <p>This event handler, of event handler event type
-          <code><a>receivestream</a></code>,
-          <em class="rfc2119" title="MUST">MUST</em> be fired on when data is received
-          from a newly created remote <code><a>ReceiveStream</a></code> for the
-          first time.
-          </p>
-        </dd>
-      </dl>
-    </section>
     <section>
       <h2>Methods</h2>
       <dl data-link-for="UnidirectionalStreamsTransport" data-dfn-for="UnidirectionalStreamsTransport" class=
@@ -194,6 +178,47 @@ interface mixin UnidirectionalStreamsTransport {
           </div>
         </dd>
       </dl>
+
+       <dt><dfn><code>receiveStreams</code></dfn></dt>
+          <dd>
+          <p>Returns a <code><a>ReadableStream</a></code> of <code><a>ReceiveStream</a></code>s
+          that have been received from the remote host.</p>
+          <p>When <code>receiveStreams</code> is called, the user agent
+          <em class="rfc2119" title="MUST">MUST</em> run the following
+          steps:</p>
+          <ol>
+            <li>
+              <p>Let <var>transport</var> be the <code><a>UnidirectionalStreamsTransport</a></code>
+              on which <code>receiveStreams</code> is invoked.</p>
+            </li>
+            <li>
+              <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
+              <code>"failed"</code>, throw a
+              newly created <code>InvalidStateError</code> and abort these steps.</p>
+            </li>
+            <li>
+              <p>Let <var>s</var> be a new ReadableStream.</p>
+            </li>
+            <li>
+              <p>Return <var>s</var> and continue the following steps in
+              the background.</p>
+            </li>
+            <li>
+              <p>
+                  Whenever a new unidirectional stream is received from the remote
+                  host (for QUIC, this is when data is first received for a new unidirectional stream), 
+                  create a new <code><a>ReceiveStream</a></code> and insert it into <code>s</code>.
+              </p>
+            </li>
+          </ol>
+          <div>
+            <em>No parameters.</em>
+          </div>
+          <div>
+            <em>Return type:</em> <code><a>ReadableStream</a></code>
+          </div>
+        </dd>
+      </dl>
     </section>
     <section id="UnidirectionalStreamsTransport-procedures*">
       <h3>Procedures</h3>
@@ -248,89 +273,6 @@ interface mixin UnidirectionalStreamsTransport {
         </section>
       </div>
     </section>
-    <section>
-      <h3><dfn>ReceiveStreamEvent</dfn></h3>
-      <p>The <code><a>receivestream</a></code> event uses the
-      <code><a>ReceiveStreamEvent</a></code> interface.</p>
-      <div>
-        <pre class="idl">
-        [ Constructor (DOMString type, ReceiveStreamEventInit eventInitDict), Exposed=Window]
-interface ReceiveStreamEvent : Event {
-    readonly attribute ReceiveStream stream;
-};</pre>
-        <section>
-          <h2>Constructors</h2>
-          <dl data-link-for="ReceiveStreamEvent" data-dfn-for="ReceiveStreamEvent"
-          class="constructors">
-            <dt><code>ReceiveStreamEvent</code></dt>
-            <dd>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">type</td>
-                    <td class="prmType"><code>DOMString</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                  <tr>
-                    <td class="prmName">eventInitDict</td>
-                    <td class="prmType"><code><a>ReceiveStreamEventInit</a></code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-            </dd>
-          </dl>
-        </section>
-        <section>
-          <h2>Attributes</h2>
-          <dl data-link-for="ReceiveStreamEvent" data-dfn-for="ReceiveStreamEvent"
-          class="attributes">
-            <dt><code>stream</code> of type <span class=
-            "idlAttrType"><a>ReceiveStream</a></span>, readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-receivequicstreamevent-stream"><code>stream</code></dfn>
-              attribute represents the <code><a>ReceiveStream</a></code> object
-              associated with the event.</p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-      <div>
-        <p>The <dfn><code>ReceiveStreamEventInit</code></dfn> dictionary includes
-          information on the configuration of the stream.</p>
-        <pre class="idl">
-dictionary ReceiveStreamEventInit : EventInit {
-              ReceiveStream stream;
-};</pre>
-        <section>
-          <h2>Dictionary ReceiveStreamEventInit Members</h2>
-          <dl data-link-for="ReceiveStreamEventInit" data-dfn-for=
-          "ReceiveStreamEventInit" class="dictionary-members">
-            <dt><dfn><code>stream</code></dfn> of type <span class=
-            "idlMemberType"><a>ReceiveStream</a></span></dt>
-            <dd>
-              <p>The <code><a>ReceiveStream</a></code> object associated with the
-              event.</p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-    </section>
   </section>
 
   <section id="bidirectional-streams-transport*">
@@ -345,6 +287,7 @@ dictionary ReceiveStreamEventInit : EventInit {
     <pre class="idl">
 interface BidirectionalStreamsTransport {
     Promise&lt;BidirectionalStream&gt; createBidirectionalStream ();
+    ***
     attribute EventHandler             onbidirectionalstream;
 };</pre>
     <section>
@@ -475,6 +418,7 @@ interface BidirectionalStreamsTransport {
       </section>
     </section>
     <section>
+      ***
       <h3><dfn>BidirectionalStreamEvent</dfn></h3>
       <p>The <code><a>bidirectionalstream</a></code> event uses the
       <code><a>BidirectionalStreamEvent</a></code> interface.</p>
@@ -540,6 +484,7 @@ interface BidirectionalStreamEvent : Event {
           <p>The <dfn><code>BidirectionalStreamEventInit</code></dfn> dictionary includes
           information on the configuration of the stream.</p>
         <pre class="idl">
+          ***
 dictionary BidirectionalStreamEventInit : EventInit {
     BidirectionalStream stream;
 };</pre>
@@ -569,8 +514,10 @@ dictionary BidirectionalStreamEventInit : EventInit {
       <pre class="idl">
 interface mixin DatagramTransport {
     readonly attribute unsigned short         maxDatagramSize;
+    ***
     Promise&lt;void&gt                        readyToSendDatagram ();
     Promise&lt;boolean&gt                     sendDatagram (Uint8Array data);
+    ***
     Promise&lt;sequence&lt;Uint8Array&gt;&gt; receiveDatagrams ();
 };</pre>
     <section>
@@ -1141,6 +1088,7 @@ interface QuicTransport : QuicTransportBase {
       <pre class="idl">
       [ Exposed=Window ]
 interface mixin OutgoingStream {
+    ***
     readonly attribute boolean writable;
     readonly attribute unsigned long writeBufferedAmount;
     readonly attribute Promise&lt;StreamAbortInfo&gt; writingAborted;
@@ -1384,6 +1332,7 @@ interface mixin OutgoingStream {
         relating to the data to be written with <code><a>OutgoingStream</a>.write</code>.</p>
         <div>
           <pre class="idl">
+            ***
 dictionary StreamWriteParameters {
   Uint8Array data;
   boolean finished = false;
@@ -1443,6 +1392,7 @@ dictionary StreamWriteParameters {
       <pre class="idl">
 [ Exposed=Window ]
 interface mixin IncomingStream {
+    ***
     readonly attribute boolean readable;
     readonly attribute unsigned long readableAmount;
     readonly attribute Promise&lt;StreamAbortInfo&gt; readingAborted;
@@ -2036,6 +1986,7 @@ for (msg in messages) {
       ignored in this example).</p>
       <pre class="example highlight">
 const transport = getTransport();
+***
 const datagrams = getDatagramsToSend();
 datagrams.forEach((datagram) => {
   await transport.readyToSendDatagram();
@@ -2053,6 +2004,7 @@ datagrams.forEach((datagram) => {
 // Sends datagrams every 100 ms.
 const transport = getTransport();
 setInterval(() => {
+  ***
   transport.sendDatagram(createDatagram());
 }, 100);</pre>
     </section>
@@ -2065,6 +2017,7 @@ setInterval(() => {
       </p>
       <pre class="example highlight">
       const transport = getTransport();
+      ***
       const datagrams = await transport.receiveDatagrams();
       for (let data of datagrams) {
         if (data == null) {
