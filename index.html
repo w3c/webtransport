@@ -94,14 +94,14 @@
     <pre class="idl">
 interface mixin UnidirectionalStreamsTransport {
   Promise&lt;SendStream&gt; createSendStream (optional SendStreamParameters parameters);
-  ReadableStream receiveStreams();
+  ReadableStream receiveStreams ();
 };</pre>
     <section>
       <h2>Methods</h2>
       <dl data-link-for="UnidirectionalStreamsTransport" data-dfn-for="UnidirectionalStreamsTransport" class=
       "methods">
         <dt><dfn><code>createSendStream</code></dfn></dt>
-          <dd>
+        <dd>
           <p>Creates an <code><a>SendStream</a></code> object.</p>
           <p>When <code>createSendStream</code> is called, the user agent
           <em class="rfc2119" title="MUST">MUST</em> run the following
@@ -177,10 +177,8 @@ interface mixin UnidirectionalStreamsTransport {
             <em>Return type:</em> <code><a>Promise&lt;SendStream&gt;</a></code>
           </div>
         </dd>
-      </dl>
-
-       <dt><dfn><code>receiveStreams</code></dfn></dt>
-          <dd>
+        <dt><dfn><code>receiveStreams</code></dfn></dt>
+        <dd>
           <p>Returns a <code><a>ReadableStream</a></code> of <code><a>ReceiveStream</a></code>s
           that have been received from the remote host.</p>
           <p>When <code>receiveStreams</code> is called, the user agent
@@ -287,30 +285,13 @@ interface mixin UnidirectionalStreamsTransport {
     <pre class="idl">
 interface BidirectionalStreamsTransport {
     Promise&lt;BidirectionalStream&gt; createBidirectionalStream ();
-    ***
-    attribute EventHandler             onbidirectionalstream;
+    ReadableStream receiveBidirectionalStreams ();
 };</pre>
-    <section>
-      <h2>Attributes</h2>
-      <dl data-link-for="BidirectionalStreamsTransport" data-dfn-for="BidirectionalStreamsTransport" class=
-      "attributes">
-        <dt><dfn><code>onbidirectionalstream</code></dfn> of type <span class=
-        "idlAttrType"><a>EventHandler</a></span></dt>
-        <dd>
-          <p>This event handler, of event handler event type
-          <code><a>bidirectionalstream</a></code>,
-          <em class="rfc2119" title="MUST">MUST</em> be fired when data is received
-          from a newly created remote <code><a>BidirectionalStream</a></code> for the
-          first time.
-          </p>
-        </dd>
-      </dl>
-    </section>
     <section>
       <h2>Methods</h2>
       <dl data-link-for="BidirectionalStreamsTransport" data-dfn-for="BidirectionalStreamsTransport" class=
       "methods">
-       <dt><dfn><code>createBidirectionalStream</code></dfn></dt>
+        <dt><dfn><code>createBidirectionalStream</code></dfn></dt>
         <dd>
           <p>Creates an <code><a>BidirectionalStream</a></code> object.</p>
           <p>When <code>createBidectionalStream</code> is called, the user agent
@@ -385,6 +366,45 @@ interface BidirectionalStreamsTransport {
             <em>Return type:</em> <code><a>Promise&lt;BidirectionalStream&gt;</a></code>
           </div>
         </dd>
+        <dt><dfn><code>receiveBidirectionalStreams</code></dfn></dt>
+        <dd>
+          <p>Returns a <code><a>ReadableStream</a></code> of <code><a>BidirectionalStream</a></code>s
+          that have been received from the remote host.</p>
+          <p>When <code>receiveBidirectionalStreams</code> is called, the user agent
+          <em class="rfc2119" title="MUST">MUST</em> run the following
+          steps:</p>
+          <ol>
+            <li>
+              <p>Let <var>transport</var> be the <code><a>UnidirectionalStreamsTransport</a></code>
+              on which <code>receiveStreams</code> is invoked.</p>
+            </li>
+            <li>
+              <p>If <code><var>transport</var>'s state</code> is <code>"closed"</code> or
+              <code>"failed"</code>, throw a
+              newly created <code>InvalidStateError</code> and abort these steps.</p>
+            </li>
+            <li>
+              <p>Let <var>s</var> be a new ReadableStream.</p>
+            </li>
+            <li>
+              <p>Return <var>s</var> and continue the following steps in
+              the background.</p>
+            </li>
+            <li>
+              <p>
+                  Whenever a new bidirectional stream is received from the remote
+                  host (for QUIC, this is when data is first received for a new bidirectional stream), 
+                  create a new <code><a>BidirectionalStream</a></code> and insert it into <code>s</code>.
+              </p>
+            </li>
+          </ol>
+          <div>
+            <em>No parameters.</em>
+          </div>
+          <div>
+            <em>Return type:</em> <code><a>ReadableStream</a></code>
+          </div>
+        </dd>
       </dl>
     </section>
     <section id="BidirectionalStreamsTransport-procedures*">
@@ -416,91 +436,6 @@ interface BidirectionalStreamsTransport {
           </li>
         </ol>
       </section>
-    </section>
-    <section>
-      ***
-      <h3><dfn>BidirectionalStreamEvent</dfn></h3>
-      <p>The <code><a>bidirectionalstream</a></code> event uses the
-      <code><a>BidirectionalStreamEvent</a></code> interface.</p>
-      <div>
-        <pre class="idl">
-        [ Constructor (DOMString type, BidirectionalStreamEventInit eventInitDict), Exposed=Window]
-interface BidirectionalStreamEvent : Event {
-    readonly        attribute BidirectionalStream stream;
-};</pre>
-        <section>
-          <h2>Constructors</h2>
-          <dl data-link-for="BidirectionalStreamEvent" data-dfn-for="BidirectionalStreamEvent"
-          class="constructors">
-            <dt><code>BidirectionalStreamEvent</code></dt>
-            <dd>
-              <table class="parameters">
-                <tbody>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Optional</th>
-                    <th>Description</th>
-                  </tr>
-                  <tr>
-                    <td class="prmName">type</td>
-                    <td class="prmType"><code>DOMString</code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                  <tr>
-                    <td class="prmName">eventInitDict</td>
-                    <td class="prmType"><code><a>BidirectionalStreamEventInit</a></code></td>
-                    <td class="prmNullFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmOptFalse"><span role="img" aria-label=
-                    "False">&#10008;</span></td>
-                    <td class="prmDesc"></td>
-                  </tr>
-                </tbody>
-              </table>
-            </dd>
-          </dl>
-        </section>
-        <section>
-          <h2>Attributes</h2>
-          <dl data-link-for="BidirectionalStreamEvent" data-dfn-for="BidirectionalStreamEvent"
-          class="attributes">
-            <dt><code>stream</code> of type <span class=
-            "idlAttrType"><a>BidirectionalStream</a></span>, readonly</dt>
-            <dd>
-              <p>The <dfn id="dom-bidirectionalquicstreamevent-stream"><code>stream</code></dfn>
-              attribute represents the <code><a>BidirectionalStream</a></code> object
-              associated with the event.</p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-      <div>
-          <p>The <dfn><code>BidirectionalStreamEventInit</code></dfn> dictionary includes
-          information on the configuration of the stream.</p>
-        <pre class="idl">
-          ***
-dictionary BidirectionalStreamEventInit : EventInit {
-    BidirectionalStream stream;
-};</pre>
-        <section>
-          <h2>Dictionary BidirectionalStreamEventInit Members</h2>
-          <dl data-link-for="BidirectionalStreamEventInit" data-dfn-for=
-          "BidirectionalStreamEventInit" class="dictionary-members">
-            <dt><dfn><code>stream</code></dfn> of type <span class=
-            "idlMemberType"><a>BidirectionalStream</a></span></dt>
-            <dd>
-              <p>The <code><a>BidirectionalStream</a></code> object associated with the
-              event.</p>
-            </dd>
-          </dl>
-        </section>
-      </div>
     </section>
   </section>
 
