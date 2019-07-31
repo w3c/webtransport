@@ -719,9 +719,8 @@ interface mixin DatagramTransport {
           <p>If not, return a new promise that will resolve when more datagrams are received,
               resolved with all datagrams received. </p>
           <p>If too many datagrams are queued between calls to receiveDatagrams(),
-             the implementation may drop datagrams and replace them with a null value
-             in the sequence of datagrams returned in the next call to receiveDatagrams().
-             One null value may represent many dropped datagrams.<p>
+             the implementation may drop datagrams. This will be reflected in the
+             <code>QuicTransportStats</code>.<p>
           <p>receiveDatagrams() may only be called once at a time.
              If a promised returned from a previous call is still unresolved,
              the user agent MUST return a new promise rejected with an InvalidStateError. </p>
@@ -1079,6 +1078,7 @@ dictionary QuicTransportStats {
   unsigned long long blockedFramesReceived;
   unsigned long long blockedFramesSent;
   unsigned long long connectivityProbingPacketsReceived;
+  unsigned long numReceivedDatagramsDropped;
 };</pre>
         <section>
           <h2>Dictionary <a class="idlType">QuicTransportStats</a> Members</h2>
@@ -1094,7 +1094,7 @@ dictionary QuicTransportStats {
             "idlMemberType"><a>unsigned long long</a></span></dt>
             <dd>
               <p>The amount of bytes sent on the QUIC connection, including
-              retransmissions.</p>
+              retransmissions. Does not include UDP/IP/ethernet framing.</p>
             </dd>
             <dt><dfn><code>packetsSent</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned long long</a></span></dt>
@@ -1106,13 +1106,13 @@ dictionary QuicTransportStats {
             "idlMemberType"><a>unsigned long long</a></span></dt>
             <dd>
               <p>The amount of stream bytes sent on the QUIC connection, not including
-              retransmissions.</p>
+              retransmissions. Does not include UDP/IP/ethernet framing.</p>
             </dd>
             <dt><dfn><code>streamBytesReceived</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned long long</a></span></dt>
             <dd>
               <p>The amount of stream bytes received on the QUIC connection, not including
-              retransmissions.</p>
+              retransmissions. Does not include UDP/IP/ethernet framing.</p>
             </dd>
             <dt><dfn><code>numOutgoingStreamsCreated</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned long</a></span></dt>
@@ -1128,12 +1128,12 @@ dictionary QuicTransportStats {
             "idlMemberType"><a>unsigned long long</a></span></dt>
             <dd>
               <p>The amount of total bytes received on the QUIC connection, including
-              duplicate data for streams.</p>
+              duplicate data for streams. Does not include UDP/IP/ethernet framing.</p>
             </dd>
             <dt><dfn><code>packetsReceived</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned long long</a></span></dt>
             <dd>
-              <p>The amount of total bytes received on the QUIC connection, including
+              <p>The amount of total packets received on the QUIC connection, including
               packets that were not processable.</p>
             </dd>
             <dt><dfn><code>packetsProcessed</code></dfn> of type <span class=
@@ -1144,7 +1144,8 @@ dictionary QuicTransportStats {
             <dt><dfn><code>bytesRetransmitted</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned long long</a></span></dt>
             <dd>
-              <p>The amount of bytes retransmitted on the QUIC connection.</p>
+              <p>The amount of bytes retransmitted on the QUIC connection.
+              Does not include UDP/IP/ethernet framing.</p>
             </dd>
             <dt><dfn><code>packetsRetransmitted</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned long long</a></span></dt>
@@ -1160,7 +1161,7 @@ dictionary QuicTransportStats {
             <dt><dfn><code>packetsDropped</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned long long</a></span></dt>
             <dd>
-              <p>The amount of packets dropped.</p>
+              <p>The amount of QUIC packets ignored.</p>
             </dd>
             <dt><dfn><code>cryptoRetransmitCount</code></dfn> of type <span class=
             "idlMemberType"><a>unsigned long long</a></span></dt>
@@ -1212,6 +1213,12 @@ dictionary QuicTransportStats {
             "idlMemberType"><a>unsigned long long</a></span></dt>
             <dd>
               <p>Number of connectivity probing packets received.</p>
+            </dd>
+            <dt><dfn><code>numReceivedDatagramsDropped</code></dfn> of type <span class=
+            "idlMemberType"><a>unsigned long</a></span></dt>
+            <dd>
+              <p>The number of datagrams that were dropped, due to too many datagrams buffered
+              between calls to <code>receiveDatagrams()</code>.</p>
             </dd>
           </dl>
         </section>
