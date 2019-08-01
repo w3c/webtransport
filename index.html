@@ -509,13 +509,12 @@ interface mixin DatagramTransport {
             <em>Return type:</em> <code>WritableStream</code>
           </div>
         </dd>
-        ***
         <dt><dfn><code>receiveDatagrams</code></dfn></dt>
         <dd>
           <p>Return the value of the <dfn>[[\ReceivedDatagrams]]</dfn> internal slot.</p>
-          <p>For each datagram received, insert If too many datagrams are queued in the returned stream because the stream
-             is not being read as quickly as they are received over the network,
-             the implementation may drop datagrams to avoid queueing.<p>
+          <p>For each datagram received, insert it into <dfn>[[\ReceivedDatagrams]]</dfn>.  
+             If too many datagrams are queued because the stream
+             is not being read quickly enough, datagrams to avoid queueing.<p>
           <div>
             <em>Return type:</em> <code>ReadableStream</code>
           </div>
