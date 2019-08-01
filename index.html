@@ -62,9 +62,6 @@
       event</a></dfn> and <dfn><a href=
       "http://dev.w3.org/html5/spec/webappapis.html#networking-task-source">networking
       task source</a></dfn> are defined in [[!HTML51]].</p>
-      <p>The term <dfn>finished reading</dfn> means that the application has read all
-      available data up to the STREAM frame with the FIN bit set, which causes
-      the <a>[[\Readable]]</a> slot to be set to <code>false</code>.</p> 
       <p>The terms <dfn>event</dfn>, <dfn><a href=
       "http://dev.w3.org/html5/spec/webappapis.html#event-handlers">event
       handlers</a></dfn> and <dfn><a href=
@@ -204,7 +201,7 @@ interface mixin UnidirectionalStreamsTransport {
             <li>
               <p>
                   Whenever a new unidirectional stream is received from the remote
-                  host (for QUIC, this is when data is first received for a new unidirectional stream), 
+                  host (for QUIC, this is when data is first received for a new unidirectional stream),
                   create a new <code><a>ReceiveStream</a></code> and insert it into <code>s</code>.
               </p>
             </li>
@@ -420,7 +417,6 @@ interface BidirectionalStreamsTransport {
             <code><a>BidirectionalStream</a></code> object.</p>
           </li>
           <li>
-            ***
             <p>Add <var>stream</var> to <var>transport</var>'s <a>[[\IncomingStreams]]</a>
             internal slot. </p>
           </li>
@@ -449,11 +445,9 @@ interface BidirectionalStreamsTransport {
       </p>
       <pre class="idl">
 interface mixin DatagramTransport {
-    readonly attribute unsigned short         maxDatagramSize;
-    ***
-    Promise&lt;void&gt                        readyToSendDatagram ();
-    Promise&lt;boolean&gt                     sendDatagram (Uint8Array data);
-    ReadableStream receiveDatagrams ();
+    readonly attribute unsigned short maxDatagramSize;
+    WritableStream                    sendDatagrams ();
+    ReadableStream                    receiveDatagrams ();
 };</pre>
     <section>
       <h2>Attributes</h2>
@@ -471,133 +465,55 @@ interface mixin DatagramTransport {
       <h2>Methods</h2>
       <dl data-link-for="DatagramTransport" data-dfn-for="DatagramTransport" class=
       "methods">
-        <dt><dfn><code>readyToSendDatagram</code></dfn></dt>
+        <dt><dfn><code>sendDatagrams</code></dfn></dt>
         <dd>
-          <p>Returns a promise that will be <a>resolved</a> when the DatagramTransport can send
-          a datagram.</p>
-          <p>When <code>readyToSendDatagram</code> is called, the user agent
-          <em class="rfc2119" title="MUST">MUST</em> run the following
-          steps:</p>
-          <ol>
-            <li>
-              <p>Let <var>p</var> be a new promise.</p>
-            </li>
-            <li>
-              <p>Let <var>transport</var> be the
-              <code><a>DatagramTransport</a></code> on which
-              <code>readyToSendDatagram</code> is invoked.</p>
-            </li>
-            <li>
-              <p>Return <var>p</var> and continue the following steps in
-              the background.</p>
-            </li>
-            <ol>
-              <li>
-                <p>If <var>transport</var> can send a datagram, imediately <a>resolve</a>
-                <var>p</var> and abort these steps.</p>
-              </li>
-              <li>
-                <p>If <var>transport</var>'s state is <code>"failed"</code>
-                or <code>"closed"</code> immediately <a>reject</a> <var>p</var> with a newly
-                created <code>InvalidStateError</code> and abort these steps.</p>
-              </li>
-              <li>
-                <p>If <code>transport</code> is blocked from sending a datagram due to
-                congestion control, <a>resolve</a> <var>p</var> when <var>transport</var>
-                is no longer blocked.</p>
-              </li>
-              <li>
-                <p><a>reject</a> <var>p</var> with a newly created
-                <code>InvalidStateError</code> if the <var>transport</var>'s
-                state transitions to <code>"failed"</code> or <code>"closed"</code>.</p>
-              </li>
-            </ol>
-          </ol>
-          <div>
-            <em>No parameters.</em>
-          </div>
-          <div>
-            <em>Return type:</em> <code>Promise&lt;void&gt;</code>
-          </div>
-        </dd>
-        <dt><dfn><code>sendDatagram</code></dfn></dt>
-        <dd>
-          <p>Sends a datagram.</p>
+          <p>Sends datagrams that are written to the returned WritableStream.</p>
           <p>When <code>sendDatagram</code> is called, the user agent
           <em class="rfc2119" title="MUST">MUST</em> run the following
           steps:</p>
           <ol>
-            <li>Let <var>data</var> be the first argument.</li>
             <li>
               <p>Let <var>transport</var> be
               the <code><a>DatagramTransport</a></code> on
               which <code>sendDatagram</code> is invoked.</p>
             </li>
             <li>
-              <p>If <var>transport</var>'s state is not <code>connected</code> return
-              a promise <a>rejected</a> with a newly created
+              <p>If <var>transport</var>'s state is <code>"closed"</code>throw a newly created
               <code>InvalidStateError</code> and abort these steps.</p>
             </li>
             <li>
-              <p>If <code><var>data</var></code> is too large to fit into a
-              datagram, return a promise <a>rejected</a> with a newly created
-              <code>InvalidArgumentError</code> and abort these steps.</p>
+              <p>Let <var>s</var> be a new WritableStream of Uint8Array.</p>
             </li>
             <li>
-              <p>If <var>transport</var> is unable to send the datagram due
-              to congestion control, return a promise <a>rejected</a> with
-              a newly created <code>InvalidStateError</code> and abort
-              these steps.</p>
-            </li>
-            <li>
-              <p>Let <var>p</var> be a new promise.</p>
-            </li>
-            <li>
-              <p>Return <var>p</var> and continue the following steps in
-              the background.</p>
+              <p>Return <var>s</var> and continue the following steps in
+              the background for each <var>data</var> written to <var>s</var>.</p>
             </li>
             <ol>
+              <!-- TODO: Figure out how to indicate to JS that a datagram has been acked  
+                         or dropped. -->
+              <li>
+                <p>If <code><var>data</var></code> is too large to fit into a
+                datagram, drop it and abort these steps.</p>
+              </li>
+              <li>
+                  <p>If <var>transport</var> is unable to send the datagram due
+                  to congestion control, drop it and abort
+                  these steps.</p>
+              </li>
               <li>
                 <p>Send <var>data</var> in a datagram.</p>
               </li>
-              <li>
-                <p>When an ack is received for the sent datagram,
-                <a>resolve</a> <var>p</var> with <code>true</code>.</p>
-              </li>
-              <li>
-                <p>When the datagram is detemined to be lost, <a>resolve</a>
-                <var>p</var> with <code>false</code>.</p>
-              </li>
             </ol>
           </ol>
-          <table class="parameters">
-          <tbody>
-              <tr>
-                <th>Parameter</th>
-                <th>Type</th>
-                <th>Nullable</th>
-                <th>Optional</th>
-                <th>Description</th>
-              </tr>
-              <tr>
-                <td class="prmName">data</td>
-                <td class="prmType"><code>Uint8Array</code></td>
-                <td class="prmNullFalse"><span role="img" aria-label=
-                "False">&#10008;</span></td>
-                <td class="prmOptFalse"><span role="img" aria-label=
-                "False">&#10008;</span></td>
-                <td class="prmDesc"></td>
-              </tr>
-            </tbody>
-          </table>
           <div>
-            <em>Return type:</em> <code>Promise&lt;boolean&gt;</code>
+            <em>Return type:</em> <code>WritableStream</code>
           </div>
         </dd>
+        ***
         <dt><dfn><code>receiveDatagrams</code></dfn></dt>
         <dd>
           <p>Return the value of the <dfn>[[\ReceivedDatagrams]]</dfn> internal slot.</p>
-          <p>If too many datagrams are queued in the returned stream because the stream
+          <p>For each datagram received, insert If too many datagrams are queued in the returned stream because the stream
              is not being read as quickly as they are received over the network,
              the implementation may drop datagrams to avoid queueing.<p>
           <div>
@@ -765,16 +681,11 @@ enum WebTransportState {
                 <ol>
                   <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>.
                   <li>For each <code><a>IncomingStream</a></code> in <var>transport</var>'s
-                  ***
                   <a>[[\IncomingStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
                     <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>.</li>
-                    <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
-                    <code>false</code>.</li>
-                    <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                    ***
                     <a>[[\IncomingStreams]]</a> internal slot.
                   </ol>
                   <li>For each <code><a>OutgoingStream</a></code> in <var>transport</var>'s
@@ -782,9 +693,6 @@ enum WebTransportState {
                   following:</li>
                   <ol>
                     <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code>.</li>
-                    <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
-                    <code>false</code>.</li>
-                    <li>Clear the <var>stream</var>'s write buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
                     <a>[[\OutgoingStreams]]</a> internal slot.
                   </ol>
@@ -803,25 +711,17 @@ enum WebTransportState {
                 <ol>
                   <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>.
                   <li>For each <code><a>IncomingStream</a></code> in <var>transport</var>'s
-                  ***
                   <a>[[\IncomingStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
                     <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>.</li>
-                    <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to
-                    <code>false</code>.</li>
-                    <li>Clear the <var>stream</var>'s read buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                    ***
                     <a>[[\IncomingStreams]]</a> internal slot.
                   </ol>
                   <li>For each <code><a>OutgoingStream</a></code> in <var>transport</var>'s
                   <a>[[\OutgoingStreams]]</a> internal slot run the
                   following:</li>
                   <ol>
-                    <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
-                    <code>false</code>.</li>
-                    <li>Clear the <var>stream</var>'s write buffer.</li>
                     <li>Remove the <var>stream</var> from the <var>transport</var>'s
                     <a>[[\OutgoingStreams]]</a> internal slot.
                   </ol>
@@ -936,15 +836,15 @@ interface QuicTransport : QuicTransportBase {
               Let <var>transport</var> have a <dfn>[[\WebTransportState]]</dfn>
               internal slot, initialized to <code>"connecting"</code>.
             </li>
+            <li>Let <var>transport</var> have a <dfn>[[\SentDatagrams]]</dfn>
+              internal slot representing a <code>WritableStream</code> of <code>Uint8Array</code>s,
+              initialized to empty.
+            </li>
             <li>Let <var>transport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
               internal slot representing a <code>ReadableStream</code> of <code>Uint8Array</code>s,
               initialized to empty.
             </li>
             ***
-            <li>Let <var>transport</var> have a <dfn>[[\ReceiveDatagramsPromise]]</dfn>
-              internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
-              initialized to null.
-            </li>
             <li>Run these steps in parallel:
               <ol>
                 <li>
@@ -1037,25 +937,12 @@ interface mixin OutgoingStream {
         the following:</p>
         <ol>
           <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code>.</li>
-          <li>Let <var>stream</var> have a <dfn>[[\Writable]]</dfn> internal
-          slot initialized to <code>true</code>.</li>
-          <li>Let <var>stream</var> have a <dfn>[[\WriteBufferedAmount]]</dfn> internal
-          slot initialized to zero.</li>
         </ol>
       </section>
       <section>
         <h3>Attributes</h3>
         <dl data-link-for="OutgoingStream" data-dfn-for="OutgoingStream" class=
         "attributes">
-          <dt><code>writable</code> of type <span class="idlAttrType"><a>boolean</a></span>
-          readonly</dt>
-          <dd>
-            <p>The <dfn id="dom-outgoingstream-writable"><code>writable</code></dfn>
-            attribute represents whether data can be written to the
-            <code><a>OutgoingStream</a></code>. On getting it
-            <em class="rfc2119" title="MUST">MUST</em> return the value of the
-            <a>[[\Writable]]</a> slot.</p>
-          </dd>
           <dt><code>writeBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
           long</a></span>, readonly</dt>
           <dd>
@@ -1082,8 +969,6 @@ interface mixin OutgoingStream {
             <em class="rfc2119" title="MUST">MUST</em> run the following:
             <ol>
               <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code> object.
-              <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
-              <li>Clear the <var>stream</var>'s write buffer.</li>
               <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
@@ -1115,8 +1000,6 @@ interface mixin OutgoingStream {
               <li>if length of <var>data</var>.data is 0 and <var>data</var>.finished is
               <code>false</code>, <a>throw</a> a <code>NotSupportedError</code> and abort
               these steps.</li>
-              <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
-              <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
               <li>Increase the value of <var>stream</var>'s
               <a>[[\WriteBufferedAmount]]</a> slot by the length of
               <var>data</var>.data in bytes.</li>
@@ -1127,8 +1010,6 @@ interface mixin OutgoingStream {
               <ol>
                 <li>Queue a message with an indication that this is the last data for the stream (
                   for QUIC, this is a STREAM frame with the FIN bit set.)</li>
-                <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to
-                <code>false</code>.</li>
                 <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
                 which the <var>stream</var> was created from.</li>
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
@@ -1174,10 +1055,6 @@ interface mixin OutgoingStream {
             <ol>
               <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code> object
               which is about to abort writing.</li>
-              <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is <code>false</code>,
-              <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
-              <li>Set <var>stream</var>'s <a>[[\Writable]]</a> slot to <code>false</code>.</li>
-              <li>Clear the <var>stream</var>'s write buffer.</li>
               <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.</li>
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
@@ -1208,55 +1085,6 @@ interface mixin OutgoingStream {
             </table>
             <div>
               <em>Return type:</em> <code>void</code>
-            </div>
-          </dd>
-          <dt><dfn><code>waitForWriteBufferedAmountBelow</code></dfn></dt>
-          <dd>
-            <p><code>waitForWriteBufferedAmountBelow</code> <a>resolves</a> the promise when
-            the data queued in the write buffer falls below the given threshold.
-            If <code>waitForWriteBufferedAmountBelow</code>
-            is called multiple times, multiple promises could be resolved when the
-            write buffer falls below the threshold for each promise. The Promise will
-            be <a>rejected</a> with a newly created <code>InvalidStateError</code> if the
-            <var>stream</var>'s <a>[[\Writable]]</a> slot transitions from true to false
-            and the promise isn't <a>settled</a>. When the <code>waitForWriteBufferedAmountBelow</code> method
-            is called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em> run
-            the following steps:</p>
-            <ol>
-              <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code>
-              object on which <code>waitForWriteBufferedAmountBelow</code> was invoked.</li>
-              <li>Let <var>p</var> be a new promise.</li>
-              <li>If <var>stream</var>'s <a>[[\Writable]]</a> slot is
-              <code>false</code>, <a>reject</a> <var>p</var> with a
-              newly created <code>InvalidStateError</code> and abort
-              these steps.</li>
-              <li>Let <var>threshold</var> be the first argument.</li>
-              <li>When <var>stream</var>'s <a>[[\WriteBufferedAmount]]]</a> slot decreases
-              from above <var>threshold</var> to less than or equal to it,
-              <a>resolve</a> <var>p</var> with <code>undefined</code>.</li>
-            </ol>
-            <table class="parameters">
-              <tbody>
-                <tr>
-                  <th>Parameter</th>
-                  <th>Type</th>
-                  <th>Nullable</th>
-                  <th>Optional</th>
-                  <th>Description</th>
-                </tr>
-                <tr>
-                  <td class="prmName">threshold</td>
-                  <td class="prmType"><code>unsigned long</code></td>
-                  <td class="prmNullFalse"><span role="img" aria-label=
-                  "False">&#10008;</span></td>
-                  <td class="prmOptFalse"><span role="img" aria-label=
-                  "False">&#10008;</span></td>
-                  <td class="prmDesc"></td>
-                </tr>
-              </tbody>
-            </table>
-            <div>
-              <em>Return type:</em> <code>Promise&lt;void&gt;</code>
             </div>
           </dd>
         </dl>
@@ -1341,36 +1169,13 @@ interface mixin IncomingStream {
         the following:</p>
         <ol>
           <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>.</li>
-          <li>Let <var>stream</var> have a <dfn>[[\Readable]]</dfn> internal
-          slot initialized to <code>true</code>.</li>
-          <li>Let <var>stream</var> have a <dfn>[[\ReadableAmount]]</dfn> internal
-          slot initialized to zero.</li>
+          ***
         </ol>
       </section>
       <section>
         <h3>Attributes</h3>
         <dl data-link-for="IncomingStream" data-dfn-for="IncomingStream" class=
         "attributes">
-          <dt><code>readable</code> of type <span class="idlAttrType"><a>boolean</a></span>,
-          readonly</dt>
-          <dd>
-            <p>The <dfn id="dom-incomingstream-readableamount"><code>readable</code></dfn>
-            attribute represents whether data can be read from the <code><a>IncomingStream</a></code>.
-            On getting, it <em class="rfc2119" title="MUST">MUST</em> return the value of the
-            <code><a>IncomingStream</a></code>'s <a>[[\Readable]]</a> slot.
-          </dd>
-          <dt><code>readableAmount</code> of type <span class="idlAttrType"><a>unsigned
-          long</a></span>, readonly</dt>
-          <dd>
-            <p>The <dfn id="dom-incomingstream-readableamount"><code>readableAmount</code></dfn>
-            attribute represents the number of bytes buffered for access by
-            <code>readInto</code> but that, as of the last time the event loop
-            started executing a task, had not yet been read. This does not include
-            framing overhead incurred by the protocol, or buffers associated with
-            the network hardware. On getting, it <em class="rfc2119" title="MUST">MUST</em>
-            return the value of the <code><a>IncomingStream</a></code>'s
-            <a>[[\ReadableAmount]]</a> internal slot.</p>
-          </dd>
           <dt><code>readingAborted</code> of type <span class="idlAttriType"><a>StreamAbortInfo</a>
           readonly</dt>
           <dd>
@@ -1383,8 +1188,6 @@ interface mixin IncomingStream {
             <ol>
               <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>
               object for which the abort message was received.</li>
-              <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to <code>false</code>.</li>
-              <li>Clear the <var>stream</var>'s read buffer.</li>
               <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
@@ -1410,8 +1213,6 @@ interface mixin IncomingStream {
             <ol>
               <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code> object
               on which <code>readInto</code> is invoked.</li>
-              <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
-              <a>throw</a> an <code>InvalidStateError</code>, then abort these steps.</li>
               <li>Let <var>data</var> be the first argument.</li>
               <li>Let <var>result</var> be the <code><a>StreamReadResult</a></code>
               to be returned.</li>
@@ -1426,13 +1227,9 @@ interface mixin IncomingStream {
               <li>If the <var>data</var> includes up to the indication of the end of the stream
                 (for QUIC, the FIN bit), then run the following steps:</li>
               <ol>
-                <li>Set <var>result</var>'s <code>finished</code> to <code>true</code>.</li>
-                <li>Set the <var>stream</var>'s <a>[[\Readable]]</a> slot to
-                <code>false</code>.</li>
                 <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
                 which the <var>stream</var> was created from.
                 <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                ***
                 <a>[[\IncomingStreams]]</a> internal slot.</li>
               </ol>
               <li>Else, set <var>result</var>'s <code>finished</code> to false.</li>
@@ -1472,14 +1269,9 @@ interface mixin IncomingStream {
             <ol>
               <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code> object
               which is about to abort reading.</li>
-              <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is <code>false</code>,
-              <a>throw</a> an <code>InvalidStateError</code> and abort these steps.</li>
-              <li>Set <var>stream</var>'s <a>[[\Readable]]</a> slot to <code>false</code>.</li>
-              <li>Clear the <var>stream</var>'s read buffer.</li>
               <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
-              ***
               <a>[[\IncomingStreams]]</a> internal slot.</li>
               <li>Let <var>abortInfo</var> be the first argument.</li>
               <li>Start the closing procedure by sending a message to the remote side indicating
@@ -1508,66 +1300,6 @@ interface mixin IncomingStream {
             </table>
             <div>
               <em>Return type:</em> <code>void</code>
-            </div>
-          </dd>
-          <dt><dfn><code>waitForReadable</code></dfn></dt>
-          <dd>
-            <p><code>waitForReadable</code> waits for data to become available, or
-            for the <code><a>IncomingStream</a></code> to be finished reading.  It
-            <a>resolves</a> the promise when the data queued in the read buffer
-            increases above the amount provided as an argument or when a
-            message is received with an end indication (for QUIC, a STREAM frame
-            with the FIN bit set). If <code>waitForReadable</code>
-            is called multiple times, multiple promises could be resolved.
-            The Promise will be <a>rejected</a> with a newly created
-            <code>InvalidStateError</code> if the <var>stream</var>'s
-            <a>[[\Readable]]</a> slot transitions from true to false and the promise
-            isn't <a>settled</a>. When the <code>waitForReadable</code> method is
-            called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em>
-            run the following steps:</p>
-            <ol>
-              <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>
-              on which <code>waitForReadable</code> is invoked.</li>
-              <li>Let <var>p</var> be a new promise.</li>
-              <li>If <var>stream</var>'s <a>[[\Readable]]</a> slot is
-              <code>false</code>, <a>reject</a> <var>p</var> with a
-              newly created <code>InvalidStateError</code> and abort
-              these steps.</li>
-              <li>Let <var>amount</var> be the first argument.</li>
-              <li><a>Resolve</a> <var>p</var> with <code>undefined</code> when
-              any of the following conditions are met:
-                <ol>
-                  <li>The <a>[[\ReadableAmount]]</a> increases from
-                  below the value of <var>amount</var> to greater than or equal
-                  to it.</li>
-                  <li><var>stream</var> receives a STREAM frame with the
-                  FIN bit set and <a>[[\ReadableAmount]]</a> is less than
-                  <var>amount</var>.</li>
-                </ol>
-              </li>
-            </ol>
-            <table class="parameters">
-              <tbody>
-                <tr>
-                  <th>Parameter</th>
-                  <th>Type</th>
-                  <th>Nullable</th>
-                  <th>Optional</th>
-                  <th>Description</th>
-                </tr>
-                <tr>
-                  <td class="prmName">amount</td>
-                  <td class="prmType"><code>unsigned long</code></td>
-                  <td class="prmNullFalse"><span role="img" aria-label=
-                  "False">&#10008;</span></td>
-                  <td class="prmOptFalse"><span role="img" aria-label=
-                  "False">&#10008;</span></td>
-                  <td class="prmDesc"></td>
-                </tr>
-              </tbody>
-            </table>
-            <div>
-              <em>Return type:</em> <code>Promise&lt;void&gt;</code>
             </div>
           </dd>
         </dl>
@@ -1719,14 +1451,14 @@ Http3Transport includes WebTransport;</pre>
               internal slot representing a sequence of <code><a>IncomingStream</a></code>
               objects, initialized to empty.
             </li>
+            <li>Let <var>transport</var> have a <dfn>[[\SentDatagrams]]</dfn>
+              internal slot representing a <code>WritableStream</code> of <code>Uint8Array</code>s,
+              initialized to empty.
+            </li>
             <li>Let <var>transport</var> have a <dfn>[[\ReceivedDatagrams]]</dfn>
               internal slot representing a <code>ReadableStream</code> of <code>Uint8Array</code>s,
               initialized to empty.
             </li>
-            ***
-            <li>Let <var>transport</var> have a <a>[[\ReceiveDatagramsPromise]]</a>
-                internal slot representing a <code>Promise&lt;sequence&lt;Uint8Array&gt;&gt;?</code>,
-                initialized to null.
             <li>Run these steps in parallel:
               <ol>
                 <li>
