@@ -826,7 +826,6 @@ interface QuicTransport : QuicTransportBase {
             internal slot representing a sequence of <code><a>OutgoingStream</a></code>
             objects, initialized to empty.
             </li>
-            ***
             <li>Let <var>transport</var> have a <dfn>[[\IncomingStreams]]</dfn>
             internal slot representing a sequence of <code><a>IncomingStream</a></code>
             objects, initialized to empty.
@@ -843,7 +842,6 @@ interface QuicTransport : QuicTransportBase {
               internal slot representing a <code>ReadableStream</code> of <code>Uint8Array</code>s,
               initialized to empty.
             </li>
-            ***
             <li>Run these steps in parallel:
               <ol>
                 <li>
@@ -922,13 +920,9 @@ interface QuicTransport : QuicTransportBase {
       <pre class="idl">
       [ Exposed=Window ]
 interface mixin OutgoingStream {
-    ***
-    readonly attribute boolean writable;
-    readonly attribute unsigned long writeBufferedAmount;
+    readonly attribute WritableStream writable;
     readonly attribute Promise&lt;StreamAbortInfo&gt; writingAborted;
-    void write (StreamWriteParameters data);
     void abortWriting (StreamAbortInfo abortInfo);
-    Promise&lt;void&gt; waitForWriteBufferedAmountBelow(unsigned long threshold);
 };</pre>
       <section>
         <h3>Overview</h3>
@@ -936,29 +930,23 @@ interface mixin OutgoingStream {
         the following:</p>
         <ol>
           <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code>.</li>
+          <li>Let <var>stream</var> have a <dfn>[[\Writable]]</dfn> internal
+           slot initialized to a new <code>WritableStream</code>.</li>
         </ol>
       </section>
       <section>
         <h3>Attributes</h3>
         <dl data-link-for="OutgoingStream" data-dfn-for="OutgoingStream" class=
         "attributes">
-          <dt><code>writeBufferedAmount</code> of type <span class="idlAttrType"><a>unsigned
-          long</a></span>, readonly</dt>
-          <dd>
-            <p>The <dfn id="dom-outgoingstream-writable"><code>writeBufferedAmount</code></dfn>
-            attribute represents the number of bytes of application data
-            that have been queued using <code>write</code> but that, as of the last
-            time the event loop started executing a task, had not yet been transmitted
-            to the network. This includes any data sent during the execution of the
-            current task, regardless of whether the <a>user agent</a> is able to
-            transmit text asynchronously with script execution. This does not
-            include framing overhead incurred by the protocol, or buffering done
-            by the operating system or network hardware. On getting, it
-            <em class="rfc2119" title="MUST">MUST</em> return the value of the
-            <code><a>OutgoingStream</a></code>'s <a>[[\WriteBufferedAmount]]</a> internal slot.
-          </dd>
-          <dt><code>writingAborted</code> of type <span class="idlAttriType"><a>StreamAbortInfo</a>
+          <dt><code>writable</code> of type <span class="idlAttrType"><a>WritableStream</a></span>
           readonly</dt>
+          <dd>
+            <p>The <dfn id="dom-outgoingstream-writable"><code>writable</code></dfn>
+            attribute represents a WritableStream that can be used to write to the
+            <code><a>OutgoingStream</a></code>. On getting it
+            <em class="rfc2119" title="MUST">MUST</em> return the value of the
+            <a>[[\Writable]]</a> slot.</p>
+          </dd>
           <dd>
             <p>The <dfn id="dom-outgoingstream-writingAborted"><code>writingAborted</code></dfn>
             attribute represents a promise that <a>resolves</a> when the
@@ -983,67 +971,6 @@ interface mixin OutgoingStream {
         <h3>Methods</h3>
         <dl data-link-for="OutgoingStream" data-dfn-for="OutgoingStream" class=
         "methods">
-          <dt><dfn><code>write</code></dfn></dt>
-          <dd>
-            <p>Buffer the given data to be written to the network when possible.
-	    When the remote <code><a>WebTransport</a></code>
-            receives data for this stream for the first time, it will trigger the
-            creation of the corresponding remote <code>IncomingStream</code>.
-            When the <code>write</code> method is
-            called, the <a>user agent</a> <em class="rfc2119" title="MUST">MUST</em>
-            run the following steps:</p>
-            <ol>
-              <li>Let <var>data</var> be the first argument.</li>
-              <li>Let <var>stream</var> be the <code><a>OutgoingStream</a></code>
-              object on which <var>data</var> is to be sent.</li>
-              <li>if length of <var>data</var>.data is 0 and <var>data</var>.finished is
-              <code>false</code>, <a>throw</a> a <code>NotSupportedError</code> and abort
-              these steps.</li>
-              <li>Increase the value of <var>stream</var>'s
-              <a>[[\WriteBufferedAmount]]</a> slot by the length of
-              <var>data</var>.data in bytes.</li>
-              <li>Queue <var>data</var>.data for transmission on <var>stream</var>'s
-              underlying transport.</li>
-              <li>if <var>data</var>.finish is set to <code>true</code>, run the
-              following:</li>
-              <ol>
-                <li>Queue a message with an indication that this is the last data for the stream (
-                  for QUIC, this is a STREAM frame with the FIN bit set.)</li>
-                <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
-                which the <var>stream</var> was created from.</li>
-                <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                <a>[[\OutgoingStreams]]</a> internal slot.</li>
-              </ol>
-              <div class="note">The actual transmission of data occurs in
-              parallel. If sending data leads to a transport-level error, the
-              application will be notified asynchronously through the
-              <code><a>WebTransport</a></code>'s <code><a>onerror</a></code>
-              EventHandler.</div>
-            </ol>
-            <table class="parameters">
-              <tbody>
-                <tr>
-                  <th>Parameter</th>
-                  <th>Type</th>
-                  <th>Nullable</th>
-                  <th>Optional</th>
-                  <th>Description</th>
-                </tr>
-                <tr>
-                  <td class="prmName">data</td>
-                  <td class="prmType"><code>StreamWriteParameters</code></td>
-                  <td class="prmNullFalse"><span role="img" aria-label=
-                  "False">&#10008;</span></td>
-                  <td class="prmOptFalse"><span role="img" aria-label=
-                  "False">&#10008;</span></td>
-                  <td class="prmDesc"></td>
-                </tr>
-              </tbody>
-            </table>
-            <div>
-              <em>Return type:</em> <code>void</code>
-            </div>
-          </dd>
           <dt><dfn><code>abortWriting</code></dfn></dt>
           <dd>
             <p>A hard shutdown of the <code><a>OutgoingStream</a></code>. It may be called
@@ -1087,36 +1014,6 @@ interface mixin OutgoingStream {
             </div>
           </dd>
         </dl>
-      </section>
-      <section id="streamwriteparameters*">
-        <h3><dfn>StreamWriteParameters</dfn> Dictionary</h3>
-        <p>The <code>StreamWriteParameters</code> dictionary includes information
-        relating to the data to be written with <code><a>OutgoingStream</a>.write</code>.</p>
-        <div>
-          <pre class="idl">
-            ***
-dictionary StreamWriteParameters {
-  Uint8Array data;
-  boolean finished = false;
-};</pre>
-          <section>
-            <h2>Dictionary <a class="idlType">StreamWriteParameters</a> Members</h2>
-            <dl data-link-for="StreamWriteParameters" data-dfn-for="StreamWriteParameters" class=
-            "dictionary-members">
-              <dt><dfn><code>data</code></dfn> of type <span class=
-              "idlMemberType"><a>Uint8Array</a></span>.</dt>
-              <dd>
-                <p>The data to be written.</p>
-              </dd>
-              <dt><dfn><code>finished</code></dfn> of type <span class=
-              "idlMemberType">boolean</span>.</dt>
-              <dd>
-                <p>Set to <code>true</code> if this is the last data to be written.
-                For QUIC, this will result in a STREAM frame with the FIN bit set.</p>
-              </dd>
-            </dl>
-          </section>
-        </div>
       </section>
       <section id="StreamAbortInfo*">
         <h3><dfn>StreamAbortInfo</dfn> Dictionary</h3>
