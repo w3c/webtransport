@@ -1223,8 +1223,6 @@ interface mixin IncomingStream {
 
   <section id="http3-transport*">
     <h2><dfn>Http3Transport</dfn> Interface</h2>
-    <p>The <code>Http3Transport</code> is ***
-    </p>
     <section id="http3-transport-overview*">
       <h3>Overview</h3>
       <p>An <code><a>Http3Transport</a></code> is a
@@ -1470,16 +1468,14 @@ for (msg in messages) {
       <p>Sending a buffer of datagrams can be achieved by using the
       <code>sendDatagram</code> and <code>readyToSendDatagram</code> methods. In
       the following example datagrams are only sent if the
-      <code>DatagramTransport</code> is ready to send, however the sending is not
-      blocked on the ACK promise returned from <code>sendDatagram</code> (these are
-      ignored in this example).</p>
+      <code>DatagramTransport</code> is ready to send.</p>
       <pre class="example highlight">
 const transport = getTransport();
-***
+const datagramWritableStream = transport.sendDatagrams();
 const datagrams = getDatagramsToSend();
 datagrams.forEach((datagram) => {
-  await transport.readyToSendDatagram();
-  transport.sendDatagram(datagram);
+  await datagramWritableStream.ready;
+  datagramWritableStream.getWriter().write(datagram);
 });</pre>
     </section>
 
@@ -1492,9 +1488,9 @@ datagrams.forEach((datagram) => {
       <pre class="example highlight">
 // Sends datagrams every 100 ms.
 const transport = getTransport();
+const datagramWritableStream = transport.sendDatagrams();
 setInterval(() => {
-  ***
-  transport.sendDatagram(createDatagram());
+  datagramWritableStream.getWriter().write(createDatagram());
 }, 100);</pre>
     </section>
 
@@ -1506,16 +1502,14 @@ setInterval(() => {
       </p>
       <pre class="example highlight">
       const transport = getTransport();
-      ***
-      const datagrams = await transport.receiveDatagrams();
-      for (let data of datagrams) {
-        if (data == null) {
-          // Log that datagrams were lost. Look into making the event handler faster
-          // or reducing the send rate of the remote side.
-        } else {
-          // Process the data
+      const reader = transport.receiveDatagrams().getReader();
+      while (true) {
+        const {value: datagram, done} = await reader.read();
+        if (done) {
+          break;
         }
-      };
+        // Process the data
+      }
       </pre>
     </section>
   </section>
