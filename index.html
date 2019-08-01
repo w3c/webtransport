@@ -1051,13 +1051,9 @@ interface mixin OutgoingStream {
       <pre class="idl">
 [ Exposed=Window ]
 interface mixin IncomingStream {
-    ***
     readonly attribute boolean readable;
-    readonly attribute unsigned long readableAmount;
     readonly attribute Promise&lt;StreamAbortInfo&gt; readingAborted;
-    StreamReadResult readInto (Uint8Array data);
     void abortReading (StreamAbortInfo abortInfo);
-    Promise&lt;void&gt;   waitForReadable(unsigned long amount);
 };</pre>
       <section>
         <h3>Overview</h3>
@@ -1065,13 +1061,23 @@ interface mixin IncomingStream {
         the following:</p>
         <ol>
           <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code>.</li>
-          ***
+          <li>Let <var>stream</var> have a <dfn>[[\Readable]]</dfn> internal
+          slot initialized to a new <code>ReadableStream</code>.</li>
         </ol>
       </section>
       <section>
         <h3>Attributes</h3>
         <dl data-link-for="IncomingStream" data-dfn-for="IncomingStream" class=
         "attributes">
+          <dt><code>readable</code> of type <span class="idlAttrType"><a>ReadableStream</a></span>,
+          readonly</dt>
+          <dd>
+            <p>The <dfn id="dom-incomingstream-readable"><code>readable</code></dfn>
+            attribute gives a <code>ReadableStream</code> which can be used to
+            read from the <code><a>IncomingStream</a></code>.
+            On getting, it <em class="rfc2119" title="MUST">MUST</em> return the value of the
+            <code><a>IncomingStream</a></code>'s <a>[[\Readable]]</a> slot.
+          </dd>
           <dt><code>readingAborted</code> of type <span class="idlAttriType"><a>StreamAbortInfo</a>
           readonly</dt>
           <dd>
@@ -1087,7 +1093,6 @@ interface mixin IncomingStream {
               <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
               which the <var>stream</var> was created from.
               <li>Remove the <var>stream</var> from the <var>transport</var>'s
-              ***
               <a>[[\IncomingStreams]]</a> internal slot.</li>
               <li><a>resolve</a> the promise with the resulting
               <code><a>StreamAbortInfo</a></code> with <code>errorCode</code>
@@ -1100,61 +1105,6 @@ interface mixin IncomingStream {
         <h3>Methods</h3>
         <dl data-link-for="IncomingStream" data-dfn-for="IncomingStream" class=
         "methods">
-          <dt><dfn><code>readInto</code></dfn></dt>
-          <dd>
-            <p>Reads from the <code><a>IncomingStream</a></code> into the buffer specified
-            by the first argument and returns <code><a>StreamReadResult</a></code>.
-            When the <code>readInto</code> method is called, the user agent
-            <em class="rfc2119" title="MUST">MUST</em> run the following steps:</p>
-            <ol>
-              <li>Let <var>stream</var> be the <code><a>IncomingStream</a></code> object
-              on which <code>readInto</code> is invoked.</li>
-              <li>Let <var>data</var> be the first argument.</li>
-              <li>Let <var>result</var> be the <code><a>StreamReadResult</a></code>
-              to be returned.</li>
-              <li>If <var>stream</var> has <a>finished reading</a>, return
-              <var>result</var> with <code>amount</code> set to 0 and <code>finished</code> set to
-              <code>true</code> and abort these steps.</li>
-              <li>Transfer data from the read buffer into <var>data</var>.</li>
-              <li>Decrease the value of <var>stream</var>'s <a>[[\ReadableAmount]]</a>
-              slot by the length of <var>data</var> in bytes.</li>
-              <li>Set <var>result</var>'s <code>amount</code> to the size of
-              <var>data</var> in bytes.</li>
-              <li>If the <var>data</var> includes up to the indication of the end of the stream
-                (for QUIC, the FIN bit), then run the following steps:</li>
-              <ol>
-                <li>Let <var>transport</var> be the <code><a>WebTransport</a></code>,
-                which the <var>stream</var> was created from.
-                <li>Remove the <var>stream</var> from the <var>transport</var>'s
-                <a>[[\IncomingStreams]]</a> internal slot.</li>
-              </ol>
-              <li>Else, set <var>result</var>'s <code>finished</code> to false.</li>
-              <li>Return <var>result</var>.
-            </ol>
-            <table class="parameters">
-              <tbody>
-                <tr>
-                  <th>Parameter</th>
-                  <th>Type</th>
-                  <th>Nullable</th>
-                  <th>Optional</th>
-                  <th>Description</th>
-                </tr>
-                <tr>
-                  <td class="prmName">data</td>
-                  <td class="prmType"><code>Uint8Array</code></td>
-                  <td class="prmNullFalse"><span role="img" aria-label=
-                  "False">&#10008;</span></td>
-                  <td class="prmOptFalse"><span role="img" aria-label=
-                  "False">&#10008;</span></td>
-                  <td class="prmDesc"></td>
-                </tr>
-              </tbody>
-            </table>
-            <div>
-              <em>Return type:</em> <code><a>StreamReadResult</a></code>
-            </div>
-          </dd>
           <dt><dfn><code>abortReading</code></dfn></dt>
           <dd>
             <p>A hard shutdown of the <code><a>IncomingStream</a></code>. It may be called
@@ -1199,35 +1149,6 @@ interface mixin IncomingStream {
             </div>
           </dd>
         </dl>
-      </section>
-      <section id="quicstreamresult*">
-        <h3><dfn>StreamReadResult</dfn> Dictionary</h3>
-        <p>The <code>StreamReadResult</code> dictionary includes information
-        relating to the result returned from <code>readInto</code>.</p>
-        <div>
-          <pre class="idl">dictionary StreamReadResult {
-                unsigned long amount;
-                boolean finished = false;
-          };
-          </pre>
-          <section>
-            <h2>Dictionary <a class="idlType">StreamReadResult</a> Members</h2>
-            <dl data-link-for="StreamReadResult" data-dfn-for="StreamReadResult" class=
-            "dictionary-members">
-              <dt><dfn><code>amount</code></dfn> of type <span class=
-              "idlMemberType"><a>unsigned long</a></span>.</dt>
-              <dd>
-                <p>The amount of data read in bytes.</p>
-              </dd>
-              <dt><dfn><code>finished</code></dfn> of type <span class=
-              "idlMemberType">boolean</span>.</dt>
-              <dd>
-                <p>Set to <code>true</code> if the <code><a>IncomingStream</a></code> has
-                <a>finished reading</a>.</p>
-              </dd>
-            </dl>
-          </section>
-        </div>
       </section>
     </div>
   </section>
@@ -1342,7 +1263,6 @@ Http3Transport includes WebTransport;</pre>
               internal slot representing a sequence of <code><a>OutgoingStream</a></code>
               objects, initialized to empty.
             </li>
-            ***
             <li>Let <var>transport</var> have a <a>[[\IncomingStreams]]</a>
               internal slot representing a sequence of <code><a>IncomingStream</a></code>
               objects, initialized to empty.
@@ -1514,7 +1434,6 @@ Http3Transport includes WebTransport;</pre>
           script in response to the remote peer creating a send-only stream and
           sending data on it. Prior to <code><a>receivestream</a></code>
           firing, the <code><a>ReceiveStream</a></code> is added to
-          ***
           <code><a>WebTransport</a></code>'s <a>[[\IncomingStreams]]</a>
           internal slot.</td>
         </tr>
@@ -1525,7 +1444,6 @@ Http3Transport includes WebTransport;</pre>
           script in response to the remote peer creating a bidirectional stream and
           sending data on it. Prior to <code><a>bidirectionalstream</a></code>
           firing, the <code><a>BidirectionalStream</a></code> is added to the
-          ***
           <code><a>WebTransport</a></code>'s <a>[[\IncomingStreams]]</a>
           and <a>[[\OutgoingStreams]]</a> internal slots.</td>
         </tr>
