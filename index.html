@@ -195,6 +195,9 @@ interface mixin UnidirectionalStreamsTransport {
                 insert it into <dfn>[[\ReceivedStreams]]</dfn>.  As
                 data is received over the unidirectional stream, insert
                 that data into the corresponding <code><a>IncomingStream</a></code>
+                When the remote side closes or aborts the stream,
+                close or abort the corresponding <code><a>IncomingStream</a></code>.
+              <p>
               <p>
             </li>
           </ol>
@@ -375,7 +378,9 @@ interface BidirectionalStreamsTransport {
                 corresponding <code><a>IncomingStream</a></code> and
                 insert it into <dfn>[[\ReceivedBidirectionalStreams]]</dfn>.  As
                 data is received over the bidirectional stream, insert
-                that data into the corresponding <code><a>IncomingStream</a></code>
+                that data into the corresponding <code><a>IncomingStream</a></code>.
+                When the remote side closes or aborts the stream,
+                close or abort the corresponding <code><a>IncomingStream</a></code>.
               <p>
             </li>
           </ol>
