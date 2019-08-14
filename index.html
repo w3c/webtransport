@@ -189,12 +189,12 @@ interface mixin UnidirectionalStreamsTransport {
               on which <code>receiveStreams</code> is invoked.</p>
             </li>
             <li>
-              <p>Return the value of the <dfn>[[\ReceivedStreams]]</dfn> internal slot.</p>
+              <p>Return the value of the <code><a>[[\ReceivedStreams]]</code></a> internal slot.</p>
             </li>
             <li>
               <p>For each unidirectional stream received, create a
                 corresponding <code><a>IncomingStream</a></code> and
-                insert it into <dfn>[[\ReceivedStreams]]</dfn>.  As
+                insert it into <code><a>[[\ReceivedStreams]]</code></a>.  As
                 data is received over the unidirectional stream, insert
                 that data into the corresponding <code><a>IncomingStream</a></code>
                 When the remote side closes or aborts the stream,
@@ -373,12 +373,13 @@ interface BidirectionalStreamsTransport {
               on which <code>receiveStreams</code> is invoked.</p>
             </li>
             <li>
-              <p>Return the value of the <dfn>[[\ReceivedBidirectionalStreams]]</dfn> internal slot.</p>
+              <p>Return the value of the <code><a>[[\ReceivedBidirectionalStreams]]</code></a>
+                internal slot.</p>
             </li>
             <li>
               <p>For each bidirectional stream received, create a
                 corresponding <code><a>IncomingStream</a></code> and
-                insert it into <dfn>[[\ReceivedBidirectionalStreams]]</dfn>.  As
+                insert it into <code><a>[[\ReceivedBidirectionalStreams]]</code></a>.  As
                 data is received over the bidirectional stream, insert
                 that data into the corresponding <code><a>IncomingStream</a></code>.
                 When the remote side closes or aborts the stream,
@@ -469,7 +470,7 @@ interface mixin DatagramTransport {
               which <code>sendDatagram</code> is invoked.</p>
             </li>
             <li>
-              <p>Return the value of the <dfn>[[\SentDatagrams]]]</dfn> internal slot.</p>
+              <p>Return the value of the <code><a>[[\SentDatagrams]]</code></a> internal slot.</p>
             </li>
             <!-- TODO: Figure out how to indicate to JS that a datagram has been acked  
                        or dropped. -->
@@ -480,8 +481,8 @@ interface mixin DatagramTransport {
         </dd>
         <dt><dfn><code>receiveDatagrams</code></dfn></dt>
         <dd>
-          <p>Return the value of the <dfn>[[\ReceivedDatagrams]]</dfn> internal slot.</p>
-          <p>For each datagram received, insert it into <dfn>[[\ReceivedDatagrams]]</dfn>.  
+          <p>Return the value of the <code><a>[[\ReceivedDatagrams]]</code></a> internal slot.</p>
+          <p>For each datagram received, insert it into <code><a>[[\ReceivedDatagrams]]</code></a>.
              If too many datagrams are queued because the stream
              is not being read quickly enough, drop datagrams to avoid queueing.<p>
           <div>
