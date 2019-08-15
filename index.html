@@ -208,6 +208,7 @@ interface mixin UnidirectionalStreamsTransport {
           </div>
           <div>
             <em>Return type:</em> <code><a>ReadableStream</a></code>
+            of <code><a>ReceiveStream</a></code>s.
           </div>
         </dd>
       </dl>
@@ -392,6 +393,7 @@ interface BidirectionalStreamsTransport {
           </div>
           <div>
             <em>Return type:</em> <code><a>ReadableStream</a></code>
+            of <code><a>BidirectionalStream</a></code>s
           </div>
         </dd>
       </dl>
@@ -476,7 +478,7 @@ interface mixin DatagramTransport {
                        or dropped. -->
           </ol>
           <div>
-            <em>Return type:</em> <code>WritableStream</code>
+            <em>Return type:</em> <code>WritableStream</code> of <code>Uint8Array</code>.
           </div>
         </dd>
         <dt><dfn><code>receiveDatagrams</code></dfn></dt>
@@ -484,9 +486,16 @@ interface mixin DatagramTransport {
           <p>Return the value of the <code><a>[[\ReceivedDatagrams]]</code></a> internal slot.</p>
           <p>For each datagram received, insert it into <code><a>[[\ReceivedDatagrams]]</code></a>.
              If too many datagrams are queued because the stream
-             is not being read quickly enough, drop datagrams to avoid queueing.<p>
+             is not being read quickly enough, drop datagrams to avoid queueing.
+             Implementations should drop older datagrams in favor of newer datagrams.
+             The number of datagrams to queue should be kept small enough to avoid adding
+             significant latency to packet delivery when the stream is being read slowly
+             (due to the reader being slow) but large enough to avoid dropping packets
+             when for the stream is not read for short periods of time
+             (due to the reader being paused).
+          <p>
           <div>
-            <em>Return type:</em> <code>ReadableStream</code>
+            <em>Return type:</em> <code>ReadableStream</code> of <code>Uint8Array</code>
           </div>
         </dd>
       </dl>
@@ -907,7 +916,7 @@ interface mixin OutgoingStream {
           readonly</dt>
           <dd>
             <p>The <dfn id="dom-outgoingstream-writable"><code>writable</code></dfn>
-            attribute represents a WritableStream that can be used to write to the
+            attribute represents a WritableStream (of bytes) that can be used to write to the
             <code><a>OutgoingStream</a></code>. On getting it
             <em class="rfc2119" title="MUST">MUST</em> return the value of the
             <a>[[\Writable]]</a> slot.</p>
