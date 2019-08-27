@@ -24,8 +24,3 @@ It's great for:
 See the [explainer](https://github.com/wicg/web-transport/blob/master/explainer.md) for more info.
 
 See the [proposed spec](https://wicg.github.io/web-transport/).
-
-Note that the proposed spec is out of date compared to the explainer because new
-ideas are first developed in the explainer before the spec. In particular, at
-this time the explainer uses ReadableStreams and WritableStreams (aka WHATWG
-streams) and the spec does not.
