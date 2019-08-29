@@ -478,7 +478,7 @@ The dictionary SHALL have the following attributes:
 
 # `QuicTransportBase` Interface #  {#quic-transport-base}
 
-The `QuicTransportBase` is the base interface for {{QuicTransport}}. Most of
+The `QuicTransportBase` is the base for {{QuicTransport}}. Most of
 the functionality of a `QuicTransport` is in the base class to allow for other
 subclasses (such as a p2p variant) to share the same interface.
 
@@ -535,8 +535,7 @@ dictionary QuicTransportStats {
   unsigned long numIncomingStreamsCreated;
   unsigned long long bytesReceived;
   unsigned long long packetsReceived;
-  unsigned long long minRttUs;
-  unsigned long estimatedBandwidthBps;
+  DOMHighResTimeStamp minRttUs;
   unsigned long numReceivedDatagramsDropped;
 };
 </pre>
@@ -546,10 +545,9 @@ The dictionary SHALL have the following attributes:
 : <dfn for="QuicTransportStats" dict-member>timestamp</dfn>
 :: The `timestamp` for when the stats are gathered, relative to the
 UNIX epoch (Jan 1, 1970, UTC).
-
 : <dfn for="QuicTransportStats" dict-member>bytesSent</dfn>
 :: The amount of bytes sent on the QUIC connection, including retransmissions.
-Does not include UDP/IP/ethernet framing.
+Does not include UDP or any other outer framing.
 : <dfn for="QuicTransportStats" dict-member>packetsSent</dfn>
 :: The amount of packets sent on the QUIC connection, including retransmissions.
 : <dfn for="QuicTransportStats" dict-member>numOutgoingStreamsCreated</dfn>
@@ -558,15 +556,12 @@ Does not include UDP/IP/ethernet framing.
 :: The amount of incoming QUIC streams created on the QUIC connection.
 : <dfn for="QuicTransportStats" dict-member>bytesReceived</dfn>
 :: The amount of total bytes received on the QUIC connection, including
-duplicate data for streams. Does not include UDP/IP/ethernet framing.
+duplicate data for streams. Does not include UDP or any other outer framing.
 : <dfn for="QuicTransportStats" dict-member>packetsReceived</dfn>
 :: The amount of total packets received on the QUIC connection, including
 packets that were not processable.
 : <dfn for="QuicTransportStats" dict-member>minRttUs</dfn>
-:: The minimum RTT in microseconds.
-: <dfn for="QuicTransportStats" dict-member>estimatedBandwidthBps</dfn>
-:: The estimated bandwidth in bits per second determined by the QUIC
-connection.
+:: The minimum RTT.
 : <dfn for="QuicTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
 between calls to {{receiveDatagrams()}}.
