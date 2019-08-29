@@ -89,6 +89,12 @@ var respecConfig = {
       "status": "03 May 2019. Internet draft (work in progress)",
       "publisher": "IETF"
     },
+    "WHATWG-STREAMS": {
+      "title": "Streams",
+      "href": "https://streams.spec.whatwg.org",
+      "status": "29 July 2019. Living Standard",
+      "publisher": "WHATWG"
+    },
     "TLS13": {
       "title": "The Transport Layer Security (TLS) Protocol Version 1.3",
       "href": "https://tools.ietf.org/html/rfc8446",
