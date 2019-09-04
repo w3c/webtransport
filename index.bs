@@ -535,7 +535,7 @@ dictionary QuicTransportStats {
   unsigned long numIncomingStreamsCreated;
   unsigned long long bytesReceived;
   unsigned long long packetsReceived;
-  DOMHighResTimeStamp minRttUs;
+  DOMHighResTimeStamp minRtt;
   unsigned long numReceivedDatagramsDropped;
 };
 </pre>
@@ -546,22 +546,22 @@ The dictionary SHALL have the following attributes:
 :: The `timestamp` for when the stats are gathered, relative to the
 UNIX epoch (Jan 1, 1970, UTC).
 : <dfn for="QuicTransportStats" dict-member>bytesSent</dfn>
-:: The amount of bytes sent on the QUIC connection, including retransmissions.
+:: The number of bytes sent on the QUIC connection, including retransmissions.
 Does not include UDP or any other outer framing.
 : <dfn for="QuicTransportStats" dict-member>packetsSent</dfn>
-:: The amount of packets sent on the QUIC connection, including retransmissions.
+:: The number of packets sent on the QUIC connection, including retransmissions.
 : <dfn for="QuicTransportStats" dict-member>numOutgoingStreamsCreated</dfn>
-:: The amount of outgoing QUIC streams created on the QUIC connection.
+:: The number of outgoing QUIC streams created on the QUIC connection.
 : <dfn for="QuicTransportStats" dict-member>numIncomingStreamsCreated</dfn>
-:: The amount of incoming QUIC streams created on the QUIC connection.
+:: The number of incoming QUIC streams created on the QUIC connection.
 : <dfn for="QuicTransportStats" dict-member>bytesReceived</dfn>
-:: The amount of total bytes received on the QUIC connection, including
+:: The number of total bytes received on the QUIC connection, including
 duplicate data for streams. Does not include UDP or any other outer framing.
 : <dfn for="QuicTransportStats" dict-member>packetsReceived</dfn>
-:: The amount of total packets received on the QUIC connection, including
+:: The number of total packets received on the QUIC connection, including
 packets that were not processable.
-: <dfn for="QuicTransportStats" dict-member>minRttUs</dfn>
-:: The minimum RTT.
+: <dfn for="QuicTransportStats" dict-member>minRtt</dfn>
+:: The minimum RTT observed on the entire connection.
 : <dfn for="QuicTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
 between calls to {{receiveDatagrams()}}.
