@@ -1213,9 +1213,8 @@ Possible extra rowspan handling
 	}
 </style>
   <link href="https://www.w3.org/StyleSheets/TR/2016/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version 450e0499b28bb4c684052ad936ad1e7d36c4eac5" name="generator">
+  <meta content="Bikeshed version f7860c06eaec18afc415bf3f4a7b90aee58ca680" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="e6b89a065a9bf71a29aee40d021072f034bf90a5" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1473,7 +1472,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-08-27">27 August 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-09-04">4 September 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1558,6 +1557,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <ol class="toc">
       <li><a href="#quic-transport-base-overview"><span class="secno">8.1</span> <span class="content">Overview</span></a>
       <li><a href="#quic-transport-base-definition"><span class="secno">8.2</span> <span class="content">Interface Definition</span></a>
+      <li><a href="#quic-transport-base-methods"><span class="secno">8.3</span> <span class="content">Methods</span></a>
+      <li><a href="#quic-transport-stats"><span class="secno">8.4</span> <span class="content"><code>QuicTransportStats</code> Dictionary</span></a>
      </ol>
     <li>
      <a href="#quic-transport"><span class="secno">9</span> <span class="content"><code>QuicTransport</code> Interface</span></a>
@@ -2033,7 +2034,7 @@ frame.</p>
      <p>The reason for closing the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport④">WebTransport</a></code>.</p>
    </dl>
    <h2 class="heading settled" data-level="8" id="quic-transport-base"><span class="secno">8. </span><span class="content"><code>QuicTransportBase</code> Interface</span><a class="self-link" href="#quic-transport-base"></a></h2>
-   <p>The <code>QuicTransportBase</code> is the base interface for <code class="idl"><a data-link-type="idl" href="#quictransport" id="ref-for-quictransport">QuicTransport</a></code>. Most of
+   <p>The <code>QuicTransportBase</code> is the base for <code class="idl"><a data-link-type="idl" href="#quictransport" id="ref-for-quictransport">QuicTransport</a></code>. Most of
 the functionality of a <code>QuicTransport</code> is in the base class to allow for other
 subclasses (such as a p2p variant) to share the same interface.</p>
    <h3 class="heading settled" data-level="8.1" id="quic-transport-base-overview"><span class="secno">8.1. </span><span class="content">Overview</span><a class="self-link" href="#quic-transport-base-overview"></a></h3>
@@ -2043,6 +2044,7 @@ defined in <a data-link-type="biblio" href="#biblio-quic-transport">[QUIC-TRANSP
 defined in <a data-link-type="biblio" href="#biblio-quic-datagram">[QUIC-DATAGRAM]</a>.</p>
    <h3 class="heading settled" data-level="8.2" id="quic-transport-base-definition"><span class="secno">8.2. </span><span class="content">Interface Definition</span><a class="self-link" href="#quic-transport-base-definition"></a></h3>
 <pre class="idl highlight def"><c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#quictransportbase" id="ref-for-quictransportbase"><c- g>QuicTransportBase</c-></a> {
+  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats"><c- n>QuicTransportStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-quictransportbase-getstats" id="ref-for-dom-quictransportbase-getstats"><c- g>getStats</c-></a>();
 };
 
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport④"><c- n>UnidirectionalStreamsTransport</c-></a>;
@@ -2050,6 +2052,82 @@ defined in <a data-link-type="biblio" href="#biblio-quic-datagram">[QUIC-DATAGRA
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase③"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport③"><c- n>DatagramTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase④"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑤"><c- n>WebTransport</c-></a>;
 </pre>
+   <h3 class="heading settled" data-level="8.3" id="quic-transport-base-methods"><span class="secno">8.3. </span><span class="content">Methods</span><a class="self-link" href="#quic-transport-base-methods"></a></h3>
+   <dl>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportBase" data-dfn-type="method" data-export id="dom-quictransportbase-getstats"><code>getStats()</code></dfn>
+    <dd data-md>
+     <p>Gathers stats for this <code><a data-link-type="dfn">QuicTransportBase</a></code>’s QUIC
+ connection and reports the result asynchronously.</p>
+     <p></p>
+     <p>When close is called, the user agent MUST run the following steps:</p>
+     <ol>
+      <li data-md>
+       <p>Let <var>transport</var> be the QuicTransportBase on which <code>getStats</code> is invoked.</p>
+      <li data-md>
+       <p>If <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑥">[[WebTransportState]]</a></code> is <code>"new"</code>, then abort
+  these steps.</p>
+      <li data-md>
+       <p>Let <var>p</var> be a new promise.</p>
+      <li data-md>
+       <p>Return <var>p</var> and continue the following steps in background.</p>
+       <ol>
+        <li data-md>
+         <p>Gather the stats from the underlying QUIC connection.</p>
+        <li data-md>
+         <p>Once stats have been gathered, resolve <var>p</var> with the <code class="idl"><a data-link-type="idl" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats①">QuicTransportStats</a></code> object, representing the gathered stats.</p>
+       </ol>
+     </ol>
+   </dl>
+   <h3 class="heading settled" data-level="8.4" id="quic-transport-stats"><span class="secno">8.4. </span><span class="content"><code>QuicTransportStats</code> Dictionary</span><a class="self-link" href="#quic-transport-stats"></a></h3>
+   <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-quictransportstats"><code>QuicTransportStats</code></dfn> dictionary includes information
+on QUIC connection level stats.</p>
+<pre class="idl highlight def"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats②"><c- g>QuicTransportStats</c-></a> {
+  <a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-timestamp" id="ref-for-dom-quictransportstats-timestamp"><c- g>timestamp</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-bytessent" id="ref-for-dom-quictransportstats-bytessent"><c- g>bytesSent</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-packetssent" id="ref-for-dom-quictransportstats-packetssent"><c- g>packetsSent</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numoutgoingstreamscreated" id="ref-for-dom-quictransportstats-numoutgoingstreamscreated"><c- g>numOutgoingStreamsCreated</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long①"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numincomingstreamscreated" id="ref-for-dom-quictransportstats-numincomingstreamscreated"><c- g>numIncomingStreamsCreated</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long②"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-bytesreceived" id="ref-for-dom-quictransportstats-bytesreceived"><c- g>bytesReceived</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long③"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-packetsreceived" id="ref-for-dom-quictransportstats-packetsreceived"><c- g>packetsReceived</c-></a>;
+  <a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp①"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-minrtt" id="ref-for-dom-quictransportstats-minrtt"><c- g>minRtt</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long②"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numreceiveddatagramsdropped" id="ref-for-dom-quictransportstats-numreceiveddatagramsdropped"><c- g>numReceivedDatagramsDropped</c-></a>;
+};
+</pre>
+   <p>The dictionary SHALL have the following attributes:</p>
+   <dl>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-timestamp"><code>timestamp</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp②">DOMHighResTimeStamp</a></span>
+    <dd data-md>
+     <p>The <code>timestamp</code> for when the stats are gathered, relative to the
+UNIX epoch (Jan 1, 1970, UTC).</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-bytessent"><code>bytesSent</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long④">unsigned long long</a></span>
+    <dd data-md>
+     <p>The number of bytes sent on the QUIC connection, including retransmissions.
+Does not include UDP or any other outer framing.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-packetssent"><code>packetsSent</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑤">unsigned long long</a></span>
+    <dd data-md>
+     <p>The number of packets sent on the QUIC connection, including retransmissions.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-numoutgoingstreamscreated"><code>numOutgoingStreamsCreated</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long③">unsigned long</a></span>
+    <dd data-md>
+     <p>The number of outgoing QUIC streams created on the QUIC connection.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-numincomingstreamscreated"><code>numIncomingStreamsCreated</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long④">unsigned long</a></span>
+    <dd data-md>
+     <p>The number of incoming QUIC streams created on the QUIC connection.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-bytesreceived"><code>bytesReceived</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑥">unsigned long long</a></span>
+    <dd data-md>
+     <p>The number of total bytes received on the QUIC connection, including
+duplicate data for streams. Does not include UDP or any other outer framing.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-packetsreceived"><code>packetsReceived</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑦">unsigned long long</a></span>
+    <dd data-md>
+     <p>The number of total packets received on the QUIC connection, including
+packets that were not processable.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-minrtt"><code>minRtt</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp③">DOMHighResTimeStamp</a></span>
+    <dd data-md>
+     <p>The minimum RTT observed on the entire connection.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-numreceiveddatagramsdropped"><code>numReceivedDatagramsDropped</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑤">unsigned long</a></span>
+    <dd data-md>
+     <p>The number of datagrams that were dropped, due to too many datagrams buffered
+between calls to <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-receivedatagrams" id="ref-for-dom-datagramtransport-receivedatagrams①">receiveDatagrams()</a></code>.</p>
+   </dl>
    <h2 class="heading settled" data-level="9" id="quic-transport"><span class="secno">9. </span><span class="content"><code>QuicTransport</code> Interface</span><a class="self-link" href="#quic-transport"></a></h2>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="quictransport"><code>QuicTransport</code></dfn> is a subclass of <code class="idl"><a data-link-type="idl" href="#quictransportbase" id="ref-for-quictransportbase⑤">QuicTransportBase</a></code> focused on client/server use cases.</p>
    <h3 class="heading settled" data-level="9.1" id="quic-transport-definition"><span class="secno">9.1. </span><span class="content">Interface Definition</span><a class="self-link" href="#quic-transport-definition"></a></h3>
@@ -2092,9 +2170,9 @@ agent MUST run the following steps:</p>
        <p>Establish a QUIC connection to the address identified by the given <code class="idl"><a data-link-type="idl" href="#dom-quictransport-quictransport-host-port-host" id="ref-for-dom-quictransport-quictransport-host-port-host">host</a></code> and <code class="idl"><a data-link-type="idl" href="#dom-quictransport-quictransport-host-port-port" id="ref-for-dom-quictransport-quictransport-host-port-port①">port</a></code> following the
  procedures in <a data-link-type="biblio" href="#biblio-web-transport-quic">[WEB-TRANSPORT-QUIC]</a> section 3 and using <var>clientOrigin</var> as the "origin of the client" referenced in section 3.2.</p>
       <li data-md>
-       <p>If the connection fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑥">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these steps.</p>
+       <p>If the connection fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑦">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these steps.</p>
       <li data-md>
-       <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑦">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code>.</p>
+       <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑧">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code>.</p>
      </ol>
     <li data-md>
      <p>Return <var>transport</var>.</p>
@@ -2253,13 +2331,13 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
    <p>A collection of common attributes and methods of all streams.</p>
 <pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="webtransportstream"><code><c- g>WebTransportStream</c-></code></dfn> {
-    <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-webtransportstream-streamid" id="ref-for-dom-webtransportstream-streamid"><c- g>streamId</c-></a>;
+    <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑧"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-webtransportstream-streamid" id="ref-for-dom-webtransportstream-streamid"><c- g>streamId</c-></a>;
     <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①⓪"><c- n>WebTransport</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransport" href="#dom-webtransportstream-transport" id="ref-for-dom-webtransportstream-transport"><c- g>transport</c-></a>;
 };
 </pre>
    <h3 class="heading settled" data-level="12.1" id="web-transport-stream-attributes"><span class="secno">12.1. </span><span class="content">Attributes</span><a class="self-link" href="#web-transport-stream-attributes"></a></h3>
    <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportStream" data-dfn-type="attribute" data-export id="dom-webtransportstream-streamid"><code>streamId</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①">unsigned long long</a>, readonly</span>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportStream" data-dfn-type="attribute" data-export id="dom-webtransportstream-streamid"><code>streamId</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑨">unsigned long long</a>, readonly</span>
     <dd data-md>
      <p>The readonly attribute referring to the ID of the <code class="idl"><a data-link-type="idl" href="#webtransportstream" id="ref-for-webtransportstream">WebTransportStream</a></code> object.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportStream" data-dfn-type="attribute" data-export id="dom-webtransportstream-transport"><code>transport</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①①">WebTransport</a>, readonly</span>
@@ -2331,16 +2409,16 @@ agent MUST run the following steps:</p>
  connection to the host specificed by the url, as specified in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.</p>
       <li data-md>
        <p>If there is no such HTTP/3 connection to reuse and the establishment of
- a new HTTP/3 connection, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑧">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these steps.</p>
+ a new HTTP/3 connection, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑨">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these steps.</p>
       <li data-md>
        <p>Once a connection an HTTP/3 connection is established, follow the steps
  specified in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a> section 4 for establishing a
  WebTransport session within the HTTP/3 connection.</p>
       <li data-md>
-       <p>If the establishment of the WebTransport session fails, set transport’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑨">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these
+       <p>If the establishment of the WebTransport session fails, set transport’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot①⓪">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these
  steps.</p>
       <li data-md>
-       <p>Once a session has been established, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot①⓪">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code> and abort these
+       <p>Once a session has been established, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot①①">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code> and abort these
  steps.</p>
      </ol>
     <li data-md>
@@ -2433,7 +2511,7 @@ setInterval<c- p>(()</c-> <c- p>=></c-> <c- p>{</c->
 </pre>
    <h3 class="heading settled" data-level="18.4" id="example-receiving-datagrams"><span class="secno">18.4. </span><span class="content">Receiving datagrams</span><a class="self-link" href="#example-receiving-datagrams"></a></h3>
    <p><em>This section is non-normative.</em></p>
-   <p>Receiving datagrams can be achieved by calling <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-receivedatagrams" id="ref-for-dom-datagramtransport-receivedatagrams①">receiveDatagrams()</a></code> method, remembering to check for null
+   <p>Receiving datagrams can be achieved by calling <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-receivedatagrams" id="ref-for-dom-datagramtransport-receivedatagrams②">receiveDatagrams()</a></code> method, remembering to check for null
 values indicating that packets are not being processed quickly enough.</p>
 <pre class="example highlight" id="example-8116bd90"><a class="self-link" href="#example-8116bd90"></a><c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
 <c- kr>const</c-> reader <c- o>=</c-> transport<c- p>.</c->receiveDatagrams<c- p>().</c->getReader<c- p>();</c->
@@ -2593,6 +2671,8 @@ use in this specification.</p>
    <li><a href="#add-the-sendstream">add the SendStream</a><span>, in §4.2.1</span>
    <li><a href="#bidirectionalstream">BidirectionalStream</a><span>, in §13</span>
    <li><a href="#bidirectionalstreamstransport">BidirectionalStreamsTransport</a><span>, in §5</span>
+   <li><a href="#dom-quictransportstats-bytesreceived">bytesReceived</a><span>, in §8.4</span>
+   <li><a href="#dom-quictransportstats-bytessent">bytesSent</a><span>, in §8.4</span>
    <li><a href="#dom-webtransport-close">close()</a><span>, in §7.2</span>
    <li><a href="#dom-webtransport-close">close(closeInfo)</a><span>, in §7.2</span>
    <li><a href="#dom-webtransportstate-closed">"closed"</a><span>, in §7.3</span>
@@ -2610,19 +2690,27 @@ use in this specification.</p>
      <li><a href="#dom-webtransportcloseinfo-errorcode">dict-member for WebTransportCloseInfo</a><span>, in §7.4</span>
     </ul>
    <li><a href="#dom-webtransportstate-failed">"failed"</a><span>, in §7.3</span>
+   <li><a href="#dom-quictransportbase-getstats">getStats()</a><span>, in §8.3</span>
    <li><a href="#http3transport">Http3Transport</a><span>, in §16.1</span>
    <li><a href="#dom-http3transport-http3transport">Http3Transport(url)</a><span>, in §16.2</span>
    <li><a href="#immediate-close">Immediate Close</a><span>, in §7.2</span>
    <li><a href="#incomingstream">IncomingStream</a><span>, in §11</span>
    <li><a href="#dom-datagramtransport-maxdatagramsize">maxDatagramSize</a><span>, in §6.1</span>
+   <li><a href="#dom-quictransportstats-minrtt">minRtt</a><span>, in §8.4</span>
    <li><a href="#dom-webtransportstate-new">"new"</a><span>, in §7.3</span>
+   <li><a href="#dom-quictransportstats-numincomingstreamscreated">numIncomingStreamsCreated</a><span>, in §8.4</span>
+   <li><a href="#dom-quictransportstats-numoutgoingstreamscreated">numOutgoingStreamsCreated</a><span>, in §8.4</span>
+   <li><a href="#dom-quictransportstats-numreceiveddatagramsdropped">numReceivedDatagramsDropped</a><span>, in §8.4</span>
    <li><a href="#dom-webtransport-onerror">onerror</a><span>, in §7.1</span>
    <li><a href="#dom-webtransport-onstatechange">onstatechange</a><span>, in §7.1</span>
    <li><a href="#outgoingstream">OutgoingStream</a><span>, in §10</span>
    <li><a href="#dom-quictransport-outgoingstreams-slot">[[OutgoingStreams]]</a><span>, in §9.1</span>
+   <li><a href="#dom-quictransportstats-packetsreceived">packetsReceived</a><span>, in §8.4</span>
+   <li><a href="#dom-quictransportstats-packetssent">packetsSent</a><span>, in §8.4</span>
    <li><a href="#quictransport">QuicTransport</a><span>, in §9</span>
    <li><a href="#quictransportbase">QuicTransportBase</a><span>, in §8.1</span>
    <li><a href="#dom-quictransport-quictransport">QuicTransport(host, port)</a><span>, in §9.1</span>
+   <li><a href="#dictdef-quictransportstats">QuicTransportStats</a><span>, in §8.4</span>
    <li><a href="#dom-incomingstream-readable">readable</a><span>, in §11.2</span>
    <li><a href="#dom-incomingstream-readable-slot">[[Readable]]</a><span>, in §11.1</span>
    <li><a href="#dom-incomingstream-readingaborted">readingAborted</a><span>, in §11.2</span>
@@ -2641,6 +2729,7 @@ use in this specification.</p>
    <li><a href="#dom-webtransport-state">state</a><span>, in §7.1</span>
    <li><a href="#dictdef-streamabortinfo">StreamAbortInfo</a><span>, in §10.4</span>
    <li><a href="#dom-webtransportstream-streamid">streamId</a><span>, in §12.1</span>
+   <li><a href="#dom-quictransportstats-timestamp">timestamp</a><span>, in §8.4</span>
    <li><a href="#dom-webtransportstream-transport">transport</a><span>, in §12.1</span>
    <li><a href="#unidirectionalstreamstransport">UnidirectionalStreamsTransport</a><span>, in §4</span>
    <li><a href="#webtransport">WebTransport</a><span>, in §7</span>
@@ -2706,6 +2795,12 @@ use in this specification.</p>
     <li><a href="#ref-for-sec-promise-objects①①">5.1. Methods</a> <a href="#ref-for-sec-promise-objects①②">(2)</a> <a href="#ref-for-sec-promise-objects①③">(3)</a> <a href="#ref-for-sec-promise-objects①④">(4)</a> <a href="#ref-for-sec-promise-objects①⑤">(5)</a> <a href="#ref-for-sec-promise-objects①⑥">(6)</a>
     <li><a href="#ref-for-sec-promise-objects①⑦">10.2. Attributes</a> <a href="#ref-for-sec-promise-objects①⑧">(2)</a>
     <li><a href="#ref-for-sec-promise-objects①⑨">11.2. Attributes</a> <a href="#ref-for-sec-promise-objects②⓪">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-domhighrestimestamp">
+   <a href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp">https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-domhighrestimestamp">8.4. QuicTransportStats Dictionary</a> <a href="#ref-for-dom-domhighrestimestamp①">(2)</a> <a href="#ref-for-dom-domhighrestimestamp②">(3)</a> <a href="#ref-for-dom-domhighrestimestamp③">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-errorevent">
@@ -2819,11 +2914,18 @@ use in this specification.</p>
     <li><a href="#ref-for-dfn-throw①">9.1. Interface Definition</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-unsigned-long">
+   <a href="https://heycam.github.io/webidl/#idl-unsigned-long">https://heycam.github.io/webidl/#idl-unsigned-long</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-unsigned-long">8.4. QuicTransportStats Dictionary</a> <a href="#ref-for-idl-unsigned-long①">(2)</a> <a href="#ref-for-idl-unsigned-long②">(3)</a> <a href="#ref-for-idl-unsigned-long③">(4)</a> <a href="#ref-for-idl-unsigned-long④">(5)</a> <a href="#ref-for-idl-unsigned-long⑤">(6)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-idl-unsigned-long-long">
    <a href="https://heycam.github.io/webidl/#idl-unsigned-long-long">https://heycam.github.io/webidl/#idl-unsigned-long-long</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-idl-unsigned-long-long">12. Interface WebTransportStream</a>
-    <li><a href="#ref-for-idl-unsigned-long-long①">12.1. Attributes</a>
+    <li><a href="#ref-for-idl-unsigned-long-long">8.4. QuicTransportStats Dictionary</a> <a href="#ref-for-idl-unsigned-long-long①">(2)</a> <a href="#ref-for-idl-unsigned-long-long②">(3)</a> <a href="#ref-for-idl-unsigned-long-long③">(4)</a> <a href="#ref-for-idl-unsigned-long-long④">(5)</a> <a href="#ref-for-idl-unsigned-long-long⑤">(6)</a> <a href="#ref-for-idl-unsigned-long-long⑥">(7)</a> <a href="#ref-for-idl-unsigned-long-long⑦">(8)</a>
+    <li><a href="#ref-for-idl-unsigned-long-long⑧">12. Interface WebTransportStream</a>
+    <li><a href="#ref-for-idl-unsigned-long-long⑨">12.1. Attributes</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-unsigned-short">
@@ -2883,6 +2985,11 @@ use in this specification.</p>
      <li><span class="dfn-paneled" id="term-for-sec-promise-objects④" style="color:initial">settled</span>
     </ul>
    <li>
+    <a data-link-type="biblio">[hr-time-2]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-dom-domhighrestimestamp" style="color:initial">DOMHighResTimeStamp</span>
+    </ul>
+   <li>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-errorevent" style="color:initial">ErrorEvent</span>
@@ -2905,6 +3012,7 @@ use in this specification.</p>
      <li><span class="dfn-paneled" id="term-for-idl-boolean" style="color:initial">boolean</span>
      <li><span class="dfn-paneled" id="term-for-dfn-create-exception" style="color:initial">created</span>
      <li><span class="dfn-paneled" id="term-for-dfn-throw" style="color:initial">throw</span>
+     <li><span class="dfn-paneled" id="term-for-idl-unsigned-long" style="color:initial">unsigned long</span>
      <li><span class="dfn-paneled" id="term-for-idl-unsigned-long-long" style="color:initial">unsigned long long</span>
      <li><span class="dfn-paneled" id="term-for-idl-unsigned-short" style="color:initial">unsigned short</span>
     </ul>
@@ -2922,6 +3030,8 @@ use in this specification.</p>
    <dd>Anne van Kesteren. <a href="https://dom.spec.whatwg.org/">DOM Standard</a>. Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
    <dt id="biblio-ecmascript-60">[ECMASCRIPT-6.0]
    <dd>Allen Wirfs-Brock. <a href="http://www.ecma-international.org/ecma-262/6.0/index.html">ECMA-262 6th Edition, The ECMAScript 2015 Language Specification</a>. June 2015. Standard. URL: <a href="http://www.ecma-international.org/ecma-262/6.0/index.html">http://www.ecma-international.org/ecma-262/6.0/index.html</a>
+   <dt id="biblio-hr-time-2">[HR-TIME-2]
+   <dd>Ilya Grigorik; James Simonsen; Jatinder Mann. <a href="https://www.w3.org/TR/hr-time-2/">High Resolution Time Level 2</a>. 26 June 2019. CR. URL: <a href="https://www.w3.org/TR/hr-time-2/">https://www.w3.org/TR/hr-time-2/</a>
    <dt id="biblio-html">[HTML]
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/">HTML Standard</a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-quic-datagram">[QUIC-DATAGRAM]
@@ -2967,7 +3077,7 @@ use in this specification.</p>
 <c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#datagramtransport" id="ref-for-datagramtransport⑦"><c- g>DatagramTransport</c-></a> {
     <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-short" id="ref-for-idl-unsigned-short⑦"><c- b>unsigned</c-> <c- b>short</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned short" href="#dom-datagramtransport-maxdatagramsize" id="ref-for-dom-datagramtransport-maxdatagramsize①"><c- g>maxDatagramSize</c-></a>;
     <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#ws-class" id="ref-for-ws-class①①"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="method" href="#dom-datagramtransport-senddatagrams" id="ref-for-dom-datagramtransport-senddatagrams④"><c- g>sendDatagrams</c-></a>();
-    <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑤①"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="method" href="#dom-datagramtransport-receivedatagrams" id="ref-for-dom-datagramtransport-receivedatagrams②"><c- g>receiveDatagrams</c-></a>();
+    <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑤①"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="method" href="#dom-datagramtransport-receivedatagrams" id="ref-for-dom-datagramtransport-receivedatagrams③"><c- g>receiveDatagrams</c-></a>();
 };
 
 <c- b>interface</c-> <c- b>mixin</c-> <a href="#webtransport"><code><c- g>WebTransport</c-></code></a> {
@@ -2991,12 +3101,25 @@ use in this specification.</p>
 };
 
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#quictransportbase" id="ref-for-quictransportbase⑦"><c- g>QuicTransportBase</c-></a> {
+  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats③"><c- n>QuicTransportStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-quictransportbase-getstats" id="ref-for-dom-quictransportbase-getstats①"><c- g>getStats</c-></a>();
 };
 
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase①①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport④①"><c- n>UnidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase②①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑤①"><c- n>BidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase③①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport③①"><c- n>DatagramTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase④①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑤①"><c- n>WebTransport</c-></a>;
+
+<c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats②①"><c- g>QuicTransportStats</c-></a> {
+  <a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp④"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-timestamp" id="ref-for-dom-quictransportstats-timestamp①"><c- g>timestamp</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①⓪"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-bytessent" id="ref-for-dom-quictransportstats-bytessent①"><c- g>bytesSent</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-packetssent" id="ref-for-dom-quictransportstats-packetssent①"><c- g>packetsSent</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑥"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numoutgoingstreamscreated" id="ref-for-dom-quictransportstats-numoutgoingstreamscreated①"><c- g>numOutgoingStreamsCreated</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long①①"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numincomingstreamscreated" id="ref-for-dom-quictransportstats-numincomingstreamscreated①"><c- g>numIncomingStreamsCreated</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long②①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-bytesreceived" id="ref-for-dom-quictransportstats-bytesreceived①"><c- g>bytesReceived</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long③①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-packetsreceived" id="ref-for-dom-quictransportstats-packetsreceived①"><c- g>packetsReceived</c-></a>;
+  <a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp①①"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-minrtt" id="ref-for-dom-quictransportstats-minrtt①"><c- g>minRtt</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long②①"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numreceiveddatagramsdropped" id="ref-for-dom-quictransportstats-numreceiveddatagramsdropped①"><c- g>numReceivedDatagramsDropped</c-></a>;
+};
 
 [<a href="#dom-quictransport-quictransport"><code><c- g>Constructor</c-></code></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString②①"><c- b>DOMString</c-></a> <a href="#dom-quictransport-quictransport-host-port-host"><code><c- g>host</c-></code></a>, <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-short" id="ref-for-idl-unsigned-short④①"><c- b>unsigned</c-> <c- b>short</c-></a> <a href="#dom-quictransport-quictransport-host-port-port"><code><c- g>port</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑧"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#quictransport" id="ref-for-quictransport①①"><c- g>QuicTransport</c-></a> : <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase⑥①"><c- n>QuicTransportBase</c-></a> {
@@ -3022,7 +3145,7 @@ use in this specification.</p>
 
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
 <c- b>interface</c-> <a href="#webtransportstream"><code><c- g>WebTransportStream</c-></code></a> {
-    <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long②"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-webtransportstream-streamid" id="ref-for-dom-webtransportstream-streamid①"><c- g>streamId</c-></a>;
+    <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑧①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-webtransportstream-streamid" id="ref-for-dom-webtransportstream-streamid①"><c- g>streamId</c-></a>;
     <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①⓪①"><c- n>WebTransport</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransport" href="#dom-webtransportstream-transport" id="ref-for-dom-webtransportstream-transport①"><c- g>transport</c-></a>;
 };
 
@@ -3155,7 +3278,8 @@ use in this specification.</p>
    <b><a href="#dom-datagramtransport-receivedatagrams">#dom-datagramtransport-receivedatagrams</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-datagramtransport-receivedatagrams">6. DatagramTransport Mixin</a>
-    <li><a href="#ref-for-dom-datagramtransport-receivedatagrams①">18.4. Receiving datagrams</a>
+    <li><a href="#ref-for-dom-datagramtransport-receivedatagrams①">8.4. QuicTransportStats Dictionary</a>
+    <li><a href="#ref-for-dom-datagramtransport-receivedatagrams②">18.4. Receiving datagrams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="webtransport">
@@ -3275,6 +3399,74 @@ use in this specification.</p>
     <li><a href="#ref-for-quictransportbase⑥">9.1. Interface Definition</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="dom-quictransportbase-getstats">
+   <b><a href="#dom-quictransportbase-getstats">#dom-quictransportbase-getstats</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-quictransportbase-getstats">8.2. Interface Definition</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dictdef-quictransportstats">
+   <b><a href="#dictdef-quictransportstats">#dictdef-quictransportstats</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dictdef-quictransportstats">8.2. Interface Definition</a>
+    <li><a href="#ref-for-dictdef-quictransportstats①">8.3. Methods</a>
+    <li><a href="#ref-for-dictdef-quictransportstats②">8.4. QuicTransportStats Dictionary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-quictransportstats-timestamp">
+   <b><a href="#dom-quictransportstats-timestamp">#dom-quictransportstats-timestamp</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-quictransportstats-timestamp">8.4. QuicTransportStats Dictionary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-quictransportstats-bytessent">
+   <b><a href="#dom-quictransportstats-bytessent">#dom-quictransportstats-bytessent</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-quictransportstats-bytessent">8.4. QuicTransportStats Dictionary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-quictransportstats-packetssent">
+   <b><a href="#dom-quictransportstats-packetssent">#dom-quictransportstats-packetssent</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-quictransportstats-packetssent">8.4. QuicTransportStats Dictionary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-quictransportstats-numoutgoingstreamscreated">
+   <b><a href="#dom-quictransportstats-numoutgoingstreamscreated">#dom-quictransportstats-numoutgoingstreamscreated</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-quictransportstats-numoutgoingstreamscreated">8.4. QuicTransportStats Dictionary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-quictransportstats-numincomingstreamscreated">
+   <b><a href="#dom-quictransportstats-numincomingstreamscreated">#dom-quictransportstats-numincomingstreamscreated</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-quictransportstats-numincomingstreamscreated">8.4. QuicTransportStats Dictionary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-quictransportstats-bytesreceived">
+   <b><a href="#dom-quictransportstats-bytesreceived">#dom-quictransportstats-bytesreceived</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-quictransportstats-bytesreceived">8.4. QuicTransportStats Dictionary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-quictransportstats-packetsreceived">
+   <b><a href="#dom-quictransportstats-packetsreceived">#dom-quictransportstats-packetsreceived</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-quictransportstats-packetsreceived">8.4. QuicTransportStats Dictionary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-quictransportstats-minrtt">
+   <b><a href="#dom-quictransportstats-minrtt">#dom-quictransportstats-minrtt</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-quictransportstats-minrtt">8.4. QuicTransportStats Dictionary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-quictransportstats-numreceiveddatagramsdropped">
+   <b><a href="#dom-quictransportstats-numreceiveddatagramsdropped">#dom-quictransportstats-numreceiveddatagramsdropped</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-quictransportstats-numreceiveddatagramsdropped">8.4. QuicTransportStats Dictionary</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="quictransport">
    <b><a href="#quictransport">#quictransport</a></b><b>Referenced in:</b>
    <ul>
@@ -3336,8 +3528,9 @@ use in this specification.</p>
     <li><a href="#ref-for-dom-quictransport-webtransportstate-slot">7.1. Attributes</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot①">(2)</a>
     <li><a href="#ref-for-dom-quictransport-webtransportstate-slot②">7.2. Methods</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot③">(2)</a>
     <li><a href="#ref-for-dom-quictransport-webtransportstate-slot④">7.3. WebTransportState Enum</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑤">(2)</a>
-    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑥">9.1. Interface Definition</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑦">(2)</a>
-    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑧">16.2.1. Constructors</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑨">(2)</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot①⓪">(3)</a>
+    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑥">8.3. Methods</a>
+    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑦">9.1. Interface Definition</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑧">(2)</a>
+    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑨">16.2.1. Constructors</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot①⓪">(2)</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot①①">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-sentdatagrams-slot">

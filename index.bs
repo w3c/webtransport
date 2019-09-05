@@ -478,7 +478,7 @@ The dictionary SHALL have the following attributes:
 
 # `QuicTransportBase` Interface #  {#quic-transport-base}
 
-The `QuicTransportBase` is the base interface for {{QuicTransport}}. Most of
+The `QuicTransportBase` is the base for {{QuicTransport}}. Most of
 the functionality of a `QuicTransport` is in the base class to allow for other
 subclasses (such as a p2p variant) to share the same interface.
 
@@ -496,6 +496,7 @@ defined in [[!QUIC-DATAGRAM]].
 
 <pre class="idl">
 interface QuicTransportBase {
+  Promise&lt;QuicTransportStats&gt; getStats();
 };
 
 QuicTransportBase includes UnidirectionalStreamsTransport;
@@ -503,6 +504,67 @@ QuicTransportBase includes BidirectionalStreamsTransport;
 QuicTransportBase includes DatagramTransport;
 QuicTransportBase includes WebTransport;
 </pre>
+
+## Methods ##  {#quic-transport-base-methods}
+
+: <dfn for="QuicTransportBase" method>getStats()</dfn>
+:: Gathers stats for this <code><a>QuicTransportBase</a></code>'s QUIC
+   connection and reports the result asynchronously.</p>
+
+   When close is called, the user agent MUST run the following steps:
+     1. Let |transport| be the QuicTransportBase on which `getStats` is invoked.
+     1. If |transport|'s {{[[WebTransportState]]}} is `"new"`, then abort
+        these steps.
+     1. Let |p| be a new promise.
+     1. Return |p| and continue the following steps in background.
+         1. Gather the stats from the underlying QUIC connection.
+         1. Once stats have been gathered, resolve |p| with the
+            {{QuicTransportStats}} object, representing the gathered stats.
+
+## `QuicTransportStats` Dictionary ##  {#quic-transport-stats}
+
+The <dfn dictionary>QuicTransportStats</dfn> dictionary includes information
+on QUIC connection level stats.
+
+<pre class="idl">
+dictionary QuicTransportStats {
+  DOMHighResTimeStamp timestamp;
+  unsigned long long bytesSent;
+  unsigned long long packetsSent;
+  unsigned long numOutgoingStreamsCreated;
+  unsigned long numIncomingStreamsCreated;
+  unsigned long long bytesReceived;
+  unsigned long long packetsReceived;
+  DOMHighResTimeStamp minRtt;
+  unsigned long numReceivedDatagramsDropped;
+};
+</pre>
+
+The dictionary SHALL have the following attributes:
+
+: <dfn for="QuicTransportStats" dict-member>timestamp</dfn>
+:: The `timestamp` for when the stats are gathered, relative to the
+UNIX epoch (Jan 1, 1970, UTC).
+: <dfn for="QuicTransportStats" dict-member>bytesSent</dfn>
+:: The number of bytes sent on the QUIC connection, including retransmissions.
+Does not include UDP or any other outer framing.
+: <dfn for="QuicTransportStats" dict-member>packetsSent</dfn>
+:: The number of packets sent on the QUIC connection, including retransmissions.
+: <dfn for="QuicTransportStats" dict-member>numOutgoingStreamsCreated</dfn>
+:: The number of outgoing QUIC streams created on the QUIC connection.
+: <dfn for="QuicTransportStats" dict-member>numIncomingStreamsCreated</dfn>
+:: The number of incoming QUIC streams created on the QUIC connection.
+: <dfn for="QuicTransportStats" dict-member>bytesReceived</dfn>
+:: The number of total bytes received on the QUIC connection, including
+duplicate data for streams. Does not include UDP or any other outer framing.
+: <dfn for="QuicTransportStats" dict-member>packetsReceived</dfn>
+:: The number of total packets received on the QUIC connection, including
+packets that were not processable.
+: <dfn for="QuicTransportStats" dict-member>minRtt</dfn>
+:: The minimum RTT observed on the entire connection.
+: <dfn for="QuicTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
+:: The number of datagrams that were dropped, due to too many datagrams buffered
+between calls to {{receiveDatagrams()}}.
 
 # `QuicTransport` Interface #  {#quic-transport}
 
