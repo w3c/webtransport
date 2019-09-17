@@ -74,7 +74,7 @@ encrypted and congestion-controlled communication.
 const host = 'example.com';
 const port = 10001;
 const transport = new QuicTransport(host, port);
-const datagramWritableStream = transport.sendDatagrams();
+const datagramWriter = transport.sendDatagrams().getWriter();
 
 setInterval(() => {
   // App-specific encoded game state
@@ -83,7 +83,7 @@ setInterval(() => {
 
   // If backpressure is being applied, it will get dropped
   // But that's OK for this scenario.
-  datagramWritableStream.getWriter().write(encodedGameState);
+  datagramWriter.write(encodedGameState);
 }, 100);
 ```
 
@@ -99,7 +99,6 @@ setInterval(async () => {
   const gameState = getGameState();
   const encodeGameState = encodeGameState(gameState);
   const stream = await transport.createSendStream();
-  await stream.ready;
   const writer = stream.writable.getWriter();
   writer.write(encodedGameState);
   writer.close();
@@ -115,25 +114,21 @@ const transport = new QuicTransport(host, port);
 
 const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
-mediaSource.onsourceopen = async (e) => {
-  const sourceBuffer = mediaSource.addSourceBuffer(mime);
-  // App-specific request
-  const mediaRequest = Uint8Array.from([1, 2, 3, 4]);
-  const requestStream = await transport.createSendStream();
-  requestStream.writable.getWriter().write(mediaRequest);
+await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
+const sourceBuffer = mediaSource.addSourceBuffer(mime);
 
-  readAllStreams(transport.receiveStreams(), sourceBuffer.appendBuffer);
-};
+// App-specific request
+const mediaRequest = Uint8Array.of(1, 2, 3, 4);
+const requestStream = await transport.createSendStream();
+const requestWriter = requestStream.writable.getWriter();
+requestWriter.write(mediaRequest);
+requestWriter.close();
 
-async function readAllStreams(streams, f) {
-  const streamsReader = streams.getReader();
-  while (true) {
-    const {value: responseStream, done} = await streamsReader.read();
-    if (done) {
-      return;
-    }
-    readStreamUntilFin(responseStream).then(f);
-  }
+// Receive the responses.
+for await (const responseStream of transport.receiveStreams()) {
+  const response = await responseStream.arrayBuffer();
+  sourceBuffer.appendBuffer(response);
+  await new Promise(resolve => sourceBuffer.addEventListener('update', () => resolve(), {once: true}));
 }
 ```
 
@@ -144,47 +139,20 @@ const host = 'example.com';
 const port = 10001;
 const transport = new QuicTransport(host, port);
 
-const streamsReader = transport.receiveBidirectionalStreams().getReader();
-while (true) {
-  const {value: stream, done} = await streamsReader.read();
-  if (done) {
-    break;
-  }
+for await (const stream of transport.receiveBidirectionalStreams()) {
   (async () => {
-    const notification = await readStreamUntilFin(stream)
-    if (notification) {
-      // App-specific notification encoding
-      const notificationMessage = decodeNotification(notification);
-      let n = new Notification(notificationMessage);
-      n.onclick = (e) => {
-        // App-specific click message encoding
-        const clickMessage = encodeClickMessage();
-        stream.getWriter().write(clickMessage);
-      };
-    }
+    const notification = await stream.arrayBuffer();
+    // App-specific notification encoding
+    const notificationMessage = decodeNotification(notification);
+    const notification = new Notification(notificationMessage);
+    notification.addEventListener(() => {
+      // App-specific click message encoding
+      const clickMessage = encodeClickMessage();
+      const writer = stream.writable.getWriter();
+      writer.write(clickMessage);
+      writer.close();
+    }, {once: true});
   })();
-}
-
-async function readStreamUntilFin(stream) {
-  const reader = stream.readable.getReader();
-  const buffers = [];
-  let bufferedSize = 0;
-  while (true) {
-    const {value: chunk, done} = await reader.read();
-    if (done)  {
-      break;
-    }
-    buffers.push(chunk);
-    bufferedSize += chunk.byteLength;
-  }
-
-  let joinedBuffer = new Uint8Array(bufferedSize);
-  let joinedSize = 0;
-  for (let buffer of buffers) {
-    joinedBuffer.set(buffer, joinedSize);
-    joinedSize += buffer.byteLength;
-  }
-  return joinedBuffer.array;
 }
 ```
 
@@ -193,23 +161,18 @@ async function readStreamUntilFin(stream) {
 ```javascript
 const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
-mediaSource.onsourceopen = async (e) => {
-  const sourceBuffer = mediaSource.addSourceBuffer(mime);
-  
-  const transport = new Http3Transport("/video");
-  if (transport) {
-    await fetch('http://example.com/babyshark');
-    const reader = transport.receiveDatagrams().getReader();
-    while (true) {
-      const {value: datagram, done} = await reader.read();
-      if (done) {
-        break;
-      }
-      const chunk = containerizeMedia(datagram);
-      sourceBuffer.appendBuffer(chunk);
-    }
-  }
-};
+await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
+const sourceBuffer = mediaSource.addSourceBuffer(mime);
+const transport = new Http3Transport("/video");
+if (!transport) {
+  return;
+}
+await fetch('http://example.com/babyshark');
+for await (const datagram of transport.receiveDatagrams()) {
+  const chunk = containerizeMedia(datagram);
+  sourceBuffer.appendBuffer(chunk);
+  await new Promise(resolve => sourceBuffer.addEventListener('update', () => resolve(), {once: true}));
+}
 ```
 
 ## Example of requesting over HTTP and receiving media pushed out-of-order and reliably over the same network connection
@@ -217,11 +180,13 @@ mediaSource.onsourceopen = async (e) => {
 ```javascript
 const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
-mediaSource.onsourceopen = (e) => {
-  const sourceBuffer = mediaSource.addSourceBuffer(mime);
-  const transport = new Http3Transport("https://example.com/video");
-  readAllStreams(transport.receiveStreams(), sourceBuffer.appendBuffer);
-};
+await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
+const sourceBuffer = mediaSource.addSourceBuffer(mime);
+const transport = new Http3Transport("https://example.com/video");
+for await (const stream of transport.receiveStreams()) {
+  sourceBuffer.appendBuffer(await stream.arrayBuffer());
+  await new Promise(resolve => sourceBuffer.addEventListener('update', () => resolve(), {once: true}));
+}
 ```
 
 ## Detailed design discussion
