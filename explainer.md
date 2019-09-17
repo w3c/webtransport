@@ -1,7 +1,5 @@
 # WebTransport Explainer
 
-Updated: April 2019
-
 ## Problem and Motivation
 
 Many applications, such as games and live streaming, need a mechanism to send
