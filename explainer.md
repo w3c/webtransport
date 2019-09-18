@@ -69,36 +69,29 @@ encrypted and congestion-controlled communication.
 ## Example of sending unreliable game state to server using QUIC datagrams
 
 ```javascript
-const host = 'example.com';
-const port = 10001;
-const transport = new QuicTransport(host, port);
+// The app provides a way to get a serialized state to send to the server
+function getSerializedGameState() { ... }
+
+const transport = new QuicTransport('example.com', 10001);
 const datagramWriter = transport.sendDatagrams().getWriter();
-
 setInterval(() => {
-  // App-specific encoded game state
-  const gameState = getGameState();
-  const encodeGameState = encodeGameState(gameState);
-
-  // If backpressure is being applied, it will get dropped
-  // But that's OK for this scenario.
-  datagramWriter.write(encodedGameState);
+  const message = getSerializedGameState();
+  datagramWriter.write(message);
 }, 100);
 ```
 
 ## Example of sending reliable game state to server using a QUIC unidirectional send stream
 
 ```javascript
-const host = 'example.com';
-const port = 10001;
-const transport = new QuicTransport(host, port);
+// The app provides a way to get a serialized state to send to the server.
+function getSerializedGameState() { ... }
 
+const transport = new QuicTransport('example.com', 10001);
 setInterval(async () => {
-  // App-specific encoded game state
-  const gameState = getGameState();
-  const encodeGameState = encodeGameState(gameState);
+  const message = getSerializedGameState();
   const stream = await transport.createSendStream();
   const writer = stream.writable.getWriter();
-  writer.write(encodedGameState);
+  writer.write(message);
   writer.close();
 }, 100);
 ```
@@ -106,17 +99,17 @@ setInterval(async () => {
 ## Example of receiving media pushed from server using unidirectional receive streams
 
 ```javascript
-const host = 'example.com';
-const port = 10001;
-const transport = new QuicTransport(host, port);
+// The app provides a way to get a serialized media request to send to the server
+function getSerializedMediaRequest() { ... }
 
-const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
+const transport = new QuicTransport('example.com', 10001);
+
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
-const sourceBuffer = mediaSource.addSourceBuffer(mime);
+const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
 
 // App-specific request
-const mediaRequest = Uint8Array.of(1, 2, 3, 4);
+const mediaRequest = getSerializedMediaRequest();
 const requestStream = await transport.createSendStream();
 const requestWriter = requestStream.writable.getWriter();
 requestWriter.write(mediaRequest);
@@ -133,42 +126,33 @@ for await (const responseStream of transport.receiveStreams()) {
 ## Example of receiving notifications pushed from the server, with responses
 
 ```javascript
-const host = 'example.com';
-const port = 10001;
-const transport = new QuicTransport(host, port);
+// The app provides a way to deserialize a notification received from the server.
+function deserializeNotification(serializedNotification) { ... }
+// The app also provides a way to serialize a "clicked" message to send to the server.
+function serializeClickedMessage(notification) { ... }
 
+const transport = new QuicTransport('example.com', 10001);
 for await (const stream of transport.receiveBidirectionalStreams()) {
-  (async () => {
-    const notification = await stream.arrayBuffer();
-    // App-specific notification encoding
-    const notificationMessage = decodeNotification(notification);
-    const notification = new Notification(notificationMessage);
-    notification.addEventListener(() => {
-      // App-specific click message encoding
-      const clickMessage = encodeClickMessage();
-      const writer = stream.writable.getWriter();
-      writer.write(clickMessage);
-      writer.close();
-    }, {once: true});
-  })();
+  const notification = new Notification(deserializeNofitication(await stream.arrayBuffer()));
+  notification.addEventListener('onclick', () => {
+    const clickMessage = encodeClickMessage(notification);
+    const writer = stream.writable.getWriter();
+    writer.write(clickMessage);
+    writer.close();
+  });
 }
 ```
 
 ## Example of requesting over pooled HTTP and receiving media pushed out-of-order and unreliably over the same network connection
 
 ```javascript
-const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
-const sourceBuffer = mediaSource.addSourceBuffer(mime);
+const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
 const transport = new Http3Transport("/video");
-if (!transport) {
-  return;
-}
 await fetch('http://example.com/babyshark');
 for await (const datagram of transport.receiveDatagrams()) {
-  const chunk = containerizeMedia(datagram);
-  sourceBuffer.appendBuffer(chunk);
+  sourceBuffer.appendBuffer(datagram);
   await new Promise(resolve => sourceBuffer.addEventListener('update', () => resolve(), {once: true}));
 }
 ```
@@ -176,10 +160,9 @@ for await (const datagram of transport.receiveDatagrams()) {
 ## Example of requesting over HTTP and receiving media pushed out-of-order and reliably over the same network connection
 
 ```javascript
-const mime = 'video/webm; codecs="opus, vp09.00.10.08"';
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
-const sourceBuffer = mediaSource.addSourceBuffer(mime);
+const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
 const transport = new Http3Transport("https://example.com/video");
 for await (const stream of transport.receiveStreams()) {
   sourceBuffer.appendBuffer(await stream.arrayBuffer());
