@@ -75,15 +75,15 @@ function getSerializedGameState() { ... }
 const transport = new QuicTransport('example.com', 10001);
 const datagramWriter = transport.sendDatagrams().getWriter();
 setInterval(() => {
-  const datagram = getSerializedGameState();
-  datagramWriter.write(datagram);
+  const message = getSerializedGameState();
+  datagramWriter.write(message);
 }, 100);
 ```
 
 ## Example of sending reliable game state to server using a QUIC unidirectional send stream
 
 ```javascript
-// The app  provides a way to get a serialized state to send to the server
+// The app provides a way to get a serialized state to send to the server.
 function getSerializedGameState() { ... }
 
 const transport = new QuicTransport('example.com', 10001);
@@ -127,7 +127,7 @@ for await (const responseStream of transport.receiveStreams()) {
 
 ```javascript
 // The app provides a way to deserialize a notification received from the server.
-function deserializeNofitication(serializedNotification) { ... }
+function deserializeNotification(serializedNotification) { ... }
 // The app also provides a way to serialize a "clicked" message to send to the server.
 function serializeClickedMessage(notification) { ... }
 
