@@ -162,7 +162,7 @@ interface mixin UnidirectionalStreamsTransport {
         immediately return a new [=rejected=] promise with a newly created
         {{InvalidStateError}} and abort these steps.
      1. If |transport|'s {{WebTransport/state}} is `"connected"`, immediately
-        return a new [=resolved=] promise with a newly created {{SendStream}}
+        return a new [=fulfilled=] promise with a newly created {{SendStream}}
         object, [=add the SendStream=] to the transport and abort these steps.
      1. Let |p| be a new promise.
      1. Return |p| and continue the following steps in background.
@@ -260,7 +260,7 @@ interface BidirectionalStreamsTransport {
       immediately return a new [=rejected=] promise with a newly created
       {{InvalidStateError}} and abort these steps.
    1. If |transport|'s {{WebTransport/state}} is `"connected"`, immediately
-      return a new [=resolved=] promise with a newly created
+      return a new [=fulfilled=] promise with a newly created
       {{BidirectionalStream}} object, [=add the BidirectionalStream=] to the
       transport and abort these steps.
    1. Let |p| be a new promise.
@@ -649,7 +649,7 @@ The {{OutgoingStream}} will initialize with the following:
    be used to write to the {{OutgoingStream}}. On getting it MUST return the
    value of the {{[[Writable]]}} slot.
 : <dfn attribute for="OutgoingStream">writingAborted</dfn>
-:: The `writingAborted` attribute represents a promise that is [=resolved=]
+:: The `writingAborted` attribute represents a promise that is [=fulfilled=]
     when the a message from the remote side aborting the stream is received.
     For QUIC, that message is a STOP_SENDING frame. When the stream receives
     this mesage, the user agent MUST run the following:
@@ -726,7 +726,7 @@ The {{IncomingStream}} will initialize with the following:
    be used to read from the {{IncomingStream}}. On getting it MUST return the
    value of the {{IncomingStream}}'s {{[[Readable]]}} slot.
 : <dfn attribute for="IncomingStream">readingAborted</dfn>
-:: The `readingAborted` attribute represents a promise that is [=resolved=]
+:: The `readingAborted` attribute represents a promise that is [=fulfilled=]
     when the a message from the remote side aborting the stream is received.
     For QUIC, that message is a RST_STREAM frame. When the stream receives
     this mesage, the user agent MUST run the following:
