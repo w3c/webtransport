@@ -1213,8 +1213,9 @@ Possible extra rowspan handling
 	}
 </style>
   <link href="https://www.w3.org/StyleSheets/TR/2016/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version f7860c06eaec18afc415bf3f4a7b90aee58ca680" name="generator">
+  <meta content="Bikeshed version 450e0499b28bb4c684052ad936ad1e7d36c4eac5" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
+  <meta content="6c9cbf26870723a5c6e4a5131691b876fbb7b281" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1472,7 +1473,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-09-04">4 September 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-10-28">28 October 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1653,7 +1654,7 @@ particular, the algorithms defined in this specification are intended to be
 easy to follow, and not intended to be performant.)</p>
    <p>Implementations that use ECMAScript to implement the APIs defined in this
 specification MUST implement them in a manner consistent with the ECMAScript
-Bindings defined in the Web IDL specification <a data-link-type="biblio" href="#biblio-webidl-1">[WEBIDL-1]</a>, as this
+Bindings defined in the Web IDL specification <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>, as this
 specification uses that specification and terminology.</p>
    <h2 class="heading settled" data-level="3" id="terminology"><span class="secno">3. </span><span class="content">Terminology</span><a class="self-link" href="#terminology"></a></h2>
    <p>The <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler" id="ref-for-eventhandler">EventHandler</a></code> interface, representing a callback used for event
@@ -2098,11 +2099,11 @@ on QUIC connection level stats.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-timestamp"><code>timestamp</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp②">DOMHighResTimeStamp</a></span>
     <dd data-md>
      <p>The <code>timestamp</code> for when the stats are gathered, relative to the
-UNIX epoch (Jan 1, 1970, UTC).</p>
+ UNIX epoch (Jan 1, 1970, UTC).</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-bytessent"><code>bytesSent</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long④">unsigned long long</a></span>
     <dd data-md>
      <p>The number of bytes sent on the QUIC connection, including retransmissions.
-Does not include UDP or any other outer framing.</p>
+ Does not include UDP or any other outer framing.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-packetssent"><code>packetsSent</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑤">unsigned long long</a></span>
     <dd data-md>
      <p>The number of packets sent on the QUIC connection, including retransmissions.</p>
@@ -2115,18 +2116,18 @@ Does not include UDP or any other outer framing.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-bytesreceived"><code>bytesReceived</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑥">unsigned long long</a></span>
     <dd data-md>
      <p>The number of total bytes received on the QUIC connection, including
-duplicate data for streams. Does not include UDP or any other outer framing.</p>
+ duplicate data for streams. Does not include UDP or any other outer framing.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-packetsreceived"><code>packetsReceived</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑦">unsigned long long</a></span>
     <dd data-md>
      <p>The number of total packets received on the QUIC connection, including
-packets that were not processable.</p>
+ packets that were not processable.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-minrtt"><code>minRtt</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp③">DOMHighResTimeStamp</a></span>
     <dd data-md>
      <p>The minimum RTT observed on the entire connection.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-numreceiveddatagramsdropped"><code>numReceivedDatagramsDropped</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑤">unsigned long</a></span>
     <dd data-md>
      <p>The number of datagrams that were dropped, due to too many datagrams buffered
-between calls to <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-receivedatagrams" id="ref-for-dom-datagramtransport-receivedatagrams①">receiveDatagrams()</a></code>.</p>
+ between calls to <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-receivedatagrams" id="ref-for-dom-datagramtransport-receivedatagrams①">receiveDatagrams()</a></code>.</p>
    </dl>
    <h2 class="heading settled" data-level="9" id="quic-transport"><span class="secno">9. </span><span class="content"><code>QuicTransport</code> Interface</span><a class="self-link" href="#quic-transport"></a></h2>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="quictransport"><code>QuicTransport</code></dfn> is a subclass of <code class="idl"><a data-link-type="idl" href="#quictransportbase" id="ref-for-quictransportbase⑤">QuicTransportBase</a></code> focused on client/server use cases.</p>
@@ -2268,6 +2269,7 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class①③"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable"><c- g>readable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑤"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-incomingstream-readingaborted" id="ref-for-dom-incomingstream-readingaborted"><c- g>readingAborted</c-></a>;
   <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-abortreading" id="ref-for-dom-incomingstream-abortreading"><c- g>abortReading</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑥"><c- n>StreamAbortInfo</c-></a> <dfn class="idl-code" data-dfn-for="IncomingStream/abortReading(abortInfo), IncomingStream/abortReading()" data-dfn-type="argument" data-export id="dom-incomingstream-abortreading-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code><a class="self-link" href="#dom-incomingstream-abortreading-abortinfo-abortinfo"></a></dfn>);
+  <c- b>Promise</c->&lt;<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-ArrayBuffer" id="ref-for-idl-ArrayBuffer"><c- b>ArrayBuffer</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-arraybuffer" id="ref-for-dom-incomingstream-arraybuffer"><c- g>arrayBuffer</c-></a>();
 };
 </pre>
    <h3 class="heading settled" data-level="11.1" id="incoming-stream-overview"><span class="secno">11.1. </span><span class="content">Overview</span><a class="self-link" href="#incoming-stream-overview"></a></h3>
@@ -2326,6 +2328,12 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
   STOP_SENDING frame) with its error code set to the value of
   |abortInfo.errorCode|.</p>
      </ol>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="IncomingStream" data-dfn-type="method" data-export id="dom-incomingstream-arraybuffer"><code>arrayBuffer()</code></dfn>
+    <dd data-md>
+     <p>A convenience method that asynchronously reads all the contents of
+ |IncomingStream.readable| and returns it as an ArrayBuffer.  This locks the
+ stream while reading, just as if |IncomingStream.readable.getReader()| were
+ used.</p>
    </dl>
    <h2 class="heading settled" data-level="12" id="web-transport-stream"><span class="secno">12. </span><span class="content">Interface <code>WebTransportStream</code></span><a class="self-link" href="#web-transport-stream"></a></h2>
    <p>A collection of common attributes and methods of all streams.</p>
@@ -2669,6 +2677,7 @@ use in this specification.</p>
    <li><a href="#dom-outgoingstream-abortwriting">abortWriting(abortInfo)</a><span>, in §10.3</span>
    <li><a href="#add-the-bidirectionalstream">add the BidirectionalStream</a><span>, in §5.2.1</span>
    <li><a href="#add-the-sendstream">add the SendStream</a><span>, in §4.2.1</span>
+   <li><a href="#dom-incomingstream-arraybuffer">arrayBuffer()</a><span>, in §11.3</span>
    <li><a href="#bidirectionalstream">BidirectionalStream</a><span>, in §13</span>
    <li><a href="#bidirectionalstreamstransport">BidirectionalStreamsTransport</a><span>, in §5</span>
    <li><a href="#dom-quictransportstats-bytesreceived">bytesReceived</a><span>, in §8.4</span>
@@ -2854,6 +2863,12 @@ use in this specification.</p>
     <li><a href="#ref-for-relevant-settings-object">9.1. Interface Definition</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-ArrayBuffer">
+   <a href="https://heycam.github.io/webidl/#idl-ArrayBuffer">https://heycam.github.io/webidl/#idl-ArrayBuffer</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-ArrayBuffer">11. Interface Mixin IncomingStream</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-idl-DOMString">
    <a href="https://heycam.github.io/webidl/#idl-DOMString">https://heycam.github.io/webidl/#idl-DOMString</a><b>Referenced in:</b>
    <ul>
@@ -3004,6 +3019,7 @@ use in this specification.</p>
    <li>
     <a data-link-type="biblio">[WEBIDL]</a> defines the following terms:
     <ul>
+     <li><span class="dfn-paneled" id="term-for-idl-ArrayBuffer" style="color:initial">ArrayBuffer</span>
      <li><span class="dfn-paneled" id="term-for-idl-DOMString" style="color:initial">DOMString</span>
      <li><span class="dfn-paneled" id="term-for-Exposed" style="color:initial">Exposed</span>
      <li><span class="dfn-paneled" id="term-for-invalidstateerror" style="color:initial">InvalidStateError</span>
@@ -3048,8 +3064,6 @@ use in this specification.</p>
    <dd>Victor Vasiliev. <a href="https://tools.ietf.org/html/draft-vvv-webtransport-quic">WebTransport over QUIC</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-vvv-webtransport-quic">https://tools.ietf.org/html/draft-vvv-webtransport-quic</a>
    <dt id="biblio-webidl">[WEBIDL]
    <dd>Boris Zbarsky. <a href="https://heycam.github.io/webidl/">Web IDL</a>. 15 December 2016. ED. URL: <a href="https://heycam.github.io/webidl/">https://heycam.github.io/webidl/</a>
-   <dt id="biblio-webidl-1">[WEBIDL-1]
-   <dd>Cameron McCormack. <a href="https://www.w3.org/TR/2016/REC-WebIDL-1-20161215/">WebIDL Level 1</a>. 15 December 2016. REC. URL: <a href="https://www.w3.org/TR/2016/REC-WebIDL-1-20161215/">https://www.w3.org/TR/2016/REC-WebIDL-1-20161215/</a>
    <dt id="biblio-whatwg-streams">[WHATWG-STREAMS]
    <dd>Adam Rice; Domenic Denicola; 吉野剛史 (Takeshi Yoshino). <a href="https://streams.spec.whatwg.org/">Streams Standard</a>. Living Standard. URL: <a href="https://streams.spec.whatwg.org/">https://streams.spec.whatwg.org/</a>
   </dl>
@@ -3141,6 +3155,7 @@ use in this specification.</p>
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class①③①"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable①"><c- g>readable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑤①"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-incomingstream-readingaborted" id="ref-for-dom-incomingstream-readingaborted①"><c- g>readingAborted</c-></a>;
   <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-abortreading" id="ref-for-dom-incomingstream-abortreading①"><c- g>abortReading</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑥①"><c- n>StreamAbortInfo</c-></a> <a href="#dom-incomingstream-abortreading-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code></a>);
+  <c- b>Promise</c->&lt;<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-ArrayBuffer" id="ref-for-idl-ArrayBuffer①"><c- b>ArrayBuffer</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-arraybuffer" id="ref-for-dom-incomingstream-arraybuffer①"><c- g>arrayBuffer</c-></a>();
 };
 
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
@@ -3640,6 +3655,12 @@ use in this specification.</p>
    <b><a href="#dom-incomingstream-abortreading">#dom-incomingstream-abortreading</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-incomingstream-abortreading">11. Interface Mixin IncomingStream</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-incomingstream-arraybuffer">
+   <b><a href="#dom-incomingstream-arraybuffer">#dom-incomingstream-arraybuffer</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-incomingstream-arraybuffer">11. Interface Mixin IncomingStream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="webtransportstream">
