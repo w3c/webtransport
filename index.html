@@ -1213,9 +1213,9 @@ Possible extra rowspan handling
 	}
 </style>
   <link href="https://www.w3.org/StyleSheets/TR/2016/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version 450e0499b28bb4c684052ad936ad1e7d36c4eac5" name="generator">
+  <meta content="Bikeshed version e86d5b1b47a216fa66165c234892adc259212183" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="6c9cbf26870723a5c6e4a5131691b876fbb7b281" name="document-revision">
+  <meta content="3b183f73b0777120840761770c458ed91b536e1e" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1473,7 +1473,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-10-28">28 October 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-11-11">11 November 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1958,7 +1958,6 @@ state, state changes, and the ability to close the transport.</p>
    <h3 class="heading settled" data-level="7.3" id="web-transport-state-enum"><span class="secno">7.3. </span><span class="content"><code>WebTransportState</code> Enum</span><a class="self-link" href="#web-transport-state-enum"></a></h3>
    <p><dfn class="dfn-paneled idl-code" data-dfn-type="enum" data-export id="enumdef-webtransportstate"><code>WebTransportState</code></dfn> indicates the state of the transport.</p>
 <pre class="idl highlight def"><c- b>enum</c-> <a class="idl-code" data-link-type="enum" href="#enumdef-webtransportstate" id="ref-for-enumdef-webtransportstate②"><c- g>WebTransportState</c-></a> {
-  <a class="idl-code" data-link-type="enum-value" href="#dom-webtransportstate-new" id="ref-for-dom-webtransportstate-new"><c- s>"new"</c-></a>,
   <a class="idl-code" data-link-type="enum-value" href="#dom-webtransportstate-connecting" id="ref-for-dom-webtransportstate-connecting"><c- s>"connecting"</c-></a>,
   <a class="idl-code" data-link-type="enum-value" href="#dom-webtransportstate-connected" id="ref-for-dom-webtransportstate-connected"><c- s>"connected"</c-></a>,
   <a class="idl-code" data-link-type="enum-value" href="#dom-webtransportstate-closed" id="ref-for-dom-webtransportstate-closed"><c- s>"closed"</c-></a>,
@@ -1966,9 +1965,6 @@ state, state changes, and the ability to close the transport.</p>
 };
 </pre>
    <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportState" data-dfn-type="enum-value" data-export id="dom-webtransportstate-new"><code>"new"</code></dfn>
-    <dd data-md>
-     <p>The <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport">WebTransport</a></code> object has been created and has not started negotiating yet.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportState" data-dfn-type="enum-value" data-export id="dom-webtransportstate-connecting"><code>"connecting"</code></dfn>
     <dd data-md>
      <p>The transport is in the process of negotiating a secure connection. Once a
@@ -1980,11 +1976,11 @@ state, state changes, and the ability to close the transport.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportState" data-dfn-type="enum-value" data-export id="dom-webtransportstate-closed"><code>"closed"</code></dfn>
     <dd data-md>
      <p>The transport has been closed intentionally via a call to <code class="idl"><a data-link-type="idl" href="#dom-webtransport-close" id="ref-for-dom-webtransport-close②">close()</a></code> or receipt of a closing message from the remote
- side.  When the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①">WebTransport</a></code>'s internal <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot④">[[WebTransportState]]</a></code> slot
+ side.  When the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport">WebTransport</a></code>'s internal <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot④">[[WebTransportState]]</a></code> slot
  transitions to <code>closed</code> the user agent MUST run the following steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②">WebTransport</a></code>.</p>
+       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①">WebTransport</a></code>.</p>
       <li data-md>
        <p>Close the <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑥">ReadableStream</a></code> in <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-receivedstreams-slot" id="ref-for-dom-quictransport-receivedstreams-slot③">[[ReceivedStreams]]</a></code> internal slot.</p>
       <li data-md>
@@ -2017,7 +2013,7 @@ state, state changes, and the ability to close the transport.</p>
    </dl>
    <h3 class="heading settled" data-level="7.4" id="web-transport-close-info"><span class="secno">7.4. </span><span class="content"><code>WebTransportCloseInfo</code> Dictionary</span><a class="self-link" href="#web-transport-close-info"></a></h3>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-webtransportcloseinfo"><code>WebTransportCloseInfo</code></dfn> dictionary includes information
-relating to the error code for closing a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport③">WebTransport</a></code>. For QUIC, this
+relating to the error code for closing a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②">WebTransport</a></code>. For QUIC, this
 information is used to set the error code and reason for an CONNECTION_CLOSE
 frame.</p>
 <pre class="idl highlight def"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo①"><c- g>WebTransportCloseInfo</c-></a> {
@@ -2032,7 +2028,7 @@ frame.</p>
      <p>The error code communicated to the peer.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportCloseInfo" data-dfn-type="dict-member" data-export id="dom-webtransportcloseinfo-reason"><code>reason</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString①">DOMString</a>, defaulting to <code>""</code></span>
     <dd data-md>
-     <p>The reason for closing the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport④">WebTransport</a></code>.</p>
+     <p>The reason for closing the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport③">WebTransport</a></code>.</p>
    </dl>
    <h2 class="heading settled" data-level="8" id="quic-transport-base"><span class="secno">8. </span><span class="content"><code>QuicTransportBase</code> Interface</span><a class="self-link" href="#quic-transport-base"></a></h2>
    <p>The <code>QuicTransportBase</code> is the base for <code class="idl"><a data-link-type="idl" href="#quictransport" id="ref-for-quictransport">QuicTransport</a></code>. Most of
@@ -2051,7 +2047,7 @@ defined in <a data-link-type="biblio" href="#biblio-quic-datagram">[QUIC-DATAGRA
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport④"><c- n>UnidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase②"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑤"><c- n>BidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase③"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport③"><c- n>DatagramTransport</c-></a>;
-<a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase④"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑤"><c- n>WebTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase④"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport④"><c- n>WebTransport</c-></a>;
 </pre>
    <h3 class="heading settled" data-level="8.3" id="quic-transport-base-methods"><span class="secno">8.3. </span><span class="content">Methods</span><a class="self-link" href="#quic-transport-base-methods"></a></h3>
    <dl>
@@ -2064,9 +2060,6 @@ defined in <a data-link-type="biblio" href="#biblio-quic-datagram">[QUIC-DATAGRA
      <ol>
       <li data-md>
        <p>Let <var>transport</var> be the QuicTransportBase on which <code>getStats</code> is invoked.</p>
-      <li data-md>
-       <p>If <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑥">[[WebTransportState]]</a></code> is <code>"new"</code>, then abort
-  these steps.</p>
       <li data-md>
        <p>Let <var>p</var> be a new promise.</p>
       <li data-md>
@@ -2171,9 +2164,9 @@ agent MUST run the following steps:</p>
        <p>Establish a QUIC connection to the address identified by the given <code class="idl"><a data-link-type="idl" href="#dom-quictransport-quictransport-host-port-host" id="ref-for-dom-quictransport-quictransport-host-port-host">host</a></code> and <code class="idl"><a data-link-type="idl" href="#dom-quictransport-quictransport-host-port-port" id="ref-for-dom-quictransport-quictransport-host-port-port①">port</a></code> following the
  procedures in <a data-link-type="biblio" href="#biblio-web-transport-quic">[WEB-TRANSPORT-QUIC]</a> section 3 and using <var>clientOrigin</var> as the "origin of the client" referenced in section 3.2.</p>
       <li data-md>
-       <p>If the connection fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑦">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these steps.</p>
+       <p>If the connection fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑥">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these steps.</p>
       <li data-md>
-       <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑧">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code>.</p>
+       <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑦">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code>.</p>
      </ol>
     <li data-md>
      <p>Return <var>transport</var>.</p>
@@ -2212,7 +2205,7 @@ either a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-fo
       <li data-md>
        <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑧">OutgoingStream</a></code> object.</p>
       <li data-md>
-       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑥">WebTransport</a></code>, which the <var>stream</var> was created
+       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑤">WebTransport</a></code>, which the <var>stream</var> was created
  from.</p>
       <li data-md>
        <p>Remove the stream from the <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-outgoingstreams-slot" id="ref-for-dom-quictransport-outgoingstreams-slot⑥">[[OutgoingStreams]]</a></code> internal slot.</p>
@@ -2235,7 +2228,7 @@ either a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-fo
        <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream①①">OutgoingStream</a></code> object which is about to abort
   writing.</p>
       <li data-md>
-       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑦">WebTransport</a></code>, which the <var>stream</var> was created
+       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑥">WebTransport</a></code>, which the <var>stream</var> was created
   from.</p>
       <li data-md>
        <p>Remove the stream from the transport’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-outgoingstreams-slot" id="ref-for-dom-quictransport-outgoingstreams-slot⑦">[[OutgoingStreams]]</a></code> internal
@@ -2297,7 +2290,7 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
        <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream⑨">IncomingStream</a></code> object for which the abort
  message was received.</p>
       <li data-md>
-       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑧">WebTransport</a></code>, which the <var>stream</var> was created
+       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑦">WebTransport</a></code>, which the <var>stream</var> was created
  from.</p>
       <li data-md>
        <p><a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②⓪">Resolve</a> the promise with the resulting <code class="idl"><a data-link-type="idl" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑧">StreamAbortInfo</a></code> with
@@ -2318,7 +2311,7 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
        <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream①②">IncomingStream</a></code> object which is about to abort
   reading.</p>
       <li data-md>
-       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑨">WebTransport</a></code>, which the <var>stream</var> was created
+       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑧">WebTransport</a></code>, which the <var>stream</var> was created
   from.</p>
       <li data-md>
        <p>Let <var>abortInfo</var> be the first argument.</p>
@@ -2340,7 +2333,7 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
 <pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="webtransportstream"><code><c- g>WebTransportStream</c-></code></dfn> {
     <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑧"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-webtransportstream-streamid" id="ref-for-dom-webtransportstream-streamid"><c- g>streamId</c-></a>;
-    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①⓪"><c- n>WebTransport</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransport" href="#dom-webtransportstream-transport" id="ref-for-dom-webtransportstream-transport"><c- g>transport</c-></a>;
+    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑨"><c- n>WebTransport</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransport" href="#dom-webtransportstream-transport" id="ref-for-dom-webtransportstream-transport"><c- g>transport</c-></a>;
 };
 </pre>
    <h3 class="heading settled" data-level="12.1" id="web-transport-stream-attributes"><span class="secno">12.1. </span><span class="content">Attributes</span><a class="self-link" href="#web-transport-stream-attributes"></a></h3>
@@ -2348,9 +2341,9 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportStream" data-dfn-type="attribute" data-export id="dom-webtransportstream-streamid"><code>streamId</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑨">unsigned long long</a>, readonly</span>
     <dd data-md>
      <p>The readonly attribute referring to the ID of the <code class="idl"><a data-link-type="idl" href="#webtransportstream" id="ref-for-webtransportstream">WebTransportStream</a></code> object.</p>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportStream" data-dfn-type="attribute" data-export id="dom-webtransportstream-transport"><code>transport</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①①">WebTransport</a>, readonly</span>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportStream" data-dfn-type="attribute" data-export id="dom-webtransportstream-transport"><code>transport</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①⓪">WebTransport</a>, readonly</span>
     <dd data-md>
-     <p>The readonly attribute referring to the related <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①②">WebTransport</a></code> object.</p>
+     <p>The readonly attribute referring to the related <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①①">WebTransport</a></code> object.</p>
    </dl>
    <h2 class="heading settled" data-level="13" id="bidirectional-stream"><span class="secno">13. </span><span class="content">Interface <code>BidirectionalStream</code></span><a class="self-link" href="#bidirectional-stream"></a></h2>
 <pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
@@ -2385,7 +2378,7 @@ Datagrams are implemented with QUIC datagrams as defined in <a data-link-type="b
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport⑥"><c- n>UnidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport②"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑦"><c- n>BidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport③"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport⑤"><c- n>DatagramTransport</c-></a>;
-<a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport④"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①③"><c- n>WebTransport</c-></a>;</pre>
+<a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport④"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①②"><c- n>WebTransport</c-></a>;</pre>
    <h4 class="heading settled" data-level="16.2.1" id="http3-transport-constructors"><span class="secno">16.2.1. </span><span class="content">Constructors</span><a class="self-link" href="#http3-transport-constructors"></a></h4>
    <p>When the <code class="idl"><a data-link-type="idl" href="#dom-http3transport-http3transport" id="ref-for-dom-http3transport-http3transport">Http3Transport()</a></code> constructor is invoked, the user
 agent MUST run the following steps:</p>
@@ -2417,16 +2410,16 @@ agent MUST run the following steps:</p>
  connection to the host specificed by the url, as specified in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.</p>
       <li data-md>
        <p>If there is no such HTTP/3 connection to reuse and the establishment of
- a new HTTP/3 connection, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑨">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these steps.</p>
+ a new HTTP/3 connection, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑧">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these steps.</p>
       <li data-md>
        <p>Once a connection an HTTP/3 connection is established, follow the steps
  specified in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a> section 4 for establishing a
  WebTransport session within the HTTP/3 connection.</p>
       <li data-md>
-       <p>If the establishment of the WebTransport session fails, set transport’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot①⓪">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these
+       <p>If the establishment of the WebTransport session fails, set transport’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot⑨">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these
  steps.</p>
       <li data-md>
-       <p>Once a session has been established, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot①①">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code> and abort these
+       <p>Once a session has been established, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-quictransport-webtransportstate-slot" id="ref-for-dom-quictransport-webtransportstate-slot①⓪">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code> and abort these
  steps.</p>
      </ol>
     <li data-md>
@@ -2706,7 +2699,6 @@ use in this specification.</p>
    <li><a href="#incomingstream">IncomingStream</a><span>, in §11</span>
    <li><a href="#dom-datagramtransport-maxdatagramsize">maxDatagramSize</a><span>, in §6.1</span>
    <li><a href="#dom-quictransportstats-minrtt">minRtt</a><span>, in §8.4</span>
-   <li><a href="#dom-webtransportstate-new">"new"</a><span>, in §7.3</span>
    <li><a href="#dom-quictransportstats-numincomingstreamscreated">numIncomingStreamsCreated</a><span>, in §8.4</span>
    <li><a href="#dom-quictransportstats-numoutgoingstreamscreated">numOutgoingStreamsCreated</a><span>, in §8.4</span>
    <li><a href="#dom-quictransportstats-numreceiveddatagramsdropped">numReceivedDatagramsDropped</a><span>, in §8.4</span>
@@ -3047,7 +3039,7 @@ use in this specification.</p>
    <dt id="biblio-ecmascript-60">[ECMASCRIPT-6.0]
    <dd>Allen Wirfs-Brock. <a href="http://www.ecma-international.org/ecma-262/6.0/index.html">ECMA-262 6th Edition, The ECMAScript 2015 Language Specification</a>. June 2015. Standard. URL: <a href="http://www.ecma-international.org/ecma-262/6.0/index.html">http://www.ecma-international.org/ecma-262/6.0/index.html</a>
    <dt id="biblio-hr-time-2">[HR-TIME-2]
-   <dd>Ilya Grigorik; James Simonsen; Jatinder Mann. <a href="https://www.w3.org/TR/hr-time-2/">High Resolution Time Level 2</a>. 26 June 2019. CR. URL: <a href="https://www.w3.org/TR/hr-time-2/">https://www.w3.org/TR/hr-time-2/</a>
+   <dd>Ilya Grigorik. <a href="https://www.w3.org/TR/hr-time-2/">High Resolution Time Level 2</a>. 15 October 2019. PR. URL: <a href="https://www.w3.org/TR/hr-time-2/">https://www.w3.org/TR/hr-time-2/</a>
    <dt id="biblio-html">[HTML]
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/">HTML Standard</a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-quic-datagram">[QUIC-DATAGRAM]
@@ -3102,7 +3094,6 @@ use in this specification.</p>
 };
 
 <c- b>enum</c-> <a class="idl-code" data-link-type="enum" href="#enumdef-webtransportstate" id="ref-for-enumdef-webtransportstate②①"><c- g>WebTransportState</c-></a> {
-  <a class="idl-code" data-link-type="enum-value" href="#dom-webtransportstate-new" id="ref-for-dom-webtransportstate-new①"><c- s>"new"</c-></a>,
   <a class="idl-code" data-link-type="enum-value" href="#dom-webtransportstate-connecting" id="ref-for-dom-webtransportstate-connecting①"><c- s>"connecting"</c-></a>,
   <a class="idl-code" data-link-type="enum-value" href="#dom-webtransportstate-connected" id="ref-for-dom-webtransportstate-connected①"><c- s>"connected"</c-></a>,
   <a class="idl-code" data-link-type="enum-value" href="#dom-webtransportstate-closed" id="ref-for-dom-webtransportstate-closed①"><c- s>"closed"</c-></a>,
@@ -3121,7 +3112,7 @@ use in this specification.</p>
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase①①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport④①"><c- n>UnidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase②①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑤①"><c- n>BidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase③①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport③①"><c- n>DatagramTransport</c-></a>;
-<a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase④①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑤①"><c- n>WebTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase④①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport④①"><c- n>WebTransport</c-></a>;
 
 <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats②①"><c- g>QuicTransportStats</c-></a> {
   <a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp④"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-timestamp" id="ref-for-dom-quictransportstats-timestamp①"><c- g>timestamp</c-></a>;
@@ -3161,7 +3152,7 @@ use in this specification.</p>
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
 <c- b>interface</c-> <a href="#webtransportstream"><code><c- g>WebTransportStream</c-></code></a> {
     <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑧①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-webtransportstream-streamid" id="ref-for-dom-webtransportstream-streamid①"><c- g>streamId</c-></a>;
-    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①⓪①"><c- n>WebTransport</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransport" href="#dom-webtransportstream-transport" id="ref-for-dom-webtransportstream-transport①"><c- g>transport</c-></a>;
+    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑨①"><c- n>WebTransport</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransport" href="#dom-webtransportstream-transport" id="ref-for-dom-webtransportstream-transport①"><c- g>transport</c-></a>;
 };
 
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
@@ -3187,7 +3178,7 @@ use in this specification.</p>
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport①①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport⑥①"><c- n>UnidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport②①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑦①"><c- n>BidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport③①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport⑤①"><c- n>DatagramTransport</c-></a>;
-<a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport④①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①③①"><c- n>WebTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport④①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①②①"><c- n>WebTransport</c-></a>;
 </pre>
   <aside class="dfn-panel" data-for="unidirectionalstreamstransport">
    <b><a href="#unidirectionalstreamstransport">#unidirectionalstreamstransport</a></b><b>Referenced in:</b>
@@ -3300,16 +3291,16 @@ use in this specification.</p>
   <aside class="dfn-panel" data-for="webtransport">
    <b><a href="#webtransport">#webtransport</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-webtransport">7.3. WebTransportState Enum</a> <a href="#ref-for-webtransport①">(2)</a> <a href="#ref-for-webtransport②">(3)</a>
-    <li><a href="#ref-for-webtransport③">7.4. WebTransportCloseInfo Dictionary</a> <a href="#ref-for-webtransport④">(2)</a>
-    <li><a href="#ref-for-webtransport⑤">8.2. Interface Definition</a>
-    <li><a href="#ref-for-webtransport⑥">10.2. Attributes</a>
-    <li><a href="#ref-for-webtransport⑦">10.3. Methods</a>
-    <li><a href="#ref-for-webtransport⑧">11.2. Attributes</a>
-    <li><a href="#ref-for-webtransport⑨">11.3. Methods</a>
-    <li><a href="#ref-for-webtransport①⓪">12. Interface WebTransportStream</a>
-    <li><a href="#ref-for-webtransport①①">12.1. Attributes</a> <a href="#ref-for-webtransport①②">(2)</a>
-    <li><a href="#ref-for-webtransport①③">16.2. Interface Definition</a>
+    <li><a href="#ref-for-webtransport">7.3. WebTransportState Enum</a> <a href="#ref-for-webtransport①">(2)</a>
+    <li><a href="#ref-for-webtransport②">7.4. WebTransportCloseInfo Dictionary</a> <a href="#ref-for-webtransport③">(2)</a>
+    <li><a href="#ref-for-webtransport④">8.2. Interface Definition</a>
+    <li><a href="#ref-for-webtransport⑤">10.2. Attributes</a>
+    <li><a href="#ref-for-webtransport⑥">10.3. Methods</a>
+    <li><a href="#ref-for-webtransport⑦">11.2. Attributes</a>
+    <li><a href="#ref-for-webtransport⑧">11.3. Methods</a>
+    <li><a href="#ref-for-webtransport⑨">12. Interface WebTransportStream</a>
+    <li><a href="#ref-for-webtransport①⓪">12.1. Attributes</a> <a href="#ref-for-webtransport①①">(2)</a>
+    <li><a href="#ref-for-webtransport①②">16.2. Interface Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-state">
@@ -3353,12 +3344,6 @@ use in this specification.</p>
     <li><a href="#ref-for-enumdef-webtransportstate">7. WebTransport Mixin</a>
     <li><a href="#ref-for-enumdef-webtransportstate①">7.1. Attributes</a>
     <li><a href="#ref-for-enumdef-webtransportstate②">7.3. WebTransportState Enum</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="dom-webtransportstate-new">
-   <b><a href="#dom-webtransportstate-new">#dom-webtransportstate-new</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-webtransportstate-new">7.3. WebTransportState Enum</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransportstate-connecting">
@@ -3543,9 +3528,8 @@ use in this specification.</p>
     <li><a href="#ref-for-dom-quictransport-webtransportstate-slot">7.1. Attributes</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot①">(2)</a>
     <li><a href="#ref-for-dom-quictransport-webtransportstate-slot②">7.2. Methods</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot③">(2)</a>
     <li><a href="#ref-for-dom-quictransport-webtransportstate-slot④">7.3. WebTransportState Enum</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑤">(2)</a>
-    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑥">8.3. Methods</a>
-    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑦">9.1. Interface Definition</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑧">(2)</a>
-    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑨">16.2.1. Constructors</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot①⓪">(2)</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot①①">(3)</a>
+    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑥">9.1. Interface Definition</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑦">(2)</a>
+    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑧">16.2.1. Constructors</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑨">(2)</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot①⓪">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-sentdatagrams-slot">
