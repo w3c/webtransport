@@ -407,7 +407,6 @@ interface mixin WebTransport {
 
 <pre class="idl">
 enum WebTransportState {
-  "new",
   "connecting",
   "connected",
   "closed",
@@ -415,8 +414,6 @@ enum WebTransportState {
 };
 </pre>
 
-: <dfn for="WebTransportState" enum-value>"new"</dfn>
-:: The {{WebTransport}} object has been created and has not started negotiating yet.
 : <dfn for="WebTransportState" enum-value>"connecting"</dfn>
 :: The transport is in the process of negotiating a secure connection. Once a
    secure connection is negotiated, incoming data can flow through.
@@ -513,8 +510,6 @@ QuicTransportBase includes WebTransport;
 
    When close is called, the user agent MUST run the following steps:
      1. Let |transport| be the QuicTransportBase on which `getStats` is invoked.
-     1. If |transport|'s {{[[WebTransportState]]}} is `"new"`, then abort
-        these steps.
      1. Let |p| be a new promise.
      1. Return |p| and continue the following steps in background.
          1. Gather the stats from the underlying QUIC connection.
