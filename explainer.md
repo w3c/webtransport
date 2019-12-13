@@ -105,7 +105,7 @@ function getSerializedMediaRequest() { ... }
 const transport = new QuicTransport('example.com', 10001);
 
 const mediaSource = new MediaSource();
-await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
+await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve, {once: true}));
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
 
 // App-specific request
