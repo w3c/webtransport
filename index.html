@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 670c46b501fc025ae87a3398a195af35379ab37d" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="4ebe70deb0c3e509ac8731fc1c9067deab215241" name="document-revision">
+  <meta content="e1d32f65b489d39edab256328a8484ca337e11f1" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1602,10 +1602,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     <li>
      <a href="#examples"><span class="secno">17</span> <span class="content">Examples</span></a>
      <ol class="toc">
-      <li><a href="#example-unreliable-delivery"><span class="secno">17.1</span> <span class="content">Unreliable delivery</span></a>
-      <li><a href="#example-datagrams"><span class="secno">17.2</span> <span class="content">Sending a buffer of datagrams</span></a>
-      <li><a href="#example-fixed-rate"><span class="secno">17.3</span> <span class="content">Sending datagrams at a fixed rate</span></a>
-      <li><a href="#example-receiving-datagrams"><span class="secno">17.4</span> <span class="content">Receiving datagrams</span></a>
+      <li><a href="#example-datagrams"><span class="secno">17.1</span> <span class="content">Sending a buffer of datagrams</span></a>
+      <li><a href="#example-fixed-rate"><span class="secno">17.2</span> <span class="content">Sending datagrams at a fixed rate</span></a>
+      <li><a href="#example-receiving-datagrams"><span class="secno">17.3</span> <span class="content">Receiving datagrams</span></a>
      </ol>
     <li><a href="#acknowledgements"><span class="secno">18</span> <span class="content">Acknowledgements</span></a>
     <li>
@@ -1755,17 +1754,8 @@ the following steps:</p>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-sendstreamparameters"><code>SendStreamParameters</code></dfn> dictionary includes information
 relating to stream configuration.</p>
 <pre class="idl highlight def"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-sendstreamparameters" id="ref-for-dictdef-sendstreamparameters①"><c- g>SendStreamParameters</c-></a> {
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-boolean" id="ref-for-idl-boolean"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-sendstreamparameters-disableretransmissions" id="ref-for-dom-sendstreamparameters-disableretransmissions"><c- g>disableRetransmissions</c-></a> = <c- b>false</c->;
 };
 </pre>
-   <p>The dictionary SHALL have the following fields:</p>
-   <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="SendStreamParameters" data-dfn-type="dict-member" data-export id="dom-sendstreamparameters-disableretransmissions"><code>disableRetransmissions</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-boolean" id="ref-for-idl-boolean①">boolean</a>, defaulting to <code>false</code></span>
-    <dd data-md>
-     <p>If true, the stream will be sent without retransmissions. If false, the
- stream will be sent with retransmissions. If the WebTransport is unable to
- send without retransmissions, it may ignore this value.</p>
-   </dl>
    <h2 class="heading settled" data-level="5" id="bidirectional-streams-transport"><span class="secno">5. </span><span class="content"><code>BidirectionalStreamsTransport</code> Mixin</span><a class="self-link" href="#bidirectional-streams-transport"></a></h2>
    <p>A <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="bidirectionalstreamstransport"><code>BidirectionalStreamsTransport</code></dfn> can send and receive
 bidirectional streams.  Data within a stream is delivered in order, but data
@@ -2134,7 +2124,7 @@ agent MUST run the following steps:</p>
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransport" data-dfn-type="method" data-export id="dom-quictransport-getstats"><code>getStats()</code></dfn>
     <dd data-md>
-     <p>Gathers stats for this <code class="idl"><a data-link-type="idl">QuicTransportBase</a></code>'s QUIC
+     <p>Gathers stats for this <code class="idl"><a data-link-type="idl" href="#quictransport" id="ref-for-quictransport⑥">QuicTransport</a></code>'s QUIC
  connection and reports the result asynchronously.</p>
      <p></p>
      <p>When close is called, the user agent MUST run the following steps:</p>
@@ -2454,17 +2444,7 @@ endpoint is verified to be a WebTransport endpoint; thus, the Web application
 cannot distinguish between a non-existing endpoint and the endpoint that is not
 willing to accept connections from the Web.</p>
    <h2 class="heading settled" data-level="17" id="examples"><span class="secno">17. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
-   <h3 class="heading settled" data-level="17.1" id="example-unreliable-delivery"><span class="secno">17.1. </span><span class="content">Unreliable delivery</span><a class="self-link" href="#example-unreliable-delivery"></a></h3>
-   <p><em>This section is non-normative.</em></p>
-   <p>Unreliable delivery can be achieved by creating many streams with
-retransmissions disabled, each transporting a single small message.</p>
-<pre class="example highlight" id="example-acdb0c13"><a class="self-link" href="#example-acdb0c13"></a><c- a>let</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
-<c- a>let</c-> messages <c- o>=</c-> getMessages<c- p>();</c->
-<c- k>for</c-> <c- p>(</c->msg <c- k>in</c-> messages<c- p>)</c-> <c- p>{</c->
-  transport<c- p>.</c->createSendStream<c- p>({</c->disableRetransmissions<c- o>:</c-> <c- kc>true</c-><c- p>}).</c->writable<c- p>.</c->getWriter<c- p>().</c->write<c- p>({</c->data<c- o>:</c-> msg<c- p>,</c-> finished<c- o>:</c-> <c- kc>true</c-><c- p>});</c->
-<c- p>}</c->
-</pre>
-   <h3 class="heading settled" data-level="17.2" id="example-datagrams"><span class="secno">17.2. </span><span class="content">Sending a buffer of datagrams</span><a class="self-link" href="#example-datagrams"></a></h3>
+   <h3 class="heading settled" data-level="17.1" id="example-datagrams"><span class="secno">17.1. </span><span class="content">Sending a buffer of datagrams</span><a class="self-link" href="#example-datagrams"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Sending a buffer of datagrams can be achieved by using the <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-senddatagrams" id="ref-for-dom-datagramtransport-senddatagrams②">sendDatagrams()</a></code> method. In the following example
 datagrams are only sent if the <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport⑥">DatagramTransport</a></code> is ready to send.</p>
@@ -2476,7 +2456,7 @@ datagrams<c- p>.</c->forEach<c- p>((</c->datagram<c- p>)</c-> <c- p>=></c-> <c- 
   datagramWritableStream<c- p>.</c->getWriter<c- p>().</c->write<c- p>(</c->datagram<c- p>);</c->
 <c- p>});</c->
 </pre>
-   <h3 class="heading settled" data-level="17.3" id="example-fixed-rate"><span class="secno">17.3. </span><span class="content">Sending datagrams at a fixed rate</span><a class="self-link" href="#example-fixed-rate"></a></h3>
+   <h3 class="heading settled" data-level="17.2" id="example-fixed-rate"><span class="secno">17.2. </span><span class="content">Sending datagrams at a fixed rate</span><a class="self-link" href="#example-fixed-rate"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Sending datagrams at a fixed rate regardless if the transport is ready to send
 can be achieved by simply using <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-senddatagrams" id="ref-for-dom-datagramtransport-senddatagrams③">sendDatagrams()</a></code> and not
@@ -2488,7 +2468,7 @@ setInterval<c- p>(()</c-> <c- p>=></c-> <c- p>{</c->
   datagramWritableStream<c- p>.</c->getWriter<c- p>().</c->write<c- p>(</c->createDatagram<c- p>());</c->
 <c- p>},</c-> <c- mi>100</c-><c- p>);</c->
 </pre>
-   <h3 class="heading settled" data-level="17.4" id="example-receiving-datagrams"><span class="secno">17.4. </span><span class="content">Receiving datagrams</span><a class="self-link" href="#example-receiving-datagrams"></a></h3>
+   <h3 class="heading settled" data-level="17.3" id="example-receiving-datagrams"><span class="secno">17.3. </span><span class="content">Receiving datagrams</span><a class="self-link" href="#example-receiving-datagrams"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Receiving datagrams can be achieved by calling <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-receivedatagrams" id="ref-for-dom-datagramtransport-receivedatagrams②">receiveDatagrams()</a></code> method, remembering to check for null
 values indicating that packets are not being processed quickly enough.</p>
@@ -2507,7 +2487,7 @@ values indicating that packets are not being processed quickly enough.</p>
 Alvestrand, Stefan Håkansson, Bernard Aboba and Dominique
 Hazaël-Massieux, for their support. Contributions to this specification
 were provided by Robin Raymond. 
-   <p>The <code class="idl"><a data-link-type="idl" href="#quictransport" id="ref-for-quictransport⑥">QuicTransport</a></code> and <code>QuicStream</code> objects were initially described in the <a href="https://www.w3.org/community/ortc/">W3C ORTC CG</a>, and have been adapted for
+   <p>The <code class="idl"><a data-link-type="idl" href="#quictransport" id="ref-for-quictransport⑦">QuicTransport</a></code> and <code>QuicStream</code> objects were initially described in the <a href="https://www.w3.org/community/ortc/">W3C ORTC CG</a>, and have been adapted for
 use in this specification.</p>
   </main>
 <script>
@@ -2663,7 +2643,6 @@ use in this specification.</p>
    <li><a href="#dom-unidirectionalstreamstransport-createsendstream">createSendStream()</a><span>, in §4.1</span>
    <li><a href="#dom-unidirectionalstreamstransport-createsendstream">createSendStream(parameters)</a><span>, in §4.1</span>
    <li><a href="#datagramtransport">DatagramTransport</a><span>, in §6</span>
-   <li><a href="#dom-sendstreamparameters-disableretransmissions">disableRetransmissions</a><span>, in §4.3</span>
    <li>
     errorCode
     <ul>
@@ -2876,12 +2855,6 @@ use in this specification.</p>
     <li><a href="#ref-for-idl-Uint8Array②">15.2.1. Constructors</a> <a href="#ref-for-idl-Uint8Array③">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-boolean">
-   <a href="https://heycam.github.io/webidl/#idl-boolean">https://heycam.github.io/webidl/#idl-boolean</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-idl-boolean">4.3. SendStreamParameters Dictionary</a> <a href="#ref-for-idl-boolean①">(2)</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-dfn-create-exception">
    <a href="https://heycam.github.io/webidl/#dfn-create-exception">https://heycam.github.io/webidl/#dfn-create-exception</a><b>Referenced in:</b>
    <ul>
@@ -2984,7 +2957,6 @@ use in this specification.</p>
      <li><span class="dfn-paneled" id="term-for-invalidstateerror" style="color:initial">InvalidStateError</span>
      <li><span class="dfn-paneled" id="term-for-notsupportederror" style="color:initial">NotSupportedError</span>
      <li><span class="dfn-paneled" id="term-for-idl-Uint8Array" style="color:initial">Uint8Array</span>
-     <li><span class="dfn-paneled" id="term-for-idl-boolean" style="color:initial">boolean</span>
      <li><span class="dfn-paneled" id="term-for-dfn-create-exception" style="color:initial">created</span>
      <li><span class="dfn-paneled" id="term-for-dfn-throw" style="color:initial">throw</span>
      <li><span class="dfn-paneled" id="term-for-idl-unsigned-long" style="color:initial">unsigned long</span>
@@ -3037,7 +3009,6 @@ use in this specification.</p>
   <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class①①⓪"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="method" href="#dom-unidirectionalstreamstransport-receivestreams" id="ref-for-dom-unidirectionalstreamstransport-receivestreams①"><c- g>receiveStreams</c-></a>();
 };
 <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-sendstreamparameters" id="ref-for-dictdef-sendstreamparameters①①"><c- g>SendStreamParameters</c-></a> {
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-boolean" id="ref-for-idl-boolean②"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-sendstreamparameters-disableretransmissions" id="ref-for-dom-sendstreamparameters-disableretransmissions①"><c- g>disableRetransmissions</c-></a> = <c- b>false</c->;
 };
 
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑧"><c- g>BidirectionalStreamsTransport</c-></a> {
@@ -3083,7 +3054,7 @@ use in this specification.</p>
 };
 
 [<a href="#dom-quictransport-quictransport"><code><c- g>Constructor</c-></code></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString②①"><c- b>DOMString</c-></a> <a href="#dom-quictransport-quictransport-host-port-host"><code><c- g>host</c-></code></a>, <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-short" id="ref-for-idl-unsigned-short④①"><c- b>unsigned</c-> <c- b>short</c-></a> <a href="#dom-quictransport-quictransport-host-port-port"><code><c- g>port</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑧"><c- g>Exposed</c-></a>=<c- n>Window</c->]
-<c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#quictransport" id="ref-for-quictransport⑦"><c- g>QuicTransport</c-></a> {
+<c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#quictransport" id="ref-for-quictransport⑧"><c- g>QuicTransport</c-></a> {
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats①①"><c- n>QuicTransportStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-quictransport-getstats" id="ref-for-dom-quictransport-getstats①"><c- g>getStats</c-></a>();
 };
 
@@ -3177,12 +3148,6 @@ use in this specification.</p>
     <li><a href="#ref-for-dictdef-sendstreamparameters①">4.3. SendStreamParameters Dictionary</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-sendstreamparameters-disableretransmissions">
-   <b><a href="#dom-sendstreamparameters-disableretransmissions">#dom-sendstreamparameters-disableretransmissions</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-sendstreamparameters-disableretransmissions">4.3. SendStreamParameters Dictionary</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="bidirectionalstreamstransport">
    <b><a href="#bidirectionalstreamstransport">#bidirectionalstreamstransport</a></b><b>Referenced in:</b>
    <ul>
@@ -3223,7 +3188,7 @@ use in this specification.</p>
     <li><a href="#ref-for-datagramtransport③">8.1. Interface Definition</a>
     <li><a href="#ref-for-datagramtransport④">15.1. Overview</a>
     <li><a href="#ref-for-datagramtransport⑤">15.2. Interface Definition</a>
-    <li><a href="#ref-for-datagramtransport⑥">17.2. Sending a buffer of datagrams</a>
+    <li><a href="#ref-for-datagramtransport⑥">17.1. Sending a buffer of datagrams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-datagramtransport-maxdatagramsize">
@@ -3237,8 +3202,8 @@ use in this specification.</p>
    <ul>
     <li><a href="#ref-for-dom-datagramtransport-senddatagrams">6. DatagramTransport Mixin</a>
     <li><a href="#ref-for-dom-datagramtransport-senddatagrams①">6.1. Attributes</a>
-    <li><a href="#ref-for-dom-datagramtransport-senddatagrams②">17.2. Sending a buffer of datagrams</a>
-    <li><a href="#ref-for-dom-datagramtransport-senddatagrams③">17.3. Sending datagrams at a fixed rate</a>
+    <li><a href="#ref-for-dom-datagramtransport-senddatagrams②">17.1. Sending a buffer of datagrams</a>
+    <li><a href="#ref-for-dom-datagramtransport-senddatagrams③">17.2. Sending datagrams at a fixed rate</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-datagramtransport-receivedatagrams">
@@ -3246,7 +3211,7 @@ use in this specification.</p>
    <ul>
     <li><a href="#ref-for-dom-datagramtransport-receivedatagrams">6. DatagramTransport Mixin</a>
     <li><a href="#ref-for-dom-datagramtransport-receivedatagrams①">7.5. QuicTransportStats Dictionary</a>
-    <li><a href="#ref-for-dom-datagramtransport-receivedatagrams②">17.4. Receiving datagrams</a>
+    <li><a href="#ref-for-dom-datagramtransport-receivedatagrams②">17.3. Receiving datagrams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="webtransport">
@@ -3418,7 +3383,8 @@ use in this specification.</p>
    <b><a href="#quictransport">#quictransport</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-quictransport">8.1. Interface Definition</a> <a href="#ref-for-quictransport①">(2)</a> <a href="#ref-for-quictransport②">(3)</a> <a href="#ref-for-quictransport③">(4)</a> <a href="#ref-for-quictransport④">(5)</a> <a href="#ref-for-quictransport⑤">(6)</a>
-    <li><a href="#ref-for-quictransport⑥">18. Acknowledgements</a>
+    <li><a href="#ref-for-quictransport⑥">8.2. Methods</a>
+    <li><a href="#ref-for-quictransport⑦">18. Acknowledgements</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-quictransport">
