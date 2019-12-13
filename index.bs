@@ -361,9 +361,9 @@ state, state changes, and the ability to close the transport.
 <pre class="idl">
 interface mixin WebTransport {
   readonly attribute WebTransportState state;
+  readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   void close(optional WebTransportCloseInfo closeInfo);
   attribute EventHandler onstatechange;
-  attribute EventHandler onerror;
 };
 </pre>
 
@@ -372,15 +372,14 @@ interface mixin WebTransport {
 : <dfn for="WebTransport" attribute>state</dfn>
 :: The current state of the transport. On getting, it MUST return the value of
    the {{[[WebTransportState]]}} internal slot.
+: <dfn for="WebTransport" attribute>closed</dfn>
+:: This promise MUST be [=resolved=] when the transport is closed; an
+   implementation SHOULD include error information in the `reason` and
+   `errorCode` fields of {{WebTransportCloseInfo}}.
 : <dfn for="WebTransport" attribute>onstatechange</dfn>
 :: This event handler, of event handler event type `statechange`, MUST be fired
    any time the {{[[WebTransportState]]}} slot changes, unless the state changes
    due to calling {{WebTransport/close}}.
-: <dfn for="WebTransport" attribute>onerror</dfn>
-:: This event handler, of event handler event type `error`, MUST be fired on
-   reception of an error; an implementation SHOULD include error information in
-   the `message` field of {{ErrorEvent}}. This event MUST be fired before the
-   {{WebTransport/onstatechange}} event.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -405,7 +404,6 @@ interface mixin WebTransport {
 
 <pre class="idl">
 enum WebTransportState {
-  "new",
   "connecting",
   "connected",
   "closed",
@@ -413,8 +411,6 @@ enum WebTransportState {
 };
 </pre>
 
-: <dfn for="WebTransportState" enum-value>"new"</dfn>
-:: The {{WebTransport}} object has been created and has not started negotiating yet.
 : <dfn for="WebTransportState" enum-value>"connecting"</dfn>
 :: The transport is in the process of negotiating a secure connection. Once a
    secure connection is negotiated, incoming data can flow through.
@@ -474,51 +470,6 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportCloseInfo" dict-member>reason</dfn>
 :: The reason for closing the {{WebTransport}}.
 
-# `QuicTransportBase` Interface #  {#quic-transport-base}
-
-The `QuicTransportBase` is the base for {{QuicTransport}}. Most of
-the functionality of a `QuicTransport` is in the base class to allow for other
-subclasses (such as a p2p variant) to share the same interface.
-
-## Overview ##  {#quic-transport-base-overview}
-
-A <dfn interface>QuicTransportBase</dfn> is a
-{{UnidirectionalStreamsTransport}}, a {{BidirectionalStreamsTransport}}, and a
-{{DatagramTransport}}.  {{SendStream}}s and {{ReceiveStream}}s are implemented
-with unidirectional QUIC streams as defined in [[!QUIC-TRANSPORT]].
-{{BidirectionalStream}}s are implemented with bidirectional QUIC streams as
-defined in [[!QUIC-TRANSPORT]]. Datagrams are implemented with QUIC datagrams as
-defined in [[!QUIC-DATAGRAM]].
-
-## Interface Definition ##  {#quic-transport-base-definition}
-
-<pre class="idl">
-interface QuicTransportBase {
-  Promise&lt;QuicTransportStats&gt; getStats();
-};
-
-QuicTransportBase includes UnidirectionalStreamsTransport;
-QuicTransportBase includes BidirectionalStreamsTransport;
-QuicTransportBase includes DatagramTransport;
-QuicTransportBase includes WebTransport;
-</pre>
-
-## Methods ##  {#quic-transport-base-methods}
-
-: <dfn for="QuicTransportBase" method>getStats()</dfn>
-:: Gathers stats for this {{QuicTransportBase}}'s QUIC connection and reports
-   the result asynchronously.</p>
-
-   When close is called, the user agent MUST run the following steps:
-     1. Let |transport| be the QuicTransportBase on which `getStats` is invoked.
-     1. If |transport|'s {{[[WebTransportState]]}} is `"new"`, then abort
-        these steps.
-     1. Let |p| be a new promise.
-     1. Return |p| and continue the following steps in background.
-         1. Gather the stats from the underlying QUIC connection.
-         1. Once stats have been gathered, resolve |p| with the
-            {{QuicTransportStats}} object, representing the gathered stats.
-
 ## `QuicTransportStats` Dictionary ##  {#quic-transport-stats}
 
 The <dfn dictionary>QuicTransportStats</dfn> dictionary includes information
@@ -566,16 +517,28 @@ The dictionary SHALL have the following attributes:
 
 # `QuicTransport` Interface #  {#quic-transport}
 
-The <dfn interface>QuicTransport</dfn> is a subclass of {{QuicTransportBase}}
-focused on client/server use cases.
+The <dfn interface>QuicTransport</dfn> is a
+{{UnidirectionalStreamsTransport}}, a {{BidirectionalStreamsTransport}}, and a
+{{DatagramTransport}}.  {{SendStream}}s and {{ReceiveStream}}s are implemented
+with unidirectional QUIC streams as defined in [[!QUIC-TRANSPORT]].
+{{BidirectionalStream}}s are implemented with bidirectional QUIC streams as
+defined in [[!QUIC-TRANSPORT]]. Datagrams are implemented with QUIC datagrams as
+defined in [[!QUIC-DATAGRAM]].
 
 ## Interface Definition ##  {#quic-transport-definition}
 
 <pre class="idl">
 [Constructor(DOMString host, unsigned short port), Exposed=Window]
-interface QuicTransport : QuicTransportBase {
+interface QuicTransport {
+  Promise&lt;QuicTransportStats&gt; getStats();
 };
+
+QuicTransport includes UnidirectionalStreamsTransport;
+QuicTransport includes BidirectionalStreamsTransport;
+QuicTransport includes DatagramTransport;
+QuicTransport includes WebTransport;
 </pre>
+
 
 When the {{QuicTransport/QuicTransport()}} constructor is invoked, the user
 agent MUST run the following steps:
@@ -617,6 +580,20 @@ agent MUST run the following steps:
     1. Set |transport|'s {{[[WebTransportState]]}} internal slot to
        `"connected"`.
 1. Return |transport|.
+
+## Methods ##  {#quic-transport-methods}
+
+: <dfn for="QuicTransport" method>getStats()</dfn>
+:: Gathers stats for this {{QuicTransportBase}}'s QUIC
+   connection and reports the result asynchronously.</p>
+
+   When close is called, the user agent MUST run the following steps:
+     1. Let |transport| be the QuicTransport on which `getStats` is invoked.
+     1. Let |p| be a new promise.
+     1. Return |p| and continue the following steps in background.
+         1. Gather the stats from the underlying QUIC connection.
+         1. Once stats have been gathered, resolve |p| with the
+            {{QuicTransportStats}} object, representing the gathered stats.
 
 # Interface Mixin `OutgoingStream` #  {#outgoing-stream}
 
@@ -766,16 +743,12 @@ A collection of common attributes and methods of all streams.
 <pre class="idl">
 [ Exposed=Window ]
 interface WebTransportStream {
-    readonly attribute unsigned long long streamId;
     readonly attribute WebTransport transport;
 };
 </pre>
 
 ## Attributes ##  {#web-transport-stream-attributes}
 
-: <dfn for="WebTransportStream" attribute>streamId</dfn>
-:: The readonly attribute referring to the ID of the {{WebTransportStream}}
-   object.
 : <dfn for="WebTransportStream" attribute>transport</dfn>
 :: The readonly attribute referring to the related {{WebTransport}} object.
 
