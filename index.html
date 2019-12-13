@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 670c46b501fc025ae87a3398a195af35379ab37d" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="6d4df4fbe27d636a8a33d577b837af90be4dbd2a" name="document-revision">
+  <meta content="4ebe70deb0c3e509ac8731fc1c9067deab215241" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -2083,10 +2083,10 @@ defined in <a data-link-type="biblio" href="#biblio-quic-datagram">[QUIC-DATAGRA
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats①"><c- n>QuicTransportStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-quictransport-getstats" id="ref-for-dom-quictransport-getstats"><c- g>getStats</c-></a>();
 };
 
-<a class="n" data-link-type="idl-name"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport④"><c- n>UnidirectionalStreamsTransport</c-></a>;
-<a class="n" data-link-type="idl-name"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑤"><c- n>BidirectionalStreamsTransport</c-></a>;
-<a class="n" data-link-type="idl-name"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport③"><c- n>DatagramTransport</c-></a>;
-<a class="n" data-link-type="idl-name"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport④"><c- n>WebTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#quictransport" id="ref-for-quictransport①"><c- n>QuicTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport④"><c- n>UnidirectionalStreamsTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#quictransport" id="ref-for-quictransport②"><c- n>QuicTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑤"><c- n>BidirectionalStreamsTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#quictransport" id="ref-for-quictransport③"><c- n>QuicTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport③"><c- n>DatagramTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#quictransport" id="ref-for-quictransport④"><c- n>QuicTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport④"><c- n>WebTransport</c-></a>;
 </pre>
    <p>When the <code class="idl"><a data-link-type="idl" href="#dom-quictransport-quictransport" id="ref-for-dom-quictransport-quictransport">QuicTransport()</a></code> constructor is invoked, the user
 agent MUST run the following steps:</p>
@@ -2094,7 +2094,7 @@ agent MUST run the following steps:</p>
     <li data-md>
      <p>If <code class="idl"><a data-link-type="idl" href="#dom-quictransport-quictransport-host-port-port" id="ref-for-dom-quictransport-quictransport-host-port-port">port</a></code> is 0, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw①">throw</a> an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror">NotSupportedError</a></code> and abort these steps.</p>
     <li data-md>
-     <p>Let <var>transport</var> be a newly constructed <code class="idl"><a data-link-type="idl" href="#quictransport" id="ref-for-quictransport①">QuicTransport</a></code> object.</p>
+     <p>Let <var>transport</var> be a newly constructed <code class="idl"><a data-link-type="idl" href="#quictransport" id="ref-for-quictransport⑤">QuicTransport</a></code> object.</p>
     <li data-md>
      <p>Let <var>transport</var> have a <dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransport" data-dfn-type="attribute" data-export id="dom-quictransport-outgoingstreams-slot"><code>[[OutgoingStreams]]</code></dfn> internal slot
  representing a sequence of <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream③">OutgoingStream</a></code> objects, initialized to empty.</p>
@@ -2134,7 +2134,7 @@ agent MUST run the following steps:</p>
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransport" data-dfn-type="method" data-export id="dom-quictransport-getstats"><code>getStats()</code></dfn>
     <dd data-md>
-     <p>Gathers stats for this <code><a data-link-type="dfn">QuicTransport</a></code>’s QUIC
+     <p>Gathers stats for this <code class="idl"><a data-link-type="idl">QuicTransportBase</a></code>'s QUIC
  connection and reports the result asynchronously.</p>
      <p></p>
      <p>When close is called, the user agent MUST run the following steps:</p>
@@ -2507,7 +2507,7 @@ values indicating that packets are not being processed quickly enough.</p>
 Alvestrand, Stefan Håkansson, Bernard Aboba and Dominique
 Hazaël-Massieux, for their support. Contributions to this specification
 were provided by Robin Raymond. 
-   <p>The <code class="idl"><a data-link-type="idl" href="#quictransport" id="ref-for-quictransport②">QuicTransport</a></code> and <code>QuicStream</code> objects were initially described in the <a href="https://www.w3.org/community/ortc/">W3C ORTC CG</a>, and have been adapted for
+   <p>The <code class="idl"><a data-link-type="idl" href="#quictransport" id="ref-for-quictransport⑥">QuicTransport</a></code> and <code>QuicStream</code> objects were initially described in the <a href="https://www.w3.org/community/ortc/">W3C ORTC CG</a>, and have been adapted for
 use in this specification.</p>
   </main>
 <script>
@@ -3083,14 +3083,14 @@ use in this specification.</p>
 };
 
 [<a href="#dom-quictransport-quictransport"><code><c- g>Constructor</c-></code></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString②①"><c- b>DOMString</c-></a> <a href="#dom-quictransport-quictransport-host-port-host"><code><c- g>host</c-></code></a>, <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-short" id="ref-for-idl-unsigned-short④①"><c- b>unsigned</c-> <c- b>short</c-></a> <a href="#dom-quictransport-quictransport-host-port-port"><code><c- g>port</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑧"><c- g>Exposed</c-></a>=<c- n>Window</c->]
-<c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#quictransport" id="ref-for-quictransport③"><c- g>QuicTransport</c-></a> {
+<c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#quictransport" id="ref-for-quictransport⑦"><c- g>QuicTransport</c-></a> {
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats①①"><c- n>QuicTransportStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-quictransport-getstats" id="ref-for-dom-quictransport-getstats①"><c- g>getStats</c-></a>();
 };
 
-<a class="n" data-link-type="idl-name"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport④①"><c- n>UnidirectionalStreamsTransport</c-></a>;
-<a class="n" data-link-type="idl-name"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑤①"><c- n>BidirectionalStreamsTransport</c-></a>;
-<a class="n" data-link-type="idl-name"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport③①"><c- n>DatagramTransport</c-></a>;
-<a class="n" data-link-type="idl-name"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport④①"><c- n>WebTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#quictransport" id="ref-for-quictransport①①"><c- n>QuicTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport④①"><c- n>UnidirectionalStreamsTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#quictransport" id="ref-for-quictransport②①"><c- n>QuicTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑤①"><c- n>BidirectionalStreamsTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#quictransport" id="ref-for-quictransport③①"><c- n>QuicTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport③①"><c- n>DatagramTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#quictransport" id="ref-for-quictransport④①"><c- n>QuicTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport④①"><c- n>WebTransport</c-></a>;
 
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
 <c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#outgoingstream" id="ref-for-outgoingstream④①"><c- g>OutgoingStream</c-></a> {
@@ -3417,8 +3417,8 @@ use in this specification.</p>
   <aside class="dfn-panel" data-for="quictransport">
    <b><a href="#quictransport">#quictransport</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-quictransport">8.1. Interface Definition</a> <a href="#ref-for-quictransport①">(2)</a>
-    <li><a href="#ref-for-quictransport②">18. Acknowledgements</a>
+    <li><a href="#ref-for-quictransport">8.1. Interface Definition</a> <a href="#ref-for-quictransport①">(2)</a> <a href="#ref-for-quictransport②">(3)</a> <a href="#ref-for-quictransport③">(4)</a> <a href="#ref-for-quictransport④">(5)</a> <a href="#ref-for-quictransport⑤">(6)</a>
+    <li><a href="#ref-for-quictransport⑥">18. Acknowledgements</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-quictransport">

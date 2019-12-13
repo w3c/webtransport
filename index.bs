@@ -70,7 +70,6 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMA
     text: pending; url: sec-promise-objects
     text: resolved; url: sec-promise-objects
     text: settled; url: sec-promise-objects
-    
 </pre>
 
 # Introduction #    {#introduction}
@@ -176,7 +175,6 @@ interface mixin UnidirectionalStreamsTransport {
          1. |p| has not been [=settled=].
      1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
         the following conditions are met:
-     
          1. The |transport|'s state transitions to `"closed"` or `"failed"`.
          1. |p| has not been [=settled=].
 
@@ -576,7 +574,7 @@ agent MUST run the following steps:
        {{QuicTransport/QuicTransport(host, port)/host}} and
        {{QuicTransport/QuicTransport(host, port)/port}} following the
        procedures in [[!WEB-TRANSPORT-QUIC]] section 3 and using |clientOrigin|
-       as the "origin of the client" referenced in section 3.2. 
+       as the "origin of the client" referenced in section 3.2.
     1. If the connection fails, set |transport|'s {{[[WebTransportState]]}}
        internal slot to `"failed"` and abort these steps.
     1. Set |transport|'s {{[[WebTransportState]]}} internal slot to
@@ -586,7 +584,7 @@ agent MUST run the following steps:
 ## Methods ##  {#quic-transport-methods}
 
 : <dfn for="QuicTransport" method>getStats()</dfn>
-:: Gathers stats for this <code><a>QuicTransport</a></code>'s QUIC
+:: Gathers stats for this {{QuicTransport}}'s QUIC
    connection and reports the result asynchronously.</p>
 
    When close is called, the user agent MUST run the following steps:
