@@ -61,6 +61,8 @@ Boilerplate: omit conformance
 <pre class="link-defaults">
 spec:streams; type:interface; text:ReadableStream
 spec:html; type:dfn; for:/; text:origin
+spec:url; type:dfn; text:scheme
+spec:url; type:dfn; text:fragment
 </pre>
 <pre class="anchors">
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMASCRIPT-6.0
@@ -520,7 +522,7 @@ defined in [[!QUIC-DATAGRAM]].
 ## Interface Definition ##  {#quic-transport-definition}
 
 <pre class="idl">
-[Constructor(DOMString host, unsigned short port), Exposed=Window]
+[Constructor(USVString url), Exposed=Window]
 interface QuicTransport {
   Promise&lt;QuicTransportStats&gt; getStats();
 };
@@ -534,8 +536,12 @@ QuicTransport includes WebTransport;
 
 When the {{QuicTransport/QuicTransport()}} constructor is invoked, the user
 agent MUST run the following steps:
-1. If {{QuicTransport/QuicTransport(host, port)/port}} is 0, [=throw=] an
-   {{NotSupportedError}} and abort these steps.
+1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
+   of {{QuicTransport/QuicTransport(url)/url}}.
+1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
+1. If |parsedURL| [=scheme=] is not `quic-transport`, [=throw=]
+   a {{SyntaxError}} exception.
+1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
 1. Let |transport| be a newly constructed {{QuicTransport}} object.
 1. Let |transport| have a
    <dfn attribute for="QuicTransport">\[[OutgoingStreams]]</dfn> internal slot
@@ -562,11 +568,9 @@ agent MUST run the following steps:
     1. Let |clientOrigin| be |transport|'s [=relevant settings object=]'s
        [=origin=],
        [serialized](https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin).
-    1. Establish a QUIC connection to the address identified by the given
-       {{QuicTransport/QuicTransport(host, port)/host}} and
-       {{QuicTransport/QuicTransport(host, port)/port}} following the
-       procedures in [[!WEB-TRANSPORT-QUIC]] section 3 and using |clientOrigin|
-       as the "origin of the client" referenced in section 3.2.
+    1. Establish a QUIC connection to the address identified by |parsedURL|
+       following the procedures in [[!WEB-TRANSPORT-QUIC]] section 3 and using
+       |clientOrigin| as the "origin of the client" referenced in section 3.2.1.
     1. If the connection fails, set |transport|'s {{[[WebTransportState]]}}
        internal slot to `"failed"` and abort these steps.
     1. Set |transport|'s {{[[WebTransportState]]}} internal slot to
