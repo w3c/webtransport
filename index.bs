@@ -219,16 +219,8 @@ relating to stream configuration.
 
 <pre class="idl">
 dictionary SendStreamParameters {
-  boolean disableRetransmissions = false;
 };
 </pre>
-
-The dictionary SHALL have the following fields:
-
-: <dfn for="SendStreamParameters" dict-member>disableRetransmissions</dfn>
-:: If true, the stream will be sent without retransmissions. If false, the
-   stream will be sent with retransmissions. If the WebTransport is unable to
-   send without retransmissions, it may ignore this value.
 
 # `BidirectionalStreamsTransport` Mixin #  {#bidirectional-streams-transport}
 
@@ -920,21 +912,6 @@ cannot distinguish between a non-existing endpoint and the endpoint that is not
 willing to accept connections from the Web.
 
 # Examples #  {#examples}
-
-## Unreliable delivery ##  {#example-unreliable-delivery}
-
-*This section is non-normative.*
-
-Unreliable delivery can be achieved by creating many streams with
-retransmissions disabled, each transporting a single small message.
-
-<pre class="example" highlight="js">
-let transport = getTransport();
-let messages = getMessages();
-for (msg in messages) {
-  transport.createSendStream({disableRetransmissions: true}).writable.getWriter().write({data: msg, finished: true});
-}
-</pre>
 
 ## Sending a buffer of datagrams ##  {#example-datagrams}
 
