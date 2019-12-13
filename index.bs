@@ -472,49 +472,6 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportCloseInfo" dict-member>reason</dfn>
 :: The reason for closing the {{WebTransport}}.
 
-# `QuicTransportBase` Interface #  {#quic-transport-base}
-
-The `QuicTransportBase` is the base for {{QuicTransport}}. Most of
-the functionality of a `QuicTransport` is in the base class to allow for other
-subclasses (such as a p2p variant) to share the same interface.
-
-## Overview ##  {#quic-transport-base-overview}
-
-A <dfn interface>QuicTransportBase</dfn> is a
-{{UnidirectionalStreamsTransport}}, a {{BidirectionalStreamsTransport}}, and a
-{{DatagramTransport}}.  {{SendStream}}s and {{ReceiveStream}}s are implemented
-with unidirectional QUIC streams as defined in [[!QUIC-TRANSPORT]].
-{{BidirectionalStream}}s are implemented with bidirectional QUIC streams as
-defined in [[!QUIC-TRANSPORT]]. Datagrams are implemented with QUIC datagrams as
-defined in [[!QUIC-DATAGRAM]].
-
-## Interface Definition ##  {#quic-transport-base-definition}
-
-<pre class="idl">
-interface QuicTransportBase {
-  Promise&lt;QuicTransportStats&gt; getStats();
-};
-
-QuicTransportBase includes UnidirectionalStreamsTransport;
-QuicTransportBase includes BidirectionalStreamsTransport;
-QuicTransportBase includes DatagramTransport;
-QuicTransportBase includes WebTransport;
-</pre>
-
-## Methods ##  {#quic-transport-base-methods}
-
-: <dfn for="QuicTransportBase" method>getStats()</dfn>
-:: Gathers stats for this <code><a>QuicTransportBase</a></code>'s QUIC
-   connection and reports the result asynchronously.</p>
-
-   When close is called, the user agent MUST run the following steps:
-     1. Let |transport| be the QuicTransportBase on which `getStats` is invoked.
-     1. Let |p| be a new promise.
-     1. Return |p| and continue the following steps in background.
-         1. Gather the stats from the underlying QUIC connection.
-         1. Once stats have been gathered, resolve |p| with the
-            {{QuicTransportStats}} object, representing the gathered stats.
-
 ## `QuicTransportStats` Dictionary ##  {#quic-transport-stats}
 
 The <dfn dictionary>QuicTransportStats</dfn> dictionary includes information
@@ -562,16 +519,28 @@ The dictionary SHALL have the following attributes:
 
 # `QuicTransport` Interface #  {#quic-transport}
 
-The <dfn interface>QuicTransport</dfn> is a subclass of {{QuicTransportBase}}
-focused on client/server use cases.
+The <dfn interface>QuicTransport</dfn> is a
+{{UnidirectionalStreamsTransport}}, a {{BidirectionalStreamsTransport}}, and a
+{{DatagramTransport}}.  {{SendStream}}s and {{ReceiveStream}}s are implemented
+with unidirectional QUIC streams as defined in [[!QUIC-TRANSPORT]].
+{{BidirectionalStream}}s are implemented with bidirectional QUIC streams as
+defined in [[!QUIC-TRANSPORT]]. Datagrams are implemented with QUIC datagrams as
+defined in [[!QUIC-DATAGRAM]].
 
 ## Interface Definition ##  {#quic-transport-definition}
 
 <pre class="idl">
 [Constructor(DOMString host, unsigned short port), Exposed=Window]
-interface QuicTransport : QuicTransportBase {
+interface QuicTransport {
+  Promise&lt;QuicTransportStats&gt; getStats();
 };
+
+QuicTransport includes UnidirectionalStreamsTransport;
+QuicTransport includes BidirectionalStreamsTransport;
+QuicTransport includes DatagramTransport;
+QuicTransport includes WebTransport;
 </pre>
+
 
 When the {{QuicTransport/QuicTransport()}} constructor is invoked, the user
 agent MUST run the following steps:
@@ -613,6 +582,20 @@ agent MUST run the following steps:
     1. Set |transport|'s {{[[WebTransportState]]}} internal slot to
        `"connected"`.
 1. Return |transport|.
+
+## Methods ##  {#quic-transport-methods}
+
+: <dfn for="QuicTransport" method>getStats()</dfn>
+:: Gathers stats for this <code><a>QuicTransport</a></code>'s QUIC
+   connection and reports the result asynchronously.</p>
+
+   When close is called, the user agent MUST run the following steps:
+     1. Let |transport| be the QuicTransport on which `getStats` is invoked.
+     1. Let |p| be a new promise.
+     1. Return |p| and continue the following steps in background.
+         1. Gather the stats from the underlying QUIC connection.
+         1. Once stats have been gathered, resolve |p| with the
+            {{QuicTransportStats}} object, representing the gathered stats.
 
 # Interface Mixin `OutgoingStream` #  {#outgoing-stream}
 
