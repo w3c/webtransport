@@ -1029,7 +1029,7 @@ Possible extra rowspan handling
 		}
 	/* } */
 
-	@supports (display:grid) and (display:contents) {
+	@supports (display:grid) {
 		/* Use #toc over .toc to override non-@supports rules. */
 		#toc {
 			display: grid;
@@ -1212,9 +1212,9 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <link href="https://www.w3.org/StyleSheets/TR/2016/cg-draft" rel="stylesheet">
+  <meta content="Bikeshed version 670c46b501fc025ae87a3398a195af35379ab37d" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="bf16cc1c9e2d2e19e59960ac93610bc2cb4d4894" name="document-revision">
+  <meta content="6d4df4fbe27d636a8a33d577b837af90be4dbd2a" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1580,40 +1580,35 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li><a href="#incoming-stream-attributes"><span class="secno">11.2</span> <span class="content">Attributes</span></a>
       <li><a href="#incoming-stream-methods"><span class="secno">11.3</span> <span class="content">Methods</span></a>
      </ol>
+    <li><a href="#bidirectional-stream"><span class="secno">12</span> <span class="content">Interface <code>BidirectionalStream</code></span></a>
+    <li><a href="#send-stream"><span class="secno">13</span> <span class="content">Interface <code>SendStream</code></span></a>
+    <li><a href="#receive-stream"><span class="secno">14</span> <span class="content">Interface <code>ReceiveStream</code></span></a>
     <li>
-     <a href="#web-transport-stream"><span class="secno">12</span> <span class="content">Interface <code>WebTransportStream</code></span></a>
+     <a href="#http3-transport"><span class="secno">15</span> <span class="content"><code>Http3Transport</code> Interface</span></a>
      <ol class="toc">
-      <li><a href="#web-transport-stream-attributes"><span class="secno">12.1</span> <span class="content">Attributes</span></a>
-     </ol>
-    <li><a href="#bidirectional-stream"><span class="secno">13</span> <span class="content">Interface <code>BidirectionalStream</code></span></a>
-    <li><a href="#send-stream"><span class="secno">14</span> <span class="content">Interface <code>SendStream</code></span></a>
-    <li><a href="#receive-stream"><span class="secno">15</span> <span class="content">Interface <code>ReceiveStream</code></span></a>
-    <li>
-     <a href="#http3-transport"><span class="secno">16</span> <span class="content"><code>Http3Transport</code> Interface</span></a>
-     <ol class="toc">
-      <li><a href="#http3-transport-overview"><span class="secno">16.1</span> <span class="content">Overview</span></a>
+      <li><a href="#http3-transport-overview"><span class="secno">15.1</span> <span class="content">Overview</span></a>
       <li>
-       <a href="#http3-transport-interface"><span class="secno">16.2</span> <span class="content">Interface Definition</span></a>
+       <a href="#http3-transport-interface"><span class="secno">15.2</span> <span class="content">Interface Definition</span></a>
        <ol class="toc">
-        <li><a href="#http3-transport-constructors"><span class="secno">16.2.1</span> <span class="content">Constructors</span></a>
+        <li><a href="#http3-transport-constructors"><span class="secno">15.2.1</span> <span class="content">Constructors</span></a>
        </ol>
      </ol>
     <li>
-     <a href="#privacy-security"><span class="secno">17</span> <span class="content">Privacy and Security Considerations</span></a>
+     <a href="#privacy-security"><span class="secno">16</span> <span class="content">Privacy and Security Considerations</span></a>
      <ol class="toc">
-      <li><a href="#confidentiality"><span class="secno">17.1</span> <span class="content">Confidentiality of Communications</span></a>
-      <li><a href="#state-persistence"><span class="secno">17.2</span> <span class="content">State Persistence</span></a>
-      <li><a href="#protocol-security"><span class="secno">17.3</span> <span class="content">Protocol Security</span></a>
+      <li><a href="#confidentiality"><span class="secno">16.1</span> <span class="content">Confidentiality of Communications</span></a>
+      <li><a href="#state-persistence"><span class="secno">16.2</span> <span class="content">State Persistence</span></a>
+      <li><a href="#protocol-security"><span class="secno">16.3</span> <span class="content">Protocol Security</span></a>
      </ol>
     <li>
-     <a href="#examples"><span class="secno">18</span> <span class="content">Examples</span></a>
+     <a href="#examples"><span class="secno">17</span> <span class="content">Examples</span></a>
      <ol class="toc">
-      <li><a href="#example-unreliable-delivery"><span class="secno">18.1</span> <span class="content">Unreliable delivery</span></a>
-      <li><a href="#example-datagrams"><span class="secno">18.2</span> <span class="content">Sending a buffer of datagrams</span></a>
-      <li><a href="#example-fixed-rate"><span class="secno">18.3</span> <span class="content">Sending datagrams at a fixed rate</span></a>
-      <li><a href="#example-receiving-datagrams"><span class="secno">18.4</span> <span class="content">Receiving datagrams</span></a>
+      <li><a href="#example-unreliable-delivery"><span class="secno">17.1</span> <span class="content">Unreliable delivery</span></a>
+      <li><a href="#example-datagrams"><span class="secno">17.2</span> <span class="content">Sending a buffer of datagrams</span></a>
+      <li><a href="#example-fixed-rate"><span class="secno">17.3</span> <span class="content">Sending datagrams at a fixed rate</span></a>
+      <li><a href="#example-receiving-datagrams"><span class="secno">17.4</span> <span class="content">Receiving datagrams</span></a>
      </ol>
-    <li><a href="#acknowledgements"><span class="secno">19</span> <span class="content">Acknowledgements</span></a>
+    <li><a href="#acknowledgements"><span class="secno">18</span> <span class="content">Acknowledgements</span></a>
     <li>
      <a href="#index"><span class="secno"></span> <span class="content">Index</span></a>
      <ol class="toc">
@@ -2074,20 +2069,20 @@ defined in <a data-link-type="biblio" href="#biblio-quic-datagram">[QUIC-DATAGRA
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-quictransportstats"><code>QuicTransportStats</code></dfn> dictionary includes information
 on QUIC connection level stats.</p>
 <pre class="idl highlight def"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats②"><c- g>QuicTransportStats</c-></a> {
-  <a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-timestamp" id="ref-for-dom-quictransportstats-timestamp"><c- g>timestamp</c-></a>;
+  <a class="n" data-link-type="idl-name"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-timestamp" id="ref-for-dom-quictransportstats-timestamp"><c- g>timestamp</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-bytessent" id="ref-for-dom-quictransportstats-bytessent"><c- g>bytesSent</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-packetssent" id="ref-for-dom-quictransportstats-packetssent"><c- g>packetsSent</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numoutgoingstreamscreated" id="ref-for-dom-quictransportstats-numoutgoingstreamscreated"><c- g>numOutgoingStreamsCreated</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long①"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numincomingstreamscreated" id="ref-for-dom-quictransportstats-numincomingstreamscreated"><c- g>numIncomingStreamsCreated</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long②"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-bytesreceived" id="ref-for-dom-quictransportstats-bytesreceived"><c- g>bytesReceived</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long③"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-packetsreceived" id="ref-for-dom-quictransportstats-packetsreceived"><c- g>packetsReceived</c-></a>;
-  <a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp①"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-minrtt" id="ref-for-dom-quictransportstats-minrtt"><c- g>minRtt</c-></a>;
+  <a class="n" data-link-type="idl-name"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-minrtt" id="ref-for-dom-quictransportstats-minrtt"><c- g>minRtt</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long②"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numreceiveddatagramsdropped" id="ref-for-dom-quictransportstats-numreceiveddatagramsdropped"><c- g>numReceivedDatagramsDropped</c-></a>;
 };
 </pre>
    <p>The dictionary SHALL have the following attributes:</p>
    <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-timestamp"><code>timestamp</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp②">DOMHighResTimeStamp</a></span>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-timestamp"><code>timestamp</code></dfn>, <span> of type <a data-link-type="idl-name">DOMHighResTimeStamp</a></span>
     <dd data-md>
      <p>The <code>timestamp</code> for when the stats are gathered, relative to the
  UNIX epoch (Jan 1, 1970, UTC).</p>
@@ -2112,7 +2107,7 @@ on QUIC connection level stats.</p>
     <dd data-md>
      <p>The number of total packets received on the QUIC connection, including
  packets that were not processable.</p>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-minrtt"><code>minRtt</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp③">DOMHighResTimeStamp</a></span>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-minrtt"><code>minRtt</code></dfn>, <span> of type <a data-link-type="idl-name">DOMHighResTimeStamp</a></span>
     <dd data-md>
      <p>The minimum RTT observed on the entire connection.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportStats" data-dfn-type="dict-member" data-export id="dom-quictransportstats-numreceiveddatagramsdropped"><code>numReceivedDatagramsDropped</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑤">unsigned long</a></span>
@@ -2326,54 +2321,41 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
  stream while reading, just as if |IncomingStream.readable.getReader()| were
  used.</p>
    </dl>
-   <h2 class="heading settled" data-level="12" id="web-transport-stream"><span class="secno">12. </span><span class="content">Interface <code>WebTransportStream</code></span><a class="self-link" href="#web-transport-stream"></a></h2>
-   <p>A collection of common attributes and methods of all streams.</p>
+   <h2 class="heading settled" data-level="12" id="bidirectional-stream"><span class="secno">12. </span><span class="content">Interface <code>BidirectionalStream</code></span><a class="self-link" href="#bidirectional-stream"></a></h2>
 <pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
-<c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="webtransportstream"><code><c- g>WebTransportStream</c-></code></dfn> {
-    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑨"><c- n>WebTransport</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransport" href="#dom-webtransportstream-transport" id="ref-for-dom-webtransportstream-transport"><c- g>transport</c-></a>;
-};
-</pre>
-   <h3 class="heading settled" data-level="12.1" id="web-transport-stream-attributes"><span class="secno">12.1. </span><span class="content">Attributes</span><a class="self-link" href="#web-transport-stream-attributes"></a></h3>
-   <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportStream" data-dfn-type="attribute" data-export id="dom-webtransportstream-transport"><code>transport</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①⓪">WebTransport</a>, readonly</span>
-    <dd data-md>
-     <p>The readonly attribute referring to the related <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①①">WebTransport</a></code> object.</p>
-   </dl>
-   <h2 class="heading settled" data-level="13" id="bidirectional-stream"><span class="secno">13. </span><span class="content">Interface <code>BidirectionalStream</code></span><a class="self-link" href="#bidirectional-stream"></a></h2>
-<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
-<c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="bidirectionalstream"><code><c- g>BidirectionalStream</c-></code></dfn> : <a class="n" data-link-type="idl-name" href="#webtransportstream" id="ref-for-webtransportstream"><c- n>WebTransportStream</c-></a> {
+<c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="bidirectionalstream"><code><c- g>BidirectionalStream</c-></code></dfn> {
 };
 <a class="n" data-link-type="idl-name" href="#bidirectionalstream" id="ref-for-bidirectionalstream⑨"><c- n>BidirectionalStream</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#outgoingstream" id="ref-for-outgoingstream①②"><c- n>OutgoingStream</c-></a>;
 <a class="n" data-link-type="idl-name" href="#bidirectionalstream" id="ref-for-bidirectionalstream①⓪"><c- n>BidirectionalStream</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#incomingstream" id="ref-for-incomingstream①③"><c- n>IncomingStream</c-></a>;
 </pre>
-   <h2 class="heading settled" data-level="14" id="send-stream"><span class="secno">14. </span><span class="content">Interface <code>SendStream</code></span><a class="self-link" href="#send-stream"></a></h2>
-<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑤"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
-<c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="sendstream"><code><c- g>SendStream</c-></code></dfn> : <a class="n" data-link-type="idl-name" href="#webtransportstream" id="ref-for-webtransportstream①"><c- n>WebTransportStream</c-></a> {
+   <h2 class="heading settled" data-level="13" id="send-stream"><span class="secno">13. </span><span class="content">Interface <code>SendStream</code></span><a class="self-link" href="#send-stream"></a></h2>
+<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
+<c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="sendstream"><code><c- g>SendStream</c-></code></dfn> {
 };
 <a class="n" data-link-type="idl-name" href="#sendstream" id="ref-for-sendstream⑦"><c- n>SendStream</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#outgoingstream" id="ref-for-outgoingstream①③"><c- n>OutgoingStream</c-></a>;
 </pre>
-   <h2 class="heading settled" data-level="15" id="receive-stream"><span class="secno">15. </span><span class="content">Interface <code>ReceiveStream</code></span><a class="self-link" href="#receive-stream"></a></h2>
-<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑥"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
-<c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="receivestream"><code><c- g>ReceiveStream</c-></code></dfn> : <a class="n" data-link-type="idl-name" href="#webtransportstream" id="ref-for-webtransportstream②"><c- n>WebTransportStream</c-></a> {
+   <h2 class="heading settled" data-level="14" id="receive-stream"><span class="secno">14. </span><span class="content">Interface <code>ReceiveStream</code></span><a class="self-link" href="#receive-stream"></a></h2>
+<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑤"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
+<c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="receivestream"><code><c- g>ReceiveStream</c-></code></dfn> {
 };
 <a class="n" data-link-type="idl-name" href="#receivestream" id="ref-for-receivestream③"><c- n>ReceiveStream</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#incomingstream" id="ref-for-incomingstream①④"><c- n>IncomingStream</c-></a>;
 </pre>
-   <h2 class="heading settled" data-level="16" id="http3-transport"><span class="secno">16. </span><span class="content"><code>Http3Transport</code> Interface</span><a class="self-link" href="#http3-transport"></a></h2>
-   <h3 class="heading settled" data-level="16.1" id="http3-transport-overview"><span class="secno">16.1. </span><span class="content">Overview</span><a class="self-link" href="#http3-transport-overview"></a></h3>
+   <h2 class="heading settled" data-level="15" id="http3-transport"><span class="secno">15. </span><span class="content"><code>Http3Transport</code> Interface</span><a class="self-link" href="#http3-transport"></a></h2>
+   <h3 class="heading settled" data-level="15.1" id="http3-transport-overview"><span class="secno">15.1. </span><span class="content">Overview</span><a class="self-link" href="#http3-transport-overview"></a></h3>
    <p>An <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="http3transport"><code>Http3Transport</code></dfn> is a <code class="idl"><a data-link-type="idl" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport⑤">UnidirectionalStreamsTransport</a></code>,
 a <code class="idl"><a data-link-type="idl" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑥">BidirectionalStreamsTransport</a></code>, and a <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport④">DatagramTransport</a></code>. <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream⑧">SendStream</a></code>s, <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream④">ReceiveStream</a></code>s and <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream①①">BidirectionalStream</a></code>s are
 implemented with HTTP/3 streams as defined in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.
 Datagrams are implemented with QUIC datagrams as defined in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.</p>
-   <h3 class="heading settled" data-level="16.2" id="http3-transport-interface"><span class="secno">16.2. </span><span class="content">Interface Definition</span><a class="self-link" href="#http3-transport-interface"></a></h3>
-<pre class="idl highlight def">[<dfn class="dfn-paneled idl-code" data-dfn-for="Http3Transport" data-dfn-type="constructor" data-export data-lt="Http3Transport(url)" id="dom-http3transport-http3transport"><code><c- g>Constructor</c-></code></dfn> (<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString③"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="Http3Transport/Http3Transport(url)" data-dfn-type="argument" data-export id="dom-http3transport-http3transport-url-url"><code><c- g>url</c-></code><a class="self-link" href="#dom-http3transport-http3transport-url-url"></a></dfn>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑦"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+   <h3 class="heading settled" data-level="15.2" id="http3-transport-interface"><span class="secno">15.2. </span><span class="content">Interface Definition</span><a class="self-link" href="#http3-transport-interface"></a></h3>
+<pre class="idl highlight def">[<dfn class="dfn-paneled idl-code" data-dfn-for="Http3Transport" data-dfn-type="constructor" data-export data-lt="Http3Transport(url)" id="dom-http3transport-http3transport"><code><c- g>Constructor</c-></code></dfn> (<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString③"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="Http3Transport/Http3Transport(url)" data-dfn-type="argument" data-export id="dom-http3transport-http3transport-url-url"><code><c- g>url</c-></code><a class="self-link" href="#dom-http3transport-http3transport-url-url"></a></dfn>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑥"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#http3transport" id="ref-for-http3transport"><c- g>Http3Transport</c-></a> {
 };
 
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport⑥"><c- n>UnidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport②"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑦"><c- n>BidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport③"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport⑤"><c- n>DatagramTransport</c-></a>;
-<a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport④"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①②"><c- n>WebTransport</c-></a>;</pre>
-   <h4 class="heading settled" data-level="16.2.1" id="http3-transport-constructors"><span class="secno">16.2.1. </span><span class="content">Constructors</span><a class="self-link" href="#http3-transport-constructors"></a></h4>
+<a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport④"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑨"><c- n>WebTransport</c-></a>;</pre>
+   <h4 class="heading settled" data-level="15.2.1" id="http3-transport-constructors"><span class="secno">15.2.1. </span><span class="content">Constructors</span><a class="self-link" href="#http3-transport-constructors"></a></h4>
    <p>When the <code class="idl"><a data-link-type="idl" href="#dom-http3transport-http3transport" id="ref-for-dom-http3transport-http3transport">Http3Transport()</a></code> constructor is invoked, the user
 agent MUST run the following steps:</p>
    <ol>
@@ -2419,10 +2401,10 @@ agent MUST run the following steps:</p>
     <li data-md>
      <p>Return <var>transport</var>.</p>
    </ol>
-   <h2 class="heading settled" data-level="17" id="privacy-security"><span class="secno">17. </span><span class="content">Privacy and Security Considerations</span><a class="self-link" href="#privacy-security"></a></h2>
+   <h2 class="heading settled" data-level="16" id="privacy-security"><span class="secno">16. </span><span class="content">Privacy and Security Considerations</span><a class="self-link" href="#privacy-security"></a></h2>
    <p>This section is non-normative; it specifies no new behaviour, but instead
 summarizes information already present in other parts of the specification.</p>
-   <h3 class="heading settled" data-level="17.1" id="confidentiality"><span class="secno">17.1. </span><span class="content">Confidentiality of Communications</span><a class="self-link" href="#confidentiality"></a></h3>
+   <h3 class="heading settled" data-level="16.1" id="confidentiality"><span class="secno">16.1. </span><span class="content">Confidentiality of Communications</span><a class="self-link" href="#confidentiality"></a></h3>
    <p>The fact that communication is taking place cannot be hidden from adversaries
 that can observe the network, so this has to be regarded as public information.</p>
    <p>All of the transport protocols described in this document use either TLS <a data-link-type="biblio" href="#biblio-rfc8446">[RFC8446]</a> or a semantically equivalent protocol, thus providing all of the
@@ -2432,7 +2414,7 @@ verification mechanism as outbound HTTP requests, thus relying on the same
 public key infrastructure for authentication of the remote server. In
 WebTransport, certificate verification errors are fatal; no interstitial
 allowing bypassing certificate validation is available.</p>
-   <h3 class="heading settled" data-level="17.2" id="state-persistence"><span class="secno">17.2. </span><span class="content">State Persistence</span><a class="self-link" href="#state-persistence"></a></h3>
+   <h3 class="heading settled" data-level="16.2" id="state-persistence"><span class="secno">16.2. </span><span class="content">State Persistence</span><a class="self-link" href="#state-persistence"></a></h3>
    <p>WebTransport by itself does not create any new unique identifiers or new ways
 to persistently store state, nor does it automatically expose any of the
 existing persistent state to the server. For instance, none of the transports
@@ -2443,7 +2425,7 @@ passive network observers) to correlate different connections from the same
 client. This is not specific to WebTransport by itself, but rather an inherent
 property of all TLS-based protocols; thus, this is out-of-scope for this
 specification.</p>
-   <h3 class="heading settled" data-level="17.3" id="protocol-security"><span class="secno">17.3. </span><span class="content">Protocol Security</span><a class="self-link" href="#protocol-security"></a></h3>
+   <h3 class="heading settled" data-level="16.3" id="protocol-security"><span class="secno">16.3. </span><span class="content">Protocol Security</span><a class="self-link" href="#protocol-security"></a></h3>
    <p>WebTransport imposes a common set of requirements on all of the protocols,
 described in <a data-link-type="biblio" href="#biblio-web-transport-overview">[WEB-TRANSPORT-OVERVIEW]</a>. Notable ones include:</p>
    <ol>
@@ -2469,8 +2451,8 @@ approach</a> to this problem: the specific connection error is not returned unti
 endpoint is verified to be a WebTransport endpoint; thus, the Web application
 cannot distinguish between a non-existing endpoint and the endpoint that is not
 willing to accept connections from the Web.</p>
-   <h2 class="heading settled" data-level="18" id="examples"><span class="secno">18. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
-   <h3 class="heading settled" data-level="18.1" id="example-unreliable-delivery"><span class="secno">18.1. </span><span class="content">Unreliable delivery</span><a class="self-link" href="#example-unreliable-delivery"></a></h3>
+   <h2 class="heading settled" data-level="17" id="examples"><span class="secno">17. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
+   <h3 class="heading settled" data-level="17.1" id="example-unreliable-delivery"><span class="secno">17.1. </span><span class="content">Unreliable delivery</span><a class="self-link" href="#example-unreliable-delivery"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Unreliable delivery can be achieved by creating many streams with
 retransmissions disabled, each transporting a single small message.</p>
@@ -2480,7 +2462,7 @@ retransmissions disabled, each transporting a single small message.</p>
   transport<c- p>.</c->createSendStream<c- p>({</c->disableRetransmissions<c- o>:</c-> <c- kc>true</c-><c- p>}).</c->writable<c- p>.</c->getWriter<c- p>().</c->write<c- p>({</c->data<c- o>:</c-> msg<c- p>,</c-> finished<c- o>:</c-> <c- kc>true</c-><c- p>});</c->
 <c- p>}</c->
 </pre>
-   <h3 class="heading settled" data-level="18.2" id="example-datagrams"><span class="secno">18.2. </span><span class="content">Sending a buffer of datagrams</span><a class="self-link" href="#example-datagrams"></a></h3>
+   <h3 class="heading settled" data-level="17.2" id="example-datagrams"><span class="secno">17.2. </span><span class="content">Sending a buffer of datagrams</span><a class="self-link" href="#example-datagrams"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Sending a buffer of datagrams can be achieved by using the <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-senddatagrams" id="ref-for-dom-datagramtransport-senddatagrams②">sendDatagrams()</a></code> method. In the following example
 datagrams are only sent if the <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport⑥">DatagramTransport</a></code> is ready to send.</p>
@@ -2492,7 +2474,7 @@ datagrams<c- p>.</c->forEach<c- p>((</c->datagram<c- p>)</c-> <c- p>=></c-> <c- 
   datagramWritableStream<c- p>.</c->getWriter<c- p>().</c->write<c- p>(</c->datagram<c- p>);</c->
 <c- p>});</c->
 </pre>
-   <h3 class="heading settled" data-level="18.3" id="example-fixed-rate"><span class="secno">18.3. </span><span class="content">Sending datagrams at a fixed rate</span><a class="self-link" href="#example-fixed-rate"></a></h3>
+   <h3 class="heading settled" data-level="17.3" id="example-fixed-rate"><span class="secno">17.3. </span><span class="content">Sending datagrams at a fixed rate</span><a class="self-link" href="#example-fixed-rate"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Sending datagrams at a fixed rate regardless if the transport is ready to send
 can be achieved by simply using <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-senddatagrams" id="ref-for-dom-datagramtransport-senddatagrams③">sendDatagrams()</a></code> and not
@@ -2504,7 +2486,7 @@ setInterval<c- p>(()</c-> <c- p>=></c-> <c- p>{</c->
   datagramWritableStream<c- p>.</c->getWriter<c- p>().</c->write<c- p>(</c->createDatagram<c- p>());</c->
 <c- p>},</c-> <c- mi>100</c-><c- p>);</c->
 </pre>
-   <h3 class="heading settled" data-level="18.4" id="example-receiving-datagrams"><span class="secno">18.4. </span><span class="content">Receiving datagrams</span><a class="self-link" href="#example-receiving-datagrams"></a></h3>
+   <h3 class="heading settled" data-level="17.4" id="example-receiving-datagrams"><span class="secno">17.4. </span><span class="content">Receiving datagrams</span><a class="self-link" href="#example-receiving-datagrams"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Receiving datagrams can be achieved by calling <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-receivedatagrams" id="ref-for-dom-datagramtransport-receivedatagrams②">receiveDatagrams()</a></code> method, remembering to check for null
 values indicating that packets are not being processed quickly enough.</p>
@@ -2518,7 +2500,7 @@ values indicating that packets are not being processed quickly enough.</p>
   <c- c1>// Process the data</c->
 <c- p>}</c->
 </pre>
-   <h2 class="heading settled" data-level="19" id="acknowledgements"><span class="secno">19. </span><span class="content">Acknowledgements</span><a class="self-link" href="#acknowledgements"></a></h2>
+   <h2 class="heading settled" data-level="18" id="acknowledgements"><span class="secno">18. </span><span class="content">Acknowledgements</span><a class="self-link" href="#acknowledgements"></a></h2>
     The editors wish to thank the Working Group chairs and Team Contact, Harald
 Alvestrand, Stefan Håkansson, Bernard Aboba and Dominique
 Hazaël-Massieux, for their support. Contributions to this specification
@@ -2665,7 +2647,7 @@ use in this specification.</p>
    <li><a href="#add-the-bidirectionalstream">add the BidirectionalStream</a><span>, in §5.2.1</span>
    <li><a href="#add-the-sendstream">add the SendStream</a><span>, in §4.2.1</span>
    <li><a href="#dom-incomingstream-arraybuffer">arrayBuffer()</a><span>, in §11.3</span>
-   <li><a href="#bidirectionalstream">BidirectionalStream</a><span>, in §13</span>
+   <li><a href="#bidirectionalstream">BidirectionalStream</a><span>, in §12</span>
    <li><a href="#bidirectionalstreamstransport">BidirectionalStreamsTransport</a><span>, in §5</span>
    <li><a href="#dom-quictransportstats-bytesreceived">bytesReceived</a><span>, in §8.4</span>
    <li><a href="#dom-quictransportstats-bytessent">bytesSent</a><span>, in §8.4</span>
@@ -2688,8 +2670,8 @@ use in this specification.</p>
     </ul>
    <li><a href="#dom-webtransportstate-failed">"failed"</a><span>, in §7.3</span>
    <li><a href="#dom-quictransportbase-getstats">getStats()</a><span>, in §8.3</span>
-   <li><a href="#http3transport">Http3Transport</a><span>, in §16.1</span>
-   <li><a href="#dom-http3transport-http3transport">Http3Transport(url)</a><span>, in §16.2</span>
+   <li><a href="#http3transport">Http3Transport</a><span>, in §15.1</span>
+   <li><a href="#dom-http3transport-http3transport">Http3Transport(url)</a><span>, in §15.2</span>
    <li><a href="#immediate-close">Immediate Close</a><span>, in §7.2</span>
    <li><a href="#incomingstream">IncomingStream</a><span>, in §11</span>
    <li><a href="#dom-datagramtransport-maxdatagramsize">maxDatagramSize</a><span>, in §6.1</span>
@@ -2715,22 +2697,20 @@ use in this specification.</p>
    <li><a href="#dom-quictransport-receivedbidirectionalstreams-slot">[[ReceivedBidirectionalStreams]]</a><span>, in §9.1</span>
    <li><a href="#dom-quictransport-receiveddatagrams-slot">[[ReceivedDatagrams]]</a><span>, in §9.1</span>
    <li><a href="#dom-quictransport-receivedstreams-slot">[[ReceivedStreams]]</a><span>, in §9.1</span>
-   <li><a href="#receivestream">ReceiveStream</a><span>, in §15</span>
+   <li><a href="#receivestream">ReceiveStream</a><span>, in §14</span>
    <li><a href="#dom-unidirectionalstreamstransport-receivestreams">receiveStreams()</a><span>, in §4.1</span>
    <li><a href="#dom-datagramtransport-senddatagrams">sendDatagrams()</a><span>, in §6.2</span>
-   <li><a href="#sendstream">SendStream</a><span>, in §14</span>
+   <li><a href="#sendstream">SendStream</a><span>, in §13</span>
    <li><a href="#dictdef-sendstreamparameters">SendStreamParameters</a><span>, in §4.3</span>
    <li><a href="#dom-quictransport-sentdatagrams-slot">[[SentDatagrams]]</a><span>, in §9.1</span>
    <li><a href="#dom-webtransport-state">state</a><span>, in §7.1</span>
    <li><a href="#dictdef-streamabortinfo">StreamAbortInfo</a><span>, in §10.4</span>
    <li><a href="#dom-quictransportstats-timestamp">timestamp</a><span>, in §8.4</span>
-   <li><a href="#dom-webtransportstream-transport">transport</a><span>, in §12.1</span>
    <li><a href="#unidirectionalstreamstransport">UnidirectionalStreamsTransport</a><span>, in §4</span>
    <li><a href="#webtransport">WebTransport</a><span>, in §7</span>
    <li><a href="#dictdef-webtransportcloseinfo">WebTransportCloseInfo</a><span>, in §7.4</span>
    <li><a href="#dom-quictransport-webtransportstate-slot">[[WebTransportState]]</a><span>, in §9.1</span>
    <li><a href="#enumdef-webtransportstate">WebTransportState</a><span>, in §7.3</span>
-   <li><a href="#webtransportstream">WebTransportStream</a><span>, in §12</span>
    <li><a href="#dom-outgoingstream-writable-slot">[[Writable]]</a><span>, in §10.1</span>
    <li><a href="#dom-outgoingstream-writable">writable</a><span>, in §10.2</span>
    <li><a href="#dom-outgoingstream-writingaborted">writingAborted</a><span>, in §10.2</span>
@@ -2796,12 +2776,6 @@ use in this specification.</p>
     <li><a href="#ref-for-sec-promise-objects②⓪">11.2. Attributes</a> <a href="#ref-for-sec-promise-objects②①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-domhighrestimestamp">
-   <a href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp">https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-domhighrestimestamp">8.4. QuicTransportStats Dictionary</a> <a href="#ref-for-dom-domhighrestimestamp①">(2)</a> <a href="#ref-for-dom-domhighrestimestamp②">(3)</a> <a href="#ref-for-dom-domhighrestimestamp③">(4)</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-errorevent">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#errorevent">https://html.spec.whatwg.org/multipage/webappapis.html#errorevent</a><b>Referenced in:</b>
    <ul>
@@ -2863,7 +2837,7 @@ use in this specification.</p>
    <ul>
     <li><a href="#ref-for-idl-DOMString">7.4. WebTransportCloseInfo Dictionary</a> <a href="#ref-for-idl-DOMString①">(2)</a>
     <li><a href="#ref-for-idl-DOMString②">9.1. Interface Definition</a>
-    <li><a href="#ref-for-idl-DOMString③">16.2. Interface Definition</a>
+    <li><a href="#ref-for-idl-DOMString③">15.2. Interface Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-Exposed">
@@ -2872,11 +2846,10 @@ use in this specification.</p>
     <li><a href="#ref-for-Exposed">9.1. Interface Definition</a>
     <li><a href="#ref-for-Exposed①">10. Interface Mixin OutgoingStream</a>
     <li><a href="#ref-for-Exposed②">11. Interface Mixin IncomingStream</a>
-    <li><a href="#ref-for-Exposed③">12. Interface WebTransportStream</a>
-    <li><a href="#ref-for-Exposed④">13. Interface BidirectionalStream</a>
-    <li><a href="#ref-for-Exposed⑤">14. Interface SendStream</a>
-    <li><a href="#ref-for-Exposed⑥">15. Interface ReceiveStream</a>
-    <li><a href="#ref-for-Exposed⑦">16.2. Interface Definition</a>
+    <li><a href="#ref-for-Exposed③">12. Interface BidirectionalStream</a>
+    <li><a href="#ref-for-Exposed④">13. Interface SendStream</a>
+    <li><a href="#ref-for-Exposed⑤">14. Interface ReceiveStream</a>
+    <li><a href="#ref-for-Exposed⑥">15.2. Interface Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-invalidstateerror">
@@ -2896,7 +2869,7 @@ use in this specification.</p>
    <a href="https://heycam.github.io/webidl/#idl-Uint8Array">https://heycam.github.io/webidl/#idl-Uint8Array</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-Uint8Array">9.1. Interface Definition</a> <a href="#ref-for-idl-Uint8Array①">(2)</a>
-    <li><a href="#ref-for-idl-Uint8Array②">16.2.1. Constructors</a> <a href="#ref-for-idl-Uint8Array③">(2)</a>
+    <li><a href="#ref-for-idl-Uint8Array②">15.2.1. Constructors</a> <a href="#ref-for-idl-Uint8Array③">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-boolean">
@@ -2954,7 +2927,7 @@ use in this specification.</p>
     <li><a href="#ref-for-rs-class①③">11. Interface Mixin IncomingStream</a>
     <li><a href="#ref-for-rs-class①④">11.1. Overview</a>
     <li><a href="#ref-for-rs-class①⑤">11.2. Attributes</a> <a href="#ref-for-rs-class①⑥">(2)</a>
-    <li><a href="#ref-for-rs-class①⑦">16.2.1. Constructors</a> <a href="#ref-for-rs-class①⑧">(2)</a> <a href="#ref-for-rs-class①⑨">(3)</a>
+    <li><a href="#ref-for-rs-class①⑦">15.2.1. Constructors</a> <a href="#ref-for-rs-class①⑧">(2)</a> <a href="#ref-for-rs-class①⑨">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-ws-class">
@@ -2967,7 +2940,7 @@ use in this specification.</p>
     <li><a href="#ref-for-ws-class④">10. Interface Mixin OutgoingStream</a>
     <li><a href="#ref-for-ws-class⑤">10.1. Overview</a>
     <li><a href="#ref-for-ws-class⑥">10.2. Attributes</a> <a href="#ref-for-ws-class⑦">(2)</a>
-    <li><a href="#ref-for-ws-class⑧">16.2.1. Constructors</a>
+    <li><a href="#ref-for-ws-class⑧">15.2.1. Constructors</a>
    </ul>
   </aside>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
@@ -2985,11 +2958,6 @@ use in this specification.</p>
      <li><span class="dfn-paneled" id="term-for-sec-promise-objects②" style="color:initial">rejected</span>
      <li><span class="dfn-paneled" id="term-for-sec-promise-objects③" style="color:initial">resolved</span>
      <li><span class="dfn-paneled" id="term-for-sec-promise-objects④" style="color:initial">settled</span>
-    </ul>
-   <li>
-    <a data-link-type="biblio">[hr-time-2]</a> defines the following terms:
-    <ul>
-     <li><span class="dfn-paneled" id="term-for-dom-domhighrestimestamp" style="color:initial">DOMHighResTimeStamp</span>
     </ul>
    <li>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
@@ -3033,8 +3001,6 @@ use in this specification.</p>
    <dd>Anne van Kesteren. <a href="https://dom.spec.whatwg.org/">DOM Standard</a>. Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
    <dt id="biblio-ecmascript-60">[ECMASCRIPT-6.0]
    <dd>Allen Wirfs-Brock. <a href="http://www.ecma-international.org/ecma-262/6.0/index.html">ECMA-262 6th Edition, The ECMAScript 2015 Language Specification</a>. June 2015. Standard. URL: <a href="http://www.ecma-international.org/ecma-262/6.0/index.html">http://www.ecma-international.org/ecma-262/6.0/index.html</a>
-   <dt id="biblio-hr-time-2">[HR-TIME-2]
-   <dd>Ilya Grigorik; James Simonsen; Jatinder Mann. <a href="https://www.w3.org/TR/hr-time-2/">High Resolution Time Level 2</a>. 26 June 2019. CR. URL: <a href="https://www.w3.org/TR/hr-time-2/">https://www.w3.org/TR/hr-time-2/</a>
    <dt id="biblio-html">[HTML]
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/">HTML Standard</a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-quic-datagram">[QUIC-DATAGRAM]
@@ -3050,7 +3016,7 @@ use in this specification.</p>
    <dt id="biblio-web-transport-quic">[WEB-TRANSPORT-QUIC]
    <dd>Victor Vasiliev. <a href="https://tools.ietf.org/html/draft-vvv-webtransport-quic">WebTransport over QUIC</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-vvv-webtransport-quic">https://tools.ietf.org/html/draft-vvv-webtransport-quic</a>
    <dt id="biblio-webidl">[WEBIDL]
-   <dd>Boris Zbarsky. <a href="https://heycam.github.io/webidl/">Web IDL</a>. 15 December 2016. ED. URL: <a href="https://heycam.github.io/webidl/">https://heycam.github.io/webidl/</a>
+   <dd>Cameron McCormack; Boris Zbarsky; Tobie Langel. <a href="https://heycam.github.io/webidl/">Web IDL</a>. 15 December 2016. ED. URL: <a href="https://heycam.github.io/webidl/">https://heycam.github.io/webidl/</a>
    <dt id="biblio-whatwg-streams">[WHATWG-STREAMS]
    <dd>Adam Rice; Domenic Denicola; 吉野剛史 (Takeshi Yoshino). <a href="https://streams.spec.whatwg.org/">Streams Standard</a>. Living Standard. URL: <a href="https://streams.spec.whatwg.org/">https://streams.spec.whatwg.org/</a>
   </dl>
@@ -3110,18 +3076,18 @@ use in this specification.</p>
 <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase④①"><c- n>QuicTransportBase</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport④①"><c- n>WebTransport</c-></a>;
 
 <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-quictransportstats" id="ref-for-dictdef-quictransportstats②①"><c- g>QuicTransportStats</c-></a> {
-  <a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp④"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-timestamp" id="ref-for-dom-quictransportstats-timestamp①"><c- g>timestamp</c-></a>;
+  <a class="n" data-link-type="idl-name"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-timestamp" id="ref-for-dom-quictransportstats-timestamp①"><c- g>timestamp</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑧"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-bytessent" id="ref-for-dom-quictransportstats-bytessent①"><c- g>bytesSent</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-packetssent" id="ref-for-dom-quictransportstats-packetssent①"><c- g>packetsSent</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑥"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numoutgoingstreamscreated" id="ref-for-dom-quictransportstats-numoutgoingstreamscreated①"><c- g>numOutgoingStreamsCreated</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long①①"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numincomingstreamscreated" id="ref-for-dom-quictransportstats-numincomingstreamscreated①"><c- g>numIncomingStreamsCreated</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long②①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-bytesreceived" id="ref-for-dom-quictransportstats-bytesreceived①"><c- g>bytesReceived</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long③①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-quictransportstats-packetsreceived" id="ref-for-dom-quictransportstats-packetsreceived①"><c- g>packetsReceived</c-></a>;
-  <a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp①①"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-minrtt" id="ref-for-dom-quictransportstats-minrtt①"><c- g>minRtt</c-></a>;
+  <a class="n" data-link-type="idl-name"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-quictransportstats-minrtt" id="ref-for-dom-quictransportstats-minrtt①"><c- g>minRtt</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long②①"><c- b>unsigned</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long " href="#dom-quictransportstats-numreceiveddatagramsdropped" id="ref-for-dom-quictransportstats-numreceiveddatagramsdropped①"><c- g>numReceivedDatagramsDropped</c-></a>;
 };
 
-[<a href="#dom-quictransport-quictransport"><code><c- g>Constructor</c-></code></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString②①"><c- b>DOMString</c-></a> <a href="#dom-quictransport-quictransport-host-port-host"><code><c- g>host</c-></code></a>, <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-short" id="ref-for-idl-unsigned-short④①"><c- b>unsigned</c-> <c- b>short</c-></a> <a href="#dom-quictransport-quictransport-host-port-port"><code><c- g>port</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑧"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+[<a href="#dom-quictransport-quictransport"><code><c- g>Constructor</c-></code></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString②①"><c- b>DOMString</c-></a> <a href="#dom-quictransport-quictransport-host-port-host"><code><c- g>host</c-></code></a>, <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-short" id="ref-for-idl-unsigned-short④①"><c- b>unsigned</c-> <c- b>short</c-></a> <a href="#dom-quictransport-quictransport-host-port-port"><code><c- g>port</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑦"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#quictransport" id="ref-for-quictransport①①"><c- g>QuicTransport</c-></a> : <a class="n" data-link-type="idl-name" href="#quictransportbase" id="ref-for-quictransportbase⑥①"><c- n>QuicTransportBase</c-></a> {
 };
 
@@ -3145,34 +3111,29 @@ use in this specification.</p>
 };
 
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
-<c- b>interface</c-> <a href="#webtransportstream"><code><c- g>WebTransportStream</c-></code></a> {
-    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑨①"><c- n>WebTransport</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransport" href="#dom-webtransportstream-transport" id="ref-for-dom-webtransportstream-transport①"><c- g>transport</c-></a>;
-};
-
-[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
-<c- b>interface</c-> <a href="#bidirectionalstream"><code><c- g>BidirectionalStream</c-></code></a> : <a class="n" data-link-type="idl-name" href="#webtransportstream" id="ref-for-webtransportstream③"><c- n>WebTransportStream</c-></a> {
+<c- b>interface</c-> <a href="#bidirectionalstream"><code><c- g>BidirectionalStream</c-></code></a> {
 };
 <a class="n" data-link-type="idl-name" href="#bidirectionalstream" id="ref-for-bidirectionalstream⑨①"><c- n>BidirectionalStream</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#outgoingstream" id="ref-for-outgoingstream①②①"><c- n>OutgoingStream</c-></a>;
 <a class="n" data-link-type="idl-name" href="#bidirectionalstream" id="ref-for-bidirectionalstream①⓪①"><c- n>BidirectionalStream</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#incomingstream" id="ref-for-incomingstream①③①"><c- n>IncomingStream</c-></a>;
 
-[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑤①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
-<c- b>interface</c-> <a href="#sendstream"><code><c- g>SendStream</c-></code></a> : <a class="n" data-link-type="idl-name" href="#webtransportstream" id="ref-for-webtransportstream①①"><c- n>WebTransportStream</c-></a> {
+[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
+<c- b>interface</c-> <a href="#sendstream"><code><c- g>SendStream</c-></code></a> {
 };
 <a class="n" data-link-type="idl-name" href="#sendstream" id="ref-for-sendstream⑦①"><c- n>SendStream</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#outgoingstream" id="ref-for-outgoingstream①③①"><c- n>OutgoingStream</c-></a>;
 
-[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑥①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
-<c- b>interface</c-> <a href="#receivestream"><code><c- g>ReceiveStream</c-></code></a> : <a class="n" data-link-type="idl-name" href="#webtransportstream" id="ref-for-webtransportstream②①"><c- n>WebTransportStream</c-></a> {
+[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑤①"><c- g>Exposed</c-></a>=<c- n>Window</c-> ]
+<c- b>interface</c-> <a href="#receivestream"><code><c- g>ReceiveStream</c-></code></a> {
 };
 <a class="n" data-link-type="idl-name" href="#receivestream" id="ref-for-receivestream③①"><c- n>ReceiveStream</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#incomingstream" id="ref-for-incomingstream①④①"><c- n>IncomingStream</c-></a>;
 
-[<a href="#dom-http3transport-http3transport"><code><c- g>Constructor</c-></code></a> (<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString③①"><c- b>DOMString</c-></a> <a href="#dom-http3transport-http3transport-url-url"><code><c- g>url</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑦①"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+[<a href="#dom-http3transport-http3transport"><code><c- g>Constructor</c-></code></a> (<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString③①"><c- b>DOMString</c-></a> <a href="#dom-http3transport-http3transport-url-url"><code><c- g>url</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑥①"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#http3transport" id="ref-for-http3transport⑥"><c- g>Http3Transport</c-></a> {
 };
 
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport①①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport⑥①"><c- n>UnidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport②①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑦①"><c- n>BidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport③①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport⑤①"><c- n>DatagramTransport</c-></a>;
-<a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport④①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①②①"><c- n>WebTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport④①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑨①"><c- n>WebTransport</c-></a>;
 </pre>
   <aside class="dfn-panel" data-for="unidirectionalstreamstransport">
    <b><a href="#unidirectionalstreamstransport">#unidirectionalstreamstransport</a></b><b>Referenced in:</b>
@@ -3181,8 +3142,8 @@ use in this specification.</p>
     <li><a href="#ref-for-unidirectionalstreamstransport①">4.2.1. Add SendStream to UnidirectionalStreamsTransport</a> <a href="#ref-for-unidirectionalstreamstransport②">(2)</a>
     <li><a href="#ref-for-unidirectionalstreamstransport③">8.1. Overview</a>
     <li><a href="#ref-for-unidirectionalstreamstransport④">8.2. Interface Definition</a>
-    <li><a href="#ref-for-unidirectionalstreamstransport⑤">16.1. Overview</a>
-    <li><a href="#ref-for-unidirectionalstreamstransport⑥">16.2. Interface Definition</a>
+    <li><a href="#ref-for-unidirectionalstreamstransport⑤">15.1. Overview</a>
+    <li><a href="#ref-for-unidirectionalstreamstransport⑥">15.2. Interface Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-unidirectionalstreamstransport-createsendstream">
@@ -3224,8 +3185,8 @@ use in this specification.</p>
     <li><a href="#ref-for-bidirectionalstreamstransport②">5.2.1. Add BidirectionalStream to BidirectionalStreamsTransport</a> <a href="#ref-for-bidirectionalstreamstransport③">(2)</a>
     <li><a href="#ref-for-bidirectionalstreamstransport④">8.1. Overview</a>
     <li><a href="#ref-for-bidirectionalstreamstransport⑤">8.2. Interface Definition</a>
-    <li><a href="#ref-for-bidirectionalstreamstransport⑥">16.1. Overview</a>
-    <li><a href="#ref-for-bidirectionalstreamstransport⑦">16.2. Interface Definition</a>
+    <li><a href="#ref-for-bidirectionalstreamstransport⑥">15.1. Overview</a>
+    <li><a href="#ref-for-bidirectionalstreamstransport⑦">15.2. Interface Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bidirectionalstreamstransport-createbidirectionalstream">
@@ -3254,9 +3215,9 @@ use in this specification.</p>
     <li><a href="#ref-for-datagramtransport①">6.2. Methods</a>
     <li><a href="#ref-for-datagramtransport②">8.1. Overview</a>
     <li><a href="#ref-for-datagramtransport③">8.2. Interface Definition</a>
-    <li><a href="#ref-for-datagramtransport④">16.1. Overview</a>
-    <li><a href="#ref-for-datagramtransport⑤">16.2. Interface Definition</a>
-    <li><a href="#ref-for-datagramtransport⑥">18.2. Sending a buffer of datagrams</a>
+    <li><a href="#ref-for-datagramtransport④">15.1. Overview</a>
+    <li><a href="#ref-for-datagramtransport⑤">15.2. Interface Definition</a>
+    <li><a href="#ref-for-datagramtransport⑥">17.2. Sending a buffer of datagrams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-datagramtransport-maxdatagramsize">
@@ -3270,8 +3231,8 @@ use in this specification.</p>
    <ul>
     <li><a href="#ref-for-dom-datagramtransport-senddatagrams">6. DatagramTransport Mixin</a>
     <li><a href="#ref-for-dom-datagramtransport-senddatagrams①">6.1. Attributes</a>
-    <li><a href="#ref-for-dom-datagramtransport-senddatagrams②">18.2. Sending a buffer of datagrams</a>
-    <li><a href="#ref-for-dom-datagramtransport-senddatagrams③">18.3. Sending datagrams at a fixed rate</a>
+    <li><a href="#ref-for-dom-datagramtransport-senddatagrams②">17.2. Sending a buffer of datagrams</a>
+    <li><a href="#ref-for-dom-datagramtransport-senddatagrams③">17.3. Sending datagrams at a fixed rate</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-datagramtransport-receivedatagrams">
@@ -3279,7 +3240,7 @@ use in this specification.</p>
    <ul>
     <li><a href="#ref-for-dom-datagramtransport-receivedatagrams">6. DatagramTransport Mixin</a>
     <li><a href="#ref-for-dom-datagramtransport-receivedatagrams①">8.4. QuicTransportStats Dictionary</a>
-    <li><a href="#ref-for-dom-datagramtransport-receivedatagrams②">18.4. Receiving datagrams</a>
+    <li><a href="#ref-for-dom-datagramtransport-receivedatagrams②">17.4. Receiving datagrams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="webtransport">
@@ -3292,9 +3253,7 @@ use in this specification.</p>
     <li><a href="#ref-for-webtransport⑥">10.3. Methods</a>
     <li><a href="#ref-for-webtransport⑦">11.2. Attributes</a>
     <li><a href="#ref-for-webtransport⑧">11.3. Methods</a>
-    <li><a href="#ref-for-webtransport⑨">12. Interface WebTransportStream</a>
-    <li><a href="#ref-for-webtransport①⓪">12.1. Attributes</a> <a href="#ref-for-webtransport①①">(2)</a>
-    <li><a href="#ref-for-webtransport①②">16.2. Interface Definition</a>
+    <li><a href="#ref-for-webtransport⑨">15.2. Interface Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-state">
@@ -3466,7 +3425,7 @@ use in this specification.</p>
    <ul>
     <li><a href="#ref-for-quictransport">8. QuicTransportBase Interface</a>
     <li><a href="#ref-for-quictransport①">9.1. Interface Definition</a> <a href="#ref-for-quictransport②">(2)</a>
-    <li><a href="#ref-for-quictransport③">19. Acknowledgements</a>
+    <li><a href="#ref-for-quictransport③">18. Acknowledgements</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-quictransport">
@@ -3495,7 +3454,7 @@ use in this specification.</p>
     <li><a href="#ref-for-dom-quictransport-outgoingstreams-slot②">7.3. WebTransportState Enum</a> <a href="#ref-for-dom-quictransport-outgoingstreams-slot③">(2)</a> <a href="#ref-for-dom-quictransport-outgoingstreams-slot④">(3)</a> <a href="#ref-for-dom-quictransport-outgoingstreams-slot⑤">(4)</a>
     <li><a href="#ref-for-dom-quictransport-outgoingstreams-slot⑥">10.2. Attributes</a>
     <li><a href="#ref-for-dom-quictransport-outgoingstreams-slot⑦">10.3. Methods</a>
-    <li><a href="#ref-for-dom-quictransport-outgoingstreams-slot⑧">16.2.1. Constructors</a>
+    <li><a href="#ref-for-dom-quictransport-outgoingstreams-slot⑧">15.2.1. Constructors</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-receivedstreams-slot">
@@ -3504,7 +3463,7 @@ use in this specification.</p>
     <li><a href="#ref-for-dom-quictransport-receivedstreams-slot">4.1. Methods</a> <a href="#ref-for-dom-quictransport-receivedstreams-slot①">(2)</a>
     <li><a href="#ref-for-dom-quictransport-receivedstreams-slot②">5.1. Methods</a>
     <li><a href="#ref-for-dom-quictransport-receivedstreams-slot③">7.3. WebTransportState Enum</a> <a href="#ref-for-dom-quictransport-receivedstreams-slot④">(2)</a>
-    <li><a href="#ref-for-dom-quictransport-receivedstreams-slot⑤">16.2.1. Constructors</a>
+    <li><a href="#ref-for-dom-quictransport-receivedstreams-slot⑤">15.2.1. Constructors</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-receivedbidirectionalstreams-slot">
@@ -3513,7 +3472,7 @@ use in this specification.</p>
     <li><a href="#ref-for-dom-quictransport-receivedbidirectionalstreams-slot">5.1. Methods</a>
     <li><a href="#ref-for-dom-quictransport-receivedbidirectionalstreams-slot①">5.2.1. Add BidirectionalStream to BidirectionalStreamsTransport</a>
     <li><a href="#ref-for-dom-quictransport-receivedbidirectionalstreams-slot②">7.3. WebTransportState Enum</a> <a href="#ref-for-dom-quictransport-receivedbidirectionalstreams-slot③">(2)</a>
-    <li><a href="#ref-for-dom-quictransport-receivedbidirectionalstreams-slot④">16.2.1. Constructors</a>
+    <li><a href="#ref-for-dom-quictransport-receivedbidirectionalstreams-slot④">15.2.1. Constructors</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-webtransportstate-slot">
@@ -3523,21 +3482,21 @@ use in this specification.</p>
     <li><a href="#ref-for-dom-quictransport-webtransportstate-slot②">7.2. Methods</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot③">(2)</a>
     <li><a href="#ref-for-dom-quictransport-webtransportstate-slot④">7.3. WebTransportState Enum</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑤">(2)</a>
     <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑥">9.1. Interface Definition</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑦">(2)</a>
-    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑧">16.2.1. Constructors</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑨">(2)</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot①⓪">(3)</a>
+    <li><a href="#ref-for-dom-quictransport-webtransportstate-slot⑧">15.2.1. Constructors</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot⑨">(2)</a> <a href="#ref-for-dom-quictransport-webtransportstate-slot①⓪">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-sentdatagrams-slot">
    <b><a href="#dom-quictransport-sentdatagrams-slot">#dom-quictransport-sentdatagrams-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-quictransport-sentdatagrams-slot">6.2. Methods</a>
-    <li><a href="#ref-for-dom-quictransport-sentdatagrams-slot①">16.2.1. Constructors</a>
+    <li><a href="#ref-for-dom-quictransport-sentdatagrams-slot①">15.2.1. Constructors</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-receiveddatagrams-slot">
    <b><a href="#dom-quictransport-receiveddatagrams-slot">#dom-quictransport-receiveddatagrams-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-quictransport-receiveddatagrams-slot">6.2. Methods</a> <a href="#ref-for-dom-quictransport-receiveddatagrams-slot①">(2)</a>
-    <li><a href="#ref-for-dom-quictransport-receiveddatagrams-slot②">16.2.1. Constructors</a>
+    <li><a href="#ref-for-dom-quictransport-receiveddatagrams-slot②">15.2.1. Constructors</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="outgoingstream">
@@ -3549,9 +3508,9 @@ use in this specification.</p>
     <li><a href="#ref-for-outgoingstream⑤">10.1. Overview</a> <a href="#ref-for-outgoingstream⑥">(2)</a>
     <li><a href="#ref-for-outgoingstream⑦">10.2. Attributes</a> <a href="#ref-for-outgoingstream⑧">(2)</a>
     <li><a href="#ref-for-outgoingstream⑨">10.3. Methods</a> <a href="#ref-for-outgoingstream①⓪">(2)</a> <a href="#ref-for-outgoingstream①①">(3)</a>
-    <li><a href="#ref-for-outgoingstream①②">13. Interface BidirectionalStream</a>
-    <li><a href="#ref-for-outgoingstream①③">14. Interface SendStream</a>
-    <li><a href="#ref-for-outgoingstream①④">16.2.1. Constructors</a>
+    <li><a href="#ref-for-outgoingstream①②">12. Interface BidirectionalStream</a>
+    <li><a href="#ref-for-outgoingstream①③">13. Interface SendStream</a>
+    <li><a href="#ref-for-outgoingstream①④">15.2.1. Constructors</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-outgoingstream-writable-slot">
@@ -3606,9 +3565,9 @@ use in this specification.</p>
     <li><a href="#ref-for-incomingstream⑤">11.1. Overview</a> <a href="#ref-for-incomingstream⑥">(2)</a>
     <li><a href="#ref-for-incomingstream⑦">11.2. Attributes</a> <a href="#ref-for-incomingstream⑧">(2)</a> <a href="#ref-for-incomingstream⑨">(3)</a>
     <li><a href="#ref-for-incomingstream①⓪">11.3. Methods</a> <a href="#ref-for-incomingstream①①">(2)</a> <a href="#ref-for-incomingstream①②">(3)</a>
-    <li><a href="#ref-for-incomingstream①③">13. Interface BidirectionalStream</a>
-    <li><a href="#ref-for-incomingstream①④">15. Interface ReceiveStream</a>
-    <li><a href="#ref-for-incomingstream①⑤">16.2.1. Constructors</a> <a href="#ref-for-incomingstream①⑥">(2)</a>
+    <li><a href="#ref-for-incomingstream①③">12. Interface BidirectionalStream</a>
+    <li><a href="#ref-for-incomingstream①④">14. Interface ReceiveStream</a>
+    <li><a href="#ref-for-incomingstream①⑤">15.2.1. Constructors</a> <a href="#ref-for-incomingstream①⑥">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-incomingstream-readable-slot">
@@ -3641,20 +3600,6 @@ use in this specification.</p>
     <li><a href="#ref-for-dom-incomingstream-arraybuffer">11. Interface Mixin IncomingStream</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="webtransportstream">
-   <b><a href="#webtransportstream">#webtransportstream</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-webtransportstream">13. Interface BidirectionalStream</a>
-    <li><a href="#ref-for-webtransportstream①">14. Interface SendStream</a>
-    <li><a href="#ref-for-webtransportstream②">15. Interface ReceiveStream</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="dom-webtransportstream-transport">
-   <b><a href="#dom-webtransportstream-transport">#dom-webtransportstream-transport</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-webtransportstream-transport">12. Interface WebTransportStream</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="bidirectionalstream">
    <b><a href="#bidirectionalstream">#bidirectionalstream</a></b><b>Referenced in:</b>
    <ul>
@@ -3664,8 +3609,8 @@ use in this specification.</p>
     <li><a href="#ref-for-bidirectionalstream⑥">8.1. Overview</a>
     <li><a href="#ref-for-bidirectionalstream⑦">10. Interface Mixin OutgoingStream</a>
     <li><a href="#ref-for-bidirectionalstream⑧">11. Interface Mixin IncomingStream</a>
-    <li><a href="#ref-for-bidirectionalstream⑨">13. Interface BidirectionalStream</a> <a href="#ref-for-bidirectionalstream①⓪">(2)</a>
-    <li><a href="#ref-for-bidirectionalstream①①">16.1. Overview</a>
+    <li><a href="#ref-for-bidirectionalstream⑨">12. Interface BidirectionalStream</a> <a href="#ref-for-bidirectionalstream①⓪">(2)</a>
+    <li><a href="#ref-for-bidirectionalstream①①">15.1. Overview</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="sendstream">
@@ -3676,8 +3621,8 @@ use in this specification.</p>
     <li><a href="#ref-for-sendstream④">4.2.1. Add SendStream to UnidirectionalStreamsTransport</a>
     <li><a href="#ref-for-sendstream⑤">8.1. Overview</a>
     <li><a href="#ref-for-sendstream⑥">10. Interface Mixin OutgoingStream</a>
-    <li><a href="#ref-for-sendstream⑦">14. Interface SendStream</a>
-    <li><a href="#ref-for-sendstream⑧">16.1. Overview</a>
+    <li><a href="#ref-for-sendstream⑦">13. Interface SendStream</a>
+    <li><a href="#ref-for-sendstream⑧">15.1. Overview</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="receivestream">
@@ -3686,21 +3631,21 @@ use in this specification.</p>
     <li><a href="#ref-for-receivestream">4.1. Methods</a>
     <li><a href="#ref-for-receivestream①">8.1. Overview</a>
     <li><a href="#ref-for-receivestream②">11. Interface Mixin IncomingStream</a>
-    <li><a href="#ref-for-receivestream③">15. Interface ReceiveStream</a>
-    <li><a href="#ref-for-receivestream④">16.1. Overview</a>
+    <li><a href="#ref-for-receivestream③">14. Interface ReceiveStream</a>
+    <li><a href="#ref-for-receivestream④">15.1. Overview</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="http3transport">
    <b><a href="#http3transport">#http3transport</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-http3transport">16.2. Interface Definition</a> <a href="#ref-for-http3transport①">(2)</a> <a href="#ref-for-http3transport②">(3)</a> <a href="#ref-for-http3transport③">(4)</a> <a href="#ref-for-http3transport④">(5)</a>
-    <li><a href="#ref-for-http3transport⑤">16.2.1. Constructors</a>
+    <li><a href="#ref-for-http3transport">15.2. Interface Definition</a> <a href="#ref-for-http3transport①">(2)</a> <a href="#ref-for-http3transport②">(3)</a> <a href="#ref-for-http3transport③">(4)</a> <a href="#ref-for-http3transport④">(5)</a>
+    <li><a href="#ref-for-http3transport⑤">15.2.1. Constructors</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-http3transport-http3transport">
    <b><a href="#dom-http3transport-http3transport">#dom-http3transport-http3transport</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-http3transport-http3transport">16.2.1. Constructors</a>
+    <li><a href="#ref-for-dom-http3transport-http3transport">15.2.1. Constructors</a>
    </ul>
   </aside>
 <script>/* script-var-click-highlighting */
