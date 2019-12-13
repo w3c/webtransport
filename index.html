@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 670c46b501fc025ae87a3398a195af35379ab37d" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="e1d32f65b489d39edab256328a8484ca337e11f1" name="document-revision">
+  <meta content="903f9ddaa0d9d4ce21cdfed5e9e038b403ccf461" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1687,7 +1687,7 @@ congestion-controlled.</p>
   immediately return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑤">rejected</a> promise with a newly created <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror">InvalidStateError</a></code> and abort these steps.</p>
       <li data-md>
        <p>If <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state①">state</a></code> is <code>"connected"</code>, immediately
-  return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑥">resolved</a> promise with a newly created <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②">SendStream</a></code> object, <a data-link-type="dfn" href="#add-the-sendstream" id="ref-for-add-the-sendstream">add the SendStream</a> to the transport and abort these steps.</p>
+  return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑥">fulfilled</a> promise with a newly created <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②">SendStream</a></code> object, <a data-link-type="dfn" href="#add-the-sendstream" id="ref-for-add-the-sendstream">add the SendStream</a> to the transport and abort these steps.</p>
       <li data-md>
        <p>Let <var>p</var> be a new promise.</p>
       <li data-md>
@@ -1782,7 +1782,7 @@ of unreliability.  All stream data is encrypted and congestion-controlled.</p>
   immediately return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①①">rejected</a> promise with a newly created <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror②">InvalidStateError</a></code> and abort these steps.</p>
       <li data-md>
        <p>If <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state④">state</a></code> is <code>"connected"</code>, immediately
-  return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①②">resolved</a> promise with a newly created <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream②">BidirectionalStream</a></code> object, <a data-link-type="dfn" href="#add-the-bidirectionalstream" id="ref-for-add-the-bidirectionalstream">add the BidirectionalStream</a> to the
+  return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①②">fulfilled</a> promise with a newly created <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream②">BidirectionalStream</a></code> object, <a data-link-type="dfn" href="#add-the-bidirectionalstream" id="ref-for-add-the-bidirectionalstream">add the BidirectionalStream</a> to the
   transport and abort these steps.</p>
       <li data-md>
        <p>Let <var>p</var> be a new promise.</p>
@@ -2170,7 +2170,7 @@ either a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-fo
  value of the <code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable-slot" id="ref-for-dom-outgoingstream-writable-slot">[[Writable]]</a></code> slot.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="OutgoingStream" data-dfn-type="attribute" data-export id="dom-outgoingstream-writingaborted"><code>writingAborted</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo②">StreamAbortInfo</a>>, readonly</span>
     <dd data-md>
-     <p>The <code>writingAborted</code> attribute represents a promise that is <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑧">resolved</a> when the a message from the remote side aborting the stream is received.
+     <p>The <code>writingAborted</code> attribute represents a promise that is <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑧">fulfilled</a> when the a message from the remote side aborting the stream is received.
   For QUIC, that message is a STOP_SENDING frame. When the stream receives
   this mesage, the user agent MUST run the following:</p>
      <ol>
@@ -2254,7 +2254,7 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
  value of the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream⑧">IncomingStream</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-incomingstream-readable-slot" id="ref-for-dom-incomingstream-readable-slot">[[Readable]]</a></code> slot.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="IncomingStream" data-dfn-type="attribute" data-export id="dom-incomingstream-readingaborted"><code>readingAborted</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑦">StreamAbortInfo</a>>, readonly</span>
     <dd data-md>
-     <p>The <code>readingAborted</code> attribute represents a promise that is <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②⓪">resolved</a> when the a message from the remote side aborting the stream is received.
+     <p>The <code>readingAborted</code> attribute represents a promise that is <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②⓪">fulfilled</a> when the a message from the remote side aborting the stream is received.
   For QUIC, that message is a RST_STREAM frame. When the stream receives
   this mesage, the user agent MUST run the following:</p>
      <ol>
