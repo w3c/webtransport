@@ -363,9 +363,9 @@ state, state changes, and the ability to close the transport.
 <pre class="idl">
 interface mixin WebTransport {
   readonly attribute WebTransportState state;
+  readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   void close(optional WebTransportCloseInfo closeInfo);
   attribute EventHandler onstatechange;
-  attribute EventHandler onerror;
 };
 </pre>
 
@@ -374,15 +374,14 @@ interface mixin WebTransport {
 : <dfn for="WebTransport" attribute>state</dfn>
 :: The current state of the transport. On getting, it MUST return the value of
    the {{[[WebTransportState]]}} internal slot.
+: <dfn for="WebTransport" attribute>closed</dfn>
+:: This promise MUST be [=resolved=] when the transport is closed; an
+   implementation SHOULD include error information in the `reason` and
+   `errorCode` fields of {{WebTransportCloseInfo}}.
 : <dfn for="WebTransport" attribute>onstatechange</dfn>
 :: This event handler, of event handler event type `statechange`, MUST be fired
    any time the {{[[WebTransportState]]}} slot changes, unless the state changes
    due to calling {{WebTransport/close}}.
-: <dfn for="WebTransport" attribute>onerror</dfn>
-:: This event handler, of event handler event type `error`, MUST be fired on
-   reception of an error; an implementation SHOULD include error information in
-   the `message` field of {{ErrorEvent}}. This event MUST be fired before the
-   {{WebTransport/onstatechange}} event.
 
 ## Methods ##  {#webtransport-methods}
 
