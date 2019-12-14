@@ -170,8 +170,8 @@ interface mixin UnidirectionalStreamsTransport {
          1. The |transport|'s {{WebTransport/state}} has transitioned to
             `"connected"`.
          1. Stream creation flow control is not being violated by exceeding the
-            max stream limit set by the remote endpoint, as specified in
-            [[!QUIC-TRANSPORT]].
+            max stream limit set by the remote endpoint.  For QUIC, this is
+            specified in [[!QUIC-TRANSPORT]].
          1. |p| has not been [=settled=].
      1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
         the following conditions are met:
@@ -261,8 +261,8 @@ interface BidirectionalStreamsTransport {
        1. The |transport|'s {{WebTransport/state}} has transitioned to
           `"connected"`.
        1. Stream creation flow control is not being violated by exceeding the
-          max stream limit set by the remote endpoint, as specified in
-          [[!QUIC-TRANSPORT]].
+          max stream limit set by the remote endpoint. For QUIC, this is
+          specified in [[!QUIC-TRANSPORT]].
        1. |p| has not been [=settled=].
    1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
       the following conditions are met:
@@ -520,7 +520,7 @@ defined in [[!QUIC-DATAGRAM]].
 ## Interface Definition ##  {#quic-transport-definition}
 
 <pre class="idl">
-[Constructor(DOMString host, unsigned short port), Exposed=Window]
+[Constructor(DOMString host, unsigned short port), Exposed=(Window,Worker)]
 interface QuicTransport {
   Promise&lt;QuicTransportStats&gt; getStats();
 };
@@ -593,7 +593,7 @@ An <dfn interface>OutgoingStream</dfn> is a stream that can be written to, as
 either a {{SendStream}} or a {{BidirectionalStream}}.
 
 <pre class="idl">
-[ Exposed=Window ]
+[ Exposed=(Window,Worker) ]
 interface mixin OutgoingStream {
   readonly attribute WritableStream writable;
   readonly attribute Promise&lt;StreamAbortInfo&gt; writingAborted;
@@ -669,7 +669,7 @@ An <dfn interface>IncomingStream</dfn> is a stream that can be read from, as
 either a {{ReceiveStream}} or a {{BidirectionalStream}}.
 
 <pre class="idl">
-[ Exposed=Window ]
+[ Exposed=(Window,Worker) ]
 interface mixin IncomingStream {
   readonly attribute ReadableStream readable;
   readonly attribute Promise&lt;StreamAbortInfo&gt; readingAborted;
@@ -733,7 +733,7 @@ The {{IncomingStream}} will initialize with the following:
 A collection of common attributes and methods of all streams.
 
 <pre class="idl">
-[ Exposed=Window ]
+[ Exposed=(Window,Worker) ]
 interface WebTransportStream {
     readonly attribute WebTransport transport;
 };
@@ -747,7 +747,7 @@ interface WebTransportStream {
 # Interface `BidirectionalStream` #  {#bidirectional-stream}
 
 <pre class="idl">
-[ Exposed=Window ]
+[ Exposed=(Window,Worker) ]
 interface BidirectionalStream : WebTransportStream {
 };
 BidirectionalStream includes OutgoingStream;
@@ -757,7 +757,7 @@ BidirectionalStream includes IncomingStream;
 # Interface `SendStream` #  {#send-stream}
 
 <pre class="idl">
-[ Exposed=Window ]
+[ Exposed=(Window,Worker) ]
 interface SendStream : WebTransportStream {
 };
 SendStream includes OutgoingStream;
@@ -766,7 +766,7 @@ SendStream includes OutgoingStream;
 # Interface `ReceiveStream` #  {#receive-stream}
 
 <pre class="idl">
-[ Exposed=Window ]
+[ Exposed=(Window,Worker) ]
 interface ReceiveStream : WebTransportStream {
 };
 ReceiveStream includes IncomingStream;
@@ -786,7 +786,7 @@ Datagrams are implemented with QUIC datagrams as defined in
 ## Interface Definition ##  {#http3-transport-interface}
 
 <pre class="idl">
-[Constructor (DOMString url), Exposed=Window]
+[Constructor (DOMString url), Exposed=(Window,Worker)]
 interface Http3Transport {
 };
 
