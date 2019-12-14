@@ -279,11 +279,11 @@ interface BidirectionalStreamsTransport {
      1. Let |transport| be the `BidirectionalStreamsTransport` on which
         `receiveBidirectionalStreams` is invoked.
      1. Return the value of the {{[[ReceivedBidirectionalStreams]]}} internal slot.
-     1. For each unidirectional stream received, create a corresponding
-        {{IncomingStream}} and insert it into {{[[ReceivedStreams]]}}. As data
-        is received over the unidirectional stream, insert that data into the
-        corresponding `IncomingStream`.  When the remote side closes or aborts
-        the stream, close or abort the corresponding `IncomingStream`.
+     1. For each bidirectional stream received, create a corresponding
+        {{BidirectionalStream}} and insert it into {{[[ReceivedBidirectionalStreams]]}}.
+        As data is received over the bidirectional stream, insert that data into the
+        corresponding {{BidirectionalStream}}.  When the remote side closes or aborts
+        the stream, close or abort the corresponding {{BidirectionalStream}}.
 
 ## Procedures ##  {##bidirectional-streams-transport-procedures}
 
