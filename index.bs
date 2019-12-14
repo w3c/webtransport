@@ -170,8 +170,8 @@ interface mixin UnidirectionalStreamsTransport {
          1. The |transport|'s {{WebTransport/state}} has transitioned to
             `"connected"`.
          1. Stream creation flow control is not being violated by exceeding the
-            max stream limit set by the remote endpoint, as specified in
-            [[!QUIC-TRANSPORT]].
+            max stream limit set by the remote endpoint.  For QUIC, this is
+            specified in [[!QUIC-TRANSPORT]].
          1. |p| has not been [=settled=].
      1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
         the following conditions are met:
@@ -261,8 +261,8 @@ interface BidirectionalStreamsTransport {
        1. The |transport|'s {{WebTransport/state}} has transitioned to
           `"connected"`.
        1. Stream creation flow control is not being violated by exceeding the
-          max stream limit set by the remote endpoint, as specified in
-          [[!QUIC-TRANSPORT]].
+          max stream limit set by the remote endpoint. For QUIC, this is
+          specified in [[!QUIC-TRANSPORT]].
        1. |p| has not been [=settled=].
    1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
       the following conditions are met:
