@@ -381,8 +381,8 @@ interface mixin WebTransport {
 
    When close is called, the user agent MUST run the following steps:
      1. Let |transport| be the WebTransport on which `close` is invoked.
-     1. If |transport|'s {{[[WebTransportState]]}} is `"closed"`, then abort
-        these steps.
+     1. If |transport|'s {{[[WebTransportState]]}} is `"closed"` or `"failed"`,
+        then abort these steps.
      1. Set |transport|'s {{[[WebTransportState]]}} to `"closed"`.
      1. Let `closeInfo` be the first argument.
      1. For QUIC, start the [=Immediate Close=] procedure by sending an
