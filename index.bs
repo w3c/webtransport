@@ -160,9 +160,6 @@ interface mixin UnidirectionalStreamsTransport {
      1. If |transport|'s {{WebTransport/state}} is `"closed"` or `"failed"`,
         immediately return a new [=rejected=] promise with a newly created
         {{InvalidStateError}} and abort these steps.
-     1. If |transport|'s {{WebTransport/state}} is `"connected"`, immediately
-        return a new [=fulfilled=] promise with a newly created {{SendStream}}
-        object, [=add the SendStream=] to the transport and abort these steps.
      1. Let |p| be a new promise.
      1. Return |p| and continue the following steps in background.
      1. [=Resolve=] |p| with a newly created {{SendStream}} object and [=add the
