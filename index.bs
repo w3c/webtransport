@@ -729,27 +729,11 @@ The {{IncomingStream}} will initialize with the following:
    stream while reading, just as if |IncomingStream.readable.getReader()| were
    used.
 
-# Interface `WebTransportStream` #  {#web-transport-stream}
-
-A collection of common attributes and methods of all streams.
-
-<pre class="idl">
-[ Exposed=(Window,Worker) ]
-interface WebTransportStream {
-    readonly attribute WebTransport transport;
-};
-</pre>
-
-## Attributes ##  {#web-transport-stream-attributes}
-
-: <dfn for="WebTransportStream" attribute>transport</dfn>
-:: The readonly attribute referring to the related {{WebTransport}} object.
-
 # Interface `BidirectionalStream` #  {#bidirectional-stream}
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
-interface BidirectionalStream : WebTransportStream {
+interface BidirectionalStream {
 };
 BidirectionalStream includes OutgoingStream;
 BidirectionalStream includes IncomingStream;
@@ -759,7 +743,7 @@ BidirectionalStream includes IncomingStream;
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
-interface SendStream : WebTransportStream {
+interface SendStream {
 };
 SendStream includes OutgoingStream;
 </pre>
@@ -768,7 +752,7 @@ SendStream includes OutgoingStream;
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
-interface ReceiveStream : WebTransportStream {
+interface ReceiveStream {
 };
 ReceiveStream includes IncomingStream;
 </pre>
