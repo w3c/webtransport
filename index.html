@@ -1222,8 +1222,9 @@ Possible extra rowspan handling
 	}
 </style>
   <link href="https://www.w3.org/StyleSheets/TR/2016/cg-draft" rel="stylesheet">
+  <meta content="Bikeshed version b43aa594f5014ff14748da1aace9afaa73d2b3e6" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="188bd8ebc577e8b380cf4c02dfcfe30f697b25f7" name="document-revision">
+  <meta content="868df125fb0903fa56fd029a1274762b581eb13b" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1481,13 +1482,14 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-02-06">6 February 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-02-18">18 February 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wicg.github.io/web-transport/">https://wicg.github.io/web-transport/</a>
      <dt>Issue Tracking:
      <dd><a href="https://github.com/wicg/web-transport/issues/">GitHub</a>
+     <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editors:
      <dd class="editor p-author h-card vcard"><span class="p-name fn">Peter Thatcher</span> (<span class="p-org org">Google</span>)
      <dd class="editor p-author h-card vcard"><span class="p-name fn">Bernard Aboba</span> (<span class="p-org org">Microsoft Corporation</span>)
@@ -1625,6 +1627,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li><a href="#informative"><span class="secno"></span> <span class="content">Informative References</span></a>
      </ol>
     <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL Index</span></a>
+    <li><a href="#issues-index"><span class="secno"></span> <span class="content">Issues Index</span></a>
    </ol>
   </nav>
   <main>
@@ -2073,19 +2076,29 @@ defined in <a data-link-type="biblio" href="#biblio-quic-transport">[QUIC-TRANSP
 defined in <a data-link-type="biblio" href="#biblio-quic-datagram">[QUIC-DATAGRAM]</a>.</p>
    <h3 class="heading settled" data-level="8.1" id="quic-transport-configuration"><span class="secno">8.1. </span><span class="content">Configuration</span><a class="self-link" href="#quic-transport-configuration"></a></h3>
 <pre class="idl highlight def"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-quictransportconfiguration" id="ref-for-dictdef-quictransportconfiguration"><c- g>QuicTransportConfiguration</c-></a> {
-  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint" id="ref-for-dom-rtcdtlsfingerprint"><c- n>RTCDtlsFingerprint</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<RTCDtlsFingerprint> " href="#dom-quictransportconfiguration-server_certificates" id="ref-for-dom-quictransportconfiguration-server_certificates"><c- g>server_certificates</c-></a>;
+  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint" id="ref-for-dom-rtcdtlsfingerprint"><c- n>RTCDtlsFingerprint</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<RTCDtlsFingerprint> " href="#dom-quictransportconfiguration-server_certificate_fingerprints" id="ref-for-dom-quictransportconfiguration-server_certificate_fingerprints"><c- g>server_certificate_fingerprints</c-></a>;
 };
 </pre>
    <p><dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-quictransportconfiguration"><code>QuicTransportConfiguration</code></dfn> is a dictionary of parameters
 that determine how QuicTransport connection is established and used.</p>
    <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportConfiguration" data-dfn-type="dict-member" data-export id="dom-quictransportconfiguration-server_certificates"><code>server_certificates</code></dfn>, <span> of type sequence&lt;<a data-link-type="idl-name" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint" id="ref-for-dom-rtcdtlsfingerprint①">RTCDtlsFingerprint</a>></span>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportConfiguration" data-dfn-type="dict-member" data-export id="dom-quictransportconfiguration-server_certificate_fingerprints"><code>server_certificate_fingerprints</code></dfn>, <span> of type sequence&lt;<a data-link-type="idl-name" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint" id="ref-for-dom-rtcdtlsfingerprint①">RTCDtlsFingerprint</a>></span>
     <dd data-md>
      <p>If non-empty, the user agent SHALL deem a server certificate trusted if and
- only if it matches one of the fingerprints defined in <code class="idl"><a data-link-type="idl" href="#dom-quictransportconfiguration-server_certificates" id="ref-for-dom-quictransportconfiguration-server_certificates①">server_certificates</a></code>.  The user agent SHALL
- ignore any fingerprint that uses an unknown <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-algorithm" id="ref-for-dom-rtcdtlsfingerprint-algorithm">algorithm</a></code> or has a malformed <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-value" id="ref-for-dom-rtcdtlsfingerprint-value">value</a></code>.  If empty, the user agent
- SHALL use certificate verification procedures. it would use for normal <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch">fetch</a> operations.</p>
+ only if it matches one of the fingerprints defined in <code class="idl"><a data-link-type="idl" href="#dom-quictransportconfiguration-server_certificate_fingerprints" id="ref-for-dom-quictransportconfiguration-server_certificate_fingerprints①">server_certificate_fingerprints</a></code> and satisfies <a data-link-type="dfn" href="#custom-certificate-requirements" id="ref-for-custom-certificate-requirements">custom certificate requirements</a>.  The user agent SHALL ignore any
+ fingerprint that uses an unknown <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-algorithm" id="ref-for-dom-rtcdtlsfingerprint-algorithm">algorithm</a></code> or has a
+ malformed <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-value" id="ref-for-dom-rtcdtlsfingerprint-value">value</a></code>.  If empty, the user agent SHALL use
+ certificate verification procedures it would use for normal <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch">fetch</a> operations.</p>
    </dl>
+   <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="custom-certificate-requirements">custom certificate requirements</dfn> are as follows: the certificate
+MUST be an X.509v3 certificate as defined in <a data-link-type="biblio" href="#biblio-rfc5280">[RFC5280]</a>, the current time
+MUST be within the validity period of the certificate as defined in Section
+4.1.2.5 of <a data-link-type="biblio" href="#biblio-rfc5280">[RFC5280]</a> and the total length of the validity period MUST NOT
+exceed two weeks.</p>
+   <p class="issue" id="issue-7e6950b7"><a class="self-link" href="#issue-7e6950b7"></a> Reconsider the time period above.  We want it to be sufficiently large
+that applications using this for ephemeral certificates can do so without
+having to fight the clock skew, but small enough to discourage long-term use
+without key rotation.</p>
    <h3 class="heading settled" data-level="8.2" id="quic-transport-definition"><span class="secno">8.2. </span><span class="content">Interface Definition</span><a class="self-link" href="#quic-transport-definition"></a></h3>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#quictransport" id="ref-for-quictransport"><c- g>QuicTransport</c-></a> {
@@ -2658,6 +2671,7 @@ use in this specification.</p>
    <li><a href="#dom-bidirectionalstreamstransport-createbidirectionalstream">createBidirectionalStream()</a><span>, in §5.1</span>
    <li><a href="#dom-unidirectionalstreamstransport-createsendstream">createSendStream()</a><span>, in §4.1</span>
    <li><a href="#dom-unidirectionalstreamstransport-createsendstream">createSendStream(parameters)</a><span>, in §4.1</span>
+   <li><a href="#custom-certificate-requirements">custom certificate requirements</a><span>, in §8.1</span>
    <li><a href="#datagramtransport">DatagramTransport</a><span>, in §6</span>
    <li>
     errorCode
@@ -2701,7 +2715,7 @@ use in this specification.</p>
    <li><a href="#sendstream">SendStream</a><span>, in §12</span>
    <li><a href="#dictdef-sendstreamparameters">SendStreamParameters</a><span>, in §4.3</span>
    <li><a href="#dom-quictransport-sentdatagrams-slot">[[SentDatagrams]]</a><span>, in §8.2</span>
-   <li><a href="#dom-quictransportconfiguration-server_certificates">server_certificates</a><span>, in §8.1</span>
+   <li><a href="#dom-quictransportconfiguration-server_certificate_fingerprints">server_certificate_fingerprints</a><span>, in §8.1</span>
    <li><a href="#dom-webtransport-state">state</a><span>, in §7.1</span>
    <li><a href="#dictdef-streamabortinfo">StreamAbortInfo</a><span>, in §9.4</span>
    <li><a href="#dom-quictransportstats-timestamp">timestamp</a><span>, in §7.5</span>
@@ -3089,6 +3103,8 @@ use in this specification.</p>
    <dd>Jana Iyengar; Martin Thomson. <a href="https://quicwg.org/base-drafts/draft-ietf-quic-transport.html">QUIC: A UDP-Based Multiplexed and Secure Transport</a>. Internet-Draft. URL: <a href="https://quicwg.org/base-drafts/draft-ietf-quic-transport.html">https://quicwg.org/base-drafts/draft-ietf-quic-transport.html</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>. March 1997. Best Current Practice. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
+   <dt id="biblio-rfc5280">[RFC5280]
+   <dd>D. Cooper; et al. <a href="https://tools.ietf.org/html/rfc5280">Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile</a>. May 2008. Proposed Standard. URL: <a href="https://tools.ietf.org/html/rfc5280">https://tools.ietf.org/html/rfc5280</a>
    <dt id="biblio-url">[URL]
    <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/">URL Standard</a>. Living Standard. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
    <dt id="biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]
@@ -3162,7 +3178,7 @@ use in this specification.</p>
 };
 
 <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-quictransportconfiguration" id="ref-for-dictdef-quictransportconfiguration②"><c- g>QuicTransportConfiguration</c-></a> {
-  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint" id="ref-for-dom-rtcdtlsfingerprint②"><c- n>RTCDtlsFingerprint</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<RTCDtlsFingerprint> " href="#dom-quictransportconfiguration-server_certificates" id="ref-for-dom-quictransportconfiguration-server_certificates②"><c- g>server_certificates</c-></a>;
+  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint" id="ref-for-dom-rtcdtlsfingerprint②"><c- n>RTCDtlsFingerprint</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<RTCDtlsFingerprint> " href="#dom-quictransportconfiguration-server_certificate_fingerprints" id="ref-for-dom-quictransportconfiguration-server_certificate_fingerprints②"><c- g>server_certificate_fingerprints</c-></a>;
 };
 
 [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑦"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
@@ -3220,6 +3236,13 @@ use in this specification.</p>
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport③①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport⑤①"><c- n>DatagramTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#http3transport" id="ref-for-http3transport④①"><c- n>Http3Transport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport⑨①"><c- n>WebTransport</c-></a>;
 </pre>
+  <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
+  <div style="counter-reset:issue">
+   <div class="issue"> Reconsider the time period above.  We want it to be sufficiently large
+that applications using this for ephemeral certificates can do so without
+having to fight the clock skew, but small enough to discourage long-term use
+without key rotation.<a href="#issue-7e6950b7"> ↵ </a></div>
+  </div>
   <aside class="dfn-panel" data-for="unidirectionalstreamstransport">
    <b><a href="#unidirectionalstreamstransport">#unidirectionalstreamstransport</a></b><b>Referenced in:</b>
    <ul>
@@ -3500,10 +3523,16 @@ use in this specification.</p>
     <li><a href="#ref-for-dictdef-quictransportconfiguration①">8.2. Interface Definition</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-quictransportconfiguration-server_certificates">
-   <b><a href="#dom-quictransportconfiguration-server_certificates">#dom-quictransportconfiguration-server_certificates</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="dom-quictransportconfiguration-server_certificate_fingerprints">
+   <b><a href="#dom-quictransportconfiguration-server_certificate_fingerprints">#dom-quictransportconfiguration-server_certificate_fingerprints</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-quictransportconfiguration-server_certificates">8.1. Configuration</a> <a href="#ref-for-dom-quictransportconfiguration-server_certificates①">(2)</a>
+    <li><a href="#ref-for-dom-quictransportconfiguration-server_certificate_fingerprints">8.1. Configuration</a> <a href="#ref-for-dom-quictransportconfiguration-server_certificate_fingerprints①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="custom-certificate-requirements">
+   <b><a href="#custom-certificate-requirements">#custom-certificate-requirements</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-custom-certificate-requirements">8.1. Configuration</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-quictransport-quictransport">

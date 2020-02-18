@@ -521,21 +521,33 @@ defined in [[!QUIC-DATAGRAM]].
 
 <pre class="idl">
 dictionary QuicTransportConfiguration {
-  sequence&lt;RTCDtlsFingerprint&gt; server_certificates;
+  sequence&lt;RTCDtlsFingerprint&gt; server_certificate_fingerprints;
 };
 </pre>
 
 <dfn dictionary>QuicTransportConfiguration</dfn> is a dictionary of parameters
 that determine how QuicTransport connection is established and used.
 
-: <dfn for="QuicTransportConfiguration" dict-member>server_certificates</dfn>
+: <dfn for="QuicTransportConfiguration" dict-member>server_certificate_fingerprints</dfn>
 :: If non-empty, the user agent SHALL deem a server certificate trusted if and
    only if it matches one of the fingerprints defined in
-   {{QuicTransportConfiguration/server_certificates}}.  The user agent SHALL
-   ignore any fingerprint that uses an unknown {{RTCDtlsFingerprint/algorithm}}
-   or has a malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent
-   SHALL use certificate verification procedures it would use for normal
-   [=fetch=] operations.
+   {{QuicTransportConfiguration/server_certificate_fingerprints}} and satisfies
+   [=custom certificate requirements=].  The user agent SHALL ignore any
+   fingerprint that uses an unknown {{RTCDtlsFingerprint/algorithm}} or has a
+   malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent SHALL use
+   certificate verification procedures it would use for normal [=fetch=]
+   operations.
+
+The <dfn>custom certificate requirements</dfn> are as follows: the certificate
+MUST be an X.509v3 certificate as defined in [[!RFC5280]], the current time
+MUST be within the validity period of the certificate as defined in Section
+4.1.2.5 of [[!RFC5280]] and the total length of the validity period MUST NOT
+exceed two weeks.
+
+Issue: Reconsider the time period above.  We want it to be sufficiently large
+that applications using this for ephemeral certificates can do so without
+having to fight the clock skew, but small enough to discourage long-term use
+without key rotation.
 
 ## Interface Definition ##  {#quic-transport-definition}
 
