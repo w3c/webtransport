@@ -145,9 +145,10 @@ congestion-controlled.
 
 <pre class="idl">
 interface mixin UnidirectionalStreamsTransport {
-  Promise&lt;SendStream&gt; createSendStream(optional SendStreamParameters parameters);
+  Promise&lt;SendStream&gt; createSendStream(optional SendStreamParameters parameters = {});
   ReadableStream receiveStreams();
-};</pre>
+};
+</pre>
 
 ## Methods ##  {##unidirectional-streams-transport-methods}
 
@@ -228,6 +229,7 @@ but retransmissions may be disabled or the stream may aborted to produce a form
 of unreliability.  All stream data is encrypted and congestion-controlled.
 
 <pre class="idl">
+[Exposed=Window]
 interface BidirectionalStreamsTransport {
     Promise&lt;BidirectionalStream&gt; createBidirectionalStream();
     ReadableStream receiveBidirectionalStreams();
@@ -353,7 +355,7 @@ state, state changes, and the ability to close the transport.
 interface mixin WebTransport {
   readonly attribute WebTransportState state;
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
-  void close(optional WebTransportCloseInfo closeInfo);
+  void close(optional WebTransportCloseInfo closeInfo = {});
   attribute EventHandler onstatechange;
 };
 </pre>
@@ -519,8 +521,9 @@ defined in [[!QUIC-DATAGRAM]].
 ## Interface Definition ##  {#quic-transport-definition}
 
 <pre class="idl">
-[Constructor(USVString url), Exposed=(Window,Worker)]
+[Exposed=(Window,Worker)]
 interface QuicTransport {
+  constructor(USVString url);
   Promise&lt;QuicTransportStats&gt; getStats();
 };
 
@@ -598,7 +601,7 @@ either a {{SendStream}} or a {{BidirectionalStream}}.
 interface mixin OutgoingStream {
   readonly attribute WritableStream writable;
   readonly attribute Promise&lt;StreamAbortInfo&gt; writingAborted;
-  void abortWriting(optional StreamAbortInfo abortInfo);
+  void abortWriting(optional StreamAbortInfo abortInfo = {});
 };
 </pre>
 
@@ -674,7 +677,7 @@ either a {{ReceiveStream}} or a {{BidirectionalStream}}.
 interface mixin IncomingStream {
   readonly attribute ReadableStream readable;
   readonly attribute Promise&lt;StreamAbortInfo&gt; readingAborted;
-  void abortReading(optional StreamAbortInfo abortInfo);
+  void abortReading(optional StreamAbortInfo abortInfo = {});
   Promise&lt;ArrayBuffer&gt; arrayBuffer();
 };
 </pre>
@@ -771,14 +774,16 @@ Datagrams are implemented with QUIC datagrams as defined in
 ## Interface Definition ##  {#http3-transport-interface}
 
 <pre class="idl">
-[Constructor (DOMString url), Exposed=(Window,Worker)]
+[Exposed=(Window,Worker)]
 interface Http3Transport {
+  constructor(DOMString url);
 };
 
 Http3Transport includes UnidirectionalStreamsTransport;
 Http3Transport includes BidirectionalStreamsTransport;
 Http3Transport includes DatagramTransport;
-Http3Transport includes WebTransport;</pre>
+Http3Transport includes WebTransport;
+</pre>
 
 ### Constructors ###  {#http3-transport-constructors}
 
