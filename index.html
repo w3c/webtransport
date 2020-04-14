@@ -1224,7 +1224,7 @@ Possible extra rowspan handling
   <link href="https://www.w3.org/StyleSheets/TR/2016/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version b43aa594f5014ff14748da1aace9afaa73d2b3e6" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="950f4f5c533cd84c8634437089c769ee67fc9a40" name="document-revision">
+  <meta content="53423d3ad5ce2ae7dfc36dba521d7ae078eb4abd" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -2086,11 +2086,41 @@ that determine how QuicTransport connection is established and used.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="QuicTransportConfiguration" data-dfn-type="dict-member" data-export id="dom-quictransportconfiguration-server_certificate_fingerprints"><code>server_certificate_fingerprints</code></dfn>, <span> of type sequence&lt;<a data-link-type="idl-name" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint" id="ref-for-dom-rtcdtlsfingerprint①">RTCDtlsFingerprint</a>></span>
     <dd data-md>
      <p>If non-empty, the user agent SHALL deem a server certificate trusted if and
- only if it matches one of the fingerprints defined in <code class="idl"><a data-link-type="idl" href="#dom-quictransportconfiguration-server_certificate_fingerprints" id="ref-for-dom-quictransportconfiguration-server_certificate_fingerprints①">server_certificate_fingerprints</a></code> and satisfies <a data-link-type="dfn" href="#custom-certificate-requirements" id="ref-for-custom-certificate-requirements">custom certificate requirements</a>.  The user agent SHALL ignore any
+ only if it can successfully <a data-link-type="dfn" href="#verify-a-certificate-fingerprint" id="ref-for-verify-a-certificate-fingerprint">verify a certificate fingerprint</a> against <code class="idl"><a data-link-type="idl" href="#dom-quictransportconfiguration-server_certificate_fingerprints" id="ref-for-dom-quictransportconfiguration-server_certificate_fingerprints①">server_certificate_fingerprints</a></code> and satisfies <a data-link-type="dfn" href="#custom-certificate-requirements" id="ref-for-custom-certificate-requirements">custom certificate requirements</a>.  The user agent SHALL ignore any
  fingerprint that uses an unknown <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-algorithm" id="ref-for-dom-rtcdtlsfingerprint-algorithm">algorithm</a></code> or has a
  malformed <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-value" id="ref-for-dom-rtcdtlsfingerprint-value">value</a></code>.  If empty, the user agent SHALL use
  certificate verification procedures it would use for normal <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch">fetch</a> operations.</p>
    </dl>
+   <div class="algorithm" data-algorithm="compute a certificate fingerprint">
+     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="compute-a-certificate-fingerprint">compute a certificate fingerprint</dfn>, do the following: 
+    <ol>
+     <li data-md>
+      <p>Let <var>cert</var> be the input certificate, represented as a DER encoding of
+ Certificate message defined in <a data-link-type="biblio" href="#biblio-rfc5280">[RFC5280]</a>.</p>
+     <li data-md>
+      <p>Compute the SHA-256 hash of <var>cert</var>.  Format it as <code>fingerprint</code> BNF
+ rule described in Section 5 of <a data-link-type="biblio" href="#biblio-rfc8122">[RFC8122]</a>.</p>
+    </ol>
+   </div>
+   <div class="algorithm" data-algorithm="verify a certificate fingerprint">
+     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="verify-a-certificate-fingerprint">verify a certificate fingerprint</dfn>, do the following: 
+    <ol>
+     <li data-md>
+      <p>Let <var>fprs</var> be the input array of fingerprints.</p>
+     <li data-md>
+      <p>Let <var>ref_fpr</var> be the <a data-link-type="dfn" href="#compute-a-certificate-fingerprint" id="ref-for-compute-a-certificate-fingerprint">computed
+ fingerprint</a> of the input certificate.</p>
+     <li data-md>
+      <p>For every fingerprint <var>fpr</var> in <var>fprs</var>:</p>
+      <ol>
+       <li data-md>
+        <p>If <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-algorithm" id="ref-for-dom-rtcdtlsfingerprint-algorithm①">algorithm</a></code> of <var>fpr</var> is equal to "sha-256", and <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-value" id="ref-for-dom-rtcdtlsfingerprint-value①">value</a></code> of <var>fpr</var> is equal to <var>ref_fpr</var>, the
+  certificate is valid.  Return true.</p>
+      </ol>
+     <li data-md>
+      <p>Return false.</p>
+    </ol>
+   </div>
    <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="custom-certificate-requirements">custom certificate requirements</dfn> are as follows: the certificate
 MUST be an X.509v3 certificate as defined in <a data-link-type="biblio" href="#biblio-rfc5280">[RFC5280]</a>, the current time
 MUST be within the validity period of the certificate as defined in Section
@@ -2667,6 +2697,7 @@ use in this specification.</p>
    <li><a href="#dom-webtransport-close">close(closeInfo)</a><span>, in §7.2</span>
    <li><a href="#dom-webtransportstate-closed">"closed"</a><span>, in §7.3</span>
    <li><a href="#dom-webtransport-closed">closed</a><span>, in §7.1</span>
+   <li><a href="#compute-a-certificate-fingerprint">compute a certificate fingerprint</a><span>, in §8.1</span>
    <li><a href="#dom-webtransportstate-connected">"connected"</a><span>, in §7.3</span>
    <li><a href="#dom-webtransportstate-connecting">"connecting"</a><span>, in §7.3</span>
    <li>
@@ -2728,6 +2759,7 @@ use in this specification.</p>
    <li><a href="#dictdef-streamabortinfo">StreamAbortInfo</a><span>, in §9.4</span>
    <li><a href="#dom-quictransportstats-timestamp">timestamp</a><span>, in §7.5</span>
    <li><a href="#unidirectionalstreamstransport">UnidirectionalStreamsTransport</a><span>, in §4</span>
+   <li><a href="#verify-a-certificate-fingerprint">verify a certificate fingerprint</a><span>, in §8.1</span>
    <li><a href="#webtransport">WebTransport</a><span>, in §7</span>
    <li><a href="#dictdef-webtransportcloseinfo">WebTransportCloseInfo</a><span>, in §7.4</span>
    <li><a href="#dom-quictransport-webtransportstate-slot">[[WebTransportState]]</a><span>, in §8.2</span>
@@ -2977,13 +3009,13 @@ use in this specification.</p>
   <aside class="dfn-panel" data-for="term-for-dom-rtcdtlsfingerprint-algorithm">
    <a href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-algorithm">https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-algorithm</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-rtcdtlsfingerprint-algorithm">8.1. Configuration</a>
+    <li><a href="#ref-for-dom-rtcdtlsfingerprint-algorithm">8.1. Configuration</a> <a href="#ref-for-dom-rtcdtlsfingerprint-algorithm①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-rtcdtlsfingerprint-value">
    <a href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-value">https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-value</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-rtcdtlsfingerprint-value">8.1. Configuration</a>
+    <li><a href="#ref-for-dom-rtcdtlsfingerprint-value">8.1. Configuration</a> <a href="#ref-for-dom-rtcdtlsfingerprint-value①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-rs-class">
@@ -3113,6 +3145,8 @@ use in this specification.</p>
    <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>. March 1997. Best Current Practice. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
    <dt id="biblio-rfc5280">[RFC5280]
    <dd>D. Cooper; et al. <a href="https://tools.ietf.org/html/rfc5280">Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile</a>. May 2008. Proposed Standard. URL: <a href="https://tools.ietf.org/html/rfc5280">https://tools.ietf.org/html/rfc5280</a>
+   <dt id="biblio-rfc8122">[RFC8122]
+   <dd>J. Lennox; C. Holmberg. <a href="https://tools.ietf.org/html/rfc8122">Connection-Oriented Media Transport over the Transport Layer Security (TLS) Protocol in the Session Description Protocol (SDP)</a>. March 2017. Proposed Standard. URL: <a href="https://tools.ietf.org/html/rfc8122">https://tools.ietf.org/html/rfc8122</a>
    <dt id="biblio-url">[URL]
    <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/">URL Standard</a>. Living Standard. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
    <dt id="biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]
@@ -3538,6 +3572,18 @@ without key rotation.<a href="#issue-7e6950b7"> ↵ </a></div>
    <b><a href="#dom-quictransportconfiguration-server_certificate_fingerprints">#dom-quictransportconfiguration-server_certificate_fingerprints</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-quictransportconfiguration-server_certificate_fingerprints">8.1. Configuration</a> <a href="#ref-for-dom-quictransportconfiguration-server_certificate_fingerprints①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="compute-a-certificate-fingerprint">
+   <b><a href="#compute-a-certificate-fingerprint">#compute-a-certificate-fingerprint</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-compute-a-certificate-fingerprint">8.1. Configuration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="verify-a-certificate-fingerprint">
+   <b><a href="#verify-a-certificate-fingerprint">#verify-a-certificate-fingerprint</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-verify-a-certificate-fingerprint">8.1. Configuration</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="custom-certificate-requirements">

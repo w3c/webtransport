@@ -531,13 +531,35 @@ that determine how QuicTransport connection is established and used.
 
 : <dfn for="QuicTransportConfiguration" dict-member>server_certificate_fingerprints</dfn>
 :: If non-empty, the user agent SHALL deem a server certificate trusted if and
-   only if it matches one of the fingerprints defined in
+   only if it can successfully [=verify a certificate fingerprint=] against
    {{QuicTransportConfiguration/server_certificate_fingerprints}} and satisfies
    [=custom certificate requirements=].  The user agent SHALL ignore any
    fingerprint that uses an unknown {{RTCDtlsFingerprint/algorithm}} or has a
    malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent SHALL use
    certificate verification procedures it would use for normal [=fetch=]
    operations.
+
+<div algorithm="compute a certificate fingerprint">
+To <dfn>compute a certificate fingerprint</dfn>, do the following:
+1. Let |cert| be the input certificate, represented as a DER encoding of
+   Certificate message defined in [[!RFC5280]].
+1. Compute the SHA-256 hash of |cert|.  Format it as `fingerprint` BNF
+   rule described in Section 5 of [[!RFC8122]].
+
+</div>
+
+<div algorithm="verify a certificate fingerprint">
+To <dfn>verify a certificate fingerprint</dfn>, do the following:
+1. Let |fprs| be the input array of fingerprints.
+1. Let |ref_fpr| be the [=compute a certificate fingerprint|computed
+   fingerprint=] of the input certificate.
+1. For every fingerprint |fpr| in |fprs|:
+   1. If {{RTCDtlsFingerprint/algorithm}} of |fpr| is equal to "sha-256", and
+      {{RTCDtlsFingerprint/value}} of |fpr| is equal to |ref_fpr|, the
+      certificate is valid.  Return true.
+1. Return false.
+
+</div>
 
 The <dfn>custom certificate requirements</dfn> are as follows: the certificate
 MUST be an X.509v3 certificate as defined in [[!RFC5280]], the current time
