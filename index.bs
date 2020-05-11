@@ -939,6 +939,35 @@ while (true) {
 }
 </pre>
 
+## Receiving from ReceiveStream ##  {#example-receiving-from-receivestream}
+
+*This section is non-normative.*
+
+Reading from ReceiveStreams can be achieved by calling
+{{UnidirectionalStreamsTransport/receiveStreams()}} method, then getting the
+reader for each {{ReceiveStream}}.
+
+<pre class="example" highlight="js">
+const transport = getTransport();
+const receiveStreamReader = transport.receiveStreams().getReader();
+while (true) {
+  const {value: receiveStream, done} = await receiveStreamReader.read();
+  if (done) {
+    break;
+  }
+  // Process ReceiveStreams created by remote endpoint.
+  const chunkReader = receiveStream.readable.getReader();
+  while(true){
+    const {value: chunk, done} = await chunkReader.read();
+    if(done){
+      break;
+    } else {
+      // Process the data.
+    }
+  }
+}
+</pre>
+
 # Acknowledgements #  {#acknowledgements}
 The editors wish to thank the Working Group chairs and Team Contact, Harald
 Alvestrand, Stefan H&aring;kansson, Bernard Aboba and Dominique
