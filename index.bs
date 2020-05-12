@@ -61,6 +61,7 @@ Boilerplate: omit conformance
 <pre class="link-defaults">
 spec:streams; type:interface; text:ReadableStream
 spec:html; type:dfn; for:/; text:origin
+spec:fetch; type:dfn; for:/; text:fetch
 spec:url; type:dfn; text:scheme
 spec:url; type:dfn; text:fragment
 </pre>
@@ -517,12 +518,66 @@ with unidirectional QUIC streams as defined in [[!QUIC-TRANSPORT]].
 defined in [[!QUIC-TRANSPORT]]. Datagrams are implemented with QUIC datagrams as
 defined in [[!QUIC-DATAGRAM]].
 
+## Configuration ##  {#quic-transport-configuration}
+
+<pre class="idl">
+dictionary QuicTransportConfiguration {
+  sequence&lt;RTCDtlsFingerprint&gt; server_certificate_fingerprints;
+};
+</pre>
+
+<dfn dictionary>QuicTransportConfiguration</dfn> is a dictionary of parameters
+that determine how QuicTransport connection is established and used.
+
+: <dfn for="QuicTransportConfiguration" dict-member>server_certificate_fingerprints</dfn>
+:: If non-empty, the user agent SHALL deem a server certificate trusted if and
+   only if it can successfully [=verify a certificate fingerprint=] against
+   {{QuicTransportConfiguration/server_certificate_fingerprints}} and satisfies
+   [=custom certificate requirements=].  The user agent SHALL ignore any
+   fingerprint that uses an unknown {{RTCDtlsFingerprint/algorithm}} or has a
+   malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent SHALL use
+   certificate verification procedures it would use for normal [=fetch=]
+   operations.
+
+<div algorithm="compute a certificate fingerprint">
+To <dfn>compute a certificate fingerprint</dfn>, do the following:
+1. Let |cert| be the input certificate, represented as a DER encoding of
+   Certificate message defined in [[!RFC5280]].
+1. Compute the SHA-256 hash of |cert|.  Format it as `fingerprint` BNF
+   rule described in Section 5 of [[!RFC8122]].
+
+</div>
+
+<div algorithm="verify a certificate fingerprint">
+To <dfn>verify a certificate fingerprint</dfn>, do the following:
+1. Let |fprs| be the input array of fingerprints.
+1. Let |ref_fpr| be the [=compute a certificate fingerprint|computed
+   fingerprint=] of the input certificate.
+1. For every fingerprint |fpr| in |fprs|:
+   1. If {{RTCDtlsFingerprint/algorithm}} of |fpr| is equal to "sha-256", and
+      {{RTCDtlsFingerprint/value}} of |fpr| is equal to |ref_fpr|, the
+      certificate is valid.  Return true.
+1. Return false.
+
+</div>
+
+The <dfn>custom certificate requirements</dfn> are as follows: the certificate
+MUST be an X.509v3 certificate as defined in [[!RFC5280]], the current time
+MUST be within the validity period of the certificate as defined in Section
+4.1.2.5 of [[!RFC5280]] and the total length of the validity period MUST NOT
+exceed two weeks.
+
+Issue: Reconsider the time period above.  We want it to be sufficiently large
+that applications using this for ephemeral certificates can do so without
+having to fight the clock skew, but small enough to discourage long-term use
+without key rotation.
+
 ## Interface Definition ##  {#quic-transport-definition}
 
 <pre class="idl">
 [Exposed=(Window,Worker)]
 interface QuicTransport {
-  constructor(USVString url);
+  constructor(USVString url, optional QuicTransportConfiguration config = {});
   Promise&lt;QuicTransportStats&gt; getStats();
 };
 
@@ -533,10 +588,10 @@ QuicTransport includes WebTransport;
 </pre>
 
 
-When the {{QuicTransport/QuicTransport()}} constructor is invoked, the user
+When the {{QuicTransport/constructor()}} constructor is invoked, the user
 agent MUST run the following steps:
 1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
-   of {{QuicTransport/QuicTransport(url)/url}}.
+   of {{QuicTransport/constructor(url, config)/url}}.
 1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=scheme=] is not `quic-transport`, [=throw=]
    a {{SyntaxError}} exception.
@@ -570,6 +625,8 @@ agent MUST run the following steps:
     1. Establish a QUIC connection to the address identified by |parsedURL|
        following the procedures in [[!WEB-TRANSPORT-QUIC]] section 3 and using
        |clientOrigin| as the "origin of the client" referenced in section 3.2.1.
+       While establishing the connection, follow all of the parameters
+       specified in the {{QuicTransport/constructor(url, config)/config}}.
     1. If the connection fails, set |transport|'s {{[[WebTransportState]]}}
        internal slot to `"failed"` and abort these steps.
     1. Set |transport|'s {{[[WebTransportState]]}} internal slot to
