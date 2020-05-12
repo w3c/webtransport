@@ -202,9 +202,10 @@ be connected more quickly (by reusing an existing HTTP/3 connection).
 ## Alternative designs considered
 
 ### [WebRTC Data Channel](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel)
-can be used, but require that the server endpoint implement several protocols
-uncommonly found on servers (ICE, DTLS, and SCTP) and that the client
-application use a complex API designed for a very different use case.
+While WebRTC data channel has been used for client/server communications (e.g.
+for cloud gaming applications), this requires that the server endpoint implement
+several protocols uncommonly found on servers (ICE, DTLS, and SCTP) and that the
+application use a complex API (RTCPeerConnection) designed for a very different use case.
 
 ### Layering WebSockets over HTTP/3
 [I-D.ietf-quic-http] in a manner similar to how they are currently layered over
