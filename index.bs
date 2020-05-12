@@ -951,15 +951,16 @@ reader for each {{ReceiveStream}}.
 const transport = getTransport();
 const receiveStreamReader = transport.receiveStreams().getReader();
 while (true) {
-  const {value: receiveStream, done} = await receiveStreamReader.read();
-  if (done) {
+  const {value: receiveStream, done: readingReceiveStreamsDone} =
+      await receiveStreamReader.read();
+  if (readingReceiveStreamsDone) {
     break;
   }
   // Process ReceiveStreams created by remote endpoint.
   const chunkReader = receiveStream.readable.getReader();
   while (true) {
-    const {value: chunk, done} = await chunkReader.read();
-    if (done) {
+    const {value: chunk, done: readingChunksDone} = await chunkReader.read();
+    if (readingChunksDone) {
       break;
     }
     processTheData(chunk);
