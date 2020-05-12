@@ -957,9 +957,9 @@ while (true) {
   }
   // Process ReceiveStreams created by remote endpoint.
   const chunkReader = receiveStream.readable.getReader();
-  while(true){
+  while (true) {
     const {value: chunk, done} = await chunkReader.read();
-    if(done){
+    if (done) {
       break;
     }
     processTheData(chunk);
