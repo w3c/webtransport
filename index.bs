@@ -521,18 +521,18 @@ defined in [[!QUIC-DATAGRAM]].
 ## Configuration ##  {#quic-transport-configuration}
 
 <pre class="idl">
-dictionary QuicTransportConfiguration {
-  sequence&lt;RTCDtlsFingerprint&gt; server_certificate_fingerprints;
+dictionary QuicTransportOptions {
+  sequence&lt;RTCDtlsFingerprint&gt; serverCertificateFingerprints;
 };
 </pre>
 
-<dfn dictionary>QuicTransportConfiguration</dfn> is a dictionary of parameters
+<dfn dictionary>QuicTransportOptions</dfn> is a dictionary of parameters
 that determine how QuicTransport connection is established and used.
 
-: <dfn for="QuicTransportConfiguration" dict-member>server_certificate_fingerprints</dfn>
+: <dfn for="QuicTransportOptions" dict-member>serverCertificateFingerprints</dfn>
 :: If non-empty, the user agent SHALL deem a server certificate trusted if and
    only if it can successfully [=verify a certificate fingerprint=] against
-   {{QuicTransportConfiguration/server_certificate_fingerprints}} and satisfies
+   {{QuicTransportOptions/serverCertificateFingerprints}} and satisfies
    [=custom certificate requirements=].  The user agent SHALL ignore any
    fingerprint that uses an unknown {{RTCDtlsFingerprint/algorithm}} or has a
    malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent SHALL use
@@ -577,7 +577,7 @@ without key rotation.
 <pre class="idl">
 [Exposed=(Window,Worker)]
 interface QuicTransport {
-  constructor(USVString url, optional QuicTransportConfiguration config = {});
+  constructor(USVString url, optional QuicTransportOptions options = {});
   Promise&lt;QuicTransportStats&gt; getStats();
 };
 
@@ -591,7 +591,7 @@ QuicTransport includes WebTransport;
 When the {{QuicTransport/constructor()}} constructor is invoked, the user
 agent MUST run the following steps:
 1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
-   of {{QuicTransport/constructor(url, config)/url}}.
+   of {{QuicTransport/constructor(url, options)/url}}.
 1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=scheme=] is not `quic-transport`, [=throw=]
    a {{SyntaxError}} exception.
@@ -626,7 +626,7 @@ agent MUST run the following steps:
        following the procedures in [[!WEB-TRANSPORT-QUIC]] section 3 and using
        |clientOrigin| as the "origin of the client" referenced in section 3.2.1.
        While establishing the connection, follow all of the parameters
-       specified in the {{QuicTransport/constructor(url, config)/config}}.
+       specified in the {{QuicTransport/constructor(url, options)/options}}.
     1. If the connection fails, set |transport|'s {{[[WebTransportState]]}}
        internal slot to `"failed"` and abort these steps.
     1. Set |transport|'s {{[[WebTransportState]]}} internal slot to
