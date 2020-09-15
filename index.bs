@@ -346,19 +346,98 @@ interface mixin DatagramTransport {
    but large enough to avoid dropping packets when for the stream is not read
    for short periods of time (due to the reader being paused).
 
-# `WebTransport` Mixin #  {#web-transport}
+# `WebTransport` Interface #  {#web-transport}
 
-The `WebTransport` includes the methods common to all transports, such as
-state, state changes, and the ability to close the transport.
+The `WebTransport` provides a unified interface to all client-server transports
+that are supported by the WebTransport API.  It implements all of the transport
+mixins ({{UnidirectionalStreamsTransport}}, {{BidirectionalStreamsTransport}},
+{{DatagramTransport}}), as well as stats and transport state information.
 
 <pre class="idl">
-interface mixin WebTransport {
+[Exposed=(Window,Worker)]
+interface WebTransport {
+  constructor(USVString url, optional WebTransportOptions options = {});
+
+  Promise&lt;WebTransportStats&gt; getStats();
   readonly attribute WebTransportState state;
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   void close(optional WebTransportCloseInfo closeInfo = {});
   attribute EventHandler onstatechange;
 };
+
+WebTransport includes UnidirectionalStreamsTransport;
+WebTransport includes BidirectionalStreamsTransport;
+WebTransport includes DatagramTransport;
 </pre>
+
+## Constructor ##  {#webtransport-constructor}
+
+When the {{WebTransport/constructor()}} constructor is invoked, the user
+agent MUST run the following steps:
+1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
+   of {{WebTransport/constructor(url, options)/url}}.
+1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
+1. If |parsedURL| [=scheme=] is not `quic-transport` or `https`, [=throw=]
+   a {{SyntaxError}} exception.
+1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
+1. Let |transport| be a newly constructed {{WebTransport}} object.
+1. Let |transport| have a
+   <dfn attribute for="WebTransport">\[[OutgoingStreams]]</dfn> internal slot
+   representing a sequence of {{OutgoingStream}} objects, initialized to empty.
+1. Let |transport| have a
+   <dfn attribute for="WebTransport">\[[ReceivedStreams]]</dfn> internal slot
+   representing a {{ReadableStream}} of {{IncomingStream}} objects, initialized
+   to empty.
+1. Let |transport| have a
+  <dfn attribute for="WebTransport">\[[ReceivedBidirectionalStreams]]</dfn>
+  internal slot representing a {{ReadableStream}} of {{IncomingStream}}
+  objects, initialized to empty.
+1. Let |transport| have a
+   <dfn attribute for="WebTransport">\[[WebTransportState]]</dfn> internal
+   slot, initialized to `"connecting"`.
+1. Let |transport| have a
+   <dfn attribute for="WebTransport">\[[SentDatagrams]]</dfn> internal slot
+   representing a {{WritableStream}} of {{Uint8Array}}s, initialized to empty.
+1. Let |transport| have a
+   <dfn attribute for="WebTransport">\[[ReceivedDatagrams]]</dfn> internal
+   slot representing a {{ReadableStream}} of {{Uint8Array}}s, initialized to
+   empty.
+1. If the scheme of |parsedURL| is `quic-transport`, [=in parallel=],
+   [=initialize WebTransport over QUIC=].
+1. If the scheme of |parsedURL| is `https`, [=in parallel=],
+   [=initialize WebTransport over HTTP=].
+1. Run these steps in parallel:
+1. Return |transport|.
+
+<div algorithm="initialize WebTransport over QUIC">
+To <dfn>initialize WebTransport over QUIC</dfn> for a given |transport| and
+|parsedURL|, do the following:
+
+1. Let |clientOrigin| be |transport|'s [=relevant settings object=]'s
+   [=origin=],
+   [serialized](https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin).
+1. Establish a QUIC connection to the address identified by |parsedURL|
+   following the procedures in [[!WEB-TRANSPORT-QUIC]] section 3 and using
+   |clientOrigin| as the "origin of the client" referenced in section 3.2.1.
+   While establishing the connection, follow all of the parameters
+   specified in the {{WebTransport/constructor(url, options)/options}}.
+1. If the connection fails, set |transport|'s {{[[WebTransportState]]}}
+   internal slot to `"failed"` and abort these steps.
+1. Set |transport|'s {{[[WebTransportState]]}} internal slot to `"connected"`.
+
+</div>
+
+<div algorithm="initialize WebTransport over HTTP">
+To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
+|parsedURL|, do the following:
+
+1. Establish an HTTP/3 WebTransport session to the address identified by
+   |parsedURL| following the procedures in [[!WEB-TRANSPORT-HTTP3]].
+1. If the session establishment fails, set |transport|'s {{[[WebTransportState]]}}
+   internal slot to `"failed"` and abort these steps.
+1. Set |transport|'s {{[[WebTransportState]]}} internal slot to `"connected"`.
+
+</div>
 
 ## Attributes ##  {#webtransport-attributes}
 
@@ -390,6 +469,76 @@ interface mixin WebTransport {
         CONNECTION_CLOSE frame with its error code value set to the value of
         {{WebTransportCloseInfo/errorCode}} and its reason value set to the
         value of {{WebTransportCloseInfo/reason}}.
+
+: <dfn for="WebTransport" method>getStats()</dfn>
+:: Gathers stats for this {{WebTransport}}'s QUIC
+   connection and reports the result asynchronously.</p>
+
+   When close is called, the user agent MUST run the following steps:
+     1. Let |transport| be the WebTransport on which `getStats` is invoked.
+     1. Let |p| be a new promise.
+     1. Return |p| and continue the following steps in background.
+         1. Gather the stats from the underlying QUIC connection.
+         1. Once stats have been gathered, resolve |p| with the
+            {{WebTransportStats}} object, representing the gathered stats.
+
+## Configuration ##  {#web-transport-configuration}
+
+<pre class="idl">
+dictionary WebTransportOptions : WebTransportOptions {
+  sequence&lt;RTCDtlsFingerprint&gt; serverCertificateFingerprints;
+};
+</pre>
+
+<dfn dictionary>WebTransportOptions</dfn> is a dictionary of parameters
+that determine how WebTransport connection is established and used.
+
+: <dfn for="WebTransportOptions" dict-member>serverCertificateFingerprints</dfn>
+:: This option is only supported for transports using dedicated TLS
+   connections, such as `quic-transport`.  For transport protocols that do not
+   support this feature, having this field non-empty SHALL result in a
+   {{NotSupportedError}} exception being thrown.
+:: If supported and non-empty, the user agent SHALL deem a server certificate
+   trusted if and only if it can successfully [=verify a certificate
+   fingerprint=] against {{WebTransportOptions/serverCertificateFingerprints}}
+   and satisfies [=custom certificate requirements=].  The user agent SHALL
+   ignore any fingerprint that uses an unknown {{RTCDtlsFingerprint/algorithm}}
+   or has a malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent
+   SHALL use certificate verification procedures it would use for normal
+   [=fetch=] operations.
+
+<div algorithm="compute a certificate fingerprint">
+To <dfn>compute a certificate fingerprint</dfn>, do the following:
+1. Let |cert| be the input certificate, represented as a DER encoding of
+   Certificate message defined in [[!RFC5280]].
+1. Compute the SHA-256 hash of |cert|.  Format it as `fingerprint` BNF
+   rule described in Section 5 of [[!RFC8122]].
+
+</div>
+
+<div algorithm="verify a certificate fingerprint">
+To <dfn>verify a certificate fingerprint</dfn>, do the following:
+1. Let |fprs| be the input array of fingerprints.
+1. Let |ref_fpr| be the [=compute a certificate fingerprint|computed
+   fingerprint=] of the input certificate.
+1. For every fingerprint |fpr| in |fprs|:
+   1. If {{RTCDtlsFingerprint/algorithm}} of |fpr| is equal to "sha-256", and
+      {{RTCDtlsFingerprint/value}} of |fpr| is equal to |ref_fpr|, the
+      certificate is valid.  Return true.
+1. Return false.
+
+</div>
+
+The <dfn>custom certificate requirements</dfn> are as follows: the certificate
+MUST be an X.509v3 certificate as defined in [[!RFC5280]], the current time
+MUST be within the validity period of the certificate as defined in Section
+4.1.2.5 of [[!RFC5280]] and the total length of the validity period MUST NOT
+exceed two weeks.
+
+Issue: Reconsider the time period above.  We want it to be sufficiently large
+that applications using this for ephemeral certificates can do so without
+having to fight the clock skew, but small enough to discourage long-term use
+without key rotation.
 
 ## `WebTransportState` Enum ##  {#web-transport-state-enum}
 
@@ -463,13 +612,13 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportCloseInfo" dict-member>reason</dfn>
 :: The reason for closing the {{WebTransport}}.
 
-## `QuicTransportStats` Dictionary ##  {#quic-transport-stats}
+## `WebTransportStats` Dictionary ##  {#web-transport-stats}
 
-The <dfn dictionary>QuicTransportStats</dfn> dictionary includes information
+The <dfn dictionary>WebTransportStats</dfn> dictionary includes information
 on QUIC connection level stats.
 
 <pre class="idl">
-dictionary QuicTransportStats {
+dictionary WebTransportStats {
   DOMHighResTimeStamp timestamp;
   unsigned long long bytesSent;
   unsigned long long packetsSent;
@@ -484,168 +633,29 @@ dictionary QuicTransportStats {
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="QuicTransportStats" dict-member>timestamp</dfn>
+: <dfn for="WebTransportStats" dict-member>timestamp</dfn>
 :: The `timestamp` for when the stats are gathered, relative to the
    UNIX epoch (Jan 1, 1970, UTC).
-: <dfn for="QuicTransportStats" dict-member>bytesSent</dfn>
+: <dfn for="WebTransportStats" dict-member>bytesSent</dfn>
 :: The number of bytes sent on the QUIC connection, including retransmissions.
    Does not include UDP or any other outer framing.
-: <dfn for="QuicTransportStats" dict-member>packetsSent</dfn>
+: <dfn for="WebTransportStats" dict-member>packetsSent</dfn>
 :: The number of packets sent on the QUIC connection, including retransmissions.
-: <dfn for="QuicTransportStats" dict-member>numOutgoingStreamsCreated</dfn>
+: <dfn for="WebTransportStats" dict-member>numOutgoingStreamsCreated</dfn>
 :: The number of outgoing QUIC streams created on the QUIC connection.
-: <dfn for="QuicTransportStats" dict-member>numIncomingStreamsCreated</dfn>
+: <dfn for="WebTransportStats" dict-member>numIncomingStreamsCreated</dfn>
 :: The number of incoming QUIC streams created on the QUIC connection.
-: <dfn for="QuicTransportStats" dict-member>bytesReceived</dfn>
+: <dfn for="WebTransportStats" dict-member>bytesReceived</dfn>
 :: The number of total bytes received on the QUIC connection, including
    duplicate data for streams. Does not include UDP or any other outer framing.
-: <dfn for="QuicTransportStats" dict-member>packetsReceived</dfn>
+: <dfn for="WebTransportStats" dict-member>packetsReceived</dfn>
 :: The number of total packets received on the QUIC connection, including
    packets that were not processable.
-: <dfn for="QuicTransportStats" dict-member>minRtt</dfn>
+: <dfn for="WebTransportStats" dict-member>minRtt</dfn>
 :: The minimum RTT observed on the entire connection.
-: <dfn for="QuicTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
+: <dfn for="WebTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
    between calls to {{receiveDatagrams()}}.
-
-# `QuicTransport` Interface #  {#quic-transport}
-
-The <dfn interface>QuicTransport</dfn> is a
-{{UnidirectionalStreamsTransport}}, a {{BidirectionalStreamsTransport}}, and a
-{{DatagramTransport}}.  {{SendStream}}s and {{ReceiveStream}}s are implemented
-with unidirectional QUIC streams as defined in [[!QUIC-TRANSPORT]].
-{{BidirectionalStream}}s are implemented with bidirectional QUIC streams as
-defined in [[!QUIC-TRANSPORT]]. Datagrams are implemented with QUIC datagrams as
-defined in [[!QUIC-DATAGRAM]].
-
-## Configuration ##  {#quic-transport-configuration}
-
-<pre class="idl">
-dictionary QuicTransportOptions {
-  sequence&lt;RTCDtlsFingerprint&gt; serverCertificateFingerprints;
-};
-</pre>
-
-<dfn dictionary>QuicTransportOptions</dfn> is a dictionary of parameters
-that determine how QuicTransport connection is established and used.
-
-: <dfn for="QuicTransportOptions" dict-member>serverCertificateFingerprints</dfn>
-:: If non-empty, the user agent SHALL deem a server certificate trusted if and
-   only if it can successfully [=verify a certificate fingerprint=] against
-   {{QuicTransportOptions/serverCertificateFingerprints}} and satisfies
-   [=custom certificate requirements=].  The user agent SHALL ignore any
-   fingerprint that uses an unknown {{RTCDtlsFingerprint/algorithm}} or has a
-   malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent SHALL use
-   certificate verification procedures it would use for normal [=fetch=]
-   operations.
-
-<div algorithm="compute a certificate fingerprint">
-To <dfn>compute a certificate fingerprint</dfn>, do the following:
-1. Let |cert| be the input certificate, represented as a DER encoding of
-   Certificate message defined in [[!RFC5280]].
-1. Compute the SHA-256 hash of |cert|.  Format it as `fingerprint` BNF
-   rule described in Section 5 of [[!RFC8122]].
-
-</div>
-
-<div algorithm="verify a certificate fingerprint">
-To <dfn>verify a certificate fingerprint</dfn>, do the following:
-1. Let |fprs| be the input array of fingerprints.
-1. Let |ref_fpr| be the [=compute a certificate fingerprint|computed
-   fingerprint=] of the input certificate.
-1. For every fingerprint |fpr| in |fprs|:
-   1. If {{RTCDtlsFingerprint/algorithm}} of |fpr| is equal to "sha-256", and
-      {{RTCDtlsFingerprint/value}} of |fpr| is equal to |ref_fpr|, the
-      certificate is valid.  Return true.
-1. Return false.
-
-</div>
-
-The <dfn>custom certificate requirements</dfn> are as follows: the certificate
-MUST be an X.509v3 certificate as defined in [[!RFC5280]], the current time
-MUST be within the validity period of the certificate as defined in Section
-4.1.2.5 of [[!RFC5280]] and the total length of the validity period MUST NOT
-exceed two weeks.
-
-Issue: Reconsider the time period above.  We want it to be sufficiently large
-that applications using this for ephemeral certificates can do so without
-having to fight the clock skew, but small enough to discourage long-term use
-without key rotation.
-
-## Interface Definition ##  {#quic-transport-definition}
-
-<pre class="idl">
-[Exposed=(Window,Worker)]
-interface QuicTransport {
-  constructor(USVString url, optional QuicTransportOptions options = {});
-  Promise&lt;QuicTransportStats&gt; getStats();
-};
-
-QuicTransport includes UnidirectionalStreamsTransport;
-QuicTransport includes BidirectionalStreamsTransport;
-QuicTransport includes DatagramTransport;
-QuicTransport includes WebTransport;
-</pre>
-
-
-When the {{QuicTransport/constructor()}} constructor is invoked, the user
-agent MUST run the following steps:
-1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
-   of {{QuicTransport/constructor(url, options)/url}}.
-1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
-1. If |parsedURL| [=scheme=] is not `quic-transport`, [=throw=]
-   a {{SyntaxError}} exception.
-1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
-1. Let |transport| be a newly constructed {{QuicTransport}} object.
-1. Let |transport| have a
-   <dfn attribute for="QuicTransport">\[[OutgoingStreams]]</dfn> internal slot
-   representing a sequence of {{OutgoingStream}} objects, initialized to empty.
-1. Let |transport| have a
-   <dfn attribute for="QuicTransport">\[[ReceivedStreams]]</dfn> internal slot
-   representing a {{ReadableStream}} of {{IncomingStream}} objects, initialized
-   to empty.
-1. Let |transport| have a
-  <dfn attribute for="QuicTransport">\[[ReceivedBidirectionalStreams]]</dfn>
-  internal slot representing a {{ReadableStream}} of {{IncomingStream}}
-  objects, initialized to empty.
-1. Let |transport| have a
-   <dfn attribute for="QuicTransport">\[[WebTransportState]]</dfn> internal
-   slot, initialized to `"connecting"`.
-1. Let |transport| have a
-   <dfn attribute for="QuicTransport">\[[SentDatagrams]]</dfn> internal slot
-   representing a {{WritableStream}} of {{Uint8Array}}s, initialized to empty.
-1. Let |transport| have a
-   <dfn attribute for="QuicTransport">\[[ReceivedDatagrams]]</dfn> internal
-   slot representing a {{ReadableStream}} of {{Uint8Array}}s, initialized to
-   empty.
-1. Run these steps in parallel:
-    1. Let |clientOrigin| be |transport|'s [=relevant settings object=]'s
-       [=origin=],
-       [serialized](https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin).
-    1. Establish a QUIC connection to the address identified by |parsedURL|
-       following the procedures in [[!WEB-TRANSPORT-QUIC]] section 3 and using
-       |clientOrigin| as the "origin of the client" referenced in section 3.2.1.
-       While establishing the connection, follow all of the parameters
-       specified in the {{QuicTransport/constructor(url, options)/options}}.
-    1. If the connection fails, set |transport|'s {{[[WebTransportState]]}}
-       internal slot to `"failed"` and abort these steps.
-    1. Set |transport|'s {{[[WebTransportState]]}} internal slot to
-       `"connected"`.
-1. Return |transport|.
-
-## Methods ##  {#quic-transport-methods}
-
-: <dfn for="QuicTransport" method>getStats()</dfn>
-:: Gathers stats for this {{QuicTransport}}'s QUIC
-   connection and reports the result asynchronously.</p>
-
-   When close is called, the user agent MUST run the following steps:
-     1. Let |transport| be the QuicTransport on which `getStats` is invoked.
-     1. Let |p| be a new promise.
-     1. Return |p| and continue the following steps in background.
-         1. Gather the stats from the underlying QUIC connection.
-         1. Once stats have been gathered, resolve |p| with the
-            {{QuicTransportStats}} object, representing the gathered stats.
 
 # Interface Mixin `OutgoingStream` #  {#outgoing-stream}
 
@@ -816,68 +826,6 @@ interface ReceiveStream {
 ReceiveStream includes IncomingStream;
 </pre>
 
-# `Http3Transport` Interface #  {#http3-transport}
-
-## Overview ##  {#http3-transport-overview}
-
-An <dfn interface>Http3Transport</dfn> is a {{UnidirectionalStreamsTransport}},
-a {{BidirectionalStreamsTransport}}, and a {{DatagramTransport}}.
-{{SendStream}}s, {{ReceiveStream}}s and {{BidirectionalStream}}s are
-implemented with HTTP/3 streams as defined in [[!WEB-TRANSPORT-HTTP3]].
-Datagrams are implemented with QUIC datagrams as defined in
-[[!WEB-TRANSPORT-HTTP3]].
-
-## Interface Definition ##  {#http3-transport-interface}
-
-<pre class="idl">
-[Exposed=(Window,Worker)]
-interface Http3Transport {
-  constructor(DOMString url);
-};
-
-Http3Transport includes UnidirectionalStreamsTransport;
-Http3Transport includes BidirectionalStreamsTransport;
-Http3Transport includes DatagramTransport;
-Http3Transport includes WebTransport;
-</pre>
-
-### Constructors ###  {#http3-transport-constructors}
-
-When the {{Http3Transport/Http3Transport()}} constructor is invoked, the user
-agent MUST run the following steps:
-1. Let |transport| be a newly constructed {{Http3Transport}} object with state
-   "connecting".
-1. Let |transport| have a {{[[OutgoingStreams]]}} internal slot
-   representing a sequence of {{OutgoingStream}} objects, initialized to empty.
-1. Let |transport| have a {{[[ReceivedStreams]]}} internal slot
-   representing a {{ReadableStream}} of {{IncomingStream}} objects, initialized
-   to empty.
-1. Let |transport| have a {{[[ReceivedBidirectionalStreams]]}}
-   internal slot representing a {{ReadableStream}} of {{IncomingStream}}
-   objects, initialized to empty.
-1. Let |transport| have a {{[[SentDatagrams]]}} internal slot
-   representing a {{WritableStream}} of {{Uint8Array}}s, initialized to empty.
-1. Let |transport| have a {{[[ReceivedDatagrams]]}} internal
-   slot representing a {{ReadableStream}} of {{Uint8Array}}s, initialized to
-   empty.
-1. Run these steps in parallel:
-    1. Either establish an HTTP/3 connection or reuse an existing HTTP/3
-       connection to the host specificed by the url, as specified in
-       [[!WEB-TRANSPORT-HTTP3]].
-    1. If there is no such HTTP/3 connection to reuse and the establishment of
-       a new HTTP/3 connection, set |transport|'s {{[[WebTransportState]]}}
-       internal slot to `"failed"` and abort these steps.
-    1. Once a connection an HTTP/3 connection is established, follow the steps
-       specified in [[!WEB-TRANSPORT-HTTP3]] section 4 for establishing a
-       WebTransport session within the HTTP/3 connection.
-    1. If the establishment of the WebTransport session fails, set transport's
-       {{[[WebTransportState]]}} internal slot to `"failed"` and abort these
-       steps.
-    1. Once a session has been established, set |transport|'s
-       {{[[WebTransportState]]}} internal slot to `"connected"` and abort these
-       steps.
-1. Return |transport|.
-
 # Privacy and Security Considerations #  {#privacy-security}
 
 This section is non-normative; it specifies no new behaviour, but instead
@@ -1031,6 +979,6 @@ Alvestrand, Stefan H&aring;kansson, Bernard Aboba and Dominique
 Haza&euml;l-Massieux, for their support. Contributions to this specification
 were provided by Robin Raymond.
 
-The {{QuicTransport}} and `QuicStream` objects were initially described in the
+The `QuicTransport` and `QuicStream` objects were initially described in the
 [W3C ORTC CG](https://www.w3.org/community/ortc/), and have been adapted for
 use in this specification.
