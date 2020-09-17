@@ -348,7 +348,7 @@ interface mixin DatagramTransport {
 
 # `WebTransport` Interface #  {#web-transport}
 
-The `WebTransport` provides a unified interface to all client-server transports
+`WebTransport` provides a unified interface to all client-server transports
 that are supported by the WebTransport API.  It implements all of the transport
 mixins ({{UnidirectionalStreamsTransport}}, {{BidirectionalStreamsTransport}},
 {{DatagramTransport}}), as well as stats and transport state information.
@@ -375,13 +375,13 @@ WebTransport includes DatagramTransport;
 When the {{WebTransport/constructor()}} constructor is invoked, the user
 agent MUST run the following steps:
 1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
-   of {{WebTransport/constructor(url, options)/url}}.
+   {{WebTransport/constructor(url, options)/url}}.
 1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=scheme=] is not `quic-transport` or `https`, [=throw=]
    a {{SyntaxError}} exception.
 1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
 1. Let |transport| be a newly constructed {{WebTransport}} object.
-1. Let |transport| have a
+1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[OutgoingStreams]]</dfn> internal slot
    representing a sequence of {{OutgoingStream}} objects, initialized to empty.
 1. Let |transport| have a
@@ -390,7 +390,7 @@ agent MUST run the following steps:
    to empty.
 1. Let |transport| have a
   <dfn attribute for="WebTransport">\[[ReceivedBidirectionalStreams]]</dfn>
-  internal slot representing a {{ReadableStream}} of {{IncomingStream}}
+  internal slot representing a {{ReadableStream}} of {{BidirectionalStream}}
   objects, initialized to empty.
 1. Let |transport| have a
    <dfn attribute for="WebTransport">\[[WebTransportState]]</dfn> internal
@@ -406,7 +406,6 @@ agent MUST run the following steps:
    [=initialize WebTransport over QUIC=].
 1. If the scheme of |parsedURL| is `https`, [=in parallel=],
    [=initialize WebTransport over HTTP=].
-1. Run these steps in parallel:
 1. Return |transport|.
 
 <div algorithm="initialize WebTransport over QUIC">
@@ -415,7 +414,7 @@ To <dfn>initialize WebTransport over QUIC</dfn> for a given |transport| and
 
 1. Let |clientOrigin| be |transport|'s [=relevant settings object=]'s
    [=origin=],
-   [serialized](https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin).
+   [=ASCII serialization of an origin|serialized=].
 1. Establish a QUIC connection to the address identified by |parsedURL|
    following the procedures in [[!WEB-TRANSPORT-QUIC]] section 3 and using
    |clientOrigin| as the "origin of the client" referenced in section 3.2.1.
@@ -431,6 +430,8 @@ To <dfn>initialize WebTransport over QUIC</dfn> for a given |transport| and
 To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
 |parsedURL|, do the following:
 
+1. If {{WebTransportOptions/serverCertificateFingerprints}} is specified, throw
+   a {{NotSupportedError}} exception.
 1. Establish an HTTP/3 WebTransport session to the address identified by
    |parsedURL| following the procedures in [[!WEB-TRANSPORT-HTTP3]].
 1. If the session establishment fails, set |transport|'s {{[[WebTransportState]]}}
@@ -477,6 +478,8 @@ To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
    When close is called, the user agent MUST run the following steps:
      1. Let |transport| be the WebTransport on which `getStats` is invoked.
      1. Let |p| be a new promise.
+     1. If the URL scheme associated with |transport| is not `quic-transport`,
+        [=reject=] |p| with {{NotSupportedError}} and return |p|.
      1. Return |p| and continue the following steps in background.
          1. Gather the stats from the underlying QUIC connection.
          1. Once stats have been gathered, resolve |p| with the
@@ -616,6 +619,10 @@ The dictionary SHALL have the following attributes:
 
 The <dfn dictionary>WebTransportStats</dfn> dictionary includes information
 on QUIC connection level stats.
+
+Issue: some of those are safe to expose for HTTP/2 and HTTP/3 connections (like
+min-RTT), while most would either result in information disclosure or are
+impossible to define for pooled connections.
 
 <pre class="idl">
 dictionary WebTransportStats {
@@ -979,6 +986,6 @@ Alvestrand, Stefan H&aring;kansson, Bernard Aboba and Dominique
 Haza&euml;l-Massieux, for their support. Contributions to this specification
 were provided by Robin Raymond.
 
-The `QuicTransport` and `QuicStream` objects were initially described in the
-[W3C ORTC CG](https://www.w3.org/community/ortc/), and have been adapted for
-use in this specification.
+The {{WebTransport}} interface is based on the `QuicTransport` interface
+initially described in the [W3C ORTC CG](https://www.w3.org/community/ortc/),
+and have been adapted for use in this specification.
