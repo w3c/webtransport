@@ -1224,7 +1224,7 @@ Possible extra rowspan handling
   <link href="https://www.w3.org/StyleSheets/TR/2016/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version b43aa594f5014ff14748da1aace9afaa73d2b3e6" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="439958774cd2237fae8c324d36c76c7757c74301" name="document-revision">
+  <meta content="2dd0320fe160c241dde63be5b6d7f8cffd520c96" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -2066,16 +2066,16 @@ that determine how WebTransport connection is established and used.</p>
      To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="verify-a-certificate-fingerprint">verify a certificate fingerprint</dfn>, do the following: 
     <ol>
      <li data-md>
-      <p>Let <var>fprs</var> be the input array of fingerprints.</p>
+      <p>Let <var>fingerprints</var> be the input array of fingerprints.</p>
      <li data-md>
-      <p>Let <var>ref_fpr</var> be the <a data-link-type="dfn" href="#compute-a-certificate-fingerprint" id="ref-for-compute-a-certificate-fingerprint">computed
+      <p>Let <var>referenceFingerprint</var> be the <a data-link-type="dfn" href="#compute-a-certificate-fingerprint" id="ref-for-compute-a-certificate-fingerprint">computed
  fingerprint</a> of the input certificate.</p>
      <li data-md>
-      <p>For every fingerprint <var>fpr</var> in <var>fprs</var>:</p>
+      <p>For every fingerprint <var>fingerprint</var> in <var>fingerprints</var>:</p>
       <ol>
        <li data-md>
-        <p>If <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-algorithm" id="ref-for-dom-rtcdtlsfingerprint-algorithm①">algorithm</a></code> of <var>fpr</var> is equal to "sha-256", and <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-value" id="ref-for-dom-rtcdtlsfingerprint-value①">value</a></code> of <var>fpr</var> is equal to <var>ref_fpr</var>, the
-  certificate is valid.  Return true.</p>
+        <p>If <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-algorithm" id="ref-for-dom-rtcdtlsfingerprint-algorithm①">algorithm</a></code> of <var>fingerprint</var> is equal to "sha-256",
+  and <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint-value" id="ref-for-dom-rtcdtlsfingerprint-value①">value</a></code> of <var>fingerprint</var> is equal to <var>referenceFingerprint</var>, the certificate is valid.  Return true.</p>
       </ol>
      <li data-md>
       <p>Return false.</p>
