@@ -332,7 +332,7 @@ interface mixin DatagramTransport {
 :: Sends datagrams that are written to the returned {{WritableStream}}.
 
    When `writableDatagrams` is called, the user agent MUST run the following steps:
-     1. Let |transport| be the {{DatagramTransport}} on which `sendDatagram` is
+     1. Let |transport| be the {{DatagramTransport}} on which `writableDatagrams` is
         invoked.
      1. Return the value of the {{[[SentDatagrams]]}} internal slot.
 
@@ -964,16 +964,16 @@ then getting the reader for each {{ReceiveStream}}.
 
 <pre class="example" highlight="js">
 const transport = getTransport();
-const receiveStreamReader =
+const incomingStreamReader =
     transport.incomingUnidirectionalStreams.getReader();
 while (true) {
-  const {value: receiveStream, done: readingReceiveStreamsDone} =
-      await receiveStreamReader.read();
-  if (readingReceiveStreamsDone) {
+  const {value: incomingStream, done: readingIncomingStreamsDone} =
+      await incomingStreamReader.read();
+  if (readingIncomingStreamsDone) {
     break;
   }
-  // Process ReceiveStreams created by remote endpoint.
-  const chunkReader = receiveStream.readable.getReader();
+  // Process incoming ReceiveStreams created by remote endpoint.
+  const chunkReader = incomingStream.readable.getReader();
   while (true) {
     const {value: chunk, done: readingChunksDone} = await chunkReader.read();
     if (readingChunksDone) {
