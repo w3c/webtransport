@@ -182,8 +182,8 @@ interface mixin UnidirectionalStreamsTransport {
          1. |p| has not been [=settled=].
 
 : <dfn for="UnidirectionalStreamsTransport" attribute>incomingUnidirectionalStreams</dfn>
-:: A {{ReadableStream}} of unidirectional streams, represented by
-   {{ReceiveStream}} object, that have been received from the remote host.
+:: A {{ReadableStream}} of unidirectional streams, each represented by a
+   {{ReceiveStream}} object, that have been received from the remote host."
 
    The getter steps for `incomingUnidirectionalStreams` are:
      1. Let |transport| be the `UnidirectionalStreamsTransport` on which
@@ -280,8 +280,6 @@ interface mixin BidirectionalStreamsTransport {
 
    The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
 
-     1. Let |transport| be the `BidirectionalStreamsTransport` on which
-        `receiveBidirectionalStreams` is invoked.
      1. Return the value of the {{[[ReceivedBidirectionalStreams]]}} internal slot.
      1. For each bidirectional stream received, create a corresponding
         {{BidirectionalStream}} and insert it into {{[[ReceivedBidirectionalStreams]]}}.
@@ -331,9 +329,7 @@ interface mixin DatagramTransport {
 : <dfn for="DatagramTransport" attribute>writableDatagrams</dfn>
 :: Sends datagrams that are written to the returned {{WritableStream}}.
 
-   When `writableDatagrams` is called, the user agent MUST run the following steps:
-     1. Let |transport| be the {{DatagramTransport}} on which `writableDatagrams` is
-        invoked.
+   The getter steps for the `writableDatagrams` attribute SHALL be:
      1. Return the value of the {{[[SentDatagrams]]}} internal slot.
 
 : <dfn for="DatagramTransport" attribute>readableDatagrams</dfn>
@@ -903,7 +899,7 @@ willing to accept connections from the Web.
 *This section is non-normative.*
 
 Sending a buffer of datagrams can be achieved by using the
-{{DatagramTransport/writableDatagrams}} method. In the following example
+{{DatagramTransport/writableDatagrams}} attribute. In the following example
 datagrams are only sent if the {{DatagramTransport}} is ready to send.
 
 <pre class="example" highlight="js">
@@ -939,8 +935,8 @@ setInterval(() => {
 *This section is non-normative.*
 
 Receiving datagrams can be achieved by calling
-{{DatagramTransport/readableDatagrams}} method, remembering to check for null
-values indicating that packets are not being processed quickly enough.
+{{DatagramTransport/readableDatagrams}} attribute, remembering to check for
+null values indicating that packets are not being processed quickly enough.
 
 <pre class="example" highlight="js">
 const transport = getTransport();
@@ -958,7 +954,7 @@ while (true) {
 
 *This section is non-normative.*
 
-Reading from ReceiveStreams can be achieved by accessing
+Reading from ReceiveStreams can be achieved by accessing the
 {{UnidirectionalStreamsTransport/incomingUnidirectionalStreams}} attribute,
 then getting the reader for each {{ReceiveStream}}.
 
