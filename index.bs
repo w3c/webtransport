@@ -183,11 +183,11 @@ interface mixin UnidirectionalStreamsTransport {
 
 : <dfn for="UnidirectionalStreamsTransport" attribute>incomingUnidirectionalStreams</dfn>
 :: A {{ReadableStream}} of unidirectional streams, each represented by a
-   {{ReceiveStream}} object, that have been received from the remote host."
+   {{ReceiveStream}} object, that have been received from the remote host.
 
    The getter steps for `incomingUnidirectionalStreams` are:
      1. Let |transport| be the `UnidirectionalStreamsTransport` on which
-        `incomingUnidirectionalStreams` getter is invoked.
+        the `incomingUnidirectionalStreams` getter is invoked.
      1. Return the value of the {{[[ReceivedStreams]]}} internal slot.
      1. For each unidirectional stream received, create a corresponding
         {{ReceiveStream}} and insert it into {{[[ReceivedStreams]]}}. As data
@@ -315,8 +315,8 @@ Datagrams are encrypted and congestion controlled.
 interface mixin DatagramTransport {
     readonly attribute unsigned short maxDatagramSize;
     /* both streams are streams of Uint8Array objects */
-    readonly attribute ReadableStream readableDatagrams;
-    readonly attribute WritableStream writableDatagrams;
+    readonly attribute ReadableStream datagramReadable;
+    readonly attribute WritableStream datagramWritable;
 };
 </pre>
 
@@ -324,15 +324,15 @@ interface mixin DatagramTransport {
 
 : <dfn for="DatagramTransport" attribute>maxDatagramSize</dfn>
 :: The maximum size data that may be passed to
-   {{DatagramTransport/writableDatagrams}}.
+   {{DatagramTransport/datagramWritable}}.
 
-: <dfn for="DatagramTransport" attribute>writableDatagrams</dfn>
+: <dfn for="DatagramTransport" attribute>datagramWritable</dfn>
 :: Sends datagrams that are written to the returned {{WritableStream}}.
 
-   The getter steps for the `writableDatagrams` attribute SHALL be:
+   The getter steps for the `datagramWritable` attribute SHALL be:
      1. Return the value of the {{[[SentDatagrams]]}} internal slot.
 
-: <dfn for="DatagramTransport" attribute>readableDatagrams</dfn>
+: <dfn for="DatagramTransport" attribute>datagramReadable</dfn>
 :: Return the value of the {{[[ReceivedDatagrams]]}} internal slot.
 
    For each datagram received, insert it into {{[[ReceivedDatagrams]]}}. If too
@@ -660,7 +660,7 @@ The dictionary SHALL have the following attributes:
 :: The minimum RTT observed on the entire connection.
 : <dfn for="WebTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
-   between calls to {{readableDatagrams}}.
+   between calls to {{datagramReadable}}.
 
 # Interface Mixin `OutgoingStream` #  {#outgoing-stream}
 
@@ -899,12 +899,12 @@ willing to accept connections from the Web.
 *This section is non-normative.*
 
 Sending a buffer of datagrams can be achieved by using the
-{{DatagramTransport/writableDatagrams}} attribute. In the following example
+{{DatagramTransport/datagramWritable}} attribute. In the following example
 datagrams are only sent if the {{DatagramTransport}} is ready to send.
 
 <pre class="example" highlight="js">
 const transport = getTransport();
-const writer = transport.writableDatagrams.getWriter();
+const writer = transport.datagramWritable.getWriter();
 const datagrams = getDatagramsToSend();
 datagrams.forEach((datagram) => {
   await writer.ready;
@@ -917,14 +917,14 @@ datagrams.forEach((datagram) => {
 *This section is non-normative.*
 
 Sending datagrams at a fixed rate regardless if the transport is ready to send
-can be achieved by simply using {{DatagramTransport/writableDatagrams}} and not
+can be achieved by simply using {{DatagramTransport/datagramWritable}} and not
 using the `ready` attribute. More complex scenarios can utilize the `ready`
 attribute.
 
 <pre class="example" highlight="js">
 // Sends datagrams every 100 ms.
 const transport = getTransport();
-const writer = transport.writableDatagrams.getWriter();
+const writer = transport.datagramWritable.getWriter();
 setInterval(() => {
   writer.write(createDatagram());
 }, 100);
@@ -935,12 +935,12 @@ setInterval(() => {
 *This section is non-normative.*
 
 Receiving datagrams can be achieved by calling
-{{DatagramTransport/readableDatagrams}} attribute, remembering to check for
+{{DatagramTransport/datagramReadable}} attribute, remembering to check for
 null values indicating that packets are not being processed quickly enough.
 
 <pre class="example" highlight="js">
 const transport = getTransport();
-const reader = transport.readableDatagrams.getReader();
+const reader = transport.datagramReadable.getReader();
 while (true) {
   const {value: datagram, done} = await reader.read();
   if (done) {
