@@ -137,30 +137,32 @@ depend on the lower-level concepts of "streams" defined in [[!WHATWG-STREAMS]].
 
 # `UnidirectionalStreamsTransport` Mixin #  {#unidirectional-streams-transport}
 
-A <dfn interface>UnidirectionalStreamsTransport</dfn> can send and receive
-unidirectional streams.  Data within a stream is delivered in order, but data
-between streams may be delivered out of order.  Data is generally sent
-reliably, but retransmissions may be disabled or the stream may aborted to
-produce a form of unreliability.  All stream data is encrypted and
-congestion-controlled.
+A {{UnidirectionalStreamsTransport}} can send and receive unidirectional
+streams.  Data within a stream is delivered in order, but data between streams
+may be delivered out of order.  Data is generally sent reliably, but
+retransmissions may be disabled or the stream may aborted to produce a form of
+unreliability.  All stream data is encrypted and congestion-controlled.
 
 <pre class="idl">
 interface mixin UnidirectionalStreamsTransport {
-  Promise&lt;SendStream&gt; createSendStream(optional SendStreamParameters parameters = {});
-  ReadableStream receiveStreams();
+  Promise&lt;SendStream&gt; createUnidirectionalStream(optional SendStreamParameters parameters = {});
+  /* a ReadableStream of ReceiveStream objects */
+  readonly attribute ReadableStream incomingUnidirectionalStreams;
 };
 </pre>
 
 ## Methods ##  {##unidirectional-streams-transport-methods}
 
-: <dfn for="UnidirectionalStreamsTransport" method>createSendStream()</dfn>
+: <dfn for="UnidirectionalStreamsTransport" method>createUnidirectionalStream()</dfn>
 
-:: Creates a {{SendStream}} object.
+:: Creates a {{SendStream}} object for an outgoing unidirectional stream.  Note
+   that in some transports, the mere creation of a stream is not immediately
+   visible to the peer until it is used to send data.
 
-   When `createSendStream()` method is called, the user agent MUST run the
-   following steps:
+   When `createUnidirectionalStream()` method is called, the user agent MUST
+   run the following steps:
      1. Let |transport| be the `UnidirectionalStreamsTransport` on which
-        `createSendStream` is invoked.
+        `createUnidirectionalStream` is invoked.
      1. If |transport|'s {{WebTransport/state}} is `"closed"` or `"failed"`,
         immediately return a new [=rejected=] promise with a newly created
         {{InvalidStateError}} and abort these steps.
@@ -179,20 +181,19 @@ interface mixin UnidirectionalStreamsTransport {
          1. The |transport|'s state transitions to `"closed"` or `"failed"`.
          1. |p| has not been [=settled=].
 
-: <dfn for="UnidirectionalStreamsTransport" method>receiveStreams()</dfn>
-:: Returns a {{ReadableStream}} of {{ReceiveStream}}s that have been received
-   from the remote host.
+: <dfn for="UnidirectionalStreamsTransport" attribute>incomingUnidirectionalStreams</dfn>
+:: A {{ReadableStream}} of unidirectional streams, each represented by a
+   {{ReceiveStream}} object, that have been received from the remote host.
 
-   When `receiveStreams` is called, the user agent MUST run the following
-   steps:
+   The getter steps for `incomingUnidirectionalStreams` are:
      1. Let |transport| be the `UnidirectionalStreamsTransport` on which
-        `receiveStreams` is invoked.
+        the `incomingUnidirectionalStreams` getter is invoked.
      1. Return the value of the {{[[ReceivedStreams]]}} internal slot.
      1. For each unidirectional stream received, create a corresponding
-        {{IncomingStream}} and insert it into {{[[ReceivedStreams]]}}. As data
+        {{ReceiveStream}} and insert it into {{[[ReceivedStreams]]}}. As data
         is received over the unidirectional stream, insert that data into the
-        corresponding `IncomingStream`.  When the remote side closes or aborts
-        the stream, close or abort the corresponding `IncomingStream`.
+        corresponding `ReceiveStream` object.  When the remote side closes or
+        aborts the stream, close or abort the corresponding `ReceiveStream`.
 
 ## Procedures ##  {##unidirectional-streams-transport-procedures}
 
@@ -223,16 +224,17 @@ dictionary SendStreamParameters {
 
 # `BidirectionalStreamsTransport` Mixin #  {#bidirectional-streams-transport}
 
-A <dfn interface>BidirectionalStreamsTransport</dfn> can send and receive
-bidirectional streams.  Data within a stream is delivered in order, but data
-between streams may be delivered out of order. Data is generally sent reliably,
-but retransmissions may be disabled or the stream may aborted to produce a form
-of unreliability.  All stream data is encrypted and congestion-controlled.
+A {{BidirectionalStreamsTransport}} can send and receive bidirectional streams.
+Data within a stream is delivered in order, but data between streams may be
+delivered out of order. Data is generally sent reliably, but retransmissions
+may be disabled or the stream may aborted to produce a form of unreliability.
+All stream data is encrypted and congestion-controlled.
 
 <pre class="idl">
 interface mixin BidirectionalStreamsTransport {
     Promise&lt;BidirectionalStream&gt; createBidirectionalStream();
-    ReadableStream receiveBidirectionalStreams();
+    /* a ReadableStream of BidirectionalStream objects */
+    readonly attribute ReadableStream incomingBidirectionalStreams;
 };
 </pre>
 
@@ -240,7 +242,9 @@ interface mixin BidirectionalStreamsTransport {
 ## Methods ##  {##bidirectional-streams-transport-methods}
 
 : <dfn for="BidirectionalStreamsTransport" method>createBidirectionalStream()</dfn>
-:: Creates a {{BidirectionalStream}} object.
+:: Creates a {{BidirectionalStream}} object for an outgoing bidirectional
+   stream.  Note that in some transports, the mere creation of a stream is not
+   immediately visible to the peer until it is used to send data.
 
    When `createBidirectionalStream` is called, the user agent MUST run the
    following steps:
@@ -270,15 +274,12 @@ interface mixin BidirectionalStreamsTransport {
        1. The |transport|'s state transitions to `"closed"` or `"failed"`.
        1. |p| has not been [=settled=].
 
-: <dfn for="BidirectionalStreamsTransport" method>receiveBidirectionalStreams()</dfn>
+: <dfn for="BidirectionalStreamsTransport" attribute>incomingBidirectionalStreams</dfn>
 :: Returns a {{ReadableStream}} of {{BidirectionalStream}}s that have been
    received from the remote host.
 
-   When `receiveBidirectionalStreams` method is called, the user agent MUST run
-   the following steps:
+   The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
 
-     1. Let |transport| be the `BidirectionalStreamsTransport` on which
-        `receiveBidirectionalStreams` is invoked.
      1. Return the value of the {{[[ReceivedBidirectionalStreams]]}} internal slot.
      1. For each bidirectional stream received, create a corresponding
         {{BidirectionalStream}} and insert it into {{[[ReceivedBidirectionalStreams]]}}.
@@ -313,8 +314,9 @@ Datagrams are encrypted and congestion controlled.
 <pre class="idl">
 interface mixin DatagramTransport {
     readonly attribute unsigned short maxDatagramSize;
-    WritableStream sendDatagrams();
-    ReadableStream receiveDatagrams();
+    /* both streams are streams of Uint8Array objects */
+    readonly attribute ReadableStream datagramReadable;
+    readonly attribute WritableStream datagramWritable;
 };
 </pre>
 
@@ -322,19 +324,15 @@ interface mixin DatagramTransport {
 
 : <dfn for="DatagramTransport" attribute>maxDatagramSize</dfn>
 :: The maximum size data that may be passed to
-   {{DatagramTransport/sendDatagrams}}.
+   {{DatagramTransport/datagramWritable}}.
 
-## Methods ##  {#datagram-transport-methods}
-
-: <dfn for="DatagramTransport" method>sendDatagrams()</dfn>
+: <dfn for="DatagramTransport" attribute>datagramWritable</dfn>
 :: Sends datagrams that are written to the returned {{WritableStream}}.
 
-   When `sendDatagrams` is called, the user agent MUST run the following steps:
-     1. Let |transport| be the {{DatagramTransport}} on which `sendDatagram` is
-        invoked.
+   The getter steps for the `datagramWritable` attribute SHALL be:
      1. Return the value of the {{[[SentDatagrams]]}} internal slot.
 
-: <dfn for="DatagramTransport" method>receiveDatagrams()</dfn>
+: <dfn for="DatagramTransport" attribute>datagramReadable</dfn>
 :: Return the value of the {{[[ReceivedDatagrams]]}} internal slot.
 
    For each datagram received, insert it into {{[[ReceivedDatagrams]]}}. If too
@@ -662,7 +660,7 @@ The dictionary SHALL have the following attributes:
 :: The minimum RTT observed on the entire connection.
 : <dfn for="WebTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
-   between calls to {{receiveDatagrams()}}.
+   between calls to {{datagramReadable}}.
 
 # Interface Mixin `OutgoingStream` #  {#outgoing-stream}
 
@@ -748,6 +746,7 @@ either a {{ReceiveStream}} or a {{BidirectionalStream}}.
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
 interface mixin IncomingStream {
+  /* a ReadableStream of Uint8Array */
   readonly attribute ReadableStream readable;
   readonly attribute Promise&lt;StreamAbortInfo&gt; readingAborted;
   void abortReading(optional StreamAbortInfo abortInfo = {});
@@ -900,12 +899,12 @@ willing to accept connections from the Web.
 *This section is non-normative.*
 
 Sending a buffer of datagrams can be achieved by using the
-{{DatagramTransport/sendDatagrams()}} method. In the following example
+{{DatagramTransport/datagramWritable}} attribute. In the following example
 datagrams are only sent if the {{DatagramTransport}} is ready to send.
 
 <pre class="example" highlight="js">
 const transport = getTransport();
-const writer = transport.sendDatagrams().getWriter();
+const writer = transport.datagramWritable.getWriter();
 const datagrams = getDatagramsToSend();
 datagrams.forEach((datagram) => {
   await writer.ready;
@@ -918,14 +917,14 @@ datagrams.forEach((datagram) => {
 *This section is non-normative.*
 
 Sending datagrams at a fixed rate regardless if the transport is ready to send
-can be achieved by simply using {{DatagramTransport/sendDatagrams()}} and not
+can be achieved by simply using {{DatagramTransport/datagramWritable}} and not
 using the `ready` attribute. More complex scenarios can utilize the `ready`
 attribute.
 
 <pre class="example" highlight="js">
 // Sends datagrams every 100 ms.
 const transport = getTransport();
-const writer = transport.sendDatagrams().getWriter();
+const writer = transport.datagramWritable.getWriter();
 setInterval(() => {
   writer.write(createDatagram());
 }, 100);
@@ -936,12 +935,12 @@ setInterval(() => {
 *This section is non-normative.*
 
 Receiving datagrams can be achieved by calling
-{{DatagramTransport/receiveDatagrams()}} method, remembering to check for null
-values indicating that packets are not being processed quickly enough.
+{{DatagramTransport/datagramReadable}} attribute, remembering to check for
+null values indicating that packets are not being processed quickly enough.
 
 <pre class="example" highlight="js">
 const transport = getTransport();
-const reader = transport.receiveDatagrams().getReader();
+const reader = transport.datagramReadable.getReader();
 while (true) {
   const {value: datagram, done} = await reader.read();
   if (done) {
@@ -955,21 +954,22 @@ while (true) {
 
 *This section is non-normative.*
 
-Reading from ReceiveStreams can be achieved by calling
-{{UnidirectionalStreamsTransport/receiveStreams()}} method, then getting the
-reader for each {{ReceiveStream}}.
+Reading from ReceiveStreams can be achieved by accessing the
+{{UnidirectionalStreamsTransport/incomingUnidirectionalStreams}} attribute,
+then getting the reader for each {{ReceiveStream}}.
 
 <pre class="example" highlight="js">
 const transport = getTransport();
-const receiveStreamReader = transport.receiveStreams().getReader();
+const incomingStreamReader =
+    transport.incomingUnidirectionalStreams.getReader();
 while (true) {
-  const {value: receiveStream, done: readingReceiveStreamsDone} =
-      await receiveStreamReader.read();
-  if (readingReceiveStreamsDone) {
+  const {value: incomingStream, done: readingIncomingStreamsDone} =
+      await incomingStreamReader.read();
+  if (readingIncomingStreamsDone) {
     break;
   }
-  // Process ReceiveStreams created by remote endpoint.
-  const chunkReader = receiveStream.readable.getReader();
+  // Process incoming ReceiveStreams created by remote endpoint.
+  const chunkReader = incomingStream.readable.getReader();
   while (true) {
     const {value: chunk, done: readingChunksDone} = await chunkReader.read();
     if (readingChunksDone) {
