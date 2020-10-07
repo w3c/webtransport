@@ -359,7 +359,7 @@ interface WebTransport {
   Promise&lt;WebTransportStats&gt; getStats();
   readonly attribute WebTransportState state;
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
-  void close(optional WebTransportCloseInfo closeInfo = {});
+  undefined close(optional WebTransportCloseInfo closeInfo = {});
   attribute EventHandler onstatechange;
 };
 
@@ -672,7 +672,7 @@ either a {{SendStream}} or a {{BidirectionalStream}}.
 interface mixin OutgoingStream {
   readonly attribute WritableStream writable;
   readonly attribute Promise&lt;StreamAbortInfo&gt; writingAborted;
-  void abortWriting(optional StreamAbortInfo abortInfo = {});
+  undefined abortWriting(optional StreamAbortInfo abortInfo = {});
 };
 </pre>
 
@@ -749,7 +749,7 @@ interface mixin IncomingStream {
   /* a ReadableStream of Uint8Array */
   readonly attribute ReadableStream readable;
   readonly attribute Promise&lt;StreamAbortInfo&gt; readingAborted;
-  void abortReading(optional StreamAbortInfo abortInfo = {});
+  undefined abortReading(optional StreamAbortInfo abortInfo = {});
   Promise&lt;ArrayBuffer&gt; arrayBuffer();
 };
 </pre>
