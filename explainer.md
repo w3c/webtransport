@@ -24,8 +24,8 @@ We think there is a room for a simple, client-server, unordered/unreliable API
 with minimal latency.  The WebTransport protocol provides this with a single
 transport object that abstracts away the specific underlying protocol with
 a flexibile set of possible capabilities including reliable
-unidirectional and bidirectional streams, and unreliable datagrams 
-(much like the capabilities of QUIC). 
+unidirectional and bidirectional streams, and unreliable datagrams
+(much like the capabilities of QUIC).
 
 ## Goals
 
@@ -36,7 +36,7 @@ for unreliable and unordered communication.
 including both reliable and unreliable, ordered and unordered, client-server and
 p2p, data and media.
 
-- Ensure the same security properties as WebSockets (use of TLS, 
+- Ensure the same security properties as WebSockets (use of TLS,
   server-controlled origin policy)
 
 ## Non-goals
@@ -117,7 +117,7 @@ requestWriter.close();
 
 // Receive the responses.
 for await (const receiveStream of transport.incomingUnidirectionalStreams) {
-  for await (const buffer of receiveStream.readable){ 
+  for await (const buffer of receiveStream.readable){
     sourceBuffer.appendBuffer(buffer);
   }
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
@@ -170,7 +170,7 @@ await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => re
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
 const transport = new WebTransport('https://example.com/video');
 for await (const receiveStream of transport.incomingUnidirectionalStreams) {
-  for await (const buffer of receiveStream.readable){ 
+  for await (const buffer of receiveStream.readable){
     sourceBuffer.appendBuffer(buffer);
   }
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
@@ -182,7 +182,7 @@ for await (const receiveStream of transport.incomingUnidirectionalStreams) {
 WebTransport supports multiple protocols, each of which provide some of the
 following capabilities.
 
-- Unidirectional streams are indefintely long streams of bytes in one direction 
+- Unidirectional streams are indefintely long streams of bytes in one direction
   with back pressure applied
   to the sender when either the receiver can't read quickly enough or when
   constrained by network capacity/congestions.  Useful for sending messages that
@@ -190,10 +190,10 @@ following capabilities.
   sending many messages in a single stream. Out-of-order messaging can be achieved
   by sending one message per stream.
 
-- Bidirectional streams are like unidirectional streams, but in two directions.  
+- Bidirectional streams are like unidirectional streams, but in two directions.
   They are useful for sending messages that expect a response.
 
-- Datagrams are small, out-of-order, unreliable messages.  They are useful for 
+- Datagrams are small, out-of-order, unreliable messages.  They are useful for
   sending messages with less API complexity
   and less network overhead than streams.
 
@@ -222,7 +222,7 @@ application use a complex API (RTCPeerConnection) designed for a very different 
 HTTP/2 [RFC8441].  That would avoid head-of-line blocking and provide an
 ability to cancel a stream by closing the corresponding WebSocket object.
 However, this approach has a number of drawbacks, which all stem primarily from
-the fact that semantically each WebSocket is a completely independent entity: 
+the fact that semantically each WebSocket is a completely independent entity:
 
 1. Each new stream would require a WebSocket handshake to agree on application
   protocol used, meaning that it would take at least one RTT for each new
