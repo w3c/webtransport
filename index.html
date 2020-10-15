@@ -1224,7 +1224,7 @@ Possible extra rowspan handling
   <link href="https://www.w3.org/StyleSheets/TR/2016/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version b43aa594f5014ff14748da1aace9afaa73d2b3e6" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="2c6a8de7441cc67c855f617b0c8b9c46461b57f1" name="document-revision">
+  <meta content="cf5e0156dd30bad2aec96f6c34fb94e4ff4b22d0" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1482,7 +1482,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-09-24">24 September 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-10-15">15 October 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1708,13 +1708,14 @@ unreliability.  All stream data is encrypted and congestion-controlled.</p>
          <p><var>p</var> has not been <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑨">settled</a>.</p>
        </ol>
      </ol>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="UnidirectionalStreamsTransport" data-dfn-type="attribute" data-export data-lt="incomingUnidirectionalStreams|incomingUnidirectionalStreams()" id="dom-unidirectionalstreamstransport-incomingunidirectionalstreams"><code>incomingUnidirectionalStreams()</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class②">ReadableStream</a>, readonly</span>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="UnidirectionalStreamsTransport" data-dfn-type="attribute" data-export id="dom-unidirectionalstreamstransport-incomingunidirectionalstreams"><code>incomingUnidirectionalStreams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class②">ReadableStream</a>, readonly</span>
     <dd data-md>
-     <p>A <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class③">ReadableStream</a></code> of unidirectional streams, represented by <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream">ReceiveStream</a></code> object, that have been received from the remote host.</p>
+     <p>A <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class③">ReadableStream</a></code> of unidirectional streams, each represented by a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream">ReceiveStream</a></code> object, that have been received from the remote host.</p>
      <p>The getter steps for <code>incomingUnidirectionalStreams</code> are:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be the <code>UnidirectionalStreamsTransport</code> on which <code>incomingUnidirectionalStreams</code> getter is invoked.</p>
+       <p>Let <var>transport</var> be the <code>UnidirectionalStreamsTransport</code> on which
+  the <code>incomingUnidirectionalStreams</code> getter is invoked.</p>
       <li data-md>
        <p>Return the value of the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-receivedstreams-slot" id="ref-for-dom-webtransport-receivedstreams-slot">[[ReceivedStreams]]</a></code> internal slot.</p>
       <li data-md>
@@ -1806,14 +1807,12 @@ All stream data is encrypted and congestion-controlled.</p>
          <p><var>p</var> has not been <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑤">settled</a>.</p>
        </ol>
      </ol>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="BidirectionalStreamsTransport" data-dfn-type="attribute" data-export data-lt="incomingBidirectionalStreams|incomingBidirectionalStreams()" id="dom-bidirectionalstreamstransport-incomingbidirectionalstreams"><code>incomingBidirectionalStreams()</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑤">ReadableStream</a>, readonly</span>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="BidirectionalStreamsTransport" data-dfn-type="attribute" data-export id="dom-bidirectionalstreamstransport-incomingbidirectionalstreams"><code>incomingBidirectionalStreams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑤">ReadableStream</a>, readonly</span>
     <dd data-md>
      <p>Returns a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑥">ReadableStream</a></code> of <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream④">BidirectionalStream</a></code>s that have been
  received from the remote host.</p>
      <p>The getter steps for the <code>incomingBidirectionalStreams</code> attribute SHALL be:</p>
      <ol>
-      <li data-md>
-       <p>Let <var>transport</var> be the <code>BidirectionalStreamsTransport</code> on which <code>receiveBidirectionalStreams</code> is invoked.</p>
       <li data-md>
        <p>Return the value of the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-receivedbidirectionalstreams-slot" id="ref-for-dom-webtransport-receivedbidirectionalstreams-slot">[[ReceivedBidirectionalStreams]]</a></code> internal slot.</p>
       <li data-md>
@@ -1849,27 +1848,24 @@ Datagrams are encrypted and congestion controlled.</p>
 <pre class="idl highlight def"><c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#datagramtransport" id="ref-for-datagramtransport"><c- g>DatagramTransport</c-></a> {
     <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-short" id="ref-for-idl-unsigned-short"><c- b>unsigned</c-> <c- b>short</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned short" href="#dom-datagramtransport-maxdatagramsize" id="ref-for-dom-datagramtransport-maxdatagramsize"><c- g>maxDatagramSize</c-></a>;
     /* both streams are streams of Uint8Array objects */
-    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑦"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-datagramtransport-readabledatagrams" id="ref-for-dom-datagramtransport-readabledatagrams"><c- g>readableDatagrams</c-></a>;
-    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#ws-class" id="ref-for-ws-class①"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-datagramtransport-writabledatagrams" id="ref-for-dom-datagramtransport-writabledatagrams"><c- g>writableDatagrams</c-></a>;
+    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑦"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-datagramtransport-datagramreadable" id="ref-for-dom-datagramtransport-datagramreadable"><c- g>datagramReadable</c-></a>;
+    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#ws-class" id="ref-for-ws-class①"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-datagramtransport-datagramwritable" id="ref-for-dom-datagramtransport-datagramwritable"><c- g>datagramWritable</c-></a>;
 };
 </pre>
    <h3 class="heading settled" data-level="6.1" id="datagram-transport-attributes"><span class="secno">6.1. </span><span class="content">Attributes</span><a class="self-link" href="#datagram-transport-attributes"></a></h3>
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="DatagramTransport" data-dfn-type="attribute" data-export id="dom-datagramtransport-maxdatagramsize"><code>maxDatagramSize</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-short" id="ref-for-idl-unsigned-short①">unsigned short</a>, readonly</span>
     <dd data-md>
-     <p>The maximum size data that may be passed to <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-writabledatagrams" id="ref-for-dom-datagramtransport-writabledatagrams①">writableDatagrams</a></code>.</p>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="DatagramTransport" data-dfn-type="attribute" data-export id="dom-datagramtransport-readabledatagrams"><code>readableDatagrams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑧">ReadableStream</a>, readonly</span>
+     <p>The maximum size data that may be passed to <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramwritable" id="ref-for-dom-datagramtransport-datagramwritable①">datagramWritable</a></code>.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="DatagramTransport" data-dfn-type="attribute" data-export id="dom-datagramtransport-datagramwritable"><code>datagramWritable</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#ws-class" id="ref-for-ws-class②">WritableStream</a>, readonly</span>
     <dd data-md>
-     <p>Sends datagrams that are written to the returned <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#ws-class" id="ref-for-ws-class②">WritableStream</a></code>.</p>
-     <p>When <code>writableDatagrams</code> is called, the user agent MUST run the following steps:</p>
+     <p>Sends datagrams that are written to the returned <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#ws-class" id="ref-for-ws-class③">WritableStream</a></code>.</p>
+     <p>The getter steps for the <code>datagramWritable</code> attribute SHALL be:</p>
      <ol>
-      <li data-md>
-       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport①">DatagramTransport</a></code> on which <code>sendDatagram</code> is
-  invoked.</p>
       <li data-md>
        <p>Return the value of the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-sentdatagrams-slot" id="ref-for-dom-webtransport-sentdatagrams-slot">[[SentDatagrams]]</a></code> internal slot.</p>
      </ol>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="DatagramTransport" data-dfn-type="attribute" data-export id="dom-datagramtransport-writabledatagrams"><code>writableDatagrams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#ws-class" id="ref-for-ws-class③">WritableStream</a>, readonly</span>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="DatagramTransport" data-dfn-type="attribute" data-export id="dom-datagramtransport-datagramreadable"><code>datagramReadable</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑧">ReadableStream</a>, readonly</span>
     <dd data-md>
      <p>Return the value of the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-receiveddatagrams-slot" id="ref-for-dom-webtransport-receiveddatagrams-slot">[[ReceivedDatagrams]]</a></code> internal slot.</p>
      <p>For each datagram received, insert it into <code class="idl"><a data-link-type="idl" href="#dom-webtransport-receiveddatagrams-slot" id="ref-for-dom-webtransport-receiveddatagrams-slot①">[[ReceivedDatagrams]]</a></code>. If too
@@ -1884,7 +1880,7 @@ Datagrams are encrypted and congestion controlled.</p>
    <h2 class="heading settled" data-level="7" id="web-transport"><span class="secno">7. </span><span class="content"><code>WebTransport</code> Interface</span><a class="self-link" href="#web-transport"></a></h2>
    <p><code>WebTransport</code> provides a unified interface to all client-server transports
 that are supported by the WebTransport API.  It implements all of the transport
-mixins (<code class="idl"><a data-link-type="idl" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport③">UnidirectionalStreamsTransport</a></code>, <code class="idl"><a data-link-type="idl" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport④">BidirectionalStreamsTransport</a></code>, <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport②">DatagramTransport</a></code>), as well as stats and transport state information.</p>
+mixins (<code class="idl"><a data-link-type="idl" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport③">UnidirectionalStreamsTransport</a></code>, <code class="idl"><a data-link-type="idl" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport④">BidirectionalStreamsTransport</a></code>, <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport①">DatagramTransport</a></code>), as well as stats and transport state information.</p>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="webtransport"><code><c- g>WebTransport</c-></code></dfn> {
   <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="constructor" data-export data-lt="WebTransport(url, options)|constructor(url, options)|WebTransport(url)|constructor(url)" id="dom-webtransport-webtransport"><code><c- g>constructor</c-></code></dfn>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString" id="ref-for-idl-USVString"><c- b>USVString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport/constructor(url, options), WebTransport/constructor(url)" data-dfn-type="argument" data-export id="dom-webtransport-constructor-url-options-url"><code><c- g>url</c-></code></dfn>, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-webtransportoptions" id="ref-for-dictdef-webtransportoptions"><c- n>WebTransportOptions</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport/constructor(url, options), WebTransport/constructor(url)" data-dfn-type="argument" data-export id="dom-webtransport-constructor-url-options-options"><code><c- g>options</c-></code></dfn> = {});
@@ -1898,7 +1894,7 @@ mixins (<code class="idl"><a data-link-type="idl" href="#unidirectionalstreamstr
 
 <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport"><c- n>WebTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport④"><c- n>UnidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①"><c- n>WebTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑤"><c- n>BidirectionalStreamsTransport</c-></a>;
-<a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport②"><c- n>WebTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport③"><c- n>DatagramTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport②"><c- n>WebTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport②"><c- n>DatagramTransport</c-></a>;
 </pre>
    <h3 class="heading settled" data-level="7.1" id="webtransport-constructor"><span class="secno">7.1. </span><span class="content">Constructor</span><a class="self-link" href="#webtransport-constructor"></a></h3>
    <p>When the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransport" id="ref-for-dom-webtransport-webtransport">WebTransport()</a></code> constructor is invoked, the user
@@ -2215,7 +2211,7 @@ impossible to define for pooled connections.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportStats" data-dfn-type="dict-member" data-export id="dom-webtransportstats-numreceiveddatagramsdropped"><code>numReceivedDatagramsDropped</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑤">unsigned long</a></span>
     <dd data-md>
      <p>The number of datagrams that were dropped, due to too many datagrams buffered
- between calls to <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-readabledatagrams" id="ref-for-dom-datagramtransport-readabledatagrams①">readableDatagrams</a></code>.</p>
+ between calls to <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramreadable" id="ref-for-dom-datagramtransport-datagramreadable①">datagramReadable</a></code>.</p>
    </dl>
    <h2 class="heading settled" data-level="8" id="outgoing-stream"><span class="secno">8. </span><span class="content">Interface Mixin <code>OutgoingStream</code></span><a class="self-link" href="#outgoing-stream"></a></h2>
    <p>An <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="outgoingstream"><code>OutgoingStream</code></dfn> is a stream that can be written to, as
@@ -2447,10 +2443,10 @@ willing to accept connections from the Web.</p>
    <h2 class="heading settled" data-level="14" id="examples"><span class="secno">14. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
    <h3 class="heading settled" data-level="14.1" id="example-datagrams"><span class="secno">14.1. </span><span class="content">Sending a buffer of datagrams</span><a class="self-link" href="#example-datagrams"></a></h3>
    <p><em>This section is non-normative.</em></p>
-   <p>Sending a buffer of datagrams can be achieved by using the <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-writabledatagrams" id="ref-for-dom-datagramtransport-writabledatagrams②">writableDatagrams</a></code> method. In the following example
-datagrams are only sent if the <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport④">DatagramTransport</a></code> is ready to send.</p>
-<pre class="example highlight" id="example-e634fb1d"><a class="self-link" href="#example-e634fb1d"></a><c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
-<c- kr>const</c-> writer <c- o>=</c-> transport<c- p>.</c->writableDatagrams<c- p>.</c->getWriter<c- p>();</c->
+   <p>Sending a buffer of datagrams can be achieved by using the <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramwritable" id="ref-for-dom-datagramtransport-datagramwritable②">datagramWritable</a></code> attribute. In the following example
+datagrams are only sent if the <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport③">DatagramTransport</a></code> is ready to send.</p>
+<pre class="example highlight" id="example-8662e3c1"><a class="self-link" href="#example-8662e3c1"></a><c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
+<c- kr>const</c-> writer <c- o>=</c-> transport<c- p>.</c->datagramWritable<c- p>.</c->getWriter<c- p>();</c->
 <c- kr>const</c-> datagrams <c- o>=</c-> getDatagramsToSend<c- p>();</c->
 datagrams<c- p>.</c->forEach<c- p>((</c->datagram<c- p>)</c-> <c- p>=></c-> <c- p>{</c->
   await writer<c- p>.</c->ready<c- p>;</c->
@@ -2460,21 +2456,21 @@ datagrams<c- p>.</c->forEach<c- p>((</c->datagram<c- p>)</c-> <c- p>=></c-> <c- 
    <h3 class="heading settled" data-level="14.2" id="example-fixed-rate"><span class="secno">14.2. </span><span class="content">Sending datagrams at a fixed rate</span><a class="self-link" href="#example-fixed-rate"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Sending datagrams at a fixed rate regardless if the transport is ready to send
-can be achieved by simply using <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-writabledatagrams" id="ref-for-dom-datagramtransport-writabledatagrams③">writableDatagrams</a></code> and not
+can be achieved by simply using <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramwritable" id="ref-for-dom-datagramtransport-datagramwritable③">datagramWritable</a></code> and not
 using the <code>ready</code> attribute. More complex scenarios can utilize the <code>ready</code> attribute.</p>
-<pre class="example highlight" id="example-4c777b31"><a class="self-link" href="#example-4c777b31"></a><c- c1>// Sends datagrams every 100 ms.</c->
+<pre class="example highlight" id="example-c00af5e2"><a class="self-link" href="#example-c00af5e2"></a><c- c1>// Sends datagrams every 100 ms.</c->
 <c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
-<c- kr>const</c-> writer <c- o>=</c-> transport<c- p>.</c->writableDatagrams<c- p>.</c->getWriter<c- p>();</c->
+<c- kr>const</c-> writer <c- o>=</c-> transport<c- p>.</c->datagramWritable<c- p>.</c->getWriter<c- p>();</c->
 setInterval<c- p>(()</c-> <c- p>=></c-> <c- p>{</c->
   writer<c- p>.</c->write<c- p>(</c->createDatagram<c- p>());</c->
 <c- p>},</c-> <c- mi>100</c-><c- p>);</c->
 </pre>
    <h3 class="heading settled" data-level="14.3" id="example-receiving-datagrams"><span class="secno">14.3. </span><span class="content">Receiving datagrams</span><a class="self-link" href="#example-receiving-datagrams"></a></h3>
    <p><em>This section is non-normative.</em></p>
-   <p>Receiving datagrams can be achieved by calling <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-readabledatagrams" id="ref-for-dom-datagramtransport-readabledatagrams②">readableDatagrams</a></code> method, remembering to check for null
-values indicating that packets are not being processed quickly enough.</p>
-<pre class="example highlight" id="example-0c34c926"><a class="self-link" href="#example-0c34c926"></a><c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
-<c- kr>const</c-> reader <c- o>=</c-> transport<c- p>.</c->readableDatagrams<c- p>.</c->getReader<c- p>();</c->
+   <p>Receiving datagrams can be achieved by calling <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramreadable" id="ref-for-dom-datagramtransport-datagramreadable②">datagramReadable</a></code> attribute, remembering to check for
+null values indicating that packets are not being processed quickly enough.</p>
+<pre class="example highlight" id="example-e50c81c3"><a class="self-link" href="#example-e50c81c3"></a><c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
+<c- kr>const</c-> reader <c- o>=</c-> transport<c- p>.</c->datagramReadable<c- p>.</c->getReader<c- p>();</c->
 <c- k>while</c-> <c- p>(</c-><c- kc>true</c-><c- p>)</c-> <c- p>{</c->
   <c- kr>const</c-> <c- p>{</c->value<c- o>:</c-> datagram<c- p>,</c-> done<c- p>}</c-> <c- o>=</c-> await reader<c- p>.</c->read<c- p>();</c->
   <c- k>if</c-> <c- p>(</c->done<c- p>)</c-> <c- p>{</c->
@@ -2485,19 +2481,19 @@ values indicating that packets are not being processed quickly enough.</p>
 </pre>
    <h3 class="heading settled" data-level="14.4" id="example-receiving-from-receivestream"><span class="secno">14.4. </span><span class="content">Receiving from ReceiveStream</span><a class="self-link" href="#example-receiving-from-receivestream"></a></h3>
    <p><em>This section is non-normative.</em></p>
-   <p>Reading from ReceiveStreams can be achieved by accessing <code class="idl"><a data-link-type="idl" href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams" id="ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams①">incomingUnidirectionalStreams</a></code> attribute,
+   <p>Reading from ReceiveStreams can be achieved by accessing the <code class="idl"><a data-link-type="idl" href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams" id="ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams①">incomingUnidirectionalStreams</a></code> attribute,
 then getting the reader for each <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream④">ReceiveStream</a></code>.</p>
-<pre class="example highlight" id="example-499a270a"><a class="self-link" href="#example-499a270a"></a><c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
-<c- kr>const</c-> receiveStreamReader <c- o>=</c->
+<pre class="example highlight" id="example-d103dcc1"><a class="self-link" href="#example-d103dcc1"></a><c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
+<c- kr>const</c-> incomingStreamReader <c- o>=</c->
     transport<c- p>.</c->incomingUnidirectionalStreams<c- p>.</c->getReader<c- p>();</c->
 <c- k>while</c-> <c- p>(</c-><c- kc>true</c-><c- p>)</c-> <c- p>{</c->
-  <c- kr>const</c-> <c- p>{</c->value<c- o>:</c-> receiveStream<c- p>,</c-> done<c- o>:</c-> readingReceiveStreamsDone<c- p>}</c-> <c- o>=</c->
-      await receiveStreamReader<c- p>.</c->read<c- p>();</c->
-  <c- k>if</c-> <c- p>(</c->readingReceiveStreamsDone<c- p>)</c-> <c- p>{</c->
+  <c- kr>const</c-> <c- p>{</c->value<c- o>:</c-> incomingStream<c- p>,</c-> done<c- o>:</c-> readingIncomingStreamsDone<c- p>}</c-> <c- o>=</c->
+      await incomingStreamReader<c- p>.</c->read<c- p>();</c->
+  <c- k>if</c-> <c- p>(</c->readingIncomingStreamsDone<c- p>)</c-> <c- p>{</c->
     <c- k>break</c-><c- p>;</c->
   <c- p>}</c->
-  <c- c1>// Process ReceiveStreams created by remote endpoint.</c->
-  <c- kr>const</c-> chunkReader <c- o>=</c-> receiveStream<c- p>.</c->readable<c- p>.</c->getReader<c- p>();</c->
+  <c- c1>// Process incoming ReceiveStreams created by remote endpoint.</c->
+  <c- kr>const</c-> chunkReader <c- o>=</c-> incomingStream<c- p>.</c->readable<c- p>.</c->getReader<c- p>();</c->
   <c- k>while</c-> <c- p>(</c-><c- kc>true</c-><c- p>)</c-> <c- p>{</c->
     <c- kr>const</c-> <c- p>{</c->value<c- o>:</c-> chunk<c- p>,</c-> done<c- o>:</c-> readingChunksDone<c- p>}</c-> <c- o>=</c-> await chunkReader<c- p>.</c->read<c- p>();</c->
     <c- k>if</c-> <c- p>(</c->readingChunksDone<c- p>)</c-> <c- p>{</c->
@@ -2672,7 +2668,9 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-unidirectionalstreamstransport-createunidirectionalstream">createUnidirectionalStream()</a><span>, in §4.1</span>
    <li><a href="#dom-unidirectionalstreamstransport-createunidirectionalstream">createUnidirectionalStream(parameters)</a><span>, in §4.1</span>
    <li><a href="#custom-certificate-requirements">custom certificate requirements</a><span>, in §7.4</span>
+   <li><a href="#dom-datagramtransport-datagramreadable">datagramReadable</a><span>, in §6.1</span>
    <li><a href="#datagramtransport">DatagramTransport</a><span>, in §6</span>
+   <li><a href="#dom-datagramtransport-datagramwritable">datagramWritable</a><span>, in §6.1</span>
    <li>
     errorCode
     <ul>
@@ -2683,10 +2681,8 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-webtransport-getstats">getStats()</a><span>, in §7.3</span>
    <li><a href="#immediate-close">Immediate Close</a><span>, in §7.3</span>
    <li><a href="#dom-bidirectionalstreamstransport-incomingbidirectionalstreams">incomingBidirectionalStreams</a><span>, in §5.1</span>
-   <li><a href="#dom-bidirectionalstreamstransport-incomingbidirectionalstreams">incomingBidirectionalStreams()</a><span>, in §5.1</span>
    <li><a href="#incomingstream">IncomingStream</a><span>, in §9</span>
    <li><a href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams">incomingUnidirectionalStreams</a><span>, in §4.1</span>
-   <li><a href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams">incomingUnidirectionalStreams()</a><span>, in §4.1</span>
    <li><a href="#initialize-webtransport-over-http">initialize WebTransport over HTTP</a><span>, in §7.1</span>
    <li><a href="#initialize-webtransport-over-quic">initialize WebTransport over QUIC</a><span>, in §7.1</span>
    <li><a href="#dom-datagramtransport-maxdatagramsize">maxDatagramSize</a><span>, in §6.1</span>
@@ -2699,9 +2695,8 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-webtransport-outgoingstreams-slot">[[OutgoingStreams]]</a><span>, in §7.1</span>
    <li><a href="#dom-webtransportstats-packetsreceived">packetsReceived</a><span>, in §7.7</span>
    <li><a href="#dom-webtransportstats-packetssent">packetsSent</a><span>, in §7.7</span>
-   <li><a href="#dom-incomingstream-readable">readable</a><span>, in §9.2</span>
    <li><a href="#dom-incomingstream-readable-slot">[[Readable]]</a><span>, in §9.1</span>
-   <li><a href="#dom-datagramtransport-readabledatagrams">readableDatagrams</a><span>, in §6.1</span>
+   <li><a href="#dom-incomingstream-readable">readable</a><span>, in §9.2</span>
    <li><a href="#dom-incomingstream-readingaborted">readingAborted</a><span>, in §9.2</span>
    <li><a href="#dom-webtransportcloseinfo-reason">reason</a><span>, in §7.6</span>
    <li><a href="#dom-webtransport-receivedbidirectionalstreams-slot">[[ReceivedBidirectionalStreams]]</a><span>, in §7.1</span>
@@ -2727,7 +2722,6 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-webtransport-webtransport">WebTransport(url, options)</a><span>, in §7</span>
    <li><a href="#dom-outgoingstream-writable-slot">[[Writable]]</a><span>, in §8.1</span>
    <li><a href="#dom-outgoingstream-writable">writable</a><span>, in §8.2</span>
-   <li><a href="#dom-datagramtransport-writabledatagrams">writableDatagrams</a><span>, in §6.1</span>
    <li><a href="#dom-outgoingstream-writingaborted">writingAborted</a><span>, in §8.2</span>
   </ul>
   <aside class="dfn-panel" data-for="term-for-concept-event">
@@ -3169,11 +3163,11 @@ and has been adapted for use in this specification.</p>
     <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class④①"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-bidirectionalstreamstransport-incomingbidirectionalstreams" id="ref-for-dom-bidirectionalstreamstransport-incomingbidirectionalstreams①"><c- g>incomingBidirectionalStreams</c-></a>;
 };
 
-<c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#datagramtransport" id="ref-for-datagramtransport⑤"><c- g>DatagramTransport</c-></a> {
+<c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#datagramtransport" id="ref-for-datagramtransport④"><c- g>DatagramTransport</c-></a> {
     <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-short" id="ref-for-idl-unsigned-short②"><c- b>unsigned</c-> <c- b>short</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned short" href="#dom-datagramtransport-maxdatagramsize" id="ref-for-dom-datagramtransport-maxdatagramsize①"><c- g>maxDatagramSize</c-></a>;
     /* both streams are streams of Uint8Array objects */
-    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑦①"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-datagramtransport-readabledatagrams" id="ref-for-dom-datagramtransport-readabledatagrams③"><c- g>readableDatagrams</c-></a>;
-    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#ws-class" id="ref-for-ws-class①①"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-datagramtransport-writabledatagrams" id="ref-for-dom-datagramtransport-writabledatagrams④"><c- g>writableDatagrams</c-></a>;
+    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#rs-class" id="ref-for-rs-class⑦①"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-datagramtransport-datagramreadable" id="ref-for-dom-datagramtransport-datagramreadable③"><c- g>datagramReadable</c-></a>;
+    <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://streams.spec.whatwg.org/#ws-class" id="ref-for-ws-class①①"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-datagramtransport-datagramwritable" id="ref-for-dom-datagramtransport-datagramwritable④"><c- g>datagramWritable</c-></a>;
 };
 
 [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑥"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
@@ -3189,7 +3183,7 @@ and has been adapted for use in this specification.</p>
 
 <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①⑤"><c- n>WebTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport④①"><c- n>UnidirectionalStreamsTransport</c-></a>;
 <a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport①④"><c- n>WebTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport⑤①"><c- n>BidirectionalStreamsTransport</c-></a>;
-<a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport②①"><c- n>WebTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport③①"><c- n>DatagramTransport</c-></a>;
+<a class="n" data-link-type="idl-name" href="#webtransport" id="ref-for-webtransport②①"><c- n>WebTransport</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#datagramtransport" id="ref-for-datagramtransport②①"><c- n>DatagramTransport</c-></a>;
 
 <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-webtransportoptions" id="ref-for-dictdef-webtransportoptions①①"><c- g>WebTransportOptions</c-></a> {
   <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint" id="ref-for-dom-rtcdtlsfingerprint②"><c- n>RTCDtlsFingerprint</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<RTCDtlsFingerprint> " href="#dom-webtransportoptions-servercertificatefingerprints" id="ref-for-dom-webtransportoptions-servercertificatefingerprints①①"><c- g>serverCertificateFingerprints</c-></a>;
@@ -3332,9 +3326,8 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <b><a href="#datagramtransport">#datagramtransport</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-datagramtransport">6. DatagramTransport Mixin</a>
-    <li><a href="#ref-for-datagramtransport①">6.1. Attributes</a>
-    <li><a href="#ref-for-datagramtransport②">7. WebTransport Interface</a> <a href="#ref-for-datagramtransport③">(2)</a>
-    <li><a href="#ref-for-datagramtransport④">14.1. Sending a buffer of datagrams</a>
+    <li><a href="#ref-for-datagramtransport①">7. WebTransport Interface</a> <a href="#ref-for-datagramtransport②">(2)</a>
+    <li><a href="#ref-for-datagramtransport③">14.1. Sending a buffer of datagrams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-datagramtransport-maxdatagramsize">
@@ -3343,21 +3336,21 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
     <li><a href="#ref-for-dom-datagramtransport-maxdatagramsize">6. DatagramTransport Mixin</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-datagramtransport-readabledatagrams">
-   <b><a href="#dom-datagramtransport-readabledatagrams">#dom-datagramtransport-readabledatagrams</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="dom-datagramtransport-datagramwritable">
+   <b><a href="#dom-datagramtransport-datagramwritable">#dom-datagramtransport-datagramwritable</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-datagramtransport-readabledatagrams">6. DatagramTransport Mixin</a>
-    <li><a href="#ref-for-dom-datagramtransport-readabledatagrams①">7.7. WebTransportStats Dictionary</a>
-    <li><a href="#ref-for-dom-datagramtransport-readabledatagrams②">14.3. Receiving datagrams</a>
+    <li><a href="#ref-for-dom-datagramtransport-datagramwritable">6. DatagramTransport Mixin</a>
+    <li><a href="#ref-for-dom-datagramtransport-datagramwritable①">6.1. Attributes</a>
+    <li><a href="#ref-for-dom-datagramtransport-datagramwritable②">14.1. Sending a buffer of datagrams</a>
+    <li><a href="#ref-for-dom-datagramtransport-datagramwritable③">14.2. Sending datagrams at a fixed rate</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-datagramtransport-writabledatagrams">
-   <b><a href="#dom-datagramtransport-writabledatagrams">#dom-datagramtransport-writabledatagrams</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="dom-datagramtransport-datagramreadable">
+   <b><a href="#dom-datagramtransport-datagramreadable">#dom-datagramtransport-datagramreadable</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-datagramtransport-writabledatagrams">6. DatagramTransport Mixin</a>
-    <li><a href="#ref-for-dom-datagramtransport-writabledatagrams①">6.1. Attributes</a>
-    <li><a href="#ref-for-dom-datagramtransport-writabledatagrams②">14.1. Sending a buffer of datagrams</a>
-    <li><a href="#ref-for-dom-datagramtransport-writabledatagrams③">14.2. Sending datagrams at a fixed rate</a>
+    <li><a href="#ref-for-dom-datagramtransport-datagramreadable">6. DatagramTransport Mixin</a>
+    <li><a href="#ref-for-dom-datagramtransport-datagramreadable①">7.7. WebTransportStats Dictionary</a>
+    <li><a href="#ref-for-dom-datagramtransport-datagramreadable②">14.3. Receiving datagrams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="webtransport">
