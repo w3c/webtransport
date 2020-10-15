@@ -117,7 +117,7 @@ requestWriter.close();
 
 // Receive the responses.
 for await (const receiveStream of transport.incomingUnidirectionalStreams) {
-  for await (const buffer of receiveStream.readable){
+  for await (const buffer of receiveStream.readable) {
     sourceBuffer.appendBuffer(buffer);
   }
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
@@ -170,7 +170,7 @@ await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => re
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
 const transport = new WebTransport('https://example.com/video');
 for await (const receiveStream of transport.incomingUnidirectionalStreams) {
-  for await (const buffer of receiveStream.readable){
+  for await (const buffer of receiveStream.readable) {
     sourceBuffer.appendBuffer(buffer);
   }
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
