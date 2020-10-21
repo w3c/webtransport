@@ -1,3 +1,5 @@
+## Use-Cases for WebTransport
+
 Ordinality of listing does not imply priority. 
 
 1. **Machine learning**
@@ -23,7 +25,8 @@ Ordinality of listing does not imply priority.
     1. Online document sharing
     1. Remote assistance temporarily "taking over" control of a system
 1. **Time Synchronized Multimedia Web communications**
-    1. Combining geo-separate singing and/or instruments together online with precise time synchronization
+    1. Combining geo-separate singing and/or instruments together online with precise time synchronization (deprecated as valid-case during Oct 19 TPAC meeting)
+    1. Add HUD overlay on top of received video from sensors or game data.
 1. **IOT sensor and analytics data transfer**
     1. Efficient and intermittent transmission of data. For example  - sending a 1 bit flag, GPS position updates, mouse clicks on site etc. 
     1. Sensor data upload  - including filters, aggregation, triggers.
