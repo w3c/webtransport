@@ -61,9 +61,11 @@ encrypted and congestion-controlled communication.
 1. A generic transport interface that can be provided by any transport,
    but match closely with QUIC's capabilities.
 
-2. The transport interface can talk [a QUIC based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-quic).
+2. The transport interface can talk
+   [a QUIC based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-quic).
 
-3. The transport interface can talk [a HTTP/3 based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-http3)
+3. The transport interface can talk
+   [an HTTP/3 based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-http3)
    that allows web developers to reuse HTTP/3 connections (sharing a congestion control context).
 
 ## Example of sending unreliable game state to server using QUIC datagrams
@@ -73,7 +75,7 @@ encrypted and congestion-controlled communication.
 function getSerializedGameState() { ... }
 
 const transport = new WebTransport('quic-transport://example.com:10001/path');
-const datagramWriter = transport.writableDatagrams.getWriter();
+const datagramWriter = transport.datagramWritable.getWriter();
 setInterval(() => {
   const message = getSerializedGameState();
   datagramWriter.write(message);
@@ -89,7 +91,7 @@ function getSerializedGameState() { ... }
 const transport = new WebTransport('quic-transport://example.com:10001/path');
 setInterval(async () => {
   const message = getSerializedGameState();
-  const stream = await transport.createUnidirectionaltream();
+  const stream = await transport.createUnidirectionalStream();
   const writer = stream.writable.getWriter();
   writer.write(message);
   writer.close();
@@ -110,7 +112,7 @@ const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09
 
 // App-specific request
 const mediaRequest = getSerializedMediaRequest();
-const requestStream = await transport.createUnidirectionaltream();
+const requestStream = await transport.createUnidirectionalStream();
 const requestWriter = requestStream.writable.getWriter();
 requestWriter.write(mediaRequest);
 requestWriter.close();
@@ -138,7 +140,7 @@ for await (const stream of transport.incomingBidirectionalStreams) {
   for await (const buffer of stream.readable) {
     buffers.push(buffer)
   }
-  const notification = new Notification(deserializeNofitication(buffers));
+  const notification = new Notification(deserializeNotification(buffers));
   notification.addEventListener('onclick', () => {
     const clickMessage = encodeClickMessage(notification);
     const writer = stream.writable.getWriter();
@@ -156,7 +158,7 @@ await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve,
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
 const transport = new WebTransport('/video');
 await fetch('https://example.com/babyshark');
-for await (const datagram of transport.readableDatagrams) {
+for await (const datagram of transport.datagramReadable) {
   sourceBuffer.appendBuffer(datagram);
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
 }
@@ -190,8 +192,8 @@ following capabilities.
   sending many messages in a single stream. Out-of-order messaging can be achieved
   by sending one message per stream.
 
-- Bidirectional streams are like unidirectional streams, but in two directions.
-  They are useful for sending messages that expect a response.
+- Bidirectional streams are full-duplex streams. A bidirectional stream is effectively
+  a pair of unidirectional streams.
 
 - Datagrams are small, out-of-order, unreliable messages.  They are useful for
   sending messages with less API complexity
