@@ -184,7 +184,7 @@ for await (const receiveStream of transport.incomingUnidirectionalStreams) {
 WebTransport supports multiple protocols, each of which provide some of the
 following capabilities.
 
-- Unidirectional streams are indefintely long streams of bytes in one direction
+- Unidirectional streams are indefinitely long streams of bytes in one direction
   with back pressure applied
   to the sender when either the receiver can't read quickly enough or when
   constrained by network capacity/congestions.  Useful for sending messages that
@@ -200,16 +200,16 @@ following capabilities.
   and less network overhead than streams.
 
 [QuicTransport](https://tools.ietf.org/html/draft-vvv-webtransport-quic)
-is a WebTransport that maps directly to QUIC streams and datagrams, which makes
-it easy to connect to servers that speak QUIC with minimum overhead.
+is a WebTransport protocol that maps directly to QUIC streams and datagrams,
+which makes it easy to connect to servers that speak QUIC with minimal overhead.
 It supports all of these capabilities.
 
 [Http3Transport](https://tools.ietf.org/html/draft-vvv-webtransport-http3) is a
-WebTransport that provides QUIC streams and datagrams with slightly more overhead
-vs. a QuicTransport.  It has the advantage that HTTP and non-HTTP traffic can share
-the same network port and congestion control context, and it may be pooled with other
-transports such that the transport may be connected more quickly (by reusing an
-existing HTTP/3 connection).
+WebTransport protocol that provides QUIC streams and datagrams with slightly
+more overhead vs. a QuicTransport.  It has the advantage that HTTP and non-HTTP
+traffic can share the same network port and congestion control context, and it
+may be pooled with other transports such that the transport may be connected
+more quickly (by reusing an existing HTTP/3 connection).
 
 ## Alternative designs considered
 
