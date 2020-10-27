@@ -422,7 +422,8 @@ To <dfn>initialize WebTransport over QUIC</dfn> for a given |transport| and
    While establishing the connection, follow all of the parameters
    specified in the {{WebTransport/constructor(url, options)/options}}.
 1. If the connection fails, set |transport|'s {{[[WebTransportState]]}}
-   internal slot to `"failed"` and abort these steps.
+   internal slot to `"failed"`, reject |transport|'s {{[[Ready]]}} with a
+   {{TypeError}} and abort these steps.
 1. Set |transport|'s {{[[WebTransportState]]}} internal slot to `"connected"`.
 1. Resolve |transport|'s {{[[Ready]]}} internal slot with {{undefined}}.
 
@@ -437,7 +438,8 @@ To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
 1. Establish an HTTP/3 WebTransport session to the address identified by
    |parsedURL| following the procedures in [[!WEB-TRANSPORT-HTTP3]].
 1. If the session establishment fails, set |transport|'s {{[[WebTransportState]]}}
-   internal slot to `"failed"` and abort these steps.
+   internal slot to `"failed"`, reject |transport|'s {{[[Ready]]}} with a
+   {{TypeError}} and abort these steps.
 1. Set |transport|'s {{[[WebTransportState]]}} internal slot to `"connected"`.
 1. Resolve |transport|'s {{[[Ready]]}} internal slot with {{undefined}}.
 
