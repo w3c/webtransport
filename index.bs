@@ -394,6 +394,9 @@ agent MUST run the following steps:
    <dfn attribute for="WebTransport">\[[WebTransportState]]</dfn> internal
    slot, initialized to `"connecting"`.
 1. Let |transport| have a
+   <dfn attribute for="WebTransport">\[[Ready]]</dfn> internal
+   slot, initialized to a promise.
+1. Let |transport| have a
    <dfn attribute for="WebTransport">\[[SentDatagrams]]</dfn> internal slot
    representing a {{WritableStream}} of {{Uint8Array}}s, initialized to empty.
 1. Let |transport| have a
@@ -421,6 +424,7 @@ To <dfn>initialize WebTransport over QUIC</dfn> for a given |transport| and
 1. If the connection fails, set |transport|'s {{[[WebTransportState]]}}
    internal slot to `"failed"` and abort these steps.
 1. Set |transport|'s {{[[WebTransportState]]}} internal slot to `"connected"`.
+1. Resolve |transport|'s {{[[Ready]]}} internal slot with {{undefined}}.
 
 </div>
 
@@ -435,6 +439,7 @@ To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
 1. If the session establishment fails, set |transport|'s {{[[WebTransportState]]}}
    internal slot to `"failed"` and abort these steps.
 1. Set |transport|'s {{[[WebTransportState]]}} internal slot to `"connected"`.
+1. Resolve |transport|'s {{[[Ready]]}} internal slot with {{undefined}}.
 
 </div>
 
@@ -443,6 +448,8 @@ To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
 : <dfn for="WebTransport" attribute>state</dfn>
 :: The current state of the transport. On getting, it MUST return the value of
    the {{[[WebTransportState]]}} internal slot.
+: <dfn for="WebTransport" attribute>ready</dfn>
+:: On getting, it MUST return the value of the {{[[Ready]]}} internal slot.
 : <dfn for="WebTransport" attribute>closed</dfn>
 :: This promise MUST be [=resolved=] when the transport is closed; an
    implementation SHOULD include error information in the `reason` and
