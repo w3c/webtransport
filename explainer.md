@@ -24,8 +24,8 @@ We think there is a room for a simple, client-server, unordered/unreliable API
 with minimal latency.  The WebTransport protocol provides this with a single
 transport object that abstracts away the specific underlying protocol with
 a flexibile set of possible capabilities including reliable
-unidirectional and bidirectional streams, and unreliable datagrams 
-(much like the capabilities of QUIC). 
+unidirectional and bidirectional streams, and unreliable datagrams
+(much like the capabilities of QUIC).
 
 ## Goals
 
@@ -36,7 +36,7 @@ for unreliable and unordered communication.
 including both reliable and unreliable, ordered and unordered, client-server and
 p2p, data and media.
 
-- Ensure the same security properties as WebSockets (use of TLS, 
+- Ensure the same security properties as WebSockets (use of TLS,
   server-controlled origin policy)
 
 ## Non-goals
@@ -58,13 +58,15 @@ encrypted and congestion-controlled communication.
 
 ## Proposed solutions
 
-1. A set of generic transport mixins that can be provided by any transport,
+1. A generic transport interface that can be provided by any transport,
    but match closely with QUIC's capabilities.
 
-2. A specific transport based on QUIC that implements all of the transport mixins.
+2. The transport interface can talk
+   [a QUIC based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-quic).
 
-3. A specific transport based on HTTP/3 that allows a subset of the transport
-   mixins able to be pooled with HTTP traffic (sharing a congestion control context).
+3. The transport interface can talk
+   [an HTTP/3 based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-http3)
+   that allows web developers to reuse HTTP/3 connections (sharing a congestion control context).
 
 ## Example of sending unreliable game state to server using QUIC datagrams
 
@@ -72,8 +74,8 @@ encrypted and congestion-controlled communication.
 // The app provides a way to get a serialized state to send to the server
 function getSerializedGameState() { ... }
 
-const transport = new QuicTransport('example.com', 10001);
-const datagramWriter = transport.sendDatagrams().getWriter();
+const transport = new WebTransport('quic-transport://example.com:10001/path');
+const datagramWriter = transport.datagramWritable.getWriter();
 setInterval(() => {
   const message = getSerializedGameState();
   datagramWriter.write(message);
@@ -86,10 +88,10 @@ setInterval(() => {
 // The app provides a way to get a serialized state to send to the server.
 function getSerializedGameState() { ... }
 
-const transport = new QuicTransport('example.com', 10001);
+const transport = new WebTransport('quic-transport://example.com:10001/path');
 setInterval(async () => {
   const message = getSerializedGameState();
-  const stream = await transport.createSendStream();
+  const stream = await transport.createUnidirectionalStream();
   const writer = stream.writable.getWriter();
   writer.write(message);
   writer.close();
@@ -102,7 +104,7 @@ setInterval(async () => {
 // The app provides a way to get a serialized media request to send to the server
 function getSerializedMediaRequest() { ... }
 
-const transport = new QuicTransport('example.com', 10001);
+const transport = new WebTransport('quic-transport://example.com:10001/path');
 
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve, {once: true}));
@@ -110,16 +112,17 @@ const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09
 
 // App-specific request
 const mediaRequest = getSerializedMediaRequest();
-const requestStream = await transport.createSendStream();
+const requestStream = await transport.createUnidirectionalStream();
 const requestWriter = requestStream.writable.getWriter();
 requestWriter.write(mediaRequest);
 requestWriter.close();
 
 // Receive the responses.
-for await (const responseStream of transport.receiveStreams()) {
-  const response = await responseStream.arrayBuffer();
-  sourceBuffer.appendBuffer(response);
-  await new Promise(resolve => sourceBuffer.addEventListener('update', () => resolve(), {once: true}));
+for await (const receiveStream of transport.incomingUnidirectionalStreams) {
+  for await (const buffer of receiveStream.readable) {
+    sourceBuffer.appendBuffer(buffer);
+  }
+  await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
 }
 ```
 
@@ -131,9 +134,13 @@ function deserializeNotification(serializedNotification) { ... }
 // The app also provides a way to serialize a "clicked" message to send to the server.
 function serializeClickedMessage(notification) { ... }
 
-const transport = new QuicTransport('example.com', 10001);
-for await (const stream of transport.receiveBidirectionalStreams()) {
-  const notification = new Notification(deserializeNofitication(await stream.arrayBuffer()));
+const transport = new WebTransport('quic-transport://example.com:10001/path');
+for await (const stream of transport.incomingBidirectionalStreams) {
+  const buffers = []
+  for await (const buffer of stream.readable) {
+    buffers.push(buffer)
+  }
+  const notification = new Notification(deserializeNotification(buffers));
   notification.addEventListener('onclick', () => {
     const clickMessage = encodeClickMessage(notification);
     const writer = stream.writable.getWriter();
@@ -147,13 +154,13 @@ for await (const stream of transport.receiveBidirectionalStreams()) {
 
 ```javascript
 const mediaSource = new MediaSource();
-await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
+await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve, {once: true}));
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
-const transport = new Http3Transport("/video");
-await fetch('http://example.com/babyshark');
-for await (const datagram of transport.receiveDatagrams()) {
+const transport = new WebTransport('/video');
+await fetch('https://example.com/babyshark');
+for await (const datagram of transport.datagramReadable) {
   sourceBuffer.appendBuffer(datagram);
-  await new Promise(resolve => sourceBuffer.addEventListener('update', () => resolve(), {once: true}));
+  await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
 }
 ```
 
@@ -163,18 +170,21 @@ for await (const datagram of transport.receiveDatagrams()) {
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
-const transport = new Http3Transport("https://example.com/video");
-for await (const stream of transport.receiveStreams()) {
-  sourceBuffer.appendBuffer(await stream.arrayBuffer());
-  await new Promise(resolve => sourceBuffer.addEventListener('update', () => resolve(), {once: true}));
+const transport = new WebTransport('https://example.com/video');
+for await (const receiveStream of transport.incomingUnidirectionalStreams) {
+  for await (const buffer of receiveStream.readable) {
+    sourceBuffer.appendBuffer(buffer);
+  }
+  await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
 }
 ```
 
 ## Detailed design discussion
 
-Any WebTransport can provide any of the following capabilities (mixins):
+WebTransport supports multiple protocols, each of which provide some of the
+following capabilities.
 
-- Unidirectional streams are indefintely long streams of bytes in one direction 
+- Unidirectional streams are indefinitely long streams of bytes in one direction
   with back pressure applied
   to the sender when either the receiver can't read quickly enough or when
   constrained by network capacity/congestions.  Useful for sending messages that
@@ -182,22 +192,24 @@ Any WebTransport can provide any of the following capabilities (mixins):
   sending many messages in a single stream. Out-of-order messaging can be achieved
   by sending one message per stream.
 
-- Bidirectional streams are like unidirectional streams, but in two directions.  
-  They are useful for sending messages that expect a response.
+- Bidirectional streams are full-duplex streams. A bidirectional stream is effectively
+  a pair of unidirectional streams.
 
-- Datagrams are small, out-of-order, unreliable messages.  They are useful for 
+- Datagrams are small, out-of-order, unreliable messages.  They are useful for
   sending messages with less API complexity
   and less network overhead than streams.
 
-A QuicTransport is a WebTransport that maps directly to QUIC streams and
-datagrams, which makes it easy to connect to servers that speak QUIC with
-minimum overhead.  It supports all of these capabilities.
+[QuicTransport](https://tools.ietf.org/html/draft-vvv-webtransport-quic)
+is a WebTransport protocol that maps directly to QUIC streams and datagrams,
+which makes it easy to connect to servers that speak QUIC with minimal overhead.
+It supports all of these capabilities.
 
-An Http3Transport is a WebTransport that provides QUIC streams and datagrams
-with slightly more overhead vs. a QuicTransport.  It has the advantage that HTTP
-and non-HTTP traffic can share the same network port and congestion control
-context, and it may be pooled with other transports such that the transport may
-be connected more quickly (by reusing an existing HTTP/3 connection).
+[Http3Transport](https://tools.ietf.org/html/draft-vvv-webtransport-http3) is a
+WebTransport protocol that provides QUIC streams and datagrams with slightly
+more overhead vs. a QuicTransport.  It has the advantage that HTTP and non-HTTP
+traffic can share the same network port and congestion control context, and it
+may be pooled with other transports such that the transport may be connected
+more quickly (by reusing an existing HTTP/3 connection).
 
 ## Alternative designs considered
 
@@ -212,7 +224,7 @@ application use a complex API (RTCPeerConnection) designed for a very different 
 HTTP/2 [RFC8441].  That would avoid head-of-line blocking and provide an
 ability to cancel a stream by closing the corresponding WebSocket object.
 However, this approach has a number of drawbacks, which all stem primarily from
-the fact that semantically each WebSocket is a completely independent entity: 
+the fact that semantically each WebSocket is a completely independent entity:
 
 1. Each new stream would require a WebSocket handshake to agree on application
   protocol used, meaning that it would take at least one RTT for each new
