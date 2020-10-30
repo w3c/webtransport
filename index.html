@@ -1224,7 +1224,7 @@ Possible extra rowspan handling
   <link href="https://www.w3.org/StyleSheets/TR/2016/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version b43aa594f5014ff14748da1aace9afaa73d2b3e6" name="generator">
   <link href="https://wicg.github.io/web-transport/" rel="canonical">
-  <meta content="f6b67b383913ce07ac1ec5884b6d6c4d9f04b116" name="document-revision">
+  <meta content="68c08da26ef80147d6c96d7ca2eed5eabe49d380" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1482,7 +1482,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-10-28">28 October 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-10-30">30 October 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1887,6 +1887,7 @@ mixins (<code class="idl"><a data-link-type="idl" href="#unidirectionalstreamstr
 
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-webtransportstats" id="ref-for-dictdef-webtransportstats"><c- n>WebTransportStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransport-getstats" id="ref-for-dom-webtransport-getstats"><c- g>getStats</c-></a>();
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#enumdef-webtransportstate" id="ref-for-enumdef-webtransportstate"><c- n>WebTransportState</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportState" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state⑤"><c- g>state</c-></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name"><c- n>undefined</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<undefined>" href="#dom-webtransport-ready" id="ref-for-dom-webtransport-ready"><c- g>ready</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo"><c- n>WebTransportCloseInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<WebTransportCloseInfo>" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed"><c- g>closed</c-></a>;
   <a class="n" data-link-type="idl-name"><c- n>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-webtransport-close" id="ref-for-dom-webtransport-close"><c- g>close</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo①"><c- n>WebTransportCloseInfo</c-></a> <dfn class="idl-code" data-dfn-for="WebTransport/close(closeInfo), WebTransport/close()" data-dfn-type="argument" data-export id="dom-webtransport-close-closeinfo-closeinfo"><code><c- g>closeInfo</c-></code><a class="self-link" href="#dom-webtransport-close-closeinfo-closeinfo"></a></dfn> = {});
   <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler" id="ref-for-eventhandler①"><c- n>EventHandler</c-></a> <a class="idl-code" data-link-type="attribute" data-type="EventHandler" href="#dom-webtransport-onstatechange" id="ref-for-dom-webtransport-onstatechange"><c- g>onstatechange</c-></a>;
@@ -1923,6 +1924,9 @@ agent MUST run the following steps:</p>
      <p>Let <var>transport</var> have a <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-webtransportstate-slot"><code>[[WebTransportState]]</code></dfn> internal
  slot, initialized to <code>"connecting"</code>.</p>
     <li data-md>
+     <p>Let <var>transport</var> have a <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-ready-slot"><code>[[Ready]]</code></dfn> internal
+ slot, initialized to a promise.</p>
+    <li data-md>
      <p>Let <var>transport</var> have a <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-sentdatagrams-slot"><code>[[SentDatagrams]]</code></dfn> internal slot
  representing a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#ws-class" id="ref-for-ws-class④">WritableStream</a></code> of <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-Uint8Array" id="ref-for-idl-Uint8Array">Uint8Array</a></code>s, initialized to empty.</p>
     <li data-md>
@@ -1946,9 +1950,11 @@ agent MUST run the following steps:</p>
  While establishing the connection, follow all of the parameters
  specified in the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-constructor-url-options-options" id="ref-for-dom-webtransport-constructor-url-options-options">options</a></code>.</p>
      <li data-md>
-      <p>If the connection fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these steps.</p>
+      <p>If the connection fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code>, reject <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot">[[Ready]]</a></code> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror">TypeError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot①">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code>.</p>
+     <li data-md>
+      <p>Resolve <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot①">[[Ready]]</a></code> internal slot with <code class="idl"><a data-link-type="idl">undefined</a></code>.</p>
     </ol>
    </div>
    <div class="algorithm" data-algorithm="initialize WebTransport over HTTP">
@@ -1960,9 +1966,11 @@ agent MUST run the following steps:</p>
      <li data-md>
       <p>Establish an HTTP/3 WebTransport session to the address identified by <var>parsedURL</var> following the procedures in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
-      <p>If the session establishment fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot②">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code> and abort these steps.</p>
+      <p>If the session establishment fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot②">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code>, reject <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot②">[[Ready]]</a></code> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror①">TypeError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot③">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code>.</p>
+     <li data-md>
+      <p>Resolve <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot③">[[Ready]]</a></code> internal slot with <code class="idl"><a data-link-type="idl">undefined</a></code>.</p>
     </ol>
    </div>
    <h3 class="heading settled" data-level="7.2" id="webtransport-attributes"><span class="secno">7.2. </span><span class="content">Attributes</span><a class="self-link" href="#webtransport-attributes"></a></h3>
@@ -1971,6 +1979,9 @@ agent MUST run the following steps:</p>
     <dd data-md>
      <p>The current state of the transport. On getting, it MUST return the value of
  the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot④">[[WebTransportState]]</a></code> internal slot.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-ready"><code>ready</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name">undefined</a>>, readonly</span>
+    <dd data-md>
+     <p>On getting, it MUST return the value of the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot④">[[Ready]]</a></code> internal slot.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-closed"><code>closed</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo②">WebTransportCloseInfo</a>>, readonly</span>
     <dd data-md>
      <p>This promise MUST be <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑥">resolved</a> when the transport is closed; an
@@ -2698,6 +2709,8 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-incomingstream-readable-slot">[[Readable]]</a><span>, in §9.1</span>
    <li><a href="#dom-incomingstream-readable">readable</a><span>, in §9.2</span>
    <li><a href="#dom-incomingstream-readingaborted">readingAborted</a><span>, in §9.2</span>
+   <li><a href="#dom-webtransport-ready">ready</a><span>, in §7.2</span>
+   <li><a href="#dom-webtransport-ready-slot">[[Ready]]</a><span>, in §7.1</span>
    <li><a href="#dom-webtransportcloseinfo-reason">reason</a><span>, in §7.6</span>
    <li><a href="#dom-webtransport-receivedbidirectionalstreams-slot">[[ReceivedBidirectionalStreams]]</a><span>, in §7.1</span>
    <li><a href="#dom-webtransport-receiveddatagrams-slot">[[ReceivedDatagrams]]</a><span>, in §7.1</span>
@@ -2932,6 +2945,12 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-syntaxerror">7.1. Constructor</a> <a href="#ref-for-syntaxerror①">(2)</a> <a href="#ref-for-syntaxerror②">(3)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-exceptiondef-typeerror">
+   <a href="https://heycam.github.io/webidl/#exceptiondef-typeerror">https://heycam.github.io/webidl/#exceptiondef-typeerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-exceptiondef-typeerror">7.1. Constructor</a> <a href="#ref-for-exceptiondef-typeerror①">(2)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-idl-USVString">
    <a href="https://heycam.github.io/webidl/#idl-USVString">https://heycam.github.io/webidl/#idl-USVString</a><b>Referenced in:</b>
    <ul>
@@ -3082,6 +3101,7 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="term-for-invalidstateerror" style="color:initial">InvalidStateError</span>
      <li><span class="dfn-paneled" id="term-for-notsupportederror" style="color:initial">NotSupportedError</span>
      <li><span class="dfn-paneled" id="term-for-syntaxerror" style="color:initial">SyntaxError</span>
+     <li><span class="dfn-paneled" id="term-for-exceptiondef-typeerror" style="color:initial">TypeError</span>
      <li><span class="dfn-paneled" id="term-for-idl-USVString" style="color:initial">USVString</span>
      <li><span class="dfn-paneled" id="term-for-idl-Uint8Array" style="color:initial">Uint8Array</span>
      <li><span class="dfn-paneled" id="term-for-dfn-create-exception" style="color:initial">created</span>
@@ -3176,6 +3196,7 @@ and has been adapted for use in this specification.</p>
 
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-webtransportstats" id="ref-for-dictdef-webtransportstats③"><c- n>WebTransportStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransport-getstats" id="ref-for-dom-webtransport-getstats①"><c- g>getStats</c-></a>();
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#enumdef-webtransportstate" id="ref-for-enumdef-webtransportstate③"><c- n>WebTransportState</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportState" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state⑤①"><c- g>state</c-></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name"><c- n>undefined</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<undefined>" href="#dom-webtransport-ready" id="ref-for-dom-webtransport-ready①"><c- g>ready</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo⑤"><c- n>WebTransportCloseInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<WebTransportCloseInfo>" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed①"><c- g>closed</c-></a>;
   <a class="n" data-link-type="idl-name"><c- n>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-webtransport-close" id="ref-for-dom-webtransport-close③"><c- g>close</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo①①"><c- n>WebTransportCloseInfo</c-></a> <a href="#dom-webtransport-close-closeinfo-closeinfo"><code><c- g>closeInfo</c-></code></a> = {});
   <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler" id="ref-for-eventhandler①①"><c- n>EventHandler</c-></a> <a class="idl-code" data-link-type="attribute" data-type="EventHandler" href="#dom-webtransport-onstatechange" id="ref-for-dom-webtransport-onstatechange①"><c- g>onstatechange</c-></a>;
@@ -3420,6 +3441,13 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
     <li><a href="#ref-for-dom-webtransport-webtransportstate-slot⑧">7.5. WebTransportState Enum</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot⑨">(2)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="dom-webtransport-ready-slot">
+   <b><a href="#dom-webtransport-ready-slot">#dom-webtransport-ready-slot</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-webtransport-ready-slot">7.1. Constructor</a> <a href="#ref-for-dom-webtransport-ready-slot①">(2)</a> <a href="#ref-for-dom-webtransport-ready-slot②">(3)</a> <a href="#ref-for-dom-webtransport-ready-slot③">(4)</a>
+    <li><a href="#ref-for-dom-webtransport-ready-slot④">7.2. Attributes</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-sentdatagrams-slot">
    <b><a href="#dom-webtransport-sentdatagrams-slot">#dom-webtransport-sentdatagrams-slot</a></b><b>Referenced in:</b>
    <ul>
@@ -3450,6 +3478,12 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
     <li><a href="#ref-for-dom-webtransport-state">4.1. Methods</a> <a href="#ref-for-dom-webtransport-state①">(2)</a>
     <li><a href="#ref-for-dom-webtransport-state②">5.1. Methods</a> <a href="#ref-for-dom-webtransport-state③">(2)</a> <a href="#ref-for-dom-webtransport-state④">(3)</a>
     <li><a href="#ref-for-dom-webtransport-state⑤">7. WebTransport Interface</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-webtransport-ready">
+   <b><a href="#dom-webtransport-ready">#dom-webtransport-ready</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-webtransport-ready">7. WebTransport Interface</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-closed">
