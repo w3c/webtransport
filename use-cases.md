@@ -34,3 +34,17 @@ Ordinality of listing does not imply priority.
     1. Social feeds - Twitter etc, Financial tickers
     1. Messaging platforms, including Enterprise messaging infrastructure
 
+The purpose of defining these use-cases is to extract requirements to drive and constrain the API design. These requirements are listed in the table below:
+
+> Note to editors: these requirements need to be verified and completed by persons familiar with the various fields listed above. 
+
+| Requirement  | Description |
+| ------------- | ------------- |
+| R01  | Deliver ordered and reliable data (streams) |
+| R02  | Deliver unordered and unreliable data (datagrams) with minimal latency |
+| R03  | Deliver unordered but reliable data (use new stream for each data object?) |
+| R04  | Deliver ordered and unreliable data (cancelable streams) |
+| R05  | Performant integration with existing media components such as MSE/EME.  |
+| R06  | Let web applications be able to handle large amounts of data without visible user-experience degredation.  |
+
+
