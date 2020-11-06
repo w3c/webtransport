@@ -1001,6 +1001,9 @@ the server, and sending and receiving datagrams.
 <pre class="example" highlight="js">
 // Adds an entry to the event log on the page, optionally applying a specified
 // CSS class.
+
+var currentTransport, streamNumber, currentTransportDatagramWriter;
+
 function addToEventLog(text, severity = 'info') {
   let log = document.getElementById('event-log');
   let mostRecentEntry = log.lastElementChild;
@@ -1020,7 +1023,7 @@ function addToEventLog(text, severity = 'info') {
 
 // "Connect" button handler.
 async function connect() {
-  let url = document.getElementById('url').value;
+  const url = document.getElementById('url').value;
   try {
     var transport = new WebTransport(url);
     addToEventLog('Initiating connection...');
@@ -1045,15 +1048,9 @@ async function connect() {
         addToEventLog('Connection closed abruptly.', 'error');
       });
 
-  globalThis.currentTransport = transport;
-  globalThis.streamNumber = 1;
-  try {
-    globalThis.currentTransportDatagramWriter = transport.datagramWritable.getWriter();
-    addToEventLog('Datagram writer ready.');
-  } catch (e) {
-    addToEventLog('Datagram writer failed. ' + e, 'error');
-    return;
-  }
+  currentTransport = transport;
+  currentTransportDatagramWriter = transport.datagramWritable.getWriter();
+  streamNumber = 1;
   readDatagrams(transport);
   acceptUnidirectionalStreams(transport);
   document.forms.sending.elements.send.disabled = false;
@@ -1066,11 +1063,11 @@ async function sendData() {
   let encoder = new TextEncoder('utf-8');
   let rawData = sending.data.value;
   let data = encoder.encode(rawData);
-  let transport = globalThis.currentTransport;
+  let transport = currentTransport;
   try {
     switch (form.sendtype.value) {
       case 'datagram':
-        await globalThis.currentTransportDatagramWriter.write(data);
+        await currentTransportDatagramWriter.write(data);
         addToEventLog('Sent datagram: ' + rawData);
         break;
       case 'unidi': {
@@ -1083,7 +1080,7 @@ async function sendData() {
       }
       case 'bidi': {
         let stream = await transport.createBidirectionalStream();
-        let number = globalThis.streamNumber++;
+        let number = streamNumber++;
         readFromIncomingStream(stream, number);
 
         let writer = stream.writable.getWriter();
@@ -1128,7 +1125,7 @@ async function acceptUnidirectionalStreams(transport) {
         return;
       }
       let stream = result.value;
-      let number = globalThis.streamNumber++;
+      let number = streamNumber++;
       addToEventLog('New incoming unidirectional stream #' + number);
       readFromIncomingStream(stream, number);
     }
