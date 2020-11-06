@@ -1103,12 +1103,12 @@ async function readDatagrams(transport) {
   let decoder = new TextDecoder('utf-8');
   try {
     while (true) {
-      let result = await reader.read();
-      if (result.done) {
+      const { value, done } = await reader.read();
+      if (done) {
         addToEventLog('Done reading datagrams!');
         return;
       }
-      let data = decoder.decode(result.value);
+      let data = decoder.decode(value);
       addToEventLog('Datagram received: ' + data);
     }
   } catch (e) {
@@ -1120,12 +1120,12 @@ async function acceptUnidirectionalStreams(transport) {
   let reader = transport.incomingUnidirectionalStreams.getReader();
   try {
     while (true) {
-      let result = await reader.read();
-      if (result.done) {
+      const { value, done } = await reader.read();
+      if (done) {
         addToEventLog('Done accepting unidirectional streams!');
         return;
       }
-      let stream = result.value;
+      let stream = value;
       let number = streamNumber++;
       addToEventLog('New incoming unidirectional stream #' + number);
       readFromIncomingStream(stream, number);
@@ -1140,12 +1140,12 @@ async function readFromIncomingStream(stream, number) {
   let reader = stream.readable.pipeThrough(decoder).getReader();
   try {
     while (true) {
-      let result = await reader.read();
-      if (result.done) {
+      const { value, done } = await reader.read();
+      if (done) {
         addToEventLog('Stream #' + number + ' closed');
         return;
       }
-      let data = result.value;
+      let data = value;
       addToEventLog('Received data on stream #' + number + ': ' + data);
     }
   } catch (e) {
