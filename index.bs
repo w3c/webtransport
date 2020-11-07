@@ -1004,23 +1004,6 @@ the server, and sending and receiving datagrams.
 
 let currentTransport, streamNumber, currentTransportDatagramWriter;
 
-function addToEventLog(text, severity = 'info') {
-  let log = document.getElementById('event-log');
-  let mostRecentEntry = log.lastElementChild;
-  let entry = document.createElement('li');
-  entry.innerText = text;
-  entry.className = 'log-' + severity;
-  log.appendChild(entry);
-
-  // If the most recent entry in the log was visible, scroll the log to the
-  // newly added element.
-  if (mostRecentEntry != null &&
-      mostRecentEntry.getBoundingClientRect().top <
-          log.getBoundingClientRect().bottom) {
-    entry.scrollIntoView();
-  }
-}
-
 // "Connect" button handler.
 async function connect() {
   const url = document.getElementById('url').value;
@@ -1152,6 +1135,23 @@ async function readFromIncomingStream(stream, number) {
     addToEventLog(
         'Error while reading from stream #' + number + ': ' + e, 'error');
     addToEventLog('    ' + e.message);
+  }
+}
+
+function addToEventLog(text, severity = 'info') {
+  let log = document.getElementById('event-log');
+  let mostRecentEntry = log.lastElementChild;
+  let entry = document.createElement('li');
+  entry.innerText = text;
+  entry.className = 'log-' + severity;
+  log.appendChild(entry);
+
+  // If the most recent entry in the log was visible, scroll the log to the
+  // newly added element.
+  if (mostRecentEntry != null &&
+      mostRecentEntry.getBoundingClientRect().top <
+          log.getBoundingClientRect().bottom) {
+    entry.scrollIntoView();
   }
 }
 </pre>
