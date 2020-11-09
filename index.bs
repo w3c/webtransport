@@ -1032,8 +1032,14 @@ async function connect() {
       });
 
   currentTransport = transport;
-  currentTransportDatagramWriter = transport.datagramWritable.getWriter();
   streamNumber = 1;
+  try {
+    currentTransportDatagramWriter = transport.datagramWritable.getWriter();
+    addToEventLog('Datagram writer ready.');
+  } catch (e) {
+    addToEventLog('Sending datagrams not supported: ' + e, 'error');
+    return;
+  }
   readDatagrams(transport);
   acceptUnidirectionalStreams(transport);
   document.forms.sending.elements.send.disabled = false;
@@ -1082,7 +1088,13 @@ async function sendData() {
 
 // Reads datagrams from |transport| into the event log until EOF is reached.
 async function readDatagrams(transport) {
-  let reader = transport.datagramReadable.getReader();
+  try {
+    let reader = transport.datagramReadable.getReader();
+    addToEventLog('Datagram reader ready.');
+  } catch (e) {
+    addToEventLog('Receiving datagrams not supported: ' + e, 'error');
+    return;
+  }  
   let decoder = new TextDecoder('utf-8');
   try {
     while (true) {
