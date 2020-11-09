@@ -1089,12 +1089,12 @@ async function sendData() {
 // Reads datagrams from |transport| into the event log until EOF is reached.
 async function readDatagrams(transport) {
   try {
-    let reader = transport.datagramReadable.getReader();
+    var reader = transport.datagramReadable.getReader();
     addToEventLog('Datagram reader ready.');
   } catch (e) {
     addToEventLog('Receiving datagrams not supported: ' + e, 'error');
     return;
-  }  
+  }
   let decoder = new TextDecoder('utf-8');
   try {
     while (true) {
