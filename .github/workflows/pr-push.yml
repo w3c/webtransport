@@ -1,0 +1,16 @@
+# .github/workflows/pr-push.yml
+name: CI
+on:
+  pull_request: {}
+  push:
+    branches: [master]
+jobs:
+  main:
+    name: Build, Validate and Deploy Locally
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: w3c/spec-prod@v1
+        with:
+          GH_PAGES_BRANCH: gh-pages
+          TOOLCHAIN: bikeshed
