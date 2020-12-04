@@ -6,8 +6,9 @@
   <meta content="w3c/ED" name="w3c-status">
   <link href="https://www.w3.org/StyleSheets/TR/2016/W3C-ED" rel="stylesheet">
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
-  <meta content="Bikeshed version 89ebb6ab, updated Fri Oct 9 15:32:07 2020 -0700" name="generator">
+  <meta content="Bikeshed version c5172e83, updated Fri Nov 20 15:35:20 2020 -0800" name="generator">
   <link href="https://github.com/w3c/webtransport" rel="canonical">
+  <meta content="5d38622036a9932dfc98d4348a0bf3218e835299" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -78,6 +79,8 @@ pre .property::before, pre .property::after {
 
     --text: black;
     --bg: white;
+
+    --unofficial-watermark: url(https://www.w3.org/StyleSheets/TR/2016/logos/UD-watermark);
 
     --logo-bg: #1a5e9a;
     --logo-active-bg: #c00;
@@ -390,6 +393,8 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
         --text: #ddd;
         --bg: black;
 
+        --unofficial-watermark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cg fill='%23100808' transform='translate(200 200) rotate(-45) translate(-200 -200)' stroke='%23100808' stroke-width='3'%3E%3Ctext x='50%25' y='220' style='font: bold 70px sans-serif; text-anchor: middle; letter-spacing: 6px;'%3EUNOFFICIAL%3C/text%3E%3Ctext x='50%25' y='305' style='font: bold 70px sans-serif; text-anchor: middle; letter-spacing: 6px;'%3EDRAFT%3C/text%3E%3C/g%3E%3C/svg%3E");
+
         --logo-bg: #1a5e9a;
         --logo-active-bg: #c00;
         --logo-text: white;
@@ -575,7 +580,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2020-11-11">11 November 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2020-12-04">4 December 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -619,9 +624,9 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     <li>
      <a href="#unidirectional-streams-transport"><span class="secno">4</span> <span class="content"><code>UnidirectionalStreamsTransport</code> Mixin</span></a>
      <ol class="toc">
-      <li><a href="##unidirectional-streams-transport-methods"><span class="secno">4.1</span> <span class="content">Methods</span></a>
+      <li><a href="#unidirectional-streams-transport-methods"><span class="secno">4.1</span> <span class="content">Methods</span></a>
       <li>
-       <a href="##unidirectional-streams-transport-procedures"><span class="secno">4.2</span> <span class="content">Procedures</span></a>
+       <a href="#unidirectional-streams-transport-procedures"><span class="secno">4.2</span> <span class="content">Procedures</span></a>
        <ol class="toc">
         <li><a href="#add-sendstream"><span class="secno">4.2.1</span> <span class="content">Add SendStream to UnidirectionalStreamsTransport</span></a>
        </ol>
@@ -630,9 +635,9 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     <li>
      <a href="#bidirectional-streams-transport"><span class="secno">5</span> <span class="content"><code>BidirectionalStreamsTransport</code> Mixin</span></a>
      <ol class="toc">
-      <li><a href="##bidirectional-streams-transport-methods"><span class="secno">5.1</span> <span class="content">Methods</span></a>
+      <li><a href="#bidirectional-streams-transport-methods"><span class="secno">5.1</span> <span class="content">Methods</span></a>
       <li>
-       <a href="##bidirectional-streams-transport-procedures"><span class="secno">5.2</span> <span class="content">Procedures</span></a>
+       <a href="#bidirectional-streams-transport-procedures"><span class="secno">5.2</span> <span class="content">Procedures</span></a>
        <ol class="toc">
         <li><a href="#add-bidirectionalstream"><span class="secno">5.2.1</span> <span class="content">Add BidirectionalStream to BidirectionalStreamsTransport</span></a>
        </ol>
@@ -755,7 +760,7 @@ unreliability.  All stream data is encrypted and congestion-controlled.</p>
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams" id="ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams"><c- g>incomingUnidirectionalStreams</c-></a>;
 };
 </pre>
-   <h3 class="heading settled" data-level="4.1" id="#unidirectional-streams-transport-methods"><span class="secno">4.1. </span><span class="content">Methods</span><a class="self-link" href="#%23unidirectional-streams-transport-methods"></a></h3>
+   <h3 class="heading settled" data-level="4.1" id="unidirectional-streams-transport-methods"><span class="secno">4.1. </span><span class="content">Methods</span><a class="self-link" href="#unidirectional-streams-transport-methods"></a></h3>
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="UnidirectionalStreamsTransport" data-dfn-type="method" data-export data-lt="createUnidirectionalStream(parameters)|createUnidirectionalStream()" id="dom-unidirectionalstreamstransport-createunidirectionalstream"><code>createUnidirectionalStream()</code></dfn>
     <dd data-md>
@@ -814,7 +819,7 @@ unreliability.  All stream data is encrypted and congestion-controlled.</p>
   aborts the stream, close or abort the corresponding <code>ReceiveStream</code>.</p>
      </ol>
    </dl>
-   <h3 class="heading settled" data-level="4.2" id="#unidirectional-streams-transport-procedures"><span class="secno">4.2. </span><span class="content">Procedures</span><a class="self-link" href="#%23unidirectional-streams-transport-procedures"></a></h3>
+   <h3 class="heading settled" data-level="4.2" id="unidirectional-streams-transport-procedures"><span class="secno">4.2. </span><span class="content">Procedures</span><a class="self-link" href="#unidirectional-streams-transport-procedures"></a></h3>
    <h4 class="heading settled" data-level="4.2.1" id="add-sendstream"><span class="secno">4.2.1. </span><span class="content">Add SendStream to UnidirectionalStreamsTransport</span><a class="self-link" href="#add-sendstream"></a></h4>
    <div class="algorithm" data-algorithm="add the SendStream">
     <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="add-the-sendstream">add the SendStream</dfn> to a <code class="idl"><a data-link-type="idl" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport①">UnidirectionalStreamsTransport</a></code>, run
@@ -850,7 +855,7 @@ All stream data is encrypted and congestion-controlled.</p>
     <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream④"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-bidirectionalstreamstransport-incomingbidirectionalstreams" id="ref-for-dom-bidirectionalstreamstransport-incomingbidirectionalstreams"><c- g>incomingBidirectionalStreams</c-></a>;
 };
 </pre>
-   <h3 class="heading settled" data-level="5.1" id="#bidirectional-streams-transport-methods"><span class="secno">5.1. </span><span class="content">Methods</span><a class="self-link" href="#%23bidirectional-streams-transport-methods"></a></h3>
+   <h3 class="heading settled" data-level="5.1" id="bidirectional-streams-transport-methods"><span class="secno">5.1. </span><span class="content">Methods</span><a class="self-link" href="#bidirectional-streams-transport-methods"></a></h3>
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="BidirectionalStreamsTransport" data-dfn-type="method" data-export id="dom-bidirectionalstreamstransport-createbidirectionalstream"><code>createBidirectionalStream()</code></dfn>
     <dd data-md>
@@ -911,7 +916,7 @@ All stream data is encrypted and congestion-controlled.</p>
   the stream, close or abort the corresponding <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream⑦">BidirectionalStream</a></code>.</p>
      </ol>
    </dl>
-   <h3 class="heading settled" data-level="5.2" id="#bidirectional-streams-transport-procedures"><span class="secno">5.2. </span><span class="content">Procedures</span><a class="self-link" href="#%23bidirectional-streams-transport-procedures"></a></h3>
+   <h3 class="heading settled" data-level="5.2" id="bidirectional-streams-transport-procedures"><span class="secno">5.2. </span><span class="content">Procedures</span><a class="self-link" href="#bidirectional-streams-transport-procedures"></a></h3>
    <h4 class="heading settled" data-level="5.2.1" id="add-bidirectionalstream"><span class="secno">5.2.1. </span><span class="content">Add BidirectionalStream to BidirectionalStreamsTransport</span><a class="self-link" href="#add-bidirectionalstream"></a></h4>
    <div class="algorithm" data-algorithm="add the BidirectionalStream">
     <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="add-the-bidirectionalstream">add the BidirectionalStream</dfn> to a <code class="idl"><a data-link-type="idl" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport②">BidirectionalStreamsTransport</a></code>, run the following steps:</p>
