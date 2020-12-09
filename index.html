@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version c5172e83, updated Fri Nov 20 15:35:20 2020 -0800" name="generator">
   <link href="https://github.com/w3c/webtransport" rel="canonical">
-  <meta content="5d38622036a9932dfc98d4348a0bf3218e835299" name="document-revision">
+  <meta content="b8d1a94b3df6ed9949750172f031158fd32a7444" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -580,7 +580,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2020-12-04">4 December 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2020-12-09">9 December 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1411,7 +1411,6 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑥"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable"><c- g>readable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise" id="ref-for-idl-promise⑥"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑤"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-incomingstream-readingaborted" id="ref-for-dom-incomingstream-readingaborted"><c- g>readingAborted</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined⑥"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-abortreading" id="ref-for-dom-incomingstream-abortreading"><c- g>abortReading</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑥"><c- n>StreamAbortInfo</c-></a> <dfn class="idl-code" data-dfn-for="IncomingStream/abortReading(abortInfo), IncomingStream/abortReading()" data-dfn-type="argument" data-export id="dom-incomingstream-abortreading-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code><a class="self-link" href="#dom-incomingstream-abortreading-abortinfo-abortinfo"></a></dfn> = {});
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise" id="ref-for-idl-promise⑦"><c- b>Promise</c-></a>&lt;<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-ArrayBuffer" id="ref-for-idl-ArrayBuffer"><c- b>ArrayBuffer</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-arraybuffer" id="ref-for-dom-incomingstream-arraybuffer"><c- g>arrayBuffer</c-></a>();
 };
 </pre>
    <h3 class="heading settled" data-level="9.1" id="incoming-stream-overview"><span class="secno">9.1. </span><span class="content">Overview</span><a class="self-link" href="#incoming-stream-overview"></a></h3>
@@ -1470,12 +1469,6 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
   STOP_SENDING frame) with its error code set to the value of
   |abortInfo.errorCode|.</p>
      </ol>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="IncomingStream" data-dfn-type="method" data-export id="dom-incomingstream-arraybuffer"><code>arrayBuffer()</code></dfn>
-    <dd data-md>
-     <p>A convenience method that asynchronously reads all the contents of
- |IncomingStream.readable| and returns it as an ArrayBuffer.  This locks the
- stream while reading, just as if |IncomingStream.readable.getReader()| were
- used.</p>
    </dl>
    <h2 class="heading settled" data-level="10" id="bidirectional-stream"><span class="secno">10. </span><span class="content">Interface <code>BidirectionalStream</code></span><a class="self-link" href="#bidirectional-stream"></a></h2>
 <pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
@@ -1801,7 +1794,6 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-outgoingstream-abortwriting">abortWriting(abortInfo)</a><span>, in §8.3</span>
    <li><a href="#add-the-bidirectionalstream">add the BidirectionalStream</a><span>, in §5.2.1</span>
    <li><a href="#add-the-sendstream">add the SendStream</a><span>, in §4.2.1</span>
-   <li><a href="#dom-incomingstream-arraybuffer">arrayBuffer()</a><span>, in §9.3</span>
    <li><a href="#bidirectionalstream">BidirectionalStream</a><span>, in §10</span>
    <li><a href="#bidirectionalstreamstransport">BidirectionalStreamsTransport</a><span>, in §5</span>
    <li><a href="#dom-webtransportstats-bytesreceived">bytesReceived</a><span>, in §7.7</span>
@@ -2041,12 +2033,6 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-concept-url">7.1. Constructor</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-ArrayBuffer">
-   <a href="https://heycam.github.io/webidl/#idl-ArrayBuffer">https://heycam.github.io/webidl/#idl-ArrayBuffer</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-idl-ArrayBuffer">9. Interface Mixin IncomingStream</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-idl-DOMString">
    <a href="https://heycam.github.io/webidl/#idl-DOMString">https://heycam.github.io/webidl/#idl-DOMString</a><b>Referenced in:</b>
    <ul>
@@ -2086,7 +2072,7 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-idl-promise①">5. BidirectionalStreamsTransport Mixin</a>
     <li><a href="#ref-for-idl-promise②">7. WebTransport Interface</a> <a href="#ref-for-idl-promise③">(2)</a> <a href="#ref-for-idl-promise④">(3)</a>
     <li><a href="#ref-for-idl-promise⑤">8. Interface Mixin OutgoingStream</a>
-    <li><a href="#ref-for-idl-promise⑥">9. Interface Mixin IncomingStream</a> <a href="#ref-for-idl-promise⑦">(2)</a>
+    <li><a href="#ref-for-idl-promise⑥">9. Interface Mixin IncomingStream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-syntaxerror">
@@ -2261,7 +2247,6 @@ and has been adapted for use in this specification.</p>
    <li>
     <a data-link-type="biblio">[WEBIDL]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-idl-ArrayBuffer">ArrayBuffer</span>
      <li><span class="dfn-paneled" id="term-for-idl-DOMString">DOMString</span>
      <li><span class="dfn-paneled" id="term-for-Exposed">Exposed</span>
      <li><span class="dfn-paneled" id="term-for-invalidstateerror">InvalidStateError</span>
@@ -2422,7 +2407,6 @@ and has been adapted for use in this specification.</p>
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-incomingstream-readable"><c- g>readable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-incomingstream-readingaborted"><c- g>readingAborted</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-undefined"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-abortreading"><c- g>abortReading</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-streamabortinfo"><c- n>StreamAbortInfo</c-></a> <a href="#dom-incomingstream-abortreading-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code></a> = {});
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise"><c- b>Promise</c-></a>&lt;<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-ArrayBuffer"><c- b>ArrayBuffer</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-arraybuffer"><c- g>arrayBuffer</c-></a>();
 };
 
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
@@ -2926,12 +2910,6 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <b><a href="#dom-incomingstream-abortreading">#dom-incomingstream-abortreading</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-incomingstream-abortreading">9. Interface Mixin IncomingStream</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="dom-incomingstream-arraybuffer">
-   <b><a href="#dom-incomingstream-arraybuffer">#dom-incomingstream-arraybuffer</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-incomingstream-arraybuffer">9. Interface Mixin IncomingStream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bidirectionalstream">
