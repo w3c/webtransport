@@ -363,6 +363,7 @@ interface WebTransport {
   readonly attribute WebTransportState state;
   readonly attribute Promise&lt;undefined&gt; ready;
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
+  undefined setDatagramWritableQueueExpirationDuration (long duration);
   undefined close(optional WebTransportCloseInfo closeInfo = {});
   attribute EventHandler onstatechange;
 };
@@ -467,6 +468,9 @@ To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
 
 ## Methods ##  {#webtransport-methods}
 
+: <dfn for "WebTransport" method>setDatagramWritableQueueExpirationDuration(long duration)</dfn>
+:: Sets the expiration of the DatagramWritable queue, in milliseconds.
+
 : <dfn for="WebTransport" method>close()</dfn>
 :: Closes the WebTransport object. For QUIC, this triggers an <dfn>Immediate
    Close</dfn> as described in [[!QUIC-TRANSPORT]] section 10.3.
@@ -501,6 +505,7 @@ To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
 <pre class="idl">
 dictionary WebTransportOptions {
   sequence&lt;RTCDtlsFingerprint&gt; serverCertificateFingerprints;
+  long datagramWritableHighWaterMark;
 };
 </pre>
 
@@ -520,6 +525,10 @@ that determine how WebTransport connection is established and used.
    or has a malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent
    SHALL use certificate verification procedures it would use for normal
    [=fetch=] operations.
+   
+: <dfn for="WebTransportOptions" dict-member>datagramWritableHighWaterMark</dfn>
+:: This controls the high water mark for the datagramWritable stream, as defined
+   in (https://streams.spec.whatwg.org/#high-water-mark).
 
 <div algorithm="compute a certificate fingerprint">
 To <dfn>compute a certificate fingerprint</dfn>, do the following:
