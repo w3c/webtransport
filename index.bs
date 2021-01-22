@@ -930,11 +930,12 @@ attribute.
 
 <pre class="example" highlight="js">
 // Sends datagrams every 100 ms.
-async function sendFixedRate(url, createDatagrams, ms = 100) {
+async function sendFixedRate(url, createDatagram, ms = 100) {
   const transport = new WebTransport(url);
   await transport.ready;
   const writer = transport.datagramWritable.getWriter();
-  setInterval(() => writer.write(createDatagrams()).catch(() => {}), ms);
+  const datagram = createDatagram();
+  setInterval(() => writer.write(datagram).catch(() => {}), ms);
 }
 </pre>
 
