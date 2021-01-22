@@ -1014,22 +1014,21 @@ async function receiveData(url, processTheData) {
 </pre>
 
 Decoding can also be done through pipes to new WritableStreams, for example using
-{{TextDecoderStream}}.
+{{TextDecoderStream}}. This example assumes text output should not be
+interleaved, and therefore only reads one stream at a time.
 
 <pre class="example" highlight="js">
 async function receiveText(url, createWritableStreamForTextData) {
   const transport = new WebTransport(url);
   for await (const stream of transport.incomingUnidirectionalStreams) {
-    // consume streams individually, reporting per-stream errors
-    (async () => {
-      try {
-        await stream.readable
-          .pipeThrough(new TextDecoderStream("utf-8"))
-          .pipeTo(createWritableStreamForTextData());
-      } catch (e) {
-        console.error(e);
-      }
-    })();
+    // consume sequentially to not interleave output, reporting per-stream errors
+    try {
+      await stream.readable
+       .pipeThrough(new TextDecoderStream("utf-8"))
+       .pipeTo(createWritableStreamForTextData());
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 </pre>
