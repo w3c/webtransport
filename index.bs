@@ -997,12 +997,15 @@ and then consuming each {{ReceiveStream}} by iterating over its chunks.
 <pre class="example" highlight="js">
 async function receiveData(url, processTheData) {
   const transport = new WebTransport(url);
-  const promises = [];
   for await (const stream of transport.incomingUnidirectionalStreams) {
-    // consume streams in parallel, handling errors
-    promises.push((async () => {
-      for await (const chunk of stream.readable.getReader()) {
-        processTheData(chunk);
+    // consume streams in parallel, reporting errors in case they're per-stream
+    ((async () => {
+      try {
+        for await (const chunk of stream.readable.getReader()) {
+          processTheData(chunk);
+        }
+      } catch (e) {
+        console.error(e);
       }
     })());
   }
@@ -1016,14 +1019,17 @@ Decoding can also be done through pipes to new WritableStreams, for example usin
 <pre class="example" highlight="js">
 async function receiveText(url, createWritableStreamForTextData) {
   const transport = new WebTransport(url);
-  const promises = [];
   for await (const stream of transport.incomingUnidirectionalStreams) {
-    // consume streams in parallel, handling errors
-    promises.push((async () => {
-      await stream.readable
-        .pipeThrough(new TextDecoderStream("utf-8"))
-        .pipeTo(createWritableStreamForTextData());
-    })());
+    // consume streams in parallel, reporting errors in case they're per-stream
+    (async () => {
+      try {
+        await stream.readable
+          .pipeThrough(new TextDecoderStream("utf-8"))
+          .pipeTo(createWritableStreamForTextData());
+      } catch (e) {
+        console.error(e);
+      }
+    })();
   }
   await Promise.all(promises);
 }
