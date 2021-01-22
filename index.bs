@@ -999,7 +999,7 @@ and then consuming each {{ReceiveStream}} by iterating over its chunks.
 async function receiveData(url, processTheData) {
   const transport = new WebTransport(url);
   for await (const stream of transport.incomingUnidirectionalStreams) {
-    // consume streams individually, reporting errors in case they're per-stream
+    // consume streams individually, reporting per-stream errors
     ((async () => {
       try {
         for await (const chunk of stream.readable.getReader()) {
@@ -1020,7 +1020,7 @@ Decoding can also be done through pipes to new WritableStreams, for example usin
 async function receiveText(url, createWritableStreamForTextData) {
   const transport = new WebTransport(url);
   for await (const stream of transport.incomingUnidirectionalStreams) {
-    // consume streams individually, reporting errors in case they're per-stream
+    // consume streams individually, reporting per-stream errors
     (async () => {
       try {
         await stream.readable
