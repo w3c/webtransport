@@ -909,7 +909,7 @@ Sending a buffer of datagrams can be achieved by using the
 datagrams are only sent if the {{DatagramTransport}} is ready to send.
 
 <pre class="example" highlight="js">
-async function(url, datagrams) {
+async function sendDatagrams(url, datagrams) {
   const transport = new WebTransport(url);
   const writer = transport.datagramWritable.getWriter();
   for (const datagram of datagrams) {
@@ -930,13 +930,11 @@ attribute.
 
 <pre class="example" highlight="js">
 // Sends datagrams every 100 ms.
-async function(url, createDataGrams) {
+async function sendFixedRate(url, createDatagrams, ms = 100) {
   const transport = new WebTransport(url);
   await transport.ready;
   const writer = transport.datagramWritable.getWriter();
-  setInterval(() => {
-    writer.write(createDatagram()).catch(() => {}));
-  }, 100);
+  setInterval(() => writer.write(createDatagrams()).catch(() => {})), ms);
 }
 </pre>
 
@@ -949,9 +947,9 @@ Receiving datagrams can be achieved by calling
 null values indicating that packets are not being processed quickly enough.
 
 <pre class="example" highlight="js">
-async function(url) {
+async function receiveDatagrams(url) {
   const transport = new WebTransport(url);
-  for await (datagram of transport.datagramReadable) {
+  for await (const datagram of transport.datagramReadable) {
     // Process the datagram
   }
 }
@@ -966,7 +964,7 @@ Sending data as a one-way stream can be achieved by using the
 resulting stream's writer.
 
 <pre class="example" highlight="js">
-async function(url, data) {
+async function sendData(url, data) {
   const transport = new WebTransport(url);
   const stream = await transport.createUnidirectionalStream();
   const writer = stream.writable.getWriter();
@@ -979,7 +977,7 @@ Encoding can also be done through pipes from a {{ReadableStream}}, for example u
 {{TextEncoderStream}}.
 
 <pre class="example" highlight="js">
-async function(url, readableStreamOfTextData) {
+async function sendText(url, readableStreamOfTextData) {
   const transport = new WebTransport(url);
   const stream = await transport.createUnidirectionalStream();
   await readableStreamOfTextData
@@ -997,12 +995,12 @@ Reading incoming streams can be achieved by iterating over the
 and then start consuming each {{ReceiveStream}} by iterating over its chunks.
 
 <pre class="example" highlight="js">
-async function(url, processTheData) {
+async function receiveData(url, processTheData) {
   const transport = new WebTransport(url);
-  for await (stream of transport.incomingUnidirectionalStreams) {
+  for await (const stream of transport.incomingUnidirectionalStreams) {
     // consume streams in parallel
     (async () => {
-      for await (chunk of stream.readable.getReader()) {
+      for await (const chunk of stream.readable.getReader()) {
         processTheData(chunk);
       }
     })();
@@ -1014,9 +1012,9 @@ Decoding can also be done through pipes to new WritableStreams, for example usin
 {{TextDecoderStream}}.
 
 <pre class="example" highlight="js">
-async function(url, createWritableStreamForTextData) {
+async function receiveText(url, createWritableStreamForTextData) {
   const transport = new WebTransport(url);
-  for await (stream of transport.incomingUnidirectionalStreams) {
+  for await (const stream of transport.incomingUnidirectionalStreams) {
     // consume streams in parallel
     (async () => {
       await stream.readable
@@ -1109,7 +1107,7 @@ async function readDatagrams() {
   try {
     const decoder = new TextDecoder('utf-8');
 
-    for await (datagram of transport.datagramReadable) {
+    for await (const datagram of transport.datagramReadable) {
       const data = decoder.decode(datagram);
       addToEventLog(&#96;Datagram received: ${data}&#96;);
     }
@@ -1121,7 +1119,7 @@ async function readDatagrams() {
 
 async function acceptUnidirectionalStreams() {
   try {
-    for await (stream of transport.incomingUnidirectionalStreams) {
+    for await (const stream of transport.incomingUnidirectionalStreams) {
       const number = streamNumber++;
       addToEventLog(&#96;New incoming unidirectional stream #${number}&#96;);
       readFromIncomingStream(stream, number);
@@ -1135,7 +1133,7 @@ async function acceptUnidirectionalStreams() {
 async function readFromIncomingStream(stream, number) {
   try {
     const decoder = new TextDecoderStream('utf-8');
-    for await (chunk of stream.readable.pipeThrough(decoder).getReader()) {
+    for await (const chunk of stream.readable.pipeThrough(decoder).getReader()) {
       addToEventLog(&#96;Received data on stream #${number}: ${chunk}&#96;);
     }
     addToEventLog(&#96;Stream #${number} closed&#96;);
