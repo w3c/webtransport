@@ -997,14 +997,16 @@ and then consuming each {{ReceiveStream}} by iterating over its chunks.
 <pre class="example" highlight="js">
 async function receiveData(url, processTheData) {
   const transport = new WebTransport(url);
+  const promises = [];
   for await (const stream of transport.incomingUnidirectionalStreams) {
-    // consume streams in parallel
-    (async () => {
+    // consume streams in parallel, handling errors
+    promises.push((async () => {
       for await (const chunk of stream.readable.getReader()) {
         processTheData(chunk);
       }
-    })();
+    })());
   }
+  await Promise.all(promises);
 }
 </pre>
 
@@ -1014,14 +1016,16 @@ Decoding can also be done through pipes to new WritableStreams, for example usin
 <pre class="example" highlight="js">
 async function receiveText(url, createWritableStreamForTextData) {
   const transport = new WebTransport(url);
+  const promises = [];
   for await (const stream of transport.incomingUnidirectionalStreams) {
-    // consume streams in parallel
-    (async () => {
+    // consume streams in parallel, handling errors
+    promises.push((async () => {
       await stream.readable
         .pipeThrough(new TextDecoderStream("utf-8"))
         .pipeTo(createWritableStreamForTextData());
-    })();
+    })());
   }
+  await Promise.all(promises);
 }
 </pre>
 
@@ -1039,13 +1043,12 @@ the server, and sending and receiving datagrams.
 
 let transport, streamNumber, datagramWriter;
 
-// "Connect" button handler.
-async function connect() {
-  const url = document.getElementById('url').value;
+connect.onclick = async () => {
   try {
+    const url = document.getElementById('url').value;
+
     transport = new WebTransport(url);
     addToEventLog('Initiating connection...');
-
     await transport.ready;
     addToEventLog('Connection ready.');
 
@@ -1065,8 +1068,7 @@ async function connect() {
   }
 }
 
-// "Send data" button handler.
-async function sendData() {
+sendData.onclick = async () => {
   const form = document.forms.sending.elements;
   const rawData = sending.data.value;
   const data = new TextEncoder('utf-8').encode(rawData);
