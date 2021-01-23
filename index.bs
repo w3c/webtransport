@@ -1151,15 +1151,15 @@ async function readFromIncomingStream(stream, number) {
 
 function addToEventLog(text, severity = 'info') {
   const log = document.getElementById('event-log');
-  const last = log.lastElementChild;
+  const previous = log.lastElementChild;
   const entry = document.createElement('li');
   entry.innerText = text;
   entry.className = &#96;log-${severity}&#96;;
   log.appendChild(entry);
 
-  // If the last entry in the log is visible, scroll the log to the new element.
-  if (last &&
-      last.getBoundingClientRect().top < log.getBoundingClientRect().bottom) {
+  // If the previous entry in the log was visible, scroll to the new element.
+  if (previous &&
+      previous.getBoundingClientRect().top < log.getBoundingClientRect().bottom) {
     entry.scrollIntoView();
   }
 }
