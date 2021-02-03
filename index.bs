@@ -906,13 +906,14 @@ Sending a buffer of datagrams can be achieved by using the
 datagrams are only sent if the {{DatagramTransport}} is ready to send.
 
 <pre class="example" highlight="js">
-const transport = getTransport();
-const writer = transport.datagramWritable.getWriter();
-const datagrams = getDatagramsToSend();
-datagrams.forEach((datagram) => {
-  await writer.ready;
-  writer.write(datagram);
-});
+async function sendDatagrams(url, datagrams) {
+  const transport = new WebTransport(url);
+  const writer = transport.datagramWritable.getWriter();
+  for (const datagram of datagrams) {
+    await writer.ready;
+    writer.write(datagram).catch(() => {});
+  }
+}
 </pre>
 
 ## Sending datagrams at a fixed rate ##  {#example-fixed-rate}
@@ -926,11 +927,13 @@ attribute.
 
 <pre class="example" highlight="js">
 // Sends datagrams every 100 ms.
-const transport = getTransport();
-const writer = transport.datagramWritable.getWriter();
-setInterval(() => {
-  writer.write(createDatagram());
-}, 100);
+async function sendFixedRate(url, createDatagram, ms = 100) {
+  const transport = new WebTransport(url);
+  await transport.ready;
+  const writer = transport.datagramWritable.getWriter();
+  const datagram = createDatagram();
+  setInterval(() => writer.write(datagram).catch(() => {}), ms);
+}
 </pre>
 
 ## Receiving datagrams ##  {#example-receiving-datagrams}
@@ -942,43 +945,87 @@ Receiving datagrams can be achieved by calling
 null values indicating that packets are not being processed quickly enough.
 
 <pre class="example" highlight="js">
-const transport = getTransport();
-const reader = transport.datagramReadable.getReader();
-while (true) {
-  const {value: datagram, done} = await reader.read();
-  if (done) {
-    break;
+async function receiveDatagrams(url) {
+  const transport = new WebTransport(url);
+  for await (const datagram of transport.datagramReadable) {
+    // Process the datagram
   }
-  // Process the data
 }
 </pre>
 
-## Receiving from ReceiveStream ##  {#example-receiving-from-receivestream}
+## Sending a stream ##  {#example-sending-stream}
 
 *This section is non-normative.*
 
-Reading from ReceiveStreams can be achieved by accessing the
-{{UnidirectionalStreamsTransport/incomingUnidirectionalStreams}} attribute,
-then getting the reader for each {{ReceiveStream}}.
+Sending data as a one-way stream can be achieved by using the
+{{UnidirectionalStreamsTransport/createUnidirectionalStream}} function and the
+resulting stream's writer.
 
 <pre class="example" highlight="js">
-const transport = getTransport();
-const incomingStreamReader =
-    transport.incomingUnidirectionalStreams.getReader();
-while (true) {
-  const {value: incomingStream, done: readingIncomingStreamsDone} =
-      await incomingStreamReader.read();
-  if (readingIncomingStreamsDone) {
-    break;
+async function sendData(url, data) {
+  const transport = new WebTransport(url);
+  const stream = await transport.createUnidirectionalStream();
+  const writer = stream.writable.getWriter();
+  await writer.write(data);
+  await writer.close();
+}
+</pre>
+
+Encoding can also be done through pipes from a {{ReadableStream}}, for example using
+{{TextEncoderStream}}.
+
+<pre class="example" highlight="js">
+async function sendText(url, readableStreamOfTextData) {
+  const transport = new WebTransport(url);
+  const stream = await transport.createUnidirectionalStream();
+  await readableStreamOfTextData
+    .pipeThrough(new TextEncoderStream("utf-8"))
+    .pipeTo(stream.writable);
+}
+</pre>
+
+## Receiving incoming streams ##  {#example-receiving-incoming-streams}
+
+*This section is non-normative.*
+
+Reading incoming streams can be achieved by iterating over the
+{{UnidirectionalStreamsTransport/incomingUnidirectionalStreams}} attribute,
+and then consuming each {{ReceiveStream}} by iterating over its chunks.
+
+<pre class="example" highlight="js">
+async function receiveData(url, processTheData) {
+  const transport = new WebTransport(url);
+  for await (const stream of transport.incomingUnidirectionalStreams) {
+    // consume streams individually, reporting per-stream errors
+    ((async () => {
+      try {
+        for await (const chunk of stream.readable.getReader()) {
+          processTheData(chunk);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    })());
   }
-  // Process incoming ReceiveStreams created by remote endpoint.
-  const chunkReader = incomingStream.readable.getReader();
-  while (true) {
-    const {value: chunk, done: readingChunksDone} = await chunkReader.read();
-    if (readingChunksDone) {
-      break;
+}
+</pre>
+
+Decoding can also be done through pipes to new WritableStreams, for example using
+{{TextDecoderStream}}. This example assumes text output should not be
+interleaved, and therefore only reads one stream at a time.
+
+<pre class="example" highlight="js">
+async function receiveText(url, createWritableStreamForTextData) {
+  const transport = new WebTransport(url);
+  for await (const stream of transport.incomingUnidirectionalStreams) {
+    // consume sequentially to not interleave output, reporting per-stream errors
+    try {
+      await stream.readable
+       .pipeThrough(new TextDecoderStream("utf-8"))
+       .pipeTo(createWritableStreamForTextData());
+    } catch (e) {
+      console.error(e);
     }
-    processTheData(chunk);
   }
 }
 </pre>
@@ -995,167 +1042,121 @@ the server, and sending and receiving datagrams.
 // Adds an entry to the event log on the page, optionally applying a specified
 // CSS class.
 
-let currentTransport, streamNumber, currentTransportDatagramWriter;
+let transport, streamNumber, datagramWriter;
 
-// "Connect" button handler.
-async function connect() {
-  const url = document.getElementById('url').value;
+connect.onclick = async () => {
   try {
-    var transport = new WebTransport(url);
+    const url = document.getElementById('url').value;
+
+    transport = new WebTransport(url);
     addToEventLog('Initiating connection...');
-  } catch (e) {
-    addToEventLog('Failed to create connection object. ' + e, 'error');
-    return;
-  }
-
-  try {
     await transport.ready;
     addToEventLog('Connection ready.');
-  } catch (e) {
-    addToEventLog('Connection failed. ' + e, 'error');
-    return;
-  }
 
-  transport.closed
-      .then(() => {
-        addToEventLog('Connection closed normally.');
-      })
-      .catch(() => {
-        addToEventLog('Connection closed abruptly.', 'error');
-      });
+    transport.closed
+      .then(() => addToEventLog('Connection closed normally.'))
+      .catch(() => addToEventLog('Connection closed abruptly.', 'error'));
 
-  currentTransport = transport;
-  streamNumber = 1;
-  try {
-    currentTransportDatagramWriter = transport.datagramWritable.getWriter();
-    addToEventLog('Datagram writer ready.');
+    streamNumber = 1;
+    datagramWriter = transport.datagramWritable.getWriter();
+
+    readDatagrams();
+    acceptUnidirectionalStreams();
+    document.forms.sending.elements.send.disabled = false;
+    document.getElementById('connect').disabled = true;
   } catch (e) {
-    addToEventLog('Sending datagrams not supported: ' + e, 'error');
-    return;
+    addToEventLog(&#96;Connection failed. ${e}&#96;, 'error');
   }
-  readDatagrams(transport);
-  acceptUnidirectionalStreams(transport);
-  document.forms.sending.elements.send.disabled = false;
-  document.getElementById('connect').disabled = true;
 }
 
-// "Send data" button handler.
-async function sendData() {
-  let form = document.forms.sending.elements;
-  let encoder = new TextEncoder('utf-8');
-  let rawData = sending.data.value;
-  let data = encoder.encode(rawData);
-  let transport = currentTransport;
+sendData.onclick = async () => {
+  const form = document.forms.sending.elements;
+  const rawData = sending.data.value;
+  const data = new TextEncoder('utf-8').encode(rawData);
   try {
     switch (form.sendtype.value) {
-      case 'datagram':
-        await currentTransportDatagramWriter.write(data);
-        addToEventLog('Sent datagram: ' + rawData);
+      case 'datagram': {
+        await datagramWriter.write(data);
+        addToEventLog(&#96;Sent datagram: ${rawData}&#96;);
         break;
+      }
       case 'unidi': {
-        let stream = await transport.createUnidirectionalStream();
-        let writer = stream.writable.getWriter();
+        const stream = await transport.createUnidirectionalStream();
+        const writer = stream.writable.getWriter();
         await writer.write(data);
-        writer.close();
-        addToEventLog('Sent a unidirectional stream with data: ' + rawData);
+        await writer.close();
+        addToEventLog(&#96;Sent a unidirectional stream with data: ${rawData}&#96;);
         break;
       }
       case 'bidi': {
-        let stream = await transport.createBidirectionalStream();
-        let number = streamNumber++;
-        readFromIncomingStream(stream, number);
+        const stream = await transport.createBidirectionalStream();
+        const n = streamNumber++;
+        readFromIncomingStream(stream, n);
 
-        let writer = stream.writable.getWriter();
+        const writer = stream.writable.getWriter();
         await writer.write(data);
-        writer.close();
-        addToEventLog(
-            'Opened bidirectional stream #' + number +
-            ' with data: ' + rawData);
+        await writer.close();
+        addToEventLog(&#96;Sent bidirectional stream #${n} with data: ${rawData}&#96;);
         break;
       }
     }
   } catch (e) {
-    addToEventLog('Error while sending data: ' + e, 'error');
+    addToEventLog(&#96;Error while sending data: ${e}&#96;, 'error');
   }
 }
 
-// Reads datagrams from |transport| into the event log until EOF is reached.
-async function readDatagrams(transport) {
+// Reads datagrams from into the event log until EOF is reached.
+async function readDatagrams() {
   try {
-    var reader = transport.datagramReadable.getReader();
-    addToEventLog('Datagram reader ready.');
-  } catch (e) {
-    addToEventLog('Receiving datagrams not supported: ' + e, 'error');
-    return;
-  }
-  let decoder = new TextDecoder('utf-8');
-  try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) {
-        addToEventLog('Done reading datagrams!');
-        return;
-      }
-      let data = decoder.decode(value);
-      addToEventLog('Datagram received: ' + data);
+    const decoder = new TextDecoder('utf-8');
+
+    for await (const datagram of transport.datagramReadable) {
+      const data = decoder.decode(datagram);
+      addToEventLog(&#96;Datagram received: ${data}&#96;);
     }
+    addToEventLog('Done reading datagrams!');
   } catch (e) {
-    addToEventLog('Error while reading datagrams: ' + e, 'error');
+    addToEventLog(&#96;Error while reading datagrams: ${e}&#96;, 'error');
   }
 }
 
-async function acceptUnidirectionalStreams(transport) {
-  let reader = transport.incomingUnidirectionalStreams.getReader();
+async function acceptUnidirectionalStreams() {
   try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) {
-        addToEventLog('Done accepting unidirectional streams!');
-        return;
-      }
-      let stream = value;
-      let number = streamNumber++;
-      addToEventLog('New incoming unidirectional stream #' + number);
+    for await (const stream of transport.incomingUnidirectionalStreams) {
+      const number = streamNumber++;
+      addToEventLog(&#96;New incoming unidirectional stream #${number}&#96;);
       readFromIncomingStream(stream, number);
     }
+    addToEventLog('Done accepting unidirectional streams!');
   } catch (e) {
-    addToEventLog('Error while accepting streams: ' + e, 'error');
+    addToEventLog(&#96;Error while accepting streams ${e}&#96;, 'error');
   }
 }
 
 async function readFromIncomingStream(stream, number) {
-  let decoder = new TextDecoderStream('utf-8');
-  let reader = stream.readable.pipeThrough(decoder).getReader();
   try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) {
-        addToEventLog('Stream #' + number + ' closed');
-        return;
-      }
-      let data = value;
-      addToEventLog('Received data on stream #' + number + ': ' + data);
+    const decoder = new TextDecoderStream('utf-8');
+    for await (const chunk of stream.readable.pipeThrough(decoder).getReader()) {
+      addToEventLog(&#96;Received data on stream #${number}: ${chunk}&#96;);
     }
+    addToEventLog(&#96;Stream #${number} closed&#96;);
   } catch (e) {
-    addToEventLog(
-        'Error while reading from stream #' + number + ': ' + e, 'error');
-    addToEventLog('    ' + e.message);
+    addToEventLog(&#96;Error while reading from stream #${number": ${e}&#96;, 'error');
+    addToEventLog(&#96;    ${e.message}&#96;);
   }
 }
 
 function addToEventLog(text, severity = 'info') {
-  let log = document.getElementById('event-log');
-  let mostRecentEntry = log.lastElementChild;
-  let entry = document.createElement('li');
+  const log = document.getElementById('event-log');
+  const previous = log.lastElementChild;
+  const entry = document.createElement('li');
   entry.innerText = text;
-  entry.className = 'log-' + severity;
+  entry.className = &#96;log-${severity}&#96;;
   log.appendChild(entry);
 
-  // If the most recent entry in the log was visible, scroll the log to the
-  // newly added element.
-  if (mostRecentEntry != null &&
-      mostRecentEntry.getBoundingClientRect().top <
-          log.getBoundingClientRect().bottom) {
+  // If the previous entry in the log was visible, scroll to the new element.
+  if (previous &&
+      previous.getBoundingClientRect().top < log.getBoundingClientRect().bottom) {
     entry.scrollIntoView();
   }
 }
