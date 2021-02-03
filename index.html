@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version c5172e83, updated Fri Nov 20 15:35:20 2020 -0800" name="generator">
   <link href="https://github.com/w3c/webtransport" rel="canonical">
-  <meta content="ecc7bf51e53e57109a3f7501739bbbb0705c97e1" name="document-revision">
+  <meta content="8ed586d0d318a007727b4d5cc7d034adb588e954" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -689,8 +689,9 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
       <li><a href="#example-datagrams"><span class="secno">14.1</span> <span class="content">Sending a buffer of datagrams</span></a>
       <li><a href="#example-fixed-rate"><span class="secno">14.2</span> <span class="content">Sending datagrams at a fixed rate</span></a>
       <li><a href="#example-receiving-datagrams"><span class="secno">14.3</span> <span class="content">Receiving datagrams</span></a>
-      <li><a href="#example-receiving-from-receivestream"><span class="secno">14.4</span> <span class="content">Receiving from ReceiveStream</span></a>
-      <li><a href="#example-complete"><span class="secno">14.5</span> <span class="content">Complete example</span></a>
+      <li><a href="#example-sending-stream"><span class="secno">14.4</span> <span class="content">Sending a stream</span></a>
+      <li><a href="#example-receiving-incoming-streams"><span class="secno">14.5</span> <span class="content">Receiving incoming streams</span></a>
+      <li><a href="#example-complete"><span class="secno">14.6</span> <span class="content">Complete example</span></a>
      </ol>
     <li><a href="#acknowledgements"><span class="secno">15</span> <span class="content">Acknowledgements</span></a>
     <li>
@@ -1540,233 +1541,220 @@ willing to accept connections from the Web.</p>
    <p><em>This section is non-normative.</em></p>
    <p>Sending a buffer of datagrams can be achieved by using the <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramwritable" id="ref-for-dom-datagramtransport-datagramwritable②">datagramWritable</a></code> attribute. In the following example
 datagrams are only sent if the <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport③">DatagramTransport</a></code> is ready to send.</p>
-<pre class="example highlight" id="example-8662e3c1"><a class="self-link" href="#example-8662e3c1"></a><c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
-<c- kr>const</c-> writer <c- o>=</c-> transport<c- p>.</c->datagramWritable<c- p>.</c->getWriter<c- p>();</c->
-<c- kr>const</c-> datagrams <c- o>=</c-> getDatagramsToSend<c- p>();</c->
-datagrams<c- p>.</c->forEach<c- p>((</c->datagram<c- p>)</c-> <c- p>=></c-> <c- p>{</c->
-  await writer<c- p>.</c->ready<c- p>;</c->
-  writer<c- p>.</c->write<c- p>(</c->datagram<c- p>);</c->
-<c- p>});</c->
+<pre class="example highlight" id="example-8345464f"><a class="self-link" href="#example-8345464f"></a>async <c- a>function</c-> sendDatagrams<c- p>(</c->url<c- p>,</c-> datagrams<c- p>)</c-> <c- p>{</c->
+  <c- kr>const</c-> transport <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
+  <c- kr>const</c-> writer <c- o>=</c-> transport<c- p>.</c->datagramWritable<c- p>.</c->getWriter<c- p>();</c->
+  <c- k>for</c-> <c- p>(</c-><c- kr>const</c-> datagram <c- k>of</c-> datagrams<c- p>)</c-> <c- p>{</c->
+    await writer<c- p>.</c->ready<c- p>;</c->
+    writer<c- p>.</c->write<c- p>(</c->datagram<c- p>).</c-><c- k>catch</c-><c- p>(()</c-> <c- p>=></c-> <c- p>{});</c->
+  <c- p>}</c->
+<c- p>}</c->
 </pre>
    <h3 class="heading settled" data-level="14.2" id="example-fixed-rate"><span class="secno">14.2. </span><span class="content">Sending datagrams at a fixed rate</span><a class="self-link" href="#example-fixed-rate"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Sending datagrams at a fixed rate regardless if the transport is ready to send
 can be achieved by simply using <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramwritable" id="ref-for-dom-datagramtransport-datagramwritable③">datagramWritable</a></code> and not
 using the <code>ready</code> attribute. More complex scenarios can utilize the <code>ready</code> attribute.</p>
-<pre class="example highlight" id="example-c00af5e2"><a class="self-link" href="#example-c00af5e2"></a><c- c1>// Sends datagrams every 100 ms.</c->
-<c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
-<c- kr>const</c-> writer <c- o>=</c-> transport<c- p>.</c->datagramWritable<c- p>.</c->getWriter<c- p>();</c->
-setInterval<c- p>(()</c-> <c- p>=></c-> <c- p>{</c->
-  writer<c- p>.</c->write<c- p>(</c->createDatagram<c- p>());</c->
-<c- p>},</c-> <c- mi>100</c-><c- p>);</c->
+<pre class="example highlight" id="example-4713ac81"><a class="self-link" href="#example-4713ac81"></a><c- c1>// Sends datagrams every 100 ms.</c->
+async <c- a>function</c-> sendFixedRate<c- p>(</c->url<c- p>,</c-> createDatagram<c- p>,</c-> ms <c- o>=</c-> <c- mi>100</c-><c- p>)</c-> <c- p>{</c->
+  <c- kr>const</c-> transport <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
+  await transport<c- p>.</c->ready<c- p>;</c->
+  <c- kr>const</c-> writer <c- o>=</c-> transport<c- p>.</c->datagramWritable<c- p>.</c->getWriter<c- p>();</c->
+  <c- kr>const</c-> datagram <c- o>=</c-> createDatagram<c- p>();</c->
+  setInterval<c- p>(()</c-> <c- p>=></c-> writer<c- p>.</c->write<c- p>(</c->datagram<c- p>).</c-><c- k>catch</c-><c- p>(()</c-> <c- p>=></c-> <c- p>{}),</c-> ms<c- p>);</c->
+<c- p>}</c->
 </pre>
    <h3 class="heading settled" data-level="14.3" id="example-receiving-datagrams"><span class="secno">14.3. </span><span class="content">Receiving datagrams</span><a class="self-link" href="#example-receiving-datagrams"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Receiving datagrams can be achieved by calling <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramreadable" id="ref-for-dom-datagramtransport-datagramreadable②">datagramReadable</a></code> attribute, remembering to check for
 null values indicating that packets are not being processed quickly enough.</p>
-<pre class="example highlight" id="example-e50c81c3"><a class="self-link" href="#example-e50c81c3"></a><c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
-<c- kr>const</c-> reader <c- o>=</c-> transport<c- p>.</c->datagramReadable<c- p>.</c->getReader<c- p>();</c->
-<c- k>while</c-> <c- p>(</c-><c- kc>true</c-><c- p>)</c-> <c- p>{</c->
-  <c- kr>const</c-> <c- p>{</c->value<c- o>:</c-> datagram<c- p>,</c-> done<c- p>}</c-> <c- o>=</c-> await reader<c- p>.</c->read<c- p>();</c->
-  <c- k>if</c-> <c- p>(</c->done<c- p>)</c-> <c- p>{</c->
-    <c- k>break</c-><c- p>;</c->
+<pre class="example highlight" id="example-b6b7beb7"><a class="self-link" href="#example-b6b7beb7"></a>async <c- a>function</c-> receiveDatagrams<c- p>(</c->url<c- p>)</c-> <c- p>{</c->
+  <c- kr>const</c-> transport <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
+  <c- k>for</c-> await <c- p>(</c-><c- kr>const</c-> datagram <c- k>of</c-> transport<c- p>.</c->datagramReadable<c- p>)</c-> <c- p>{</c->
+    <c- c1>// Process the datagram</c->
   <c- p>}</c->
-  <c- c1>// Process the data</c->
 <c- p>}</c->
 </pre>
-   <h3 class="heading settled" data-level="14.4" id="example-receiving-from-receivestream"><span class="secno">14.4. </span><span class="content">Receiving from ReceiveStream</span><a class="self-link" href="#example-receiving-from-receivestream"></a></h3>
+   <h3 class="heading settled" data-level="14.4" id="example-sending-stream"><span class="secno">14.4. </span><span class="content">Sending a stream</span><a class="self-link" href="#example-sending-stream"></a></h3>
    <p><em>This section is non-normative.</em></p>
-   <p>Reading from ReceiveStreams can be achieved by accessing the <code class="idl"><a data-link-type="idl" href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams" id="ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams①">incomingUnidirectionalStreams</a></code> attribute,
-then getting the reader for each <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream④">ReceiveStream</a></code>.</p>
-<pre class="example highlight" id="example-d103dcc1"><a class="self-link" href="#example-d103dcc1"></a><c- kr>const</c-> transport <c- o>=</c-> getTransport<c- p>();</c->
-<c- kr>const</c-> incomingStreamReader <c- o>=</c->
-    transport<c- p>.</c->incomingUnidirectionalStreams<c- p>.</c->getReader<c- p>();</c->
-<c- k>while</c-> <c- p>(</c-><c- kc>true</c-><c- p>)</c-> <c- p>{</c->
-  <c- kr>const</c-> <c- p>{</c->value<c- o>:</c-> incomingStream<c- p>,</c-> done<c- o>:</c-> readingIncomingStreamsDone<c- p>}</c-> <c- o>=</c->
-      await incomingStreamReader<c- p>.</c->read<c- p>();</c->
-  <c- k>if</c-> <c- p>(</c->readingIncomingStreamsDone<c- p>)</c-> <c- p>{</c->
-    <c- k>break</c-><c- p>;</c->
-  <c- p>}</c->
-  <c- c1>// Process incoming ReceiveStreams created by remote endpoint.</c->
-  <c- kr>const</c-> chunkReader <c- o>=</c-> incomingStream<c- p>.</c->readable<c- p>.</c->getReader<c- p>();</c->
-  <c- k>while</c-> <c- p>(</c-><c- kc>true</c-><c- p>)</c-> <c- p>{</c->
-    <c- kr>const</c-> <c- p>{</c->value<c- o>:</c-> chunk<c- p>,</c-> done<c- o>:</c-> readingChunksDone<c- p>}</c-> <c- o>=</c-> await chunkReader<c- p>.</c->read<c- p>();</c->
-    <c- k>if</c-> <c- p>(</c->readingChunksDone<c- p>)</c-> <c- p>{</c->
-      <c- k>break</c-><c- p>;</c->
-    <c- p>}</c->
-    processTheData<c- p>(</c->chunk<c- p>);</c->
+   <p>Sending data as a one-way stream can be achieved by using the <code class="idl"><a data-link-type="idl" href="#dom-unidirectionalstreamstransport-createunidirectionalstream" id="ref-for-dom-unidirectionalstreamstransport-createunidirectionalstream①">createUnidirectionalStream</a></code> function and the
+resulting stream’s writer.</p>
+<pre class="example highlight" id="example-d1d4a35d"><a class="self-link" href="#example-d1d4a35d"></a>async <c- a>function</c-> sendData<c- p>(</c->url<c- p>,</c-> data<c- p>)</c-> <c- p>{</c->
+  <c- kr>const</c-> transport <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
+  <c- kr>const</c-> stream <c- o>=</c-> await transport<c- p>.</c->createUnidirectionalStream<c- p>();</c->
+  <c- kr>const</c-> writer <c- o>=</c-> stream<c- p>.</c->writable<c- p>.</c->getWriter<c- p>();</c->
+  await writer<c- p>.</c->write<c- p>(</c->data<c- p>);</c->
+  await writer<c- p>.</c->close<c- p>();</c->
+<c- p>}</c->
+</pre>
+   <p>Encoding can also be done through pipes from a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream②⓪">ReadableStream</a></code>, for example using <code class="idl"><a data-link-type="idl" href="https://encoding.spec.whatwg.org/#textencoderstream" id="ref-for-textencoderstream">TextEncoderStream</a></code>.</p>
+<pre class="example highlight" id="example-6f5d6906"><a class="self-link" href="#example-6f5d6906"></a>async <c- a>function</c-> sendText<c- p>(</c->url<c- p>,</c-> readableStreamOfTextData<c- p>)</c-> <c- p>{</c->
+  <c- kr>const</c-> transport <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
+  <c- kr>const</c-> stream <c- o>=</c-> await transport<c- p>.</c->createUnidirectionalStream<c- p>();</c->
+  await readableStreamOfTextData
+    <c- p>.</c->pipeThrough<c- p>(</c-><c- k>new</c-> TextEncoderStream<c- p>(</c-><c- u>"utf-8"</c-><c- p>))</c->
+    <c- p>.</c->pipeTo<c- p>(</c->stream<c- p>.</c->writable<c- p>);</c->
+<c- p>}</c->
+</pre>
+   <h3 class="heading settled" data-level="14.5" id="example-receiving-incoming-streams"><span class="secno">14.5. </span><span class="content">Receiving incoming streams</span><a class="self-link" href="#example-receiving-incoming-streams"></a></h3>
+   <p><em>This section is non-normative.</em></p>
+   <p>Reading incoming streams can be achieved by iterating over the <code class="idl"><a data-link-type="idl" href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams" id="ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams①">incomingUnidirectionalStreams</a></code> attribute,
+and then consuming each <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream④">ReceiveStream</a></code> by iterating over its chunks.</p>
+<pre class="example highlight" id="example-ddcfb700"><a class="self-link" href="#example-ddcfb700"></a>async <c- a>function</c-> receiveData<c- p>(</c->url<c- p>,</c-> processTheData<c- p>)</c-> <c- p>{</c->
+  <c- kr>const</c-> transport <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
+  <c- k>for</c-> await <c- p>(</c-><c- kr>const</c-> stream <c- k>of</c-> transport<c- p>.</c->incomingUnidirectionalStreams<c- p>)</c-> <c- p>{</c->
+    <c- c1>// consume streams individually, reporting per-stream errors</c->
+    <c- p>((</c->async <c- p>()</c-> <c- p>=></c-> <c- p>{</c->
+      <c- k>try</c-> <c- p>{</c->
+        <c- k>for</c-> await <c- p>(</c-><c- kr>const</c-> chunk <c- k>of</c-> stream<c- p>.</c->readable<c- p>.</c->getReader<c- p>())</c-> <c- p>{</c->
+          processTheData<c- p>(</c->chunk<c- p>);</c->
+        <c- p>}</c->
+      <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
+        console<c- p>.</c->error<c- p>(</c->e<c- p>);</c->
+      <c- p>}</c->
+    <c- p>})());</c->
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h3 class="heading settled" data-level="14.5" id="example-complete"><span class="secno">14.5. </span><span class="content">Complete example</span><a class="self-link" href="#example-complete"></a></h3>
+   <p>Decoding can also be done through pipes to new WritableStreams, for example using <code class="idl"><a data-link-type="idl" href="https://encoding.spec.whatwg.org/#textdecoderstream" id="ref-for-textdecoderstream">TextDecoderStream</a></code>. This example assumes text output should not be
+interleaved, and therefore only reads one stream at a time.</p>
+<pre class="example highlight" id="example-6f5c116b"><a class="self-link" href="#example-6f5c116b"></a>async <c- a>function</c-> receiveText<c- p>(</c->url<c- p>,</c-> createWritableStreamForTextData<c- p>)</c-> <c- p>{</c->
+  <c- kr>const</c-> transport <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
+  <c- k>for</c-> await <c- p>(</c-><c- kr>const</c-> stream <c- k>of</c-> transport<c- p>.</c->incomingUnidirectionalStreams<c- p>)</c-> <c- p>{</c->
+    <c- c1>// consume sequentially to not interleave output, reporting per-stream errors</c->
+    <c- k>try</c-> <c- p>{</c->
+      await stream<c- p>.</c->readable
+       <c- p>.</c->pipeThrough<c- p>(</c-><c- k>new</c-> TextDecoderStream<c- p>(</c-><c- u>"utf-8"</c-><c- p>))</c->
+       <c- p>.</c->pipeTo<c- p>(</c->createWritableStreamForTextData<c- p>());</c->
+    <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
+      console<c- p>.</c->error<c- p>(</c->e<c- p>);</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h3 class="heading settled" data-level="14.6" id="example-complete"><span class="secno">14.6. </span><span class="content">Complete example</span><a class="self-link" href="#example-complete"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>This example illustrates use of the closed and ready promises, opening
 of uni-directional and bi-directional streams by either the client or
 the server, and sending and receiving datagrams.</p>
-<pre class="example highlight" id="example-3df361e1"><a class="self-link" href="#example-3df361e1"></a><c- c1>// Adds an entry to the event log on the page, optionally applying a specified</c->
+<pre class="example highlight" id="example-214fbdb4"><a class="self-link" href="#example-214fbdb4"></a><c- c1>// Adds an entry to the event log on the page, optionally applying a specified</c->
 <c- c1>// CSS class.</c->
 
-<c- a>let</c-> currentTransport<c- p>,</c-> streamNumber<c- p>,</c-> currentTransportDatagramWriter<c- p>;</c->
+<c- a>let</c-> transport<c- p>,</c-> streamNumber<c- p>,</c-> datagramWriter<c- p>;</c->
 
-<c- c1>// "Connect" button handler.</c->
-async <c- a>function</c-> connect<c- p>()</c-> <c- p>{</c->
-  <c- kr>const</c-> url <c- o>=</c-> document<c- p>.</c->getElementById<c- p>(</c-><c- t>'url'</c-><c- p>).</c->value<c- p>;</c->
+connect<c- p>.</c->onclick <c- o>=</c-> async <c- p>()</c-> <c- p>=></c-> <c- p>{</c->
   <c- k>try</c-> <c- p>{</c->
-    <c- a>var</c-> transport <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
+    <c- kr>const</c-> url <c- o>=</c-> document<c- p>.</c->getElementById<c- p>(</c-><c- t>'url'</c-><c- p>).</c->value<c- p>;</c->
+
+    transport <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
     addToEventLog<c- p>(</c-><c- t>'Initiating connection...'</c-><c- p>);</c->
-  <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
-    addToEventLog<c- p>(</c-><c- t>'Failed to create connection object. '</c-> <c- o>+</c-> e<c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
-    <c- k>return</c-><c- p>;</c->
-  <c- p>}</c->
-
-  <c- k>try</c-> <c- p>{</c->
     await transport<c- p>.</c->ready<c- p>;</c->
     addToEventLog<c- p>(</c-><c- t>'Connection ready.'</c-><c- p>);</c->
-  <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
-    addToEventLog<c- p>(</c-><c- t>'Connection failed. '</c-> <c- o>+</c-> e<c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
-    <c- k>return</c-><c- p>;</c->
-  <c- p>}</c->
 
-  transport<c- p>.</c->closed
-      <c- p>.</c->then<c- p>(()</c-> <c- p>=></c-> <c- p>{</c->
-        addToEventLog<c- p>(</c-><c- t>'Connection closed normally.'</c-><c- p>);</c->
-      <c- p>})</c->
-      <c- p>.</c-><c- k>catch</c-><c- p>(()</c-> <c- p>=></c-> <c- p>{</c->
-        addToEventLog<c- p>(</c-><c- t>'Connection closed abruptly.'</c-><c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
-      <c- p>});</c->
+    transport<c- p>.</c->closed
+      <c- p>.</c->then<c- p>(()</c-> <c- p>=></c-> addToEventLog<c- p>(</c-><c- t>'Connection closed normally.'</c-><c- p>))</c->
+      <c- p>.</c-><c- k>catch</c-><c- p>(()</c-> <c- p>=></c-> addToEventLog<c- p>(</c-><c- t>'Connection closed abruptly.'</c-><c- p>,</c-> <c- t>'error'</c-><c- p>));</c->
 
-  currentTransport <c- o>=</c-> transport<c- p>;</c->
-  streamNumber <c- o>=</c-> <c- mi>1</c-><c- p>;</c->
-  <c- k>try</c-> <c- p>{</c->
-    currentTransportDatagramWriter <c- o>=</c-> transport<c- p>.</c->datagramWritable<c- p>.</c->getWriter<c- p>();</c->
-    addToEventLog<c- p>(</c-><c- t>'Datagram writer ready.'</c-><c- p>);</c->
+    streamNumber <c- o>=</c-> <c- mi>1</c-><c- p>;</c->
+    datagramWriter <c- o>=</c-> transport<c- p>.</c->datagramWritable<c- p>.</c->getWriter<c- p>();</c->
+
+    readDatagrams<c- p>();</c->
+    acceptUnidirectionalStreams<c- p>();</c->
+    document<c- p>.</c->forms<c- p>.</c->sending<c- p>.</c->elements<c- p>.</c->send<c- p>.</c->disabled <c- o>=</c-> <c- kc>false</c-><c- p>;</c->
+    document<c- p>.</c->getElementById<c- p>(</c-><c- t>'connect'</c-><c- p>).</c->disabled <c- o>=</c-> <c- kc>true</c-><c- p>;</c->
   <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
-    addToEventLog<c- p>(</c-><c- t>'Sending datagrams not supported: '</c-> <c- o>+</c-> e<c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
-    <c- k>return</c-><c- p>;</c->
+    addToEventLog<c- p>(</c-><c- sb>`Connection failed. </c-><c- si>${</c->e<c- si>}</c-><c- sb>`</c-><c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
   <c- p>}</c->
-  readDatagrams<c- p>(</c->transport<c- p>);</c->
-  acceptUnidirectionalStreams<c- p>(</c->transport<c- p>);</c->
-  document<c- p>.</c->forms<c- p>.</c->sending<c- p>.</c->elements<c- p>.</c->send<c- p>.</c->disabled <c- o>=</c-> <c- kc>false</c-><c- p>;</c->
-  document<c- p>.</c->getElementById<c- p>(</c-><c- t>'connect'</c-><c- p>).</c->disabled <c- o>=</c-> <c- kc>true</c-><c- p>;</c->
 <c- p>}</c->
 
-<c- c1>// "Send data" button handler.</c->
-async <c- a>function</c-> sendData<c- p>()</c-> <c- p>{</c->
-  <c- a>let</c-> form <c- o>=</c-> document<c- p>.</c->forms<c- p>.</c->sending<c- p>.</c->elements<c- p>;</c->
-  <c- a>let</c-> encoder <c- o>=</c-> <c- k>new</c-> TextEncoder<c- p>(</c-><c- t>'utf-8'</c-><c- p>);</c->
-  <c- a>let</c-> rawData <c- o>=</c-> sending<c- p>.</c->data<c- p>.</c->value<c- p>;</c->
-  <c- a>let</c-> data <c- o>=</c-> encoder<c- p>.</c->encode<c- p>(</c->rawData<c- p>);</c->
-  <c- a>let</c-> transport <c- o>=</c-> currentTransport<c- p>;</c->
+sendData<c- p>.</c->onclick <c- o>=</c-> async <c- p>()</c-> <c- p>=></c-> <c- p>{</c->
+  <c- kr>const</c-> form <c- o>=</c-> document<c- p>.</c->forms<c- p>.</c->sending<c- p>.</c->elements<c- p>;</c->
+  <c- kr>const</c-> rawData <c- o>=</c-> sending<c- p>.</c->data<c- p>.</c->value<c- p>;</c->
+  <c- kr>const</c-> data <c- o>=</c-> <c- k>new</c-> TextEncoder<c- p>(</c-><c- t>'utf-8'</c-><c- p>).</c->encode<c- p>(</c->rawData<c- p>);</c->
   <c- k>try</c-> <c- p>{</c->
     <c- k>switch</c-> <c- p>(</c->form<c- p>.</c->sendtype<c- p>.</c->value<c- p>)</c-> <c- p>{</c->
-      <c- k>case</c-> <c- t>'datagram'</c-><c- o>:</c->
-        await currentTransportDatagramWriter<c- p>.</c->write<c- p>(</c->data<c- p>);</c->
-        addToEventLog<c- p>(</c-><c- t>'Sent datagram: '</c-> <c- o>+</c-> rawData<c- p>);</c->
+      <c- k>case</c-> <c- t>'datagram'</c-><c- o>:</c-> <c- p>{</c->
+        await datagramWriter<c- p>.</c->write<c- p>(</c->data<c- p>);</c->
+        addToEventLog<c- p>(</c-><c- sb>`Sent datagram: </c-><c- si>${</c->rawData<c- si>}</c-><c- sb>`</c-><c- p>);</c->
         <c- k>break</c-><c- p>;</c->
+      <c- p>}</c->
       <c- k>case</c-> <c- t>'unidi'</c-><c- o>:</c-> <c- p>{</c->
-        <c- a>let</c-> stream <c- o>=</c-> await transport<c- p>.</c->createUnidirectionalStream<c- p>();</c->
-        <c- a>let</c-> writer <c- o>=</c-> stream<c- p>.</c->writable<c- p>.</c->getWriter<c- p>();</c->
+        <c- kr>const</c-> stream <c- o>=</c-> await transport<c- p>.</c->createUnidirectionalStream<c- p>();</c->
+        <c- kr>const</c-> writer <c- o>=</c-> stream<c- p>.</c->writable<c- p>.</c->getWriter<c- p>();</c->
         await writer<c- p>.</c->write<c- p>(</c->data<c- p>);</c->
-        writer<c- p>.</c->close<c- p>();</c->
-        addToEventLog<c- p>(</c-><c- t>'Sent a unidirectional stream with data: '</c-> <c- o>+</c-> rawData<c- p>);</c->
+        await writer<c- p>.</c->close<c- p>();</c->
+        addToEventLog<c- p>(</c-><c- sb>`Sent a unidirectional stream with data: </c-><c- si>${</c->rawData<c- si>}</c-><c- sb>`</c-><c- p>);</c->
         <c- k>break</c-><c- p>;</c->
       <c- p>}</c->
       <c- k>case</c-> <c- t>'bidi'</c-><c- o>:</c-> <c- p>{</c->
-        <c- a>let</c-> stream <c- o>=</c-> await transport<c- p>.</c->createBidirectionalStream<c- p>();</c->
-        <c- a>let</c-> number <c- o>=</c-> streamNumber<c- o>++</c-><c- p>;</c->
-        readFromIncomingStream<c- p>(</c->stream<c- p>,</c-> number<c- p>);</c->
+        <c- kr>const</c-> stream <c- o>=</c-> await transport<c- p>.</c->createBidirectionalStream<c- p>();</c->
+        <c- kr>const</c-> n <c- o>=</c-> streamNumber<c- o>++</c-><c- p>;</c->
+        readFromIncomingStream<c- p>(</c->stream<c- p>,</c-> n<c- p>);</c->
 
-        <c- a>let</c-> writer <c- o>=</c-> stream<c- p>.</c->writable<c- p>.</c->getWriter<c- p>();</c->
+        <c- kr>const</c-> writer <c- o>=</c-> stream<c- p>.</c->writable<c- p>.</c->getWriter<c- p>();</c->
         await writer<c- p>.</c->write<c- p>(</c->data<c- p>);</c->
-        writer<c- p>.</c->close<c- p>();</c->
-        addToEventLog<c- p>(</c->
-            <c- t>'Opened bidirectional stream #'</c-> <c- o>+</c-> number <c- o>+</c->
-            <c- t>' with data: '</c-> <c- o>+</c-> rawData<c- p>);</c->
+        await writer<c- p>.</c->close<c- p>();</c->
+        addToEventLog<c- p>(</c-><c- sb>`Sent bidirectional stream #</c-><c- si>${</c->n<c- si>}</c-><c- sb> with data: </c-><c- si>${</c->rawData<c- si>}</c-><c- sb>`</c-><c- p>);</c->
         <c- k>break</c-><c- p>;</c->
       <c- p>}</c->
     <c- p>}</c->
   <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
-    addToEventLog<c- p>(</c-><c- t>'Error while sending data: '</c-> <c- o>+</c-> e<c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
+    addToEventLog<c- p>(</c-><c- sb>`Error while sending data: </c-><c- si>${</c->e<c- si>}</c-><c- sb>`</c-><c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
   <c- p>}</c->
 <c- p>}</c->
 
-<c- c1>// Reads datagrams from |transport| into the event log until EOF is reached.</c->
-async <c- a>function</c-> readDatagrams<c- p>(</c->transport<c- p>)</c-> <c- p>{</c->
+<c- c1>// Reads datagrams from into the event log until EOF is reached.</c->
+async <c- a>function</c-> readDatagrams<c- p>()</c-> <c- p>{</c->
   <c- k>try</c-> <c- p>{</c->
-    <c- a>var</c-> reader <c- o>=</c-> transport<c- p>.</c->datagramReadable<c- p>.</c->getReader<c- p>();</c->
-    addToEventLog<c- p>(</c-><c- t>'Datagram reader ready.'</c-><c- p>);</c->
-  <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
-    addToEventLog<c- p>(</c-><c- t>'Receiving datagrams not supported: '</c-> <c- o>+</c-> e<c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
-    <c- k>return</c-><c- p>;</c->
-  <c- p>}</c->
-  <c- a>let</c-> decoder <c- o>=</c-> <c- k>new</c-> TextDecoder<c- p>(</c-><c- t>'utf-8'</c-><c- p>);</c->
-  <c- k>try</c-> <c- p>{</c->
-    <c- k>while</c-> <c- p>(</c-><c- kc>true</c-><c- p>)</c-> <c- p>{</c->
-      <c- kr>const</c-> <c- p>{</c-> value<c- p>,</c-> done <c- p>}</c-> <c- o>=</c-> await reader<c- p>.</c->read<c- p>();</c->
-      <c- k>if</c-> <c- p>(</c->done<c- p>)</c-> <c- p>{</c->
-        addToEventLog<c- p>(</c-><c- t>'Done reading datagrams!'</c-><c- p>);</c->
-        <c- k>return</c-><c- p>;</c->
-      <c- p>}</c->
-      <c- a>let</c-> data <c- o>=</c-> decoder<c- p>.</c->decode<c- p>(</c->value<c- p>);</c->
-      addToEventLog<c- p>(</c-><c- t>'Datagram received: '</c-> <c- o>+</c-> data<c- p>);</c->
+    <c- kr>const</c-> decoder <c- o>=</c-> <c- k>new</c-> TextDecoder<c- p>(</c-><c- t>'utf-8'</c-><c- p>);</c->
+
+    <c- k>for</c-> await <c- p>(</c-><c- kr>const</c-> datagram <c- k>of</c-> transport<c- p>.</c->datagramReadable<c- p>)</c-> <c- p>{</c->
+      <c- kr>const</c-> data <c- o>=</c-> decoder<c- p>.</c->decode<c- p>(</c->datagram<c- p>);</c->
+      addToEventLog<c- p>(</c-><c- sb>`Datagram received: </c-><c- si>${</c->data<c- si>}</c-><c- sb>`</c-><c- p>);</c->
     <c- p>}</c->
+    addToEventLog<c- p>(</c-><c- t>'Done reading datagrams!'</c-><c- p>);</c->
   <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
-    addToEventLog<c- p>(</c-><c- t>'Error while reading datagrams: '</c-> <c- o>+</c-> e<c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
+    addToEventLog<c- p>(</c-><c- sb>`Error while reading datagrams: </c-><c- si>${</c->e<c- si>}</c-><c- sb>`</c-><c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
   <c- p>}</c->
 <c- p>}</c->
 
-async <c- a>function</c-> acceptUnidirectionalStreams<c- p>(</c->transport<c- p>)</c-> <c- p>{</c->
-  <c- a>let</c-> reader <c- o>=</c-> transport<c- p>.</c->incomingUnidirectionalStreams<c- p>.</c->getReader<c- p>();</c->
+async <c- a>function</c-> acceptUnidirectionalStreams<c- p>()</c-> <c- p>{</c->
   <c- k>try</c-> <c- p>{</c->
-    <c- k>while</c-> <c- p>(</c-><c- kc>true</c-><c- p>)</c-> <c- p>{</c->
-      <c- kr>const</c-> <c- p>{</c-> value<c- p>,</c-> done <c- p>}</c-> <c- o>=</c-> await reader<c- p>.</c->read<c- p>();</c->
-      <c- k>if</c-> <c- p>(</c->done<c- p>)</c-> <c- p>{</c->
-        addToEventLog<c- p>(</c-><c- t>'Done accepting unidirectional streams!'</c-><c- p>);</c->
-        <c- k>return</c-><c- p>;</c->
-      <c- p>}</c->
-      <c- a>let</c-> stream <c- o>=</c-> value<c- p>;</c->
-      <c- a>let</c-> number <c- o>=</c-> streamNumber<c- o>++</c-><c- p>;</c->
-      addToEventLog<c- p>(</c-><c- t>'New incoming unidirectional stream #'</c-> <c- o>+</c-> number<c- p>);</c->
+    <c- k>for</c-> await <c- p>(</c-><c- kr>const</c-> stream <c- k>of</c-> transport<c- p>.</c->incomingUnidirectionalStreams<c- p>)</c-> <c- p>{</c->
+      <c- kr>const</c-> number <c- o>=</c-> streamNumber<c- o>++</c-><c- p>;</c->
+      addToEventLog<c- p>(</c-><c- sb>`New incoming unidirectional stream #</c-><c- si>${</c->number<c- si>}</c-><c- sb>`</c-><c- p>);</c->
       readFromIncomingStream<c- p>(</c->stream<c- p>,</c-> number<c- p>);</c->
     <c- p>}</c->
+    addToEventLog<c- p>(</c-><c- t>'Done accepting unidirectional streams!'</c-><c- p>);</c->
   <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
-    addToEventLog<c- p>(</c-><c- t>'Error while accepting streams: '</c-> <c- o>+</c-> e<c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
+    addToEventLog<c- p>(</c-><c- sb>`Error while accepting streams </c-><c- si>${</c->e<c- si>}</c-><c- sb>`</c-><c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
   <c- p>}</c->
 <c- p>}</c->
 
 async <c- a>function</c-> readFromIncomingStream<c- p>(</c->stream<c- p>,</c-> number<c- p>)</c-> <c- p>{</c->
-  <c- a>let</c-> decoder <c- o>=</c-> <c- k>new</c-> TextDecoderStream<c- p>(</c-><c- t>'utf-8'</c-><c- p>);</c->
-  <c- a>let</c-> reader <c- o>=</c-> stream<c- p>.</c->readable<c- p>.</c->pipeThrough<c- p>(</c->decoder<c- p>).</c->getReader<c- p>();</c->
   <c- k>try</c-> <c- p>{</c->
-    <c- k>while</c-> <c- p>(</c-><c- kc>true</c-><c- p>)</c-> <c- p>{</c->
-      <c- kr>const</c-> <c- p>{</c-> value<c- p>,</c-> done <c- p>}</c-> <c- o>=</c-> await reader<c- p>.</c->read<c- p>();</c->
-      <c- k>if</c-> <c- p>(</c->done<c- p>)</c-> <c- p>{</c->
-        addToEventLog<c- p>(</c-><c- t>'Stream #'</c-> <c- o>+</c-> number <c- o>+</c-> <c- t>' closed'</c-><c- p>);</c->
-        <c- k>return</c-><c- p>;</c->
-      <c- p>}</c->
-      <c- a>let</c-> data <c- o>=</c-> value<c- p>;</c->
-      addToEventLog<c- p>(</c-><c- t>'Received data on stream #'</c-> <c- o>+</c-> number <c- o>+</c-> <c- t>': '</c-> <c- o>+</c-> data<c- p>);</c->
+    <c- kr>const</c-> decoder <c- o>=</c-> <c- k>new</c-> TextDecoderStream<c- p>(</c-><c- t>'utf-8'</c-><c- p>);</c->
+    <c- k>for</c-> await <c- p>(</c-><c- kr>const</c-> chunk <c- k>of</c-> stream<c- p>.</c->readable<c- p>.</c->pipeThrough<c- p>(</c->decoder<c- p>).</c->getReader<c- p>())</c-> <c- p>{</c->
+      addToEventLog<c- p>(</c-><c- sb>`Received data on stream #</c-><c- si>${</c->number<c- si>}</c-><c- sb>: </c-><c- si>${</c->chunk<c- si>}</c-><c- sb>`</c-><c- p>);</c->
     <c- p>}</c->
+    addToEventLog<c- p>(</c-><c- sb>`Stream #</c-><c- si>${</c->number<c- si>}</c-><c- sb> closed`</c-><c- p>);</c->
   <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
-    addToEventLog<c- p>(</c->
-        <c- t>'Error while reading from stream #'</c-> <c- o>+</c-> number <c- o>+</c-> <c- t>': '</c-> <c- o>+</c-> e<c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
-    addToEventLog<c- p>(</c-><c- t>'    '</c-> <c- o>+</c-> e<c- p>.</c->message<c- p>);</c->
+    addToEventLog<c- p>(</c-><c- sb>`Error while reading from stream #</c-><c- si>${</c->number"<c- o>:</c-> $<c- p>{</c->e<c- si>}</c-><c- sb>`</c-><c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
+    addToEventLog<c- p>(</c-><c- sb>`    </c-><c- si>${</c->e<c- p>.</c->message<c- si>}</c-><c- sb>`</c-><c- p>);</c->
   <c- p>}</c->
 <c- p>}</c->
 
 <c- a>function</c-> addToEventLog<c- p>(</c->text<c- p>,</c-> severity <c- o>=</c-> <c- t>'info'</c-><c- p>)</c-> <c- p>{</c->
-  <c- a>let</c-> log <c- o>=</c-> document<c- p>.</c->getElementById<c- p>(</c-><c- t>'event-log'</c-><c- p>);</c->
-  <c- a>let</c-> mostRecentEntry <c- o>=</c-> log<c- p>.</c->lastElementChild<c- p>;</c->
-  <c- a>let</c-> entry <c- o>=</c-> document<c- p>.</c->createElement<c- p>(</c-><c- t>'li'</c-><c- p>);</c->
+  <c- kr>const</c-> log <c- o>=</c-> document<c- p>.</c->getElementById<c- p>(</c-><c- t>'event-log'</c-><c- p>);</c->
+  <c- kr>const</c-> previous <c- o>=</c-> log<c- p>.</c->lastElementChild<c- p>;</c->
+  <c- kr>const</c-> entry <c- o>=</c-> document<c- p>.</c->createElement<c- p>(</c-><c- t>'li'</c-><c- p>);</c->
   entry<c- p>.</c->innerText <c- o>=</c-> text<c- p>;</c->
-  entry<c- p>.</c->className <c- o>=</c-> <c- t>'log-'</c-> <c- o>+</c-> severity<c- p>;</c->
+  entry<c- p>.</c->className <c- o>=</c-> <c- sb>`log-</c-><c- si>${</c->severity<c- si>}</c-><c- sb>`</c-><c- p>;</c->
   log<c- p>.</c->appendChild<c- p>(</c->entry<c- p>);</c->
 
-  <c- c1>// If the most recent entry in the log was visible, scroll the log to the</c->
-  <c- c1>// newly added element.</c->
-  <c- k>if</c-> <c- p>(</c->mostRecentEntry <c- o>!=</c-> <c- kc>null</c-> <c- o>&amp;&amp;</c->
-      mostRecentEntry<c- p>.</c->getBoundingClientRect<c- p>().</c->top <c- o>&lt;</c->
-          log<c- p>.</c->getBoundingClientRect<c- p>().</c->bottom<c- p>)</c-> <c- p>{</c->
+  <c- c1>// If the previous entry in the log was visible, scroll to the new element.</c->
+  <c- k>if</c-> <c- p>(</c->previous <c- o>&amp;&amp;</c->
+      previous<c- p>.</c->getBoundingClientRect<c- p>().</c->top <c- o>&lt;</c-> log<c- p>.</c->getBoundingClientRect<c- p>().</c->bottom<c- p>)</c-> <c- p>{</c->
     entry<c- p>.</c->scrollIntoView<c- p>();</c->
   <c- p>}</c->
 <c- p>}</c->
@@ -1929,6 +1917,18 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-sec-promise-objects①⑦">7.3. Methods</a>
     <li><a href="#ref-for-sec-promise-objects①⑧">8.2. Attributes</a> <a href="#ref-for-sec-promise-objects①⑨">(2)</a>
     <li><a href="#ref-for-sec-promise-objects②⓪">9.2. Attributes</a> <a href="#ref-for-sec-promise-objects②①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-textdecoderstream">
+   <a href="https://encoding.spec.whatwg.org/#textdecoderstream">https://encoding.spec.whatwg.org/#textdecoderstream</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-textdecoderstream">14.5. Receiving incoming streams</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-textencoderstream">
+   <a href="https://encoding.spec.whatwg.org/#textencoderstream">https://encoding.spec.whatwg.org/#textencoderstream</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-textencoderstream">14.4. Sending a stream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-fetch">
@@ -2172,6 +2172,7 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-readablestream①⑥">9. Interface Mixin IncomingStream</a>
     <li><a href="#ref-for-readablestream①⑦">9.1. Overview</a>
     <li><a href="#ref-for-readablestream①⑧">9.2. Attributes</a> <a href="#ref-for-readablestream①⑨">(2)</a>
+    <li><a href="#ref-for-readablestream②⓪">14.4. Sending a stream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-writablestream">
@@ -2207,6 +2208,12 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="term-for-sec-promise-objects②">rejected</span>
      <li><span class="dfn-paneled" id="term-for-sec-promise-objects③">resolved</span>
      <li><span class="dfn-paneled" id="term-for-sec-promise-objects④">settled</span>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[ENCODING]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-textdecoderstream">TextDecoderStream</span>
+     <li><span class="dfn-paneled" id="term-for-textencoderstream">TextEncoderStream</span>
     </ul>
    <li>
     <a data-link-type="biblio">[FETCH]</a> defines the following terms:
@@ -2281,6 +2288,8 @@ and has been adapted for use in this specification.</p>
    <dd>Anne van Kesteren. <a href="https://dom.spec.whatwg.org/">DOM Standard</a>. Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
    <dt id="biblio-ecmascript-60">[ECMASCRIPT-6.0]
    <dd>Allen Wirfs-Brock. <a href="http://www.ecma-international.org/ecma-262/6.0/index.html">ECMA-262 6th Edition, The ECMAScript 2015 Language Specification</a>. June 2015. Standard. URL: <a href="http://www.ecma-international.org/ecma-262/6.0/index.html">http://www.ecma-international.org/ecma-262/6.0/index.html</a>
+   <dt id="biblio-encoding">[ENCODING]
+   <dd>Anne van Kesteren. <a href="https://encoding.spec.whatwg.org/">Encoding Standard</a>. Living Standard. URL: <a href="https://encoding.spec.whatwg.org/">https://encoding.spec.whatwg.org/</a>
    <dt id="biblio-fetch">[FETCH]
    <dd>Anne van Kesteren. <a href="https://fetch.spec.whatwg.org/">Fetch Standard</a>. Living Standard. URL: <a href="https://fetch.spec.whatwg.org/">https://fetch.spec.whatwg.org/</a>
    <dt id="biblio-hr-time-2">[HR-TIME-2]
@@ -2444,13 +2453,14 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <b><a href="#dom-unidirectionalstreamstransport-createunidirectionalstream">#dom-unidirectionalstreamstransport-createunidirectionalstream</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-unidirectionalstreamstransport-createunidirectionalstream">4. UnidirectionalStreamsTransport Mixin</a>
+    <li><a href="#ref-for-dom-unidirectionalstreamstransport-createunidirectionalstream①">14.4. Sending a stream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-unidirectionalstreamstransport-incomingunidirectionalstreams">
    <b><a href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams">#dom-unidirectionalstreamstransport-incomingunidirectionalstreams</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams">4. UnidirectionalStreamsTransport Mixin</a>
-    <li><a href="#ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams①">14.4. Receiving from ReceiveStream</a>
+    <li><a href="#ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams①">14.5. Receiving incoming streams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="add-the-sendstream">
@@ -2936,7 +2946,7 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
     <li><a href="#ref-for-receivestream">4.1. Methods</a> <a href="#ref-for-receivestream①">(2)</a>
     <li><a href="#ref-for-receivestream②">9. Interface Mixin IncomingStream</a>
     <li><a href="#ref-for-receivestream③">12. Interface ReceiveStream</a>
-    <li><a href="#ref-for-receivestream④">14.4. Receiving from ReceiveStream</a>
+    <li><a href="#ref-for-receivestream④">14.5. Receiving incoming streams</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
