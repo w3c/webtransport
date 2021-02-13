@@ -317,9 +317,7 @@ Datagrams are encrypted and congestion controlled.
 <pre class="idl">
 interface mixin DatagramTransport {
     readonly attribute unsigned short maxDatagramSize;
-    /* both streams are streams of Uint8Array objects */
-    readonly attribute ReadableStream datagramReadable;
-    readonly attribute WritableStream datagramWritable;
+    readonly attribute DuplexStream datagrams;
 };
 </pre>
 
@@ -329,23 +327,68 @@ interface mixin DatagramTransport {
 :: The maximum size data that may be passed to
    {{DatagramTransport/datagramWritable}}.
 
-: <dfn for="DatagramTransport" attribute>datagramWritable</dfn>
-:: Sends datagrams that are written to the returned {{WritableStream}}.
+: <dfn for="DatagramTransport" attribute>datagrams</dfn>
+:: A single duplex stream for sending and receiving datagrams over this connection.
 
-   The getter steps for the `datagramWritable` attribute SHALL be:
-     1. Return the value of the {{[[SentDatagrams]]}} internal slot.
+   Each datagram received will be readable on the {{ReadableStream}} member.
 
-: <dfn for="DatagramTransport" attribute>datagramReadable</dfn>
-:: Return the value of the {{[[ReceivedDatagrams]]}} internal slot.
-
-   For each datagram received, insert it into {{[[ReceivedDatagrams]]}}. If too
-   many datagrams are queued because the stream is not being read quickly
-   enough, drop datagrams to avoid queueing. Implementations should drop older
+   If too many datagrams are queued because the stream is not being read quickly
+   enough, datagrams are dropped to avoid queueing. Implementations should drop older
    datagrams in favor of newer datagrams. The number of datagrams to queue
    should be kept small enough to avoid adding significant latency to packet
    delivery when the stream is being read slowly (due to the reader being slow)
    but large enough to avoid dropping packets when for the stream is not read
    for short periods of time (due to the reader being paused).
+
+   Datagrams written to the returned {{WritableStream}} member will be sent.
+
+   The getter steps for the `datagrams` attribute SHALL be:
+     1. Return the value of the {{[[Datagrams]]}} internal slot.
+
+## Procedures ## {#datagrams-transport-procedures}
+
+The <dfn>readDatagrams</dfn> algorithm is given a |transport| as parameter. It
+is defined by running the following steps:
+1. TODO
+1. [=ReadableStream/enqueue=] |data| in |transport|.`[[IncomingDatagrams]]`.
+
+The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
+|data| as input. It is defined by running the following steps:
+1. TODO
+1. Enqueue data for datagram transmission.
+1. Return [=a promise resolved with=] undefined.
+
+# `DuplexStream`
+
+A <dfn interface>DuplexStream</dfn> is a generic duplex stream.
+
+<pre class="idl">
+interface DuplexStream {
+  readonly attribute ReadableStream readable;
+  readonly attribute WritableStream writable;
+}
+</pre>
+
+ To <dfn export for="DuplexStream" lt="create|creating">create</dfn> a
+ {{DuplexStream}} given a
+ <dfn export for="DuplexStream/create"><var>readable</var></dfn>, and
+ a <dfn export for="DuplexStream/create"><var>writable</var></dfn>,
+ perform the following steps.
+
+ 1. Let |stream| be a [=new=] {{DuplexStream}}.
+ 1. Initialize |stream|.{{[[readable]]}} to |readable|.
+ 1. Initialize |stream|.{{[[writable]]}} to |writable|.
+ 1. Return |stream|.
+
+## Attributes ##  {#datagram-transport-attributes}
+
+: <dfn for="DuplexStream" attribute>readable</dfn>
+:: The getter steps are:
+1. Return [=this=].`[[readable]]`.
+
+: <dfn for="DuplexStream" attribute>writable</dfn>
+:: The getter steps are:
+1. Return [=this=].`[[writable]]`.
 
 # `WebTransport` Interface #  {#web-transport}
 
@@ -400,13 +443,21 @@ agent MUST run the following steps:
 1. Let |transport| have a
    <dfn attribute for="WebTransport">\[[Ready]]</dfn> internal
    slot, initialized to a promise.
+1. Let |transport| have an
+   <dfn attribute for="WebTransport">\[[OutgoingDatagrams]]</dfn> internal slot
+   initialized to the result of [=WritableStream/creating=] a {{WritableStream}},
+   its [=WritableStream/create/writeAlgorithm=] set to [=writeDatagrams=] given
+   |transport| as a parameter.
+1. Let |transport| have an
+   <dfn attribute for="WebTransport">\[[IncomingDatagrams]]</dfn> internal
+   slot initialized to the result of <a dfn for="ReadableStream">creating</a> a
+   {{ReadableStream}}. `transport.[[IncomingDatagrams]]` is provided datagrams
+    using the [=readDatagrams=] algorithm given |transport| as a parameter.
 1. Let |transport| have a
-   <dfn attribute for="WebTransport">\[[SentDatagrams]]</dfn> internal slot
-   representing a {{WritableStream}} of {{Uint8Array}}s, initialized to empty.
-1. Let |transport| have a
-   <dfn attribute for="WebTransport">\[[ReceivedDatagrams]]</dfn> internal
-   slot representing a {{ReadableStream}} of {{Uint8Array}}s, initialized to
-   empty.
+   <dfn attribute for="WebTransport">\[[Datagrams]]</dfn> internal slot
+   initialized to the result of [=DuplexStream/creating=] a {{DuplexStream}},
+   its [=DuplexStream/create/readable=] set to |transport|.{{[[IncomingDatagrams]]}},
+   and its [=DuplexStream/create/writable=] set to |transport|.{{[[OutgoingDatagrams]]}}.
 1. If the scheme of |parsedURL| is `quic-transport`, [=in parallel=],
    [=initialize WebTransport over QUIC=].
 1. If the scheme of |parsedURL| is `https`, [=in parallel=],
@@ -940,14 +991,15 @@ async function sendFixedRate(url, createDatagram, ms = 100) {
 
 *This section is non-normative.*
 
-Receiving datagrams can be achieved by calling
-{{DatagramTransport/datagramReadable}} attribute, remembering to check for
-null values indicating that packets are not being processed quickly enough.
+Datagrams can be received by reading from the
+transport.{{DatagramTransport/datagrams}}.{{DatagramTransport/datagrams/readable}}
+attribute. Null values may indicate that packets are not being processed quickly
+enough.
 
 <pre class="example" highlight="js">
 async function receiveDatagrams(url) {
   const transport = new WebTransport(url);
-  for await (const datagram of transport.datagramReadable) {
+  for await (const datagram of transport.datagrams.readable) {
     // Process the datagram
   }
 }
@@ -1105,13 +1157,12 @@ sendData.onclick = async () => {
   }
 }
 
-// Reads datagrams from into the event log until EOF is reached.
+// Reads datagrams into the event log until EOF is reached.
 async function readDatagrams() {
   try {
-    const decoder = new TextDecoder('utf-8');
+    const decoder = new TextDecoderStream('utf-8');
 
-    for await (const datagram of transport.datagramReadable) {
-      const data = decoder.decode(datagram);
+    for await (const data of transport.datagrams.readable.pipeThrough(decoder)) {
       addToEventLog(&#96;Datagram received: ${data}&#96;);
     }
     addToEventLog('Done reading datagrams!');
@@ -1136,7 +1187,7 @@ async function acceptUnidirectionalStreams() {
 async function readFromIncomingStream(stream, number) {
   try {
     const decoder = new TextDecoderStream('utf-8');
-    for await (const chunk of stream.readable.pipeThrough(decoder).getReader()) {
+    for await (const chunk of stream.readable.pipeThrough(decoder)) {
       addToEventLog(&#96;Received data on stream #${number}: ${chunk}&#96;);
     }
     addToEventLog(&#96;Stream #${number} closed&#96;);
