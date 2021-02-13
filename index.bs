@@ -325,7 +325,7 @@ interface mixin DatagramTransport {
 
 : <dfn for="DatagramTransport" attribute>maxDatagramSize</dfn>
 :: The maximum size data that may be passed to
-   {{DatagramTransport/datagramWritable}}.
+   {{DatagramTransport/datagrams}}' {{DuplexStream/writable}}.
 
 : <dfn for="DatagramTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this connection.
@@ -366,7 +366,7 @@ A <dfn interface>DuplexStream</dfn> is a generic duplex stream.
 interface DuplexStream {
   readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
-}
+};
 </pre>
 
  To <dfn export for="DuplexStream" lt="create|creating">create</dfn> a
@@ -376,8 +376,8 @@ interface DuplexStream {
  perform the following steps.
 
  1. Let |stream| be a [=new=] {{DuplexStream}}.
- 1. Initialize |stream|.{{[[readable]]}} to |readable|.
- 1. Initialize |stream|.{{[[writable]]}} to |writable|.
+ 1. Initialize |stream|.`[[readable]]` to |readable|.
+ 1. Initialize |stream|.`[[writable]]` to |writable|.
  1. Return |stream|.
 
 ## Attributes ##  {#duplex-stream-attributes}
@@ -469,7 +469,7 @@ To <dfn>initialize WebTransport over QUIC</dfn> for a given |transport| and
 |parsedURL|, do the following:
 
 1. Let |clientOrigin| be |transport|'s [=relevant settings object=]'s
-   [=origin=],
+   [=environment settings object/origin=],
    [=ASCII serialization of an origin|serialized=].
 1. Establish a QUIC connection to the address identified by |parsedURL|
    following the procedures in [[!WEB-TRANSPORT-QUIC]] section 3 and using
@@ -724,7 +724,7 @@ The dictionary SHALL have the following attributes:
 :: The minimum RTT observed on the entire connection.
 : <dfn for="WebTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
-   between calls to {{datagramReadable}}.
+   between calls to {{DatagramTransport/datagrams}}' {{DuplexStream/readable}}.
 
 # Interface Mixin `OutgoingStream` #  {#outgoing-stream}
 
@@ -953,13 +953,13 @@ willing to accept connections from the Web.
 *This section is non-normative.*
 
 Sending a buffer of datagrams can be achieved by using the
-{{DatagramTransport/datagramWritable}} attribute. In the following example
-datagrams are only sent if the {{DatagramTransport}} is ready to send.
+{{DatagramTransport/datagrams}}' {{DuplexStream/writable}} attribute. In the
+following example datagrams are only sent if the {{DatagramTransport}} is ready to send.
 
 <pre class="example" highlight="js">
 async function sendDatagrams(url, datagrams) {
   const transport = new WebTransport(url);
-  const writer = transport.datagramWritable.getWriter();
+  const writer = transport.datagrams.writable.getWriter();
   for (const datagram of datagrams) {
     await writer.ready;
     writer.write(datagram).catch(() => {});
@@ -972,16 +972,16 @@ async function sendDatagrams(url, datagrams) {
 *This section is non-normative.*
 
 Sending datagrams at a fixed rate regardless if the transport is ready to send
-can be achieved by simply using {{DatagramTransport/datagramWritable}} and not
-using the `ready` attribute. More complex scenarios can utilize the `ready`
-attribute.
+can be achieved by simply using {{DatagramTransport/datagrams}}'
+{{DuplexStream/writable}} and not using the `ready` attribute. More complex
+scenarios can utilize the `ready` attribute.
 
 <pre class="example" highlight="js">
 // Sends datagrams every 100 ms.
 async function sendFixedRate(url, createDatagram, ms = 100) {
   const transport = new WebTransport(url);
   await transport.ready;
-  const writer = transport.datagramWritable.getWriter();
+  const writer = transport.datagrams.writable.getWriter();
   const datagram = createDatagram();
   setInterval(() => writer.write(datagram).catch(() => {}), ms);
 }
@@ -992,7 +992,7 @@ async function sendFixedRate(url, createDatagram, ms = 100) {
 *This section is non-normative.*
 
 Datagrams can be received by reading from the
-transport.{{DatagramTransport/datagrams}}.{{DatagramTransport/datagrams/readable}}
+transport.{{DatagramTransport/datagrams}}.{{DatagramTransport/datagrams}}.{{DuplexStream/readable}}
 attribute. Null values may indicate that packets are not being processed quickly
 enough.
 
@@ -1110,7 +1110,7 @@ connect.onclick = async () => {
       .catch(() => addToEventLog('Connection closed abruptly.', 'error'));
 
     streamNumber = 1;
-    datagramWriter = transport.datagramWritable.getWriter();
+    datagramWriter = transport.datagrams.writable.getWriter();
 
     readDatagrams();
     acceptUnidirectionalStreams();
