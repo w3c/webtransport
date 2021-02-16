@@ -317,7 +317,7 @@ Datagrams are encrypted and congestion controlled.
 <pre class="idl">
 interface mixin DatagramTransport {
     readonly attribute unsigned short maxDatagramSize;
-    readonly attribute DuplexStream datagrams;
+    readonly attribute DatagramDuplexStream datagrams;
 };
 </pre>
 
@@ -325,7 +325,7 @@ interface mixin DatagramTransport {
 
 : <dfn for="DatagramTransport" attribute>maxDatagramSize</dfn>
 :: The maximum size data that may be passed to
-   {{DatagramTransport/datagrams}}' {{DuplexStream/writable}}.
+   {{DatagramTransport/datagrams}}' {{DatagramDuplexStream/writable}}.
 
 : <dfn for="DatagramTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this connection.
@@ -358,35 +358,35 @@ The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
 1. Enqueue data for datagram transmission.
 1. Return [=a promise resolved with=] undefined.
 
-# `DuplexStream` Interface #  {#duplex-stream}
+# `DatagramDuplexStream` Interface #  {#duplex-stream}
 
-A <dfn interface>DuplexStream</dfn> is a generic duplex stream.
+A <dfn interface>DatagramDuplexStream</dfn> is a generic duplex stream.
 
 <pre class="idl">
-interface DuplexStream {
+interface DatagramDuplexStream {
   readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
 };
 </pre>
 
- To <dfn export for="DuplexStream" lt="create|creating">create</dfn> a
- {{DuplexStream}} given a
- <dfn export for="DuplexStream/create"><var>readable</var></dfn>, and
- a <dfn export for="DuplexStream/create"><var>writable</var></dfn>,
+ To <dfn export for="DatagramDuplexStream" lt="create|creating">create</dfn> a
+ {{DatagramDuplexStream}} given a
+ <dfn export for="DatagramDuplexStream/create"><var>readable</var></dfn>, and
+ a <dfn export for="DatagramDuplexStream/create"><var>writable</var></dfn>,
  perform the following steps.
 
- 1. Let |stream| be a [=new=] {{DuplexStream}}.
+ 1. Let |stream| be a [=new=] {{DatagramDuplexStream}}.
  1. Initialize |stream|.`[[readable]]` to |readable|.
  1. Initialize |stream|.`[[writable]]` to |writable|.
  1. Return |stream|.
 
 ## Attributes ##  {#duplex-stream-attributes}
 
-: <dfn for="DuplexStream" attribute>readable</dfn>
+: <dfn for="DatagramDuplexStream" attribute>readable</dfn>
 :: The getter steps are:
      1. Return [=this=].`[[readable]]`.
 
-: <dfn for="DuplexStream" attribute>writable</dfn>
+: <dfn for="DatagramDuplexStream" attribute>writable</dfn>
 :: The getter steps are:
      1. Return [=this=].`[[writable]]`.
 
@@ -455,9 +455,9 @@ agent MUST run the following steps:
     using the [=readDatagrams=] algorithm given |transport| as a parameter.
 1. Let |transport| have a
    <dfn attribute for="WebTransport">\[[Datagrams]]</dfn> internal slot
-   initialized to the result of [=DuplexStream/creating=] a {{DuplexStream}},
-   its [=DuplexStream/create/readable=] set to |transport|.{{[[IncomingDatagrams]]}},
-   and its [=DuplexStream/create/writable=] set to |transport|.{{[[OutgoingDatagrams]]}}.
+   initialized to the result of [=DatagramDuplexStream/creating=] a {{DatagramDuplexStream}},
+   its [=DatagramDuplexStream/create/readable=] set to |transport|.{{[[IncomingDatagrams]]}},
+   and its [=DatagramDuplexStream/create/writable=] set to |transport|.{{[[OutgoingDatagrams]]}}.
 1. If the scheme of |parsedURL| is `quic-transport`, [=in parallel=],
    [=initialize WebTransport over QUIC=].
 1. If the scheme of |parsedURL| is `https`, [=in parallel=],
@@ -724,7 +724,7 @@ The dictionary SHALL have the following attributes:
 :: The minimum RTT observed on the entire connection.
 : <dfn for="WebTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
-   between calls to {{DatagramTransport/datagrams}}' {{DuplexStream/readable}}.
+   between calls to {{DatagramTransport/datagrams}}' {{DatagramDuplexStream/readable}}.
 
 # Interface Mixin `OutgoingStream` #  {#outgoing-stream}
 
@@ -953,7 +953,7 @@ willing to accept connections from the Web.
 *This section is non-normative.*
 
 Sending a buffer of datagrams can be achieved by using the
-{{DatagramTransport/datagrams}}' {{DuplexStream/writable}} attribute. In the
+{{DatagramTransport/datagrams}}' {{DatagramDuplexStream/writable}} attribute. In the
 following example datagrams are only sent if the {{DatagramTransport}} is ready to send.
 
 <pre class="example" highlight="js">
@@ -973,7 +973,7 @@ async function sendDatagrams(url, datagrams) {
 
 Sending datagrams at a fixed rate regardless if the transport is ready to send
 can be achieved by simply using {{DatagramTransport/datagrams}}'
-{{DuplexStream/writable}} and not using the `ready` attribute. More complex
+{{DatagramDuplexStream/writable}} and not using the `ready` attribute. More complex
 scenarios can utilize the `ready` attribute.
 
 <pre class="example" highlight="js">
@@ -992,7 +992,7 @@ async function sendFixedRate(url, createDatagram, ms = 100) {
 *This section is non-normative.*
 
 Datagrams can be received by reading from the
-transport.{{DatagramTransport/datagrams}}.{{DatagramTransport/datagrams}}.{{DuplexStream/readable}}
+transport.{{DatagramTransport/datagrams}}.{{DatagramTransport/datagrams}}.{{DatagramDuplexStream/readable}}
 attribute. Null values may indicate that packets are not being processed quickly
 enough.
 
