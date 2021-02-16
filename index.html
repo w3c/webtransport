@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version c5172e83, updated Fri Nov 20 15:35:20 2020 -0800" name="generator">
   <link href="https://github.com/w3c/webtransport" rel="canonical">
-  <meta content="fe2dda424432f1da1a8250d8a489d11fa0e23bd1" name="document-revision">
+  <meta content="edaead82bed31c03a946f7e45834a9a00bdf2ea5" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -605,10 +605,9 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
    <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
    <p>This document defines a set of ECMAScript APIs in WebIDL to allow data to be
 
-  sent and received between a browser and server, implementing pluggable
-  protocols underneath with common APIs on top. APIs specific to QUIC are also
-  provided. This specification is being developed in conjunction with a
-  protocol specification developed by the IETF QUIC Working Group.</p>
+  sent and received between a browser and server, utilizing <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.
+  This specification is being developed in conjunction with a protocol
+  specification developed by the IETF WEBTRANS Working Group.</p>
   </div>
   <h2 class="no-num no-toc no-ref heading settled" id="sotd"><span class="content">Status of this document</span></h2>
   <div data-fill-with="status">
@@ -714,13 +713,12 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <main>
    <h2 class="heading settled" data-level="1" id="introduction"><span class="secno">1. </span><span class="content">Introduction</span><a class="self-link" href="#introduction"></a></h2>
    <p><em>This section is non-normative.</em></p>
-   <p>This specification uses pluggable protocols, with QUIC <a data-link-type="biblio" href="#biblio-quic-transport">[QUIC-TRANSPORT]</a> as
-one such protocol, to send data to and receive data from servers. It can be
-used like WebSockets but with support for multiple streams, unidirectional
-streams, out-of-order delivery, and reliable as well as unreliable transport.</p>
+   <p>This specification uses <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a> to send data to and receive
+data from servers. It can be used like WebSockets but with support for multiple
+streams, unidirectional streams, out-of-order delivery, and reliable as well as
+unreliable transport.</p>
    <p class="note" role="note"><span>Note:</span> The API presented in this specification represents a preliminary proposal
-based on work-in-progress within the IETF QUIC WG. Since the QUIC transport
-specification is a work-in-progress, both the protocol and API are likely to
+based on work-in-progress within the IETF WEBTRANS WG. Since the <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a> specification is a work-in-progress, both the protocol and API are likely to
 change significantly going forward.</p>
    <h2 class="heading settled" data-level="2" id="conformance"><span class="secno">2. </span><span class="content">Conformance</span><a class="self-link" href="#conformance"></a></h2>
    <p>As well as sections marked as non-normative, all authoring guidelines,
@@ -789,8 +787,7 @@ unreliability.  All stream data is encrypted and congestion-controlled.</p>
          <p>The <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state①">state</a></code> has transitioned to <code>"connected"</code>.</p>
         <li data-md>
          <p>Stream creation flow control is not being violated by exceeding the
-  max stream limit set by the remote endpoint.  For QUIC, this is
-  specified in <a data-link-type="biblio" href="#biblio-quic-transport">[QUIC-TRANSPORT]</a>.</p>
+  max stream limit set by the remote endpoint, as specified in <a data-link-type="biblio" href="#biblio-quic-transport">[QUIC-TRANSPORT]</a>.</p>
         <li data-md>
          <p><var>p</var> has not been <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑦">settled</a>.</p>
        </ol>
@@ -888,8 +885,7 @@ All stream data is encrypted and congestion-controlled.</p>
          <p>The <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state④">state</a></code> has transitioned to <code>"connected"</code>.</p>
         <li data-md>
          <p>Stream creation flow control is not being violated by exceeding the
-  max stream limit set by the remote endpoint. For QUIC, this is
-  specified in <a data-link-type="biblio" href="#biblio-quic-transport">[QUIC-TRANSPORT]</a>.</p>
+  max stream limit set by the remote endpoint, as specified in <a data-link-type="biblio" href="#biblio-quic-transport">[QUIC-TRANSPORT]</a>.</p>
         <li data-md>
          <p><var>p</var> has not been <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①③">settled</a>.</p>
        </ol>
@@ -939,7 +935,7 @@ All stream data is encrypted and congestion-controlled.</p>
    </div>
    <h2 class="heading settled" data-level="6" id="datagram-transport"><span class="secno">6. </span><span class="content"><code>DatagramTransport</code> Mixin</span><a class="self-link" href="#datagram-transport"></a></h2>
    <p>A <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="datagramtransport"><code>DatagramTransport</code></dfn> can send and receive datagrams,
-as defined in <a data-link-type="biblio" href="#biblio-quic-datagram">[QUIC-DATAGRAM]</a>.
+as defined in <a data-link-type="biblio" href="#biblio-http3-datagram">[HTTP3-DATAGRAM]</a>.
 Datagrams are sent out of order, unreliably, and have a limited maximum size.
 Datagrams are encrypted and congestion controlled.</p>
 <pre class="idl highlight def"><c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#datagramtransport" id="ref-for-datagramtransport"><c- g>DatagramTransport</c-></a> {
@@ -975,12 +971,12 @@ Datagrams are encrypted and congestion controlled.</p>
  for short periods of time (due to the reader being paused).</p>
    </dl>
    <h2 class="heading settled" data-level="7" id="web-transport"><span class="secno">7. </span><span class="content"><code>WebTransport</code> Interface</span><a class="self-link" href="#web-transport"></a></h2>
-   <p><code>WebTransport</code> provides a unified interface to all client-server transports
-that are supported by the WebTransport API.  It implements all of the transport
+   <p><code>WebTransport</code> provides an API to the HTTP/3 transport functionality
+defined in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>. It implements all of the transport
 mixins (<code class="idl"><a data-link-type="idl" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport③">UnidirectionalStreamsTransport</a></code>, <code class="idl"><a data-link-type="idl" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport④">BidirectionalStreamsTransport</a></code>, <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport①">DatagramTransport</a></code>), as well as stats and transport state information.</p>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="webtransport"><code><c- g>WebTransport</c-></code></dfn> {
-  <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="constructor" data-export data-lt="WebTransport(url, options)|constructor(url, options)|WebTransport(url)|constructor(url)" id="dom-webtransport-webtransport"><code><c- g>constructor</c-></code></dfn>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString" id="ref-for-idl-USVString"><c- b>USVString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport/WebTransport(url, options), WebTransport/constructor(url, options), WebTransport/WebTransport(url), WebTransport/constructor(url)" data-dfn-type="argument" data-export id="dom-webtransport-webtransport-url-options-url"><code><c- g>url</c-></code></dfn>, <c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransportoptions" id="ref-for-dictdef-webtransportoptions"><c- n>WebTransportOptions</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport/WebTransport(url, options), WebTransport/constructor(url, options), WebTransport/WebTransport(url), WebTransport/constructor(url)" data-dfn-type="argument" data-export id="dom-webtransport-webtransport-url-options-options"><code><c- g>options</c-></code></dfn> = {});
+  <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="constructor" data-export data-lt="WebTransport(url, options)|constructor(url, options)|WebTransport(url)|constructor(url)" id="dom-webtransport-webtransport"><code><c- g>constructor</c-></code></dfn>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString" id="ref-for-idl-USVString"><c- b>USVString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport/WebTransport(url, options), WebTransport/constructor(url, options), WebTransport/WebTransport(url), WebTransport/constructor(url)" data-dfn-type="argument" data-export id="dom-webtransport-webtransport-url-options-url"><code><c- g>url</c-></code></dfn>, <c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransportoptions" id="ref-for-dictdef-webtransportoptions"><c- n>WebTransportOptions</c-></a> <dfn class="idl-code" data-dfn-for="WebTransport/WebTransport(url, options), WebTransport/constructor(url, options), WebTransport/WebTransport(url), WebTransport/constructor(url)" data-dfn-type="argument" data-export id="dom-webtransport-webtransport-url-options-options"><code><c- g>options</c-></code><a class="self-link" href="#dom-webtransport-webtransport-url-options-options"></a></dfn> = {});
 
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise" id="ref-for-idl-promise②"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportstats" id="ref-for-dictdef-webtransportstats"><c- n>WebTransportStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransport-getstats" id="ref-for-dom-webtransport-getstats"><c- g>getStats</c-></a>();
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransportstate" id="ref-for-enumdef-webtransportstate"><c- n>WebTransportState</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportState" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state⑤"><c- g>state</c-></a>;
@@ -1031,29 +1027,10 @@ agent MUST run the following steps:</p>
  slot representing a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①①">ReadableStream</a></code> of <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-Uint8Array" id="ref-for-idl-Uint8Array①">Uint8Array</a></code>s, initialized to
  empty.</p>
     <li data-md>
-     <p>If the scheme of <var>parsedURL</var> is <code>quic-transport</code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel">in parallel</a>, <a data-link-type="dfn" href="#initialize-webtransport-over-quic" id="ref-for-initialize-webtransport-over-quic">initialize WebTransport over QUIC</a>.</p>
-    <li data-md>
-     <p>If the scheme of <var>parsedURL</var> is <code>https</code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①">in parallel</a>, <a data-link-type="dfn" href="#initialize-webtransport-over-http" id="ref-for-initialize-webtransport-over-http">initialize WebTransport over HTTP</a>.</p>
+     <p>If the scheme of <var>parsedURL</var> is <code>https</code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel">in parallel</a>, <a data-link-type="dfn" href="#initialize-webtransport-over-http" id="ref-for-initialize-webtransport-over-http">initialize WebTransport over HTTP</a>.</p>
     <li data-md>
      <p>Return <var>transport</var>.</p>
    </ol>
-   <div class="algorithm" data-algorithm="initialize WebTransport over QUIC">
-     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="initialize-webtransport-over-quic">initialize WebTransport over QUIC</dfn> for a given <var>transport</var> and <var>parsedURL</var>, do the following: 
-    <ol>
-     <li data-md>
-      <p>Let <var>clientOrigin</var> be <var>transport</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object">relevant settings object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#concept-request-origin" id="ref-for-concept-request-origin">origin</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin" id="ref-for-ascii-serialisation-of-an-origin">serialized</a>.</p>
-     <li data-md>
-      <p>Establish a QUIC connection to the address identified by <var>parsedURL</var> following the procedures in <a data-link-type="biblio" href="#biblio-web-transport-quic">[WEB-TRANSPORT-QUIC]</a> section 3 and using <var>clientOrigin</var> as the "origin of the client" referenced in section 3.2.1.
- While establishing the connection, follow all of the parameters
- specified in the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransport-url-options-options" id="ref-for-dom-webtransport-webtransport-url-options-options">options</a></code>.</p>
-     <li data-md>
-      <p>If the connection fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code>, reject <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot">[[Ready]]</a></code> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror">TypeError</a></code> and abort these steps.</p>
-     <li data-md>
-      <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot①">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code>.</p>
-     <li data-md>
-      <p>Resolve <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot①">[[Ready]]</a></code> internal slot with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined②">undefined</a></code>.</p>
-    </ol>
-   </div>
    <div class="algorithm" data-algorithm="initialize WebTransport over HTTP">
      To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="initialize-webtransport-over-http">initialize WebTransport over HTTP</dfn> for a given <var>transport</var> and <var>parsedURL</var>, do the following: 
     <ol>
@@ -1063,11 +1040,11 @@ agent MUST run the following steps:</p>
      <li data-md>
       <p>Establish an HTTP/3 WebTransport session to the address identified by <var>parsedURL</var> following the procedures in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
-      <p>If the session establishment fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot②">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code>, reject <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot②">[[Ready]]</a></code> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror①">TypeError</a></code> and abort these steps.</p>
+      <p>If the session establishment fails, set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot">[[WebTransportState]]</a></code> internal slot to <code>"failed"</code>, reject <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot">[[Ready]]</a></code> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror">TypeError</a></code> and abort these steps.</p>
      <li data-md>
-      <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot③">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code>.</p>
+      <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot①">[[WebTransportState]]</a></code> internal slot to <code>"connected"</code>.</p>
      <li data-md>
-      <p>Resolve <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot③">[[Ready]]</a></code> internal slot with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined③">undefined</a></code>.</p>
+      <p>Resolve <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot①">[[Ready]]</a></code> internal slot with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined②">undefined</a></code>.</p>
     </ol>
    </div>
    <h3 class="heading settled" data-level="7.2" id="webtransport-attributes"><span class="secno">7.2. </span><span class="content">Attributes</span><a class="self-link" href="#webtransport-attributes"></a></h3>
@@ -1075,10 +1052,10 @@ agent MUST run the following steps:</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-state"><code>state</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransportstate" id="ref-for-enumdef-webtransportstate①">WebTransportState</a>, readonly</span>
     <dd data-md>
      <p>The current state of the transport. On getting, it MUST return the value of
- the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot④">[[WebTransportState]]</a></code> internal slot.</p>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-ready"><code>ready</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined④">undefined</a>>, readonly</span>
+ the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot②">[[WebTransportState]]</a></code> internal slot.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-ready"><code>ready</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined③">undefined</a>>, readonly</span>
     <dd data-md>
-     <p>On getting, it MUST return the value of the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot④">[[Ready]]</a></code> internal slot.</p>
+     <p>On getting, it MUST return the value of the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot②">[[Ready]]</a></code> internal slot.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-closed"><code>closed</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo②">WebTransportCloseInfo</a>>, readonly</span>
     <dd data-md>
      <p>This promise MUST be <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑥">resolved</a> when the transport is closed; an
@@ -1086,7 +1063,7 @@ agent MUST run the following steps:</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-onstatechange"><code>onstatechange</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler" id="ref-for-eventhandler②">EventHandler</a></span>
     <dd data-md>
      <p>This event handler, of event handler event type <code>statechange</code>, MUST be fired
- any time the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot⑤">[[WebTransportState]]</a></code> slot changes, unless the state changes
+ any time the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot③">[[WebTransportState]]</a></code> slot changes, unless the state changes
  due to calling <code class="idl"><a data-link-type="idl" href="#dom-webtransport-close" id="ref-for-dom-webtransport-close①">close</a></code>.</p>
    </dl>
    <h3 class="heading settled" data-level="7.3" id="webtransport-methods"><span class="secno">7.3. </span><span class="content">Methods</span><a class="self-link" href="#webtransport-methods"></a></h3>
@@ -1100,10 +1077,10 @@ agent MUST run the following steps:</p>
       <li data-md>
        <p>Let <var>transport</var> be the WebTransport on which <code>close</code> is invoked.</p>
       <li data-md>
-       <p>If <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot⑥">[[WebTransportState]]</a></code> is <code>"closed"</code> or <code>"failed"</code>,
+       <p>If <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot④">[[WebTransportState]]</a></code> is <code>"closed"</code> or <code>"failed"</code>,
   then abort these steps.</p>
       <li data-md>
-       <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot⑦">[[WebTransportState]]</a></code> to <code>"closed"</code>.</p>
+       <p>Set <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot⑤">[[WebTransportState]]</a></code> to <code>"closed"</code>.</p>
       <li data-md>
        <p>Let <code>closeInfo</code> be the first argument.</p>
       <li data-md>
@@ -1214,7 +1191,7 @@ without key rotation.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportState" data-dfn-type="enum-value" data-export id="dom-webtransportstate-closed"><code>"closed"</code></dfn>
     <dd data-md>
      <p>The transport has been closed intentionally via a call to <code class="idl"><a data-link-type="idl" href="#dom-webtransport-close" id="ref-for-dom-webtransport-close②">close()</a></code> or receipt of a closing message from the remote
- side.  When the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑤">WebTransport</a></code>'s internal <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot⑧">[[WebTransportState]]</a></code> slot
+ side.  When the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑤">WebTransport</a></code>'s internal <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot⑥">[[WebTransportState]]</a></code> slot
  transitions to <code>closed</code> the user agent MUST run the following steps:</p>
      <ol>
       <li data-md>
@@ -1235,7 +1212,7 @@ without key rotation.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportState" data-dfn-type="enum-value" data-export id="dom-webtransportstate-failed"><code>"failed"</code></dfn>
     <dd data-md>
      <p>The transport has been closed as the result of an error (such as receipt of
- an error alert). When the WebTransport’s internal <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot⑨">[[WebTransportState]]</a></code> slot transitions to <code>failed</code> the user agent MUST run the following steps:</p>
+ an error alert). When the WebTransport’s internal <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransportstate-slot" id="ref-for-dom-webtransport-webtransportstate-slot⑦">[[WebTransportState]]</a></code> slot transitions to <code>failed</code> the user agent MUST run the following steps:</p>
      <ol>
       <li data-md>
        <p>Close the <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①④">ReadableStream</a></code> in <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-receivedstreams-slot" id="ref-for-dom-webtransport-receivedstreams-slot③">[[ReceivedStreams]]</a></code> internal slot.</p>
@@ -1328,7 +1305,7 @@ either a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-fo
 <c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#outgoingstream" id="ref-for-outgoingstream④"><c- g>OutgoingStream</c-></a> {
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑤"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable"><c- g>writable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise" id="ref-for-idl-promise⑤"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-outgoingstream-writingaborted" id="ref-for-dom-outgoingstream-writingaborted"><c- g>writingAborted</c-></a>;
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined⑤"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-outgoingstream-abortwriting" id="ref-for-dom-outgoingstream-abortwriting"><c- g>abortWriting</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo①"><c- n>StreamAbortInfo</c-></a> <dfn class="idl-code" data-dfn-for="OutgoingStream/abortWriting(abortInfo), OutgoingStream/abortWriting()" data-dfn-type="argument" data-export id="dom-outgoingstream-abortwriting-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code><a class="self-link" href="#dom-outgoingstream-abortwriting-abortinfo-abortinfo"></a></dfn> = {});
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined④"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-outgoingstream-abortwriting" id="ref-for-dom-outgoingstream-abortwriting"><c- g>abortWriting</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo①"><c- n>StreamAbortInfo</c-></a> <dfn class="idl-code" data-dfn-for="OutgoingStream/abortWriting(abortInfo), OutgoingStream/abortWriting()" data-dfn-type="argument" data-export id="dom-outgoingstream-abortwriting-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code><a class="self-link" href="#dom-outgoingstream-abortwriting-abortinfo-abortinfo"></a></dfn> = {});
 };
 </pre>
    <h3 class="heading settled" data-level="8.1" id="outgoing-stream-overview"><span class="secno">8.1. </span><span class="content">Overview</span><a class="self-link" href="#outgoing-stream-overview"></a></h3>
@@ -1412,7 +1389,7 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
   /* a ReadableStream of Uint8Array */
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑥"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable"><c- g>readable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise" id="ref-for-idl-promise⑥"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑤"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-incomingstream-readingaborted" id="ref-for-dom-incomingstream-readingaborted"><c- g>readingAborted</c-></a>;
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined⑥"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-abortreading" id="ref-for-dom-incomingstream-abortreading"><c- g>abortReading</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑥"><c- n>StreamAbortInfo</c-></a> <dfn class="idl-code" data-dfn-for="IncomingStream/abortReading(abortInfo), IncomingStream/abortReading()" data-dfn-type="argument" data-export id="dom-incomingstream-abortreading-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code><a class="self-link" href="#dom-incomingstream-abortreading-abortinfo-abortinfo"></a></dfn> = {});
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined⑤"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-abortreading" id="ref-for-dom-incomingstream-abortreading"><c- g>abortReading</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑥"><c- n>StreamAbortInfo</c-></a> <dfn class="idl-code" data-dfn-for="IncomingStream/abortReading(abortInfo), IncomingStream/abortReading()" data-dfn-type="argument" data-export id="dom-incomingstream-abortreading-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code><a class="self-link" href="#dom-incomingstream-abortreading-abortinfo-abortinfo"></a></dfn> = {});
 };
 </pre>
    <h3 class="heading settled" data-level="9.1" id="incoming-stream-overview"><span class="secno">9.1. </span><span class="content">Overview</span><a class="self-link" href="#incoming-stream-overview"></a></h3>
@@ -1542,7 +1519,7 @@ summarizes information already present in other parts of the specification.</p>
 that can observe the network, so this has to be regarded as public information.</p>
    <p>All of the transport protocols described in this document use either TLS <a data-link-type="biblio" href="#biblio-rfc8446">[RFC8446]</a> or a semantically equivalent protocol, thus providing all of the
 security properties of TLS, including confidentiality and integrity of the
-traffic. Both QuicTransport and Http3Transport use the same certificate
+traffic. Http3Transport uses the same certificate
 verification mechanism as outbound HTTP requests, thus relying on the same
 public key infrastructure for authentication of the remote server. In
 WebTransport, certificate verification errors are fatal; no interstitial
@@ -1559,20 +1536,17 @@ client. This is not specific to WebTransport by itself, but rather an inherent
 property of all TLS-based protocols; thus, this is out-of-scope for this
 specification.</p>
    <h3 class="heading settled" data-level="14.3" id="protocol-security"><span class="secno">14.3. </span><span class="content">Protocol Security</span><a class="self-link" href="#protocol-security"></a></h3>
-   <p>WebTransport imposes a common set of requirements on all of the protocols,
-described in <a data-link-type="biblio" href="#biblio-web-transport-overview">[WEB-TRANSPORT-OVERVIEW]</a>. Notable ones include:</p>
+   <p>WebTransport imposes a set of requirements as described in <a data-link-type="biblio" href="#biblio-web-transport-overview">[WEB-TRANSPORT-OVERVIEW]</a>, including:</p>
    <ol>
     <li data-md>
-     <p>All transports must ensure that the remote server is aware that the
+     <p>Ensuring that the remote server is aware that the
  connection in question originates from a Web application; this is required
- to prevent cross-protocol attacks. QUIC-based transports use ALPN <a data-link-type="biblio" href="#biblio-rfc7301">[RFC7301]</a> for that purpose.</p>
+ to prevent cross-protocol attacks. <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a> uses ALPN <a data-link-type="biblio" href="#biblio-rfc7301">[RFC7301]</a> for this purpose.</p>
     <li data-md>
-     <p>All transports must allow the server to filter connections based on the
+     <p>Allowing the server to filter connections based on the
  origin of the resource originating the transport session.</p>
    </ol>
-   <p>Protocol security considersations related to the individual transports are
-described in the <em>Security Considerations</em> sections of the corresponding
-protocol documents, <a data-link-type="biblio" href="#biblio-web-transport-quic">[WEB-TRANSPORT-QUIC]</a> and <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.</p>
+   <p>Protocol security considerations related are described in the <em>Security Considerations</em> sections of <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.</p>
    <p>Networking APIs can be commonly used to scan the local network for available
 hosts, and thus be used for fingerprinting and other forms of attacks.
 WebTransport follows the <a href="https://html.spec.whatwg.org/multipage/web-sockets.html#feedback-from-the-protocol">WebSocket
@@ -1855,7 +1829,6 @@ and has been adapted for use in this specification.</p>
    <li><a href="#incomingstream">IncomingStream</a><span>, in §9</span>
    <li><a href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams">incomingUnidirectionalStreams</a><span>, in §4.1</span>
    <li><a href="#initialize-webtransport-over-http">initialize WebTransport over HTTP</a><span>, in §7.1</span>
-   <li><a href="#initialize-webtransport-over-quic">initialize WebTransport over QUIC</a><span>, in §7.1</span>
    <li><a href="#dom-datagramtransport-maxdatagramsize">maxDatagramSize</a><span>, in §6.1</span>
    <li><a href="#dom-webtransportstats-minrtt">minRtt</a><span>, in §7.7</span>
    <li><a href="#dom-webtransportstats-numincomingstreamscreated">numIncomingStreamsCreated</a><span>, in §7.7</span>
@@ -2001,12 +1974,6 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-eventhandler②">7.2. Attributes</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-ascii-serialisation-of-an-origin">
-   <a href="https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin">https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-ascii-serialisation-of-an-origin">7.1. Constructor</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-event-handlers">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handlers">https://html.spec.whatwg.org/multipage/webappapis.html#event-handlers</a><b>Referenced in:</b>
    <ul>
@@ -2022,7 +1989,7 @@ and has been adapted for use in this specification.</p>
   <aside class="dfn-panel" data-for="term-for-in-parallel">
    <a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-in-parallel">7.1. Constructor</a> <a href="#ref-for-in-parallel①">(2)</a>
+    <li><a href="#ref-for-in-parallel">7.1. Constructor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-networking-task-source">
@@ -2031,22 +1998,10 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-networking-task-source">3. Terminology</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-concept-request-origin">
-   <a href="https://html.spec.whatwg.org/multipage/infrastructure.html#concept-request-origin">https://html.spec.whatwg.org/multipage/infrastructure.html#concept-request-origin</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-concept-request-origin">7.1. Constructor</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-queue-a-task">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-queue-a-task">3. Terminology</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="term-for-relevant-settings-object">
-   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-relevant-settings-object">7.1. Constructor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-url-fragment">
@@ -2124,7 +2079,7 @@ and has been adapted for use in this specification.</p>
   <aside class="dfn-panel" data-for="term-for-exceptiondef-typeerror">
    <a href="https://heycam.github.io/webidl/#exceptiondef-typeerror">https://heycam.github.io/webidl/#exceptiondef-typeerror</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-exceptiondef-typeerror">7.1. Constructor</a> <a href="#ref-for-exceptiondef-typeerror①">(2)</a>
+    <li><a href="#ref-for-exceptiondef-typeerror">7.1. Constructor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-USVString">
@@ -2156,10 +2111,10 @@ and has been adapted for use in this specification.</p>
    <a href="https://heycam.github.io/webidl/#idl-undefined">https://heycam.github.io/webidl/#idl-undefined</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-undefined">7. WebTransport Interface</a> <a href="#ref-for-idl-undefined①">(2)</a>
-    <li><a href="#ref-for-idl-undefined②">7.1. Constructor</a> <a href="#ref-for-idl-undefined③">(2)</a>
-    <li><a href="#ref-for-idl-undefined④">7.2. Attributes</a>
-    <li><a href="#ref-for-idl-undefined⑤">8. Interface Mixin OutgoingStream</a>
-    <li><a href="#ref-for-idl-undefined⑥">9. Interface Mixin IncomingStream</a>
+    <li><a href="#ref-for-idl-undefined②">7.1. Constructor</a>
+    <li><a href="#ref-for-idl-undefined③">7.2. Attributes</a>
+    <li><a href="#ref-for-idl-undefined④">8. Interface Mixin OutgoingStream</a>
+    <li><a href="#ref-for-idl-undefined⑤">9. Interface Mixin IncomingStream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-unsigned-long">
@@ -2274,14 +2229,11 @@ and has been adapted for use in this specification.</p>
     <ul>
      <li><span class="dfn-paneled" id="term-for-errorevent">ErrorEvent</span>
      <li><span class="dfn-paneled" id="term-for-eventhandler">EventHandler</span>
-     <li><span class="dfn-paneled" id="term-for-ascii-serialisation-of-an-origin">ascii serialization of an origin</span>
      <li><span class="dfn-paneled" id="term-for-event-handlers">event handler</span>
      <li><span class="dfn-paneled" id="term-for-event-handler-event-type">event handler event type</span>
      <li><span class="dfn-paneled" id="term-for-in-parallel">in parallel</span>
      <li><span class="dfn-paneled" id="term-for-networking-task-source">networking task source</span>
-     <li><span class="dfn-paneled" id="term-for-concept-request-origin">origin</span>
      <li><span class="dfn-paneled" id="term-for-queue-a-task">queue a task</span>
-     <li><span class="dfn-paneled" id="term-for-relevant-settings-object">relevant settings object</span>
     </ul>
    <li>
     <a data-link-type="biblio">[URL]</a> defines the following terms:
@@ -2340,8 +2292,8 @@ and has been adapted for use in this specification.</p>
    <dd>Ilya Grigorik. <a href="https://www.w3.org/TR/hr-time-2/">High Resolution Time Level 2</a>. 21 November 2019. REC. URL: <a href="https://www.w3.org/TR/hr-time-2/">https://www.w3.org/TR/hr-time-2/</a>
    <dt id="biblio-html">[HTML]
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/">HTML Standard</a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
-   <dt id="biblio-quic-datagram">[QUIC-DATAGRAM]
-   <dd>Tommy Pauly; Eric Kinnear; David Schinazi. <a href="https://tools.ietf.org/html/draft-ietf-quic-datagram">An Unreliable Datagram Extension to QUIC</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-quic-datagram">https://tools.ietf.org/html/draft-ietf-quic-datagram</a>
+   <dt id="biblio-http3-datagram">[HTTP3-DATAGRAM]
+   <dd>David Schinazi; Lucas Pardue. <a href="https://tools.ietf.org/html/draft-ietf-masque-h3-datagram">Using QUIC Datagrams with HTTP/3</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-masque-h3-datagram">https://tools.ietf.org/html/draft-ietf-masque-h3-datagram</a>
    <dt id="biblio-quic-transport">[QUIC-TRANSPORT]
    <dd>Jana Iyengar; Martin Thomson. <a href="https://quicwg.org/base-drafts/draft-ietf-quic-transport.html">QUIC: A UDP-Based Multiplexed and Secure Transport</a>. Internet-Draft. URL: <a href="https://quicwg.org/base-drafts/draft-ietf-quic-transport.html">https://quicwg.org/base-drafts/draft-ietf-quic-transport.html</a>
    <dt id="biblio-rfc2119">[RFC2119]
@@ -2356,8 +2308,6 @@ and has been adapted for use in this specification.</p>
    <dd>Victor Vasiliev. <a href="https://tools.ietf.org/html/draft-vvv-webtransport-http3">WebTransport over HTTP/3</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-vvv-webtransport-http3">https://tools.ietf.org/html/draft-vvv-webtransport-http3</a>
    <dt id="biblio-web-transport-overview">[WEB-TRANSPORT-OVERVIEW]
    <dd>Victor Vasiliev. <a href="https://tools.ietf.org/html/draft-ietf-webtrans-overview">WebTransport Protocol Framework</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-webtrans-overview">https://tools.ietf.org/html/draft-ietf-webtrans-overview</a>
-   <dt id="biblio-web-transport-quic">[WEB-TRANSPORT-QUIC]
-   <dd>Victor Vasiliev. <a href="https://tools.ietf.org/html/draft-vvv-webtransport-quic">WebTransport over QUIC</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-vvv-webtransport-quic">https://tools.ietf.org/html/draft-vvv-webtransport-quic</a>
    <dt id="biblio-webidl">[WEBIDL]
    <dd>Boris Zbarsky. <a href="https://heycam.github.io/webidl/">Web IDL</a>. 15 December 2016. ED. URL: <a href="https://heycam.github.io/webidl/">https://heycam.github.io/webidl/</a>
    <dt id="biblio-webrtc-1">[WEBRTC-1]
@@ -2606,12 +2556,6 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
     <li><a href="#ref-for-dom-webtransport-webtransport-url-options-url">7.1. Constructor</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-webtransport-webtransport-url-options-options">
-   <b><a href="#dom-webtransport-webtransport-url-options-options">#dom-webtransport-webtransport-url-options-options</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-webtransport-webtransport-url-options-options">7.1. Constructor</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-outgoingstreams-slot">
    <b><a href="#dom-webtransport-outgoingstreams-slot">#dom-webtransport-outgoingstreams-slot</a></b><b>Referenced in:</b>
    <ul>
@@ -2640,17 +2584,17 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
   <aside class="dfn-panel" data-for="dom-webtransport-webtransportstate-slot">
    <b><a href="#dom-webtransport-webtransportstate-slot">#dom-webtransport-webtransportstate-slot</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-webtransport-webtransportstate-slot">7.1. Constructor</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot①">(2)</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot②">(3)</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot③">(4)</a>
-    <li><a href="#ref-for-dom-webtransport-webtransportstate-slot④">7.2. Attributes</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot⑤">(2)</a>
-    <li><a href="#ref-for-dom-webtransport-webtransportstate-slot⑥">7.3. Methods</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot⑦">(2)</a>
-    <li><a href="#ref-for-dom-webtransport-webtransportstate-slot⑧">7.5. WebTransportState Enum</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot⑨">(2)</a>
+    <li><a href="#ref-for-dom-webtransport-webtransportstate-slot">7.1. Constructor</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot①">(2)</a>
+    <li><a href="#ref-for-dom-webtransport-webtransportstate-slot②">7.2. Attributes</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot③">(2)</a>
+    <li><a href="#ref-for-dom-webtransport-webtransportstate-slot④">7.3. Methods</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot⑤">(2)</a>
+    <li><a href="#ref-for-dom-webtransport-webtransportstate-slot⑥">7.5. WebTransportState Enum</a> <a href="#ref-for-dom-webtransport-webtransportstate-slot⑦">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-ready-slot">
    <b><a href="#dom-webtransport-ready-slot">#dom-webtransport-ready-slot</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-webtransport-ready-slot">7.1. Constructor</a> <a href="#ref-for-dom-webtransport-ready-slot①">(2)</a> <a href="#ref-for-dom-webtransport-ready-slot②">(3)</a> <a href="#ref-for-dom-webtransport-ready-slot③">(4)</a>
-    <li><a href="#ref-for-dom-webtransport-ready-slot④">7.2. Attributes</a>
+    <li><a href="#ref-for-dom-webtransport-ready-slot">7.1. Constructor</a> <a href="#ref-for-dom-webtransport-ready-slot①">(2)</a>
+    <li><a href="#ref-for-dom-webtransport-ready-slot②">7.2. Attributes</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-sentdatagrams-slot">
@@ -2663,12 +2607,6 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <b><a href="#dom-webtransport-receiveddatagrams-slot">#dom-webtransport-receiveddatagrams-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-webtransport-receiveddatagrams-slot">6.1. Attributes</a> <a href="#ref-for-dom-webtransport-receiveddatagrams-slot①">(2)</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="initialize-webtransport-over-quic">
-   <b><a href="#initialize-webtransport-over-quic">#initialize-webtransport-over-quic</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-initialize-webtransport-over-quic">7.1. Constructor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="initialize-webtransport-over-http">
