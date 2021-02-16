@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version c5172e83, updated Fri Nov 20 15:35:20 2020 -0800" name="generator">
   <link href="https://github.com/w3c/webtransport" rel="canonical">
-  <meta content="d1e913f2d6897ce3d99a4be1c9d0bb48829f9538" name="document-revision">
+  <meta content="446e63d0d458750749f8b7bfb25a711adc1699f1" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -580,7 +580,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2021-02-03">3 February 2021</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2021-02-16">16 February 2021</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1637,7 +1637,7 @@ interleaved, and therefore only reads one stream at a time.</p>
    <p>This example illustrates use of the closed and ready promises, opening
 of uni-directional and bi-directional streams by either the client or
 the server, and sending and receiving datagrams.</p>
-<pre class="example highlight" id="example-214fbdb4"><a class="self-link" href="#example-214fbdb4"></a><c- c1>// Adds an entry to the event log on the page, optionally applying a specified</c->
+<pre class="example highlight" id="example-2f0a3f3d"><a class="self-link" href="#example-2f0a3f3d"></a><c- c1>// Adds an entry to the event log on the page, optionally applying a specified</c->
 <c- c1>// CSS class.</c->
 
 <c- a>let</c-> transport<c- p>,</c-> streamNumber<c- p>,</c-> datagramWriter<c- p>;</c->
@@ -1734,12 +1734,12 @@ async <c- a>function</c-> acceptUnidirectionalStreams<c- p>()</c-> <c- p>{</c->
 async <c- a>function</c-> readFromIncomingStream<c- p>(</c->stream<c- p>,</c-> number<c- p>)</c-> <c- p>{</c->
   <c- k>try</c-> <c- p>{</c->
     <c- kr>const</c-> decoder <c- o>=</c-> <c- k>new</c-> TextDecoderStream<c- p>(</c-><c- t>'utf-8'</c-><c- p>);</c->
-    <c- k>for</c-> await <c- p>(</c-><c- kr>const</c-> chunk <c- k>of</c-> stream<c- p>.</c->readable<c- p>.</c->pipeThrough<c- p>(</c->decoder<c- p>).</c->getReader<c- p>())</c-> <c- p>{</c->
+    <c- k>for</c-> await <c- p>(</c-><c- kr>const</c-> chunk <c- k>of</c-> stream<c- p>.</c->readable<c- p>.</c->pipeThrough<c- p>(</c->decoder<c- p>))</c-> <c- p>{</c->
       addToEventLog<c- p>(</c-><c- sb>`Received data on stream #</c-><c- si>${</c->number<c- si>}</c-><c- sb>: </c-><c- si>${</c->chunk<c- si>}</c-><c- sb>`</c-><c- p>);</c->
     <c- p>}</c->
     addToEventLog<c- p>(</c-><c- sb>`Stream #</c-><c- si>${</c->number<c- si>}</c-><c- sb> closed`</c-><c- p>);</c->
   <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
-    addToEventLog<c- p>(</c-><c- sb>`Error while reading from stream #</c-><c- si>${</c->number"<c- o>:</c-> $<c- p>{</c->e<c- si>}</c-><c- sb>`</c-><c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
+    addToEventLog<c- p>(</c-><c- sb>`Error while reading from stream #</c-><c- si>${</c->number"<c- si>}</c-><c- sb>: </c-><c- si>${</c->e<c- si>}</c-><c- sb>`</c-><c- p>,</c-> <c- t>'error'</c-><c- p>);</c->
     addToEventLog<c- p>(</c-><c- sb>`    </c-><c- si>${</c->e<c- p>.</c->message<c- si>}</c-><c- sb>`</c-><c- p>);</c->
   <c- p>}</c->
 <c- p>}</c->
