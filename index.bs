@@ -1136,7 +1136,7 @@ async function acceptUnidirectionalStreams() {
 async function readFromIncomingStream(stream, number) {
   try {
     const decoder = new TextDecoderStream('utf-8');
-    for await (const chunk of stream.readable.pipeThrough(decoder).getReader()) {
+    for await (const chunk of stream.readable.pipeThrough(decoder)) {
       addToEventLog(&#96;Received data on stream #${number}: ${chunk}&#96;);
     }
     addToEventLog(&#96;Stream #${number} closed&#96;);
