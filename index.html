@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version c5172e83, updated Fri Nov 20 15:35:20 2020 -0800" name="generator">
   <link href="https://github.com/w3c/webtransport" rel="canonical">
-  <meta content="446e63d0d458750749f8b7bfb25a711adc1699f1" name="document-revision">
+  <meta content="fe2dda424432f1da1a8250d8a489d11fa0e23bd1" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -676,24 +676,25 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     <li><a href="#bidirectional-stream"><span class="secno">10</span> <span class="content">Interface <code>BidirectionalStream</code></span></a>
     <li><a href="#send-stream"><span class="secno">11</span> <span class="content">Interface <code>SendStream</code></span></a>
     <li><a href="#receive-stream"><span class="secno">12</span> <span class="content">Interface <code>ReceiveStream</code></span></a>
+    <li><a href="#protocol-mapping"><span class="secno">13</span> <span class="content">Protocol Mappings</span></a>
     <li>
-     <a href="#privacy-security"><span class="secno">13</span> <span class="content">Privacy and Security Considerations</span></a>
+     <a href="#privacy-security"><span class="secno">14</span> <span class="content">Privacy and Security Considerations</span></a>
      <ol class="toc">
-      <li><a href="#confidentiality"><span class="secno">13.1</span> <span class="content">Confidentiality of Communications</span></a>
-      <li><a href="#state-persistence"><span class="secno">13.2</span> <span class="content">State Persistence</span></a>
-      <li><a href="#protocol-security"><span class="secno">13.3</span> <span class="content">Protocol Security</span></a>
+      <li><a href="#confidentiality"><span class="secno">14.1</span> <span class="content">Confidentiality of Communications</span></a>
+      <li><a href="#state-persistence"><span class="secno">14.2</span> <span class="content">State Persistence</span></a>
+      <li><a href="#protocol-security"><span class="secno">14.3</span> <span class="content">Protocol Security</span></a>
      </ol>
     <li>
-     <a href="#examples"><span class="secno">14</span> <span class="content">Examples</span></a>
+     <a href="#examples"><span class="secno">15</span> <span class="content">Examples</span></a>
      <ol class="toc">
-      <li><a href="#example-datagrams"><span class="secno">14.1</span> <span class="content">Sending a buffer of datagrams</span></a>
-      <li><a href="#example-fixed-rate"><span class="secno">14.2</span> <span class="content">Sending datagrams at a fixed rate</span></a>
-      <li><a href="#example-receiving-datagrams"><span class="secno">14.3</span> <span class="content">Receiving datagrams</span></a>
-      <li><a href="#example-sending-stream"><span class="secno">14.4</span> <span class="content">Sending a stream</span></a>
-      <li><a href="#example-receiving-incoming-streams"><span class="secno">14.5</span> <span class="content">Receiving incoming streams</span></a>
-      <li><a href="#example-complete"><span class="secno">14.6</span> <span class="content">Complete example</span></a>
+      <li><a href="#example-datagrams"><span class="secno">15.1</span> <span class="content">Sending a buffer of datagrams</span></a>
+      <li><a href="#example-fixed-rate"><span class="secno">15.2</span> <span class="content">Sending datagrams at a fixed rate</span></a>
+      <li><a href="#example-receiving-datagrams"><span class="secno">15.3</span> <span class="content">Receiving datagrams</span></a>
+      <li><a href="#example-sending-stream"><span class="secno">15.4</span> <span class="content">Sending a stream</span></a>
+      <li><a href="#example-receiving-incoming-streams"><span class="secno">15.5</span> <span class="content">Receiving incoming streams</span></a>
+      <li><a href="#example-complete"><span class="secno">15.6</span> <span class="content">Complete example</span></a>
      </ol>
-    <li><a href="#acknowledgements"><span class="secno">15</span> <span class="content">Acknowledgements</span></a>
+    <li><a href="#acknowledgements"><span class="secno">16</span> <span class="content">Acknowledgements</span></a>
     <li>
      <a href="#index"><span class="secno"></span> <span class="content">Index</span></a>
      <ol class="toc">
@@ -1490,10 +1491,53 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
 };
 <a data-link-type="idl-name" href="#receivestream" id="ref-for-receivestream③"><c- n>ReceiveStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#incomingstream" id="ref-for-incomingstream①①"><c- n>IncomingStream</c-></a>;
 </pre>
-   <h2 class="heading settled" data-level="13" id="privacy-security"><span class="secno">13. </span><span class="content">Privacy and Security Considerations</span><a class="self-link" href="#privacy-security"></a></h2>
+   <h2 class="heading settled" data-level="13" id="protocol-mapping"><span class="secno">13. </span><span class="content">Protocol Mappings</span><a class="self-link" href="#protocol-mapping"></a></h2>
+   <p><em>This section is non-normative.</em></p>
+   <p>This section describes the QUIC protocol behavior of methods defined
+in this specification, utilizing <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.</p>
+   <table class="data">
+    <colgroup class="header">
+    <colgroup span="2">
+    <thead>
+     <tr>
+      <th>Method
+      <th>QUIC Protocol Action
+    <tbody>
+     <tr>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-incomingstream-abortreading" id="ref-for-dom-incomingstream-abortreading①">abortReading</a></code>
+      <td>send STOP_SENDING with code
+     <tr>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-abortwriting" id="ref-for-dom-outgoingstream-abortwriting①">abortWriting</a></code>
+      <td>send RESET_STREAM with code
+     <tr>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable①">writable</a></code>.abort()
+      <td>send RESET_STREAM
+     <tr>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable②">writable</a></code>.close()
+      <td>send STREAM_FINAL
+     <tr>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable③">writable</a></code>.getWriter().write()
+      <td>send STREAM
+     <tr>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable④">writable</a></code>.getWriter().close()
+      <td>send STREAM_FINAL
+     <tr>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable⑤">writable</a></code>.getWriter().abort()
+      <td>send RESET_STREAM
+     <tr>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable①">readable</a></code>.cancel()
+      <td>send STOP_SENDING
+     <tr>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable②">readable</a></code>.getReader().read()
+      <td>receive STREAM or STREAM_FINAL
+     <tr>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable③">readable</a></code>.getReader().cancel()
+      <td>send STOP_SENDING
+   </table>
+   <h2 class="heading settled" data-level="14" id="privacy-security"><span class="secno">14. </span><span class="content">Privacy and Security Considerations</span><a class="self-link" href="#privacy-security"></a></h2>
    <p>This section is non-normative; it specifies no new behaviour, but instead
 summarizes information already present in other parts of the specification.</p>
-   <h3 class="heading settled" data-level="13.1" id="confidentiality"><span class="secno">13.1. </span><span class="content">Confidentiality of Communications</span><a class="self-link" href="#confidentiality"></a></h3>
+   <h3 class="heading settled" data-level="14.1" id="confidentiality"><span class="secno">14.1. </span><span class="content">Confidentiality of Communications</span><a class="self-link" href="#confidentiality"></a></h3>
    <p>The fact that communication is taking place cannot be hidden from adversaries
 that can observe the network, so this has to be regarded as public information.</p>
    <p>All of the transport protocols described in this document use either TLS <a data-link-type="biblio" href="#biblio-rfc8446">[RFC8446]</a> or a semantically equivalent protocol, thus providing all of the
@@ -1503,7 +1547,7 @@ verification mechanism as outbound HTTP requests, thus relying on the same
 public key infrastructure for authentication of the remote server. In
 WebTransport, certificate verification errors are fatal; no interstitial
 allowing bypassing certificate validation is available.</p>
-   <h3 class="heading settled" data-level="13.2" id="state-persistence"><span class="secno">13.2. </span><span class="content">State Persistence</span><a class="self-link" href="#state-persistence"></a></h3>
+   <h3 class="heading settled" data-level="14.2" id="state-persistence"><span class="secno">14.2. </span><span class="content">State Persistence</span><a class="self-link" href="#state-persistence"></a></h3>
    <p>WebTransport by itself does not create any new unique identifiers or new ways
 to persistently store state, nor does it automatically expose any of the
 existing persistent state to the server. For instance, none of the transports
@@ -1514,7 +1558,7 @@ passive network observers) to correlate different connections from the same
 client. This is not specific to WebTransport by itself, but rather an inherent
 property of all TLS-based protocols; thus, this is out-of-scope for this
 specification.</p>
-   <h3 class="heading settled" data-level="13.3" id="protocol-security"><span class="secno">13.3. </span><span class="content">Protocol Security</span><a class="self-link" href="#protocol-security"></a></h3>
+   <h3 class="heading settled" data-level="14.3" id="protocol-security"><span class="secno">14.3. </span><span class="content">Protocol Security</span><a class="self-link" href="#protocol-security"></a></h3>
    <p>WebTransport imposes a common set of requirements on all of the protocols,
 described in <a data-link-type="biblio" href="#biblio-web-transport-overview">[WEB-TRANSPORT-OVERVIEW]</a>. Notable ones include:</p>
    <ol>
@@ -1536,8 +1580,8 @@ approach</a> to this problem: the specific connection error is not returned unti
 endpoint is verified to be a WebTransport endpoint; thus, the Web application
 cannot distinguish between a non-existing endpoint and the endpoint that is not
 willing to accept connections from the Web.</p>
-   <h2 class="heading settled" data-level="14" id="examples"><span class="secno">14. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
-   <h3 class="heading settled" data-level="14.1" id="example-datagrams"><span class="secno">14.1. </span><span class="content">Sending a buffer of datagrams</span><a class="self-link" href="#example-datagrams"></a></h3>
+   <h2 class="heading settled" data-level="15" id="examples"><span class="secno">15. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
+   <h3 class="heading settled" data-level="15.1" id="example-datagrams"><span class="secno">15.1. </span><span class="content">Sending a buffer of datagrams</span><a class="self-link" href="#example-datagrams"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Sending a buffer of datagrams can be achieved by using the <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramwritable" id="ref-for-dom-datagramtransport-datagramwritable②">datagramWritable</a></code> attribute. In the following example
 datagrams are only sent if the <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport③">DatagramTransport</a></code> is ready to send.</p>
@@ -1550,7 +1594,7 @@ datagrams are only sent if the <code class="idl"><a data-link-type="idl" href="#
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h3 class="heading settled" data-level="14.2" id="example-fixed-rate"><span class="secno">14.2. </span><span class="content">Sending datagrams at a fixed rate</span><a class="self-link" href="#example-fixed-rate"></a></h3>
+   <h3 class="heading settled" data-level="15.2" id="example-fixed-rate"><span class="secno">15.2. </span><span class="content">Sending datagrams at a fixed rate</span><a class="self-link" href="#example-fixed-rate"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Sending datagrams at a fixed rate regardless if the transport is ready to send
 can be achieved by simply using <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramwritable" id="ref-for-dom-datagramtransport-datagramwritable③">datagramWritable</a></code> and not
@@ -1564,7 +1608,7 @@ async <c- a>function</c-> sendFixedRate<c- p>(</c->url<c- p>,</c-> createDatagra
   setInterval<c- p>(()</c-> <c- p>=></c-> writer<c- p>.</c->write<c- p>(</c->datagram<c- p>).</c-><c- k>catch</c-><c- p>(()</c-> <c- p>=></c-> <c- p>{}),</c-> ms<c- p>);</c->
 <c- p>}</c->
 </pre>
-   <h3 class="heading settled" data-level="14.3" id="example-receiving-datagrams"><span class="secno">14.3. </span><span class="content">Receiving datagrams</span><a class="self-link" href="#example-receiving-datagrams"></a></h3>
+   <h3 class="heading settled" data-level="15.3" id="example-receiving-datagrams"><span class="secno">15.3. </span><span class="content">Receiving datagrams</span><a class="self-link" href="#example-receiving-datagrams"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Receiving datagrams can be achieved by calling <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagramreadable" id="ref-for-dom-datagramtransport-datagramreadable②">datagramReadable</a></code> attribute, remembering to check for
 null values indicating that packets are not being processed quickly enough.</p>
@@ -1575,7 +1619,7 @@ null values indicating that packets are not being processed quickly enough.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h3 class="heading settled" data-level="14.4" id="example-sending-stream"><span class="secno">14.4. </span><span class="content">Sending a stream</span><a class="self-link" href="#example-sending-stream"></a></h3>
+   <h3 class="heading settled" data-level="15.4" id="example-sending-stream"><span class="secno">15.4. </span><span class="content">Sending a stream</span><a class="self-link" href="#example-sending-stream"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Sending data as a one-way stream can be achieved by using the <code class="idl"><a data-link-type="idl" href="#dom-unidirectionalstreamstransport-createunidirectionalstream" id="ref-for-dom-unidirectionalstreamstransport-createunidirectionalstream①">createUnidirectionalStream</a></code> function and the
 resulting stream’s writer.</p>
@@ -1596,7 +1640,7 @@ resulting stream’s writer.</p>
     <c- p>.</c->pipeTo<c- p>(</c->stream<c- p>.</c->writable<c- p>);</c->
 <c- p>}</c->
 </pre>
-   <h3 class="heading settled" data-level="14.5" id="example-receiving-incoming-streams"><span class="secno">14.5. </span><span class="content">Receiving incoming streams</span><a class="self-link" href="#example-receiving-incoming-streams"></a></h3>
+   <h3 class="heading settled" data-level="15.5" id="example-receiving-incoming-streams"><span class="secno">15.5. </span><span class="content">Receiving incoming streams</span><a class="self-link" href="#example-receiving-incoming-streams"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Reading incoming streams can be achieved by iterating over the <code class="idl"><a data-link-type="idl" href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams" id="ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams①">incomingUnidirectionalStreams</a></code> attribute,
 and then consuming each <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream④">ReceiveStream</a></code> by iterating over its chunks.</p>
@@ -1632,7 +1676,7 @@ interleaved, and therefore only reads one stream at a time.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h3 class="heading settled" data-level="14.6" id="example-complete"><span class="secno">14.6. </span><span class="content">Complete example</span><a class="self-link" href="#example-complete"></a></h3>
+   <h3 class="heading settled" data-level="15.6" id="example-complete"><span class="secno">15.6. </span><span class="content">Complete example</span><a class="self-link" href="#example-complete"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>This example illustrates use of the closed and ready promises, opening
 of uni-directional and bi-directional streams by either the client or
@@ -1759,7 +1803,7 @@ async <c- a>function</c-> readFromIncomingStream<c- p>(</c->stream<c- p>,</c-> n
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h2 class="heading settled" data-level="15" id="acknowledgements"><span class="secno">15. </span><span class="content">Acknowledgements</span><a class="self-link" href="#acknowledgements"></a></h2>
+   <h2 class="heading settled" data-level="16" id="acknowledgements"><span class="secno">16. </span><span class="content">Acknowledgements</span><a class="self-link" href="#acknowledgements"></a></h2>
     The editors wish to thank the Working Group chairs and Team Contact, Harald
 Alvestrand, Stefan Håkansson, Bernard Aboba and Dominique
 Hazaël-Massieux, for their support. Contributions to this specification
@@ -1922,13 +1966,13 @@ and has been adapted for use in this specification.</p>
   <aside class="dfn-panel" data-for="term-for-textdecoderstream">
    <a href="https://encoding.spec.whatwg.org/#textdecoderstream">https://encoding.spec.whatwg.org/#textdecoderstream</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-textdecoderstream">14.5. Receiving incoming streams</a>
+    <li><a href="#ref-for-textdecoderstream">15.5. Receiving incoming streams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-textencoderstream">
    <a href="https://encoding.spec.whatwg.org/#textencoderstream">https://encoding.spec.whatwg.org/#textencoderstream</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-textencoderstream">14.4. Sending a stream</a>
+    <li><a href="#ref-for-textencoderstream">15.4. Sending a stream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-fetch">
@@ -2172,7 +2216,7 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-readablestream①⑥">9. Interface Mixin IncomingStream</a>
     <li><a href="#ref-for-readablestream①⑦">9.1. Overview</a>
     <li><a href="#ref-for-readablestream①⑧">9.2. Attributes</a> <a href="#ref-for-readablestream①⑨">(2)</a>
-    <li><a href="#ref-for-readablestream②⓪">14.4. Sending a stream</a>
+    <li><a href="#ref-for-readablestream②⓪">15.4. Sending a stream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-writablestream">
@@ -2453,14 +2497,14 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <b><a href="#dom-unidirectionalstreamstransport-createunidirectionalstream">#dom-unidirectionalstreamstransport-createunidirectionalstream</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-unidirectionalstreamstransport-createunidirectionalstream">4. UnidirectionalStreamsTransport Mixin</a>
-    <li><a href="#ref-for-dom-unidirectionalstreamstransport-createunidirectionalstream①">14.4. Sending a stream</a>
+    <li><a href="#ref-for-dom-unidirectionalstreamstransport-createunidirectionalstream①">15.4. Sending a stream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-unidirectionalstreamstransport-incomingunidirectionalstreams">
    <b><a href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams">#dom-unidirectionalstreamstransport-incomingunidirectionalstreams</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams">4. UnidirectionalStreamsTransport Mixin</a>
-    <li><a href="#ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams①">14.5. Receiving incoming streams</a>
+    <li><a href="#ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams①">15.5. Receiving incoming streams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="add-the-sendstream">
@@ -2509,7 +2553,7 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <ul>
     <li><a href="#ref-for-datagramtransport">6. DatagramTransport Mixin</a>
     <li><a href="#ref-for-datagramtransport①">7. WebTransport Interface</a> <a href="#ref-for-datagramtransport②">(2)</a>
-    <li><a href="#ref-for-datagramtransport③">14.1. Sending a buffer of datagrams</a>
+    <li><a href="#ref-for-datagramtransport③">15.1. Sending a buffer of datagrams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-datagramtransport-maxdatagramsize">
@@ -2523,8 +2567,8 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <ul>
     <li><a href="#ref-for-dom-datagramtransport-datagramwritable">6. DatagramTransport Mixin</a>
     <li><a href="#ref-for-dom-datagramtransport-datagramwritable①">6.1. Attributes</a>
-    <li><a href="#ref-for-dom-datagramtransport-datagramwritable②">14.1. Sending a buffer of datagrams</a>
-    <li><a href="#ref-for-dom-datagramtransport-datagramwritable③">14.2. Sending datagrams at a fixed rate</a>
+    <li><a href="#ref-for-dom-datagramtransport-datagramwritable②">15.1. Sending a buffer of datagrams</a>
+    <li><a href="#ref-for-dom-datagramtransport-datagramwritable③">15.2. Sending datagrams at a fixed rate</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-datagramtransport-datagramreadable">
@@ -2532,7 +2576,7 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <ul>
     <li><a href="#ref-for-dom-datagramtransport-datagramreadable">6. DatagramTransport Mixin</a>
     <li><a href="#ref-for-dom-datagramtransport-datagramreadable①">7.7. WebTransportStats Dictionary</a>
-    <li><a href="#ref-for-dom-datagramtransport-datagramreadable②">14.3. Receiving datagrams</a>
+    <li><a href="#ref-for-dom-datagramtransport-datagramreadable②">15.3. Receiving datagrams</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="webtransport">
@@ -2547,7 +2591,7 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
     <li><a href="#ref-for-webtransport①⓪">8.3. Methods</a>
     <li><a href="#ref-for-webtransport①①">9.2. Attributes</a>
     <li><a href="#ref-for-webtransport①②">9.3. Methods</a>
-    <li><a href="#ref-for-webtransport①③">15. Acknowledgements</a>
+    <li><a href="#ref-for-webtransport①③">16. Acknowledgements</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-webtransport">
@@ -2850,6 +2894,7 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <b><a href="#dom-outgoingstream-writable">#dom-outgoingstream-writable</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-outgoingstream-writable">8. Interface Mixin OutgoingStream</a>
+    <li><a href="#ref-for-dom-outgoingstream-writable①">13. Protocol Mappings</a> <a href="#ref-for-dom-outgoingstream-writable②">(2)</a> <a href="#ref-for-dom-outgoingstream-writable③">(3)</a> <a href="#ref-for-dom-outgoingstream-writable④">(4)</a> <a href="#ref-for-dom-outgoingstream-writable⑤">(5)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-outgoingstream-writingaborted">
@@ -2862,6 +2907,7 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <b><a href="#dom-outgoingstream-abortwriting">#dom-outgoingstream-abortwriting</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-outgoingstream-abortwriting">8. Interface Mixin OutgoingStream</a>
+    <li><a href="#ref-for-dom-outgoingstream-abortwriting①">13. Protocol Mappings</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dictdef-streamabortinfo">
@@ -2904,6 +2950,7 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <b><a href="#dom-incomingstream-readable">#dom-incomingstream-readable</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-incomingstream-readable">9. Interface Mixin IncomingStream</a>
+    <li><a href="#ref-for-dom-incomingstream-readable①">13. Protocol Mappings</a> <a href="#ref-for-dom-incomingstream-readable②">(2)</a> <a href="#ref-for-dom-incomingstream-readable③">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-incomingstream-readingaborted">
@@ -2916,6 +2963,7 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
    <b><a href="#dom-incomingstream-abortreading">#dom-incomingstream-abortreading</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-incomingstream-abortreading">9. Interface Mixin IncomingStream</a>
+    <li><a href="#ref-for-dom-incomingstream-abortreading①">13. Protocol Mappings</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bidirectionalstream">
@@ -2946,7 +2994,7 @@ impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a><
     <li><a href="#ref-for-receivestream">4.1. Methods</a> <a href="#ref-for-receivestream①">(2)</a>
     <li><a href="#ref-for-receivestream②">9. Interface Mixin IncomingStream</a>
     <li><a href="#ref-for-receivestream③">12. Interface ReceiveStream</a>
-    <li><a href="#ref-for-receivestream④">14.5. Receiving incoming streams</a>
+    <li><a href="#ref-for-receivestream④">15.5. Receiving incoming streams</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
