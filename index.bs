@@ -12,10 +12,9 @@ Former Editor: Peter Thatcher, Google
 Former Editor: Robin Raymond, Optical Tone Ltd.
 Abstract:
   This document defines a set of ECMAScript APIs in WebIDL to allow data to be
-  sent and received between a browser and server, implementing pluggable
-  protocols underneath with common APIs on top. APIs specific to QUIC are also
-  provided. This specification is being developed in conjunction with a
-  protocol specification developed by the IETF QUIC Working Group.
+  sent and received between a browser and server, utilizing [[WEB-TRANSPORT-HTTP3]].
+  This specification is being developed in conjunction with a protocol
+  specification developed by the IETF WEBTRANS Working Group.
 Repository: wicg/web-transport
 Indent: 2
 Markup Shorthands: markdown yes
@@ -34,6 +33,13 @@ Boilerplate: omit conformance
     "authors": ["Tommy Pauly", "Eric Kinnear", "David Schinazi"],
     "href": "https://tools.ietf.org/html/draft-ietf-quic-datagram",
     "title": "An Unreliable Datagram Extension to QUIC",
+    "status": "Internet-Draft",
+    "publisher": "IETF"
+  },
+    "http3-datagram": {
+    "authors": ["David Schinazi", "Lucas Pardue"],
+    "href": "https://tools.ietf.org/html/draft-ietf-masque-h3-datagram",
+    "title": "Using QUIC Datagrams with HTTP/3",
     "status": "Internet-Draft",
     "publisher": "IETF"
   },
@@ -81,13 +87,13 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMA
 
 *This section is non-normative.*
 
-This specification uses pluggable protocols, with QUIC [[!QUIC-TRANSPORT]] as
-one such protocol, to send data to and receive data from servers. It can be
-used like WebSockets but with support for multiple streams, unidirectional
-streams, out-of-order delivery, and reliable as well as unreliable transport.
+This specification uses [[!WEB-TRANSPORT-HTTP3]] to send data to and receive
+data from servers. It can be used like WebSockets but with support for multiple
+streams, unidirectional streams, out-of-order delivery, and reliable as well as
+unreliable transport.
 
 Note: The API presented in this specification represents a preliminary proposal
-based on work-in-progress within the IETF QUIC WG. Since the QUIC transport
+based on work-in-progress within the IETF WEBTRANS WG. Since the [[!WEB-TRANSPORT-HTTP3]]
 specification is a work-in-progress, both the protocol and API are likely to
 change significantly going forward.
 
@@ -175,8 +181,8 @@ interface mixin UnidirectionalStreamsTransport {
          1. The |transport|'s {{WebTransport/state}} has transitioned to
             `"connected"`.
          1. Stream creation flow control is not being violated by exceeding the
-            max stream limit set by the remote endpoint.  For QUIC, this is
-            specified in [[!QUIC-TRANSPORT]].
+            max stream limit set by the remote endpoint, as specified in
+            [[!QUIC-TRANSPORT]].
          1. |p| has not been [=settled=].
      1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
         the following conditions are met:
@@ -268,8 +274,8 @@ interface mixin BidirectionalStreamsTransport {
        1. The |transport|'s {{WebTransport/state}} has transitioned to
           `"connected"`.
        1. Stream creation flow control is not being violated by exceeding the
-          max stream limit set by the remote endpoint. For QUIC, this is
-          specified in [[!QUIC-TRANSPORT]].
+          max stream limit set by the remote endpoint, as specified in
+          [[!QUIC-TRANSPORT]].
        1. |p| has not been [=settled=].
    1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
       the following conditions are met:
@@ -310,7 +316,7 @@ To <dfn>add the BidirectionalStream</dfn> to a
 # `DatagramTransport` Mixin #  {#datagram-transport}
 
 A <dfn interface>DatagramTransport</dfn> can send and receive datagrams,
-as defined in [[!QUIC-DATAGRAM]].
+as defined in [[!HTTP3-DATAGRAM]].
 Datagrams are sent out of order, unreliably, and have a limited maximum size.
 Datagrams are encrypted and congestion controlled.
 
@@ -392,8 +398,8 @@ interface DatagramDuplexStream {
 
 # `WebTransport` Interface #  {#web-transport}
 
-`WebTransport` provides a unified interface to all client-server transports
-that are supported by the WebTransport API.  It implements all of the transport
+`WebTransport` provides an API to the HTTP/3 transport functionality
+defined in [[!WEB-TRANSPORT-HTTP3]]. It implements all of the transport
 mixins ({{UnidirectionalStreamsTransport}}, {{BidirectionalStreamsTransport}},
 {{DatagramTransport}}), as well as stats and transport state information.
 
@@ -458,31 +464,9 @@ agent MUST run the following steps:
    initialized to the result of [=DatagramDuplexStream/creating=] a {{DatagramDuplexStream}},
    its [=DatagramDuplexStream/create/readable=] set to |transport|.{{[[IncomingDatagrams]]}},
    and its [=DatagramDuplexStream/create/writable=] set to |transport|.{{[[OutgoingDatagrams]]}}.
-1. If the scheme of |parsedURL| is `quic-transport`, [=in parallel=],
-   [=initialize WebTransport over QUIC=].
 1. If the scheme of |parsedURL| is `https`, [=in parallel=],
    [=initialize WebTransport over HTTP=].
 1. Return |transport|.
-
-<div algorithm="initialize WebTransport over QUIC">
-To <dfn>initialize WebTransport over QUIC</dfn> for a given |transport| and
-|parsedURL|, do the following:
-
-1. Let |clientOrigin| be |transport|'s [=relevant settings object=]'s
-   [=environment settings object/origin=],
-   [=ASCII serialization of an origin|serialized=].
-1. Establish a QUIC connection to the address identified by |parsedURL|
-   following the procedures in [[!WEB-TRANSPORT-QUIC]] section 3 and using
-   |clientOrigin| as the "origin of the client" referenced in section 3.2.1.
-   While establishing the connection, follow all of the parameters
-   specified in the {{WebTransport/constructor(url, options)/options}}.
-1. If the connection fails, set |transport|'s {{[[WebTransportState]]}}
-   internal slot to `"failed"`, reject |transport|'s {{[[Ready]]}} with a
-   {{TypeError}} and abort these steps.
-1. Set |transport|'s {{[[WebTransportState]]}} internal slot to `"connected"`.
-1. Resolve |transport|'s {{[[Ready]]}} internal slot with {{undefined}}.
-
-</div>
 
 <div algorithm="initialize WebTransport over HTTP">
 To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
@@ -889,6 +873,66 @@ interface ReceiveStream {
 ReceiveStream includes IncomingStream;
 </pre>
 
+# Protocol Mappings # {#protocol-mapping}
+
+*This section is non-normative.*
+
+This section describes the QUIC protocol behavior of methods defined
+in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
+
+  <table class="data">
+    <colgroup class="header"></colgroup>
+    <colgroup span=2></colgroup>
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>QUIC Protocol Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{IncomingStream/abortReading}}</td>
+        <td>send STOP_SENDING with code</td>
+      </tr>
+      <tr>
+        <td>{{OutgoingStream/abortWriting}}</td>
+        <td>send RESET_STREAM with code</td>
+      </tr>
+      <tr>
+        <td>{{OutgoingStream/writable}}.abort()</td>
+        <td>send RESET_STREAM</td>
+      </tr>
+      <tr>
+        <td>{{OutgoingStream/writable}}.close()</td>
+        <td>send STREAM_FINAL</td>
+      </tr>
+      <tr>
+        <td>{{OutgoingStream/writable}}.getWriter().write()</td>
+        <td>send STREAM</td>
+      </tr>
+      <tr>
+        <td>{{OutgoingStream/writable}}.getWriter().close()</td>
+        <td>send STREAM_FINAL</td>
+      </tr>
+      <tr>
+        <td>{{OutgoingStream/writable}}.getWriter().abort()</td>
+        <td>send RESET_STREAM</td>
+      </tr>
+      <tr>
+        <td>{{IncomingStream/readable}}.cancel()</td>
+        <td>send STOP_SENDING</td>
+      </tr>
+      <tr>
+        <td>{{IncomingStream/readable}}.getReader().read()</td>
+        <td>receive STREAM or STREAM_FINAL</td>
+      </tr>
+      <tr>
+        <td>{{IncomingStream/readable}}.getReader().cancel()</td>
+        <td>send STOP_SENDING</td>
+      </tr>
+    </tbody>
+  </table>
+
 # Privacy and Security Considerations #  {#privacy-security}
 
 This section is non-normative; it specifies no new behaviour, but instead
@@ -902,7 +946,7 @@ that can observe the network, so this has to be regarded as public information.
 All of the transport protocols described in this document use either TLS
 [[RFC8446]] or a semantically equivalent protocol, thus providing all of the
 security properties of TLS, including confidentiality and integrity of the
-traffic. Both QuicTransport and Http3Transport use the same certificate
+traffic. Http3Transport uses the same certificate
 verification mechanism as outbound HTTP requests, thus relying on the same
 public key infrastructure for authentication of the remote server. In
 WebTransport, certificate verification errors are fatal; no interstitial
@@ -923,19 +967,18 @@ specification.
 
 ## Protocol Security ##  {#protocol-security}
 
-WebTransport imposes a common set of requirements on all of the protocols,
-described in [[!WEB-TRANSPORT-OVERVIEW]]. Notable ones include:
+WebTransport imposes a set of requirements as described in
+[[!WEB-TRANSPORT-OVERVIEW]], including: 
 
-1. All transports must ensure that the remote server is aware that the
+1. Ensuring that the remote server is aware that the
    connection in question originates from a Web application; this is required
-   to prevent cross-protocol attacks. QUIC-based transports use ALPN
-   [[RFC7301]] for that purpose.
-1. All transports must allow the server to filter connections based on the
+   to prevent cross-protocol attacks. [[WEB-TRANSPORT-HTTP3]] uses ALPN
+   [[RFC7301]] for this purpose.
+1. Allowing the server to filter connections based on the
    origin of the resource originating the transport session.
 
-Protocol security considersations related to the individual transports are
-described in the *Security Considerations* sections of the corresponding
-protocol documents, [[!WEB-TRANSPORT-QUIC]] and [[!WEB-TRANSPORT-HTTP3]].
+Protocol security considerations related are described in the
+*Security Considerations* sections of [[!WEB-TRANSPORT-HTTP3]].
 
 Networking APIs can be commonly used to scan the local network for available
 hosts, and thus be used for fingerprinting and other forms of attacks.
@@ -1192,7 +1235,7 @@ async function readFromIncomingStream(stream, number) {
     }
     addToEventLog(&#96;Stream #${number} closed&#96;);
   } catch (e) {
-    addToEventLog(&#96;Error while reading from stream #${number": ${e}&#96;, 'error');
+    addToEventLog(&#96;Error while reading from stream #${number"}: ${e}&#96;, 'error');
     addToEventLog(&#96;    ${e.message}&#96;);
   }
 }
