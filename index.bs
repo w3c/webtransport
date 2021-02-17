@@ -175,18 +175,17 @@ interface mixin UnidirectionalStreamsTransport {
         immediately return a new [=rejected=] promise with a newly created
         {{InvalidStateError}} and abort these steps.
      1. Let |p| be a new promise.
-     1. Return |p| and continue the following steps in background.
-     1. [=Resolve=] |p| with a newly created {{SendStream}} object and [=add the
-        SendStream=] to |transport| when all of the following conditions are met:
-         1. The |transport|'s {{WebTransport/state}} has transitioned to
-            `"connected"`.
+     1. Return |p| and continue the remaining steps in parallel.
+     1. [=SendStream/Create=] a {{SendStream}} with |transport| and |p| when all
+        of the following conditions are met:
+         1. The |transport|'s {{WebTransport/state}} is `"connected"`.
          1. Stream creation flow control is not being violated by exceeding the
             max stream limit set by the remote endpoint, as specified in
             [[!QUIC-TRANSPORT]].
          1. |p| has not been [=settled=].
-     1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
-        the following conditions are met:
-         1. The |transport|'s state transitions to `"closed"` or `"failed"`.
+     1. Queue a task to [=reject=] |p| with a newly created {{InvalidStateError}}
+        when all of the following conditions are met:
+         1. The |transport|'s state is `"closed"` or `"failed"`.
          1. |p| has not been [=settled=].
 
 : <dfn for="UnidirectionalStreamsTransport" attribute>incomingUnidirectionalStreams</dfn>
@@ -207,16 +206,18 @@ interface mixin UnidirectionalStreamsTransport {
 
 ### Add SendStream to UnidirectionalStreamsTransport ### {#add-sendstream}
 
-<div algorithm="add the SendStream">
+<div algorithm="create a SendStream">
 
-To <dfn>add the SendStream</dfn> to a {{UnidirectionalStreamsTransport}}, run
-the following steps:
+To <dfn export for="SendStream" lt="create|creating">create</dfn> a
+{{SendStream}} given a <var>transport</var> and a promise |p|, run the following
+steps:
 
-1. Let |transport| be the {{UnidirectionalStreamsTransport}} in question.
-1. Let |stream| be the newly created {{SendStream}} object.
-1. Add |stream| to |transport|'s {{[[OutgoingStreams]]}} slot.
-1. Continue the following steps in the background.
-1. Create |stream|'s associated underlying transport.
+1. Reserve a unidirectional stream |association| in the underlying transport.
+1. Queue a task to run the following sub-steps:
+  1. If |transport|'s state is `"closed"` or `"failed"`, abort these sub-steps.
+  1. Let |stream| be a newly created {{SendStream}} for |association|.
+  1. Add |stream| to |transport|'s {{[[OutgoingStreams]]}} slot.
+  1. resolve |p| with |stream|.
 
 </div>
 
@@ -262,24 +263,18 @@ interface mixin BidirectionalStreamsTransport {
    1. If |transport|'s {{WebTransport/state}} is `"closed"` or `"failed"`,
       immediately return a new [=rejected=] promise with a newly created
       {{InvalidStateError}} and abort these steps.
-   1. If |transport|'s {{WebTransport/state}} is `"connected"`, immediately
-      return a new [=fulfilled=] promise with a newly created
-      {{BidirectionalStream}} object, [=add the BidirectionalStream=] to the
-      transport and abort these steps.
    1. Let |p| be a new promise.
-   1. Return |p| and continue the following steps in background.
-   1. [=Resolve=] |p| with a newly created {{BidirectionalStream}} object and
-      [=add the BidirectionalStream=] to |transport| when all of the following
-      conditions are met:
-       1. The |transport|'s {{WebTransport/state}} has transitioned to
-          `"connected"`.
+   1. Return |p| and continue the remaining steps in parallel.
+   1. [=BidirectionalStream/Create=] a {{BidirectionalStream}} with |transport|
+      and |p| when all of the following conditions are met:
+       1. The |transport|'s {{WebTransport/state}} is `"connected"`.
        1. Stream creation flow control is not being violated by exceeding the
           max stream limit set by the remote endpoint, as specified in
           [[!QUIC-TRANSPORT]].
        1. |p| has not been [=settled=].
-   1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
-      the following conditions are met:
-       1. The |transport|'s state transitions to `"closed"` or `"failed"`.
+   1. Queue a task to [=reject=] |p| with a newly created {{InvalidStateError}}
+      when all of the following conditions are met:
+       1. The |transport|'s state is `"closed"` or `"failed"`.
        1. |p| has not been [=settled=].
 
 : <dfn for="BidirectionalStreamsTransport" attribute>incomingBidirectionalStreams</dfn>
@@ -301,15 +296,16 @@ interface mixin BidirectionalStreamsTransport {
 
 <div algorithm="add the BidirectionalStream">
 
-To <dfn>add the BidirectionalStream</dfn> to a
-{{BidirectionalStreamsTransport}}, run the following steps:
+ To <dfn export for="BidirectionalStream" lt="create|creating">create</dfn> a
+ {{BidirectionalStream}} given a <var>transport</var>, run the following steps:
 
-1. Let |transport| be the {{BidirectionalStreamsTransport}} in question.
-1. Let |stream| be the newly created {{BidirectionalStream}} object.
-1. Add |stream| to |transport|'s {{[[ReceivedBidirectionalStreams]]}} slot.
-1. Add |stream| to |transport|'s {{[[OutgoingStreams]]}} slot.
-1. Continue the following steps in the background.
-1. Create |stream|'s associated underlying transport.
+1. Reserve a bidirectional stream |association| in the underlying transport.
+1. Queue a task to run the following sub-steps:
+  1. If |transport|'s state is `"closed"` or `"failed"`, abort these sub-steps.
+  1. Let |stream| be a newly created {{BidirectionalStream}} object for |association|.
+  1. Add |stream| to |transport|'s {{[[ReceivedBidirectionalStreams]]}} slot.
+  1. Add |stream| to |transport|'s {{[[OutgoingStreams]]}} slot.
+  1. return |stream|.
 
 </div>
 
