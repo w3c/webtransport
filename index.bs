@@ -316,7 +316,7 @@ To <dfn>add the BidirectionalStream</dfn> to a
 # `DatagramTransport` Mixin #  {#datagram-transport}
 
 A <dfn interface>DatagramTransport</dfn> can send and receive datagrams,
-as defined in [[!HTTP3-DATAGRAM]].
+as defined in [[!HTTP3-DATAGRAM]][[!QUIC-DATAGRAM]].
 Datagrams are sent out of order, unreliably, and have a limited maximum size.
 Datagrams are encrypted and congestion controlled.
 
@@ -502,8 +502,8 @@ To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
 ## Methods ##  {#webtransport-methods}
 
 : <dfn for="WebTransport" method>close()</dfn>
-:: Closes the WebTransport object. This triggers an <dfn>Immediate
-   Close</dfn> as described in [[!QUIC]] section 10.2.
+:: Closes the WebTransport object. For a dedicated connection, this 
+   triggers an <dfn>Immediate Close</dfn> as described in [[!QUIC]] section 10.2.
 
    When close is called, the user agent MUST run the following steps:
      1. Let |transport| be the WebTransport on which `close` is invoked.
@@ -511,9 +511,9 @@ To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
         then abort these steps.
      1. Set |transport|'s {{[[WebTransportState]]}} to `"closed"`.
      1. Let `closeInfo` be the first argument.
-     1. Start the [=Immediate Close=] procedure by sending an
-        CONNECTION_CLOSE frame with its error code value set to the value of
-        {{WebTransportCloseInfo/errorCode}} and its reason value set to the
+     1. If the connection is dedicated, start the [=Immediate Close=] procedure
+        by sending an CONNECTION_CLOSE frame with its error code value set to the value
+        of {{WebTransportCloseInfo/errorCode}} and its reason value set to the
         value of {{WebTransportCloseInfo/reason}}.
 
 : <dfn for="WebTransport" method>getStats()</dfn>
@@ -542,10 +542,9 @@ dictionary WebTransportOptions {
 that determine how WebTransport connection is established and used.
 
 : <dfn for="WebTransportOptions" dict-member>serverCertificateFingerprints</dfn>
-:: This option is only supported for transports using dedicated TLS
-   connections.  For transport protocols that do not
-   support this feature, having this field non-empty SHALL result in a
-   {{NotSupportedError}} exception being thrown.
+:: This option is only supported for transports using dedicated connections.
+   For transport protocols that do not support this feature, having this
+   field non-empty SHALL result in a {{NotSupportedError}} exception being thrown.
 :: If supported and non-empty, the user agent SHALL deem a server certificate
    trusted if and only if it can successfully [=verify a certificate
    fingerprint=] against {{WebTransportOptions/serverCertificateFingerprints}}
