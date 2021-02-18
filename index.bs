@@ -59,7 +59,7 @@ Boilerplate: omit conformance
   },
   "web-transport-http3": {
     "authors": ["Victor Vasiliev"],
-    "href": "https://tools.ietf.org/html/draft-vvv-webtransport-http3",
+    "href": "https://tools.ietf.org/html/draft-ietf-webtrans-http3",
     "title": "WebTransport over HTTP/3",
     "status": "Internet-Draft",
     "publisher": "IETF"
@@ -428,8 +428,7 @@ agent MUST run the following steps:
 1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
    {{WebTransport/constructor(url, options)/url}}.
 1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
-1. If |parsedURL| [=scheme=] is not `quic-transport` or `https`, [=throw=]
-   a {{SyntaxError}} exception.
+1. If |parsedURL| [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
 1. Let |transport| be a newly constructed {{WebTransport}} object.
 1. Let |transport| have an
@@ -544,7 +543,7 @@ that determine how WebTransport connection is established and used.
 
 : <dfn for="WebTransportOptions" dict-member>serverCertificateFingerprints</dfn>
 :: This option is only supported for transports using dedicated TLS
-   connections, such as `quic-transport`.  For transport protocols that do not
+   connections.  For transport protocols that do not
    support this feature, having this field non-empty SHALL result in a
    {{NotSupportedError}} exception being thrown.
 :: If supported and non-empty, the user agent SHALL deem a server certificate
