@@ -154,10 +154,34 @@ unreliability.  All stream data is encrypted and congestion-controlled.
 <pre class="idl">
 interface mixin UnidirectionalStreamsTransport {
   Promise&lt;SendStream&gt; createUnidirectionalStream(optional SendStreamParameters parameters = {});
-  /* a ReadableStream of ReceiveStream objects */
-  readonly attribute ReadableStream incomingUnidirectionalStreams;
+  readonly attribute UnidirectionalStreamDuplexStream unidirectionalStreams;
 };
 </pre>
+
+## Attributes ##  {#unidirectional-streams-transport-attributes}
+
+: <dfn for="UnidirectionalStreamsTransport" attribute>unidirectionalStreams</dfn>
+:: A single duplex stream for sending and receiving unidirectional streams
+   over this connection.
+
+   The {{UnidirectionalStreamDuplexStream/readable}} member is a
+   {{ReadableStream}} of {{ReceiveStream}} objects. Each unidirectional stream
+   received from the remote host will be surfaced as a single {{ReceiveStream}}
+   object.
+
+   The {{UnidirectionalStreamDuplexStream/writable}} member is a
+   {{WritableStream}} of {{ReadableStream}}s of {{Uint8Array}}s. Each
+   {{ReadableStream}} object written to the
+   {{UnidirectionalStreamDuplexStream/writable}} member will be piped to a newly
+   created outgoing unidirectional stream, sending its {{Uint8Array}}s of data
+   in parallel with other outgoing streams on the connection.
+
+   The single duplex stream's {{UnidirectionalStreamDuplexStream/writable}}
+   member does not block on the completion of piping from the individual
+   {{ReadableStream}}s of {{Uint8Array}}s, or propagate their piping errors.
+
+   The getter steps for the `unidirectionalStreams` attribute SHALL be:
+     1. Return the value of the {{[[UnidirectionalStreams]]}} internal slot.
 
 ## Methods ##  {#unidirectional-streams-transport-methods}
 
@@ -189,20 +213,6 @@ interface mixin UnidirectionalStreamsTransport {
          1. The |transport|'s state transitions to `"closed"` or `"failed"`.
          1. |p| has not been [=settled=].
 
-: <dfn for="UnidirectionalStreamsTransport" attribute>incomingUnidirectionalStreams</dfn>
-:: A {{ReadableStream}} of unidirectional streams, each represented by a
-   {{ReceiveStream}} object, that have been received from the remote host.
-
-   The getter steps for `incomingUnidirectionalStreams` are:
-     1. Let |transport| be the `UnidirectionalStreamsTransport` on which
-        the `incomingUnidirectionalStreams` getter is invoked.
-     1. Return the value of the {{[[ReceivedStreams]]}} internal slot.
-     1. For each unidirectional stream received, create a corresponding
-        {{ReceiveStream}} and insert it into {{[[ReceivedStreams]]}}. As data
-        is received over the unidirectional stream, insert that data into the
-        corresponding `ReceiveStream` object.  When the remote side closes or
-        aborts the stream, close or abort the corresponding `ReceiveStream`.
-
 ## Procedures ##  {#unidirectional-streams-transport-procedures}
 
 ### Add SendStream to UnidirectionalStreamsTransport ### {#add-sendstream}
@@ -219,6 +229,66 @@ the following steps:
 1. Create |stream|'s associated underlying transport.
 
 </div>
+
+When <dfn>receiving a new unidirectional stream</dfn> on a |transport| from
+the remote host, [=queue a task=] to run the following steps:
+1. Let |receiveStream| be the result of creating a corresponding {{ReceiveStream}}.
+1. [=ReadableStream/enqueue=] |receiveStream| in |transport|.`[[IncomingStreams]]`.
+1. [=In parallel=], as |data| is received over the unidirectional stream,
+   [=queue a task=] to [=ReadableStream/enqueue=] |data| in
+   |receiveStream|.`[[readable]]`. When the remote side closes or aborts the
+   unidirectional stream, [=queue a task=] to close or abort |receiveStream|
+   respectively.
+1. TODO: Flesh out underlying queue details and backpressure.
+
+The <dfn>writing a new unidirectional stream</dfn> algorithm is given a
+|transport| as parameter and |chunk| as input. It is defined by running the
+following steps:
+1. If |chunk| is not a {{ReadableStream}}, return [=a promise rejected with=]
+   {{TypeError}}.
+1. Let |sendStream| be a newly created {{SendStream}} object.
+1. [=add the SendStream=] |sendStream| to |transport|.
+<!-- FIXME: Use pipeTo algorithm when available. -->
+1. Let |p| be the result of calling
+   <a href="https://streams.spec.whatwg.org/#readable-stream-pipe-to">pipeTo</a>
+   with |chunk|, |sendStream|.`[[writable]]`, preventClose equal to false,
+   preventAbort equal to false, and preventCancel equal to false.
+1. [=Upon rejection=] of |p|, do nothing.
+1. Return [=a promise resolved with=] undefined.
+
+# `UnidirectionalStreamDuplexStream` Interface #  {#unidirectional-stream-duplex-stream}
+
+A <dfn interface>UnidirectionalStreamDuplexStream</dfn> is a duplex stream of
+unidirectional streams.
+
+<pre class="idl">
+interface UnidirectionalStreamDuplexStream {
+  readonly attribute ReadableStream /* of ReceiveStream */ readable;
+  readonly attribute WritableStream /* of ReadableStream of Uint8Array */ writable;
+};
+</pre>
+
+ To <dfn export for="UnidirectionalStreamDuplexStream" lt="create|creating">create</dfn> a
+ {{UnidirectionalStreamDuplexStream}} given a
+ <dfn export for="UnidirectionalStreamDuplexStream/create"><var>readable</var></dfn>, and
+ a <dfn export for="UnidirectionalStreamDuplexStream/create"><var>writable</var></dfn>,
+ perform the following steps.
+
+ 1. Let |stream| be a [=new=] {{UnidirectionalStreamDuplexStream}}.
+ 1. Initialize |stream|.`[[readable]]` to |readable|.
+ 1. Initialize |stream|.`[[writable]]` to |writable|.
+ 1. Return |stream|.
+
+## Attributes ##  {#unidirectional-stream-duplex-stream-attributes}
+
+: <dfn for="UnidirectionalStreamDuplexStream" attribute>readable</dfn>
+:: The getter steps are:
+     1. Return [=this=].`[[readable]]`.
+
+: <dfn for="UnidirectionalStreamDuplexStream" attribute>writable</dfn>
+:: The getter steps are:
+     1. Return [=this=].`[[writable]]`.
+
 
 ## SendStreamParameters Dictionary ##  {#send-stream-parameters}
 
@@ -241,10 +311,38 @@ All stream data is encrypted and congestion-controlled.
 <pre class="idl">
 interface mixin BidirectionalStreamsTransport {
     Promise&lt;BidirectionalStream&gt; createBidirectionalStream();
-    /* a ReadableStream of BidirectionalStream objects */
-    readonly attribute ReadableStream incomingBidirectionalStreams;
+    readonly attribute BidirectionalStreamDuplexStream bidirectionalStreams;
 };
 </pre>
+
+## Attributes ##  {#bidirectional-streams-transport-attributes}
+
+: <dfn for="BidirectionalStreamsTransport" attribute>bidirectionalStreams</dfn>
+:: A single duplex stream for sending and receiving bidirectional streams
+   over this connection.
+
+   The {{BidirectionalStreamDuplexStream/readable}} member is a
+   {{ReadableStream}} of {{BidirectionalStream}} objects. Each bidirectional
+   stream received from the remote host will be surfaced as a single
+   {{BidirectionalStream}} object.
+
+   The {{BidirectionalStreamDuplexStream/writable}} member is a
+   {{WritableStream}} of {{ReadableWritablePair}}s of {{Uint8Array}}s. Each
+   {{ReadableWritablePair}} object written to the
+   {{BidirectionalStreamDuplexStream/writable}} member will have its
+   {{ReadableWritablePair/readable}} piped to the outgoing side of a newly
+   created outgoing bidirectional stream, sending its {{Uint8Array}}s of data in
+   parallel with other outgoing streams on the connection. Data received from
+   the remote host on the incoming side of the same bidirectional stream will be
+   piped to the {{ReadableWritablePair}}'s {{ReadableWritablePair/writable}}
+   member.
+
+   The single duplex stream's {{UnidirectionalStreamDuplexStream/writable}}
+   member does not block on the completion of piping to and from the individual
+   {{ReadableWritablePair}}s, or propagate their piping errors.
+
+   The getter steps for the `unidirectionalStreams` attribute SHALL be:
+     1. Return the value of the {{[[BidirectionalStreams]]}} internal slot.
 
 
 ## Methods ##  {#bidirectional-streams-transport-methods}
@@ -282,19 +380,6 @@ interface mixin BidirectionalStreamsTransport {
        1. The |transport|'s state transitions to `"closed"` or `"failed"`.
        1. |p| has not been [=settled=].
 
-: <dfn for="BidirectionalStreamsTransport" attribute>incomingBidirectionalStreams</dfn>
-:: Returns a {{ReadableStream}} of {{BidirectionalStream}}s that have been
-   received from the remote host.
-
-   The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
-
-     1. Return the value of the {{[[ReceivedBidirectionalStreams]]}} internal slot.
-     1. For each bidirectional stream received, create a corresponding
-        {{BidirectionalStream}} and insert it into {{[[ReceivedBidirectionalStreams]]}}.
-        As data is received over the bidirectional stream, insert that data into the
-        corresponding {{BidirectionalStream}}.  When the remote side closes or aborts
-        the stream, close or abort the corresponding {{BidirectionalStream}}.
-
 ## Procedures ##  {#bidirectional-streams-transport-procedures}
 
 ### Add BidirectionalStream to BidirectionalStreamsTransport ### {#add-bidirectionalstream}
@@ -306,12 +391,74 @@ To <dfn>add the BidirectionalStream</dfn> to a
 
 1. Let |transport| be the {{BidirectionalStreamsTransport}} in question.
 1. Let |stream| be the newly created {{BidirectionalStream}} object.
-1. Add |stream| to |transport|'s {{[[ReceivedBidirectionalStreams]]}} slot.
+1. Add |stream| to |transport|'s {{[[IncomingBidirectionalStreams]]}} slot.
 1. Add |stream| to |transport|'s {{[[OutgoingStreams]]}} slot.
 1. Continue the following steps in the background.
 1. Create |stream|'s associated underlying transport.
 
 </div>
+
+When <dfn>receiving a new bidirectional stream</dfn> on a |transport| from
+the remote host, [=queue a task=] to run the following steps:
+1. Let |bidirectionalStream| be the result of creating a corresponding
+   {{BidirectionalStream}}.
+1. [=ReadableStream/enqueue=] |bidirectionalStream| in
+   |transport|.`[[IncomingBidirectionalStreams]]`.
+1. [=In parallel=], as |data| is received over the incoming side of the
+   bidirectional stream, [=queue a task=] to [=ReadableStream/enqueue=] |data|
+   in |bidirectionalStream|.`[[readable]]`. When the remote side closes or
+   aborts the bidirectional stream, [=queue a task=] to close or abort
+   |bidirectionalStream| respectively.
+1. TODO: Flesh out underlying queue details and backpressure.
+
+The <dfn>writing a new bidirectional stream</dfn> algorithm is given a
+|transport| as parameter and |chunk| as input. It is defined by running the
+following steps:
+1. Let |pair| be the result of
+   <a href="https://heycam.github.io/webidl/#dfn-convert-ecmascript-to-idl-value">converting</a>
+   |chunk| to the dictionary type {{ReadableWritablePair}}.
+1. If the previous step threw an exception, catch it, and return
+   [=a promise rejected with=] {{TypeError}}.
+1. Let |bidirectionalStream| be a newly created {{BidirectionalStream}} object.
+1. [=add the BidirectionalStream=] |bidirectionalStream| to |transport|.
+<!-- FIXME: Use pipeTo algorithm when available. -->
+1. Let |p1| be the result of calling
+   <a href="https://streams.spec.whatwg.org/#readable-stream-pipe-to">pipeTo</a>
+   with |pair|.`[[readable]]`, |bidirectionalStream|.`[[writable]]`,
+   preventClose equal to false, preventAbort equal to false, and preventCancel
+   equal to false.
+<!-- FIXME: Use pipeTo algorithm when available. -->
+1. Let |p2| be the result of calling
+   <a href="https://streams.spec.whatwg.org/#readable-stream-pipe-to">pipeTo</a>
+   with |bidirectionalStream|.`[[readable]]`, |pair|.`[[writable]]`,
+   preventClose equal to false, preventAbort equal to false, and preventCancel
+   equal to false.
+1. [=Upon rejection=] of |p1|, do nothing.
+1. [=Upon rejection=] of |p2|, do nothing.
+1. Return [=a promise resolved with=] undefined.
+
+# `BidirectionalStreamDuplexStream` Interface #  {#bidirectional-stream-duplex-stream}
+
+A <dfn interface>BidirectionalStreamDuplexStream</dfn> is a duplex stream of
+bidirectional streams.
+
+<pre class="idl">
+interface BidirectionalStreamDuplexStream {
+  readonly attribute ReadableStream /* of BidirectionalStream */ readable;
+  readonly attribute WritableStream /* of ReadableWritablePair of Uint8Array */ writable;
+};
+</pre>
+
+ To <dfn export for="BidirectionalStreamDuplexStream" lt="create|creating">create</dfn> a
+ {{BidirectionalStreamDuplexStream}} given a
+ <dfn export for="BidirectionalStreamDuplexStream/create"><var>readable</var></dfn>, and
+ a <dfn export for="BidirectionalStreamDuplexStream/create"><var>writable</var></dfn>,
+ perform the following steps.
+
+ 1. Let |stream| be a [=new=] {{BidirectionalStreamDuplexStream}}.
+ 1. Initialize |stream|.`[[readable]]` to |readable|.
+ 1. Initialize |stream|.`[[writable]]` to |writable|.
+ 1. Return |stream|.
 
 # `DatagramTransport` Mixin #  {#datagram-transport}
 
@@ -336,7 +483,8 @@ interface mixin DatagramTransport {
 : <dfn for="DatagramTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this connection.
 
-   Each datagram received will be readable on the {{ReadableStream}} member.
+   Each datagram received from the remote host will be readable on the
+   {{DatagramDuplexStream/readable}} member.
 
    If too many datagrams are queued because the stream is not being read quickly
    enough, datagrams are dropped to avoid queueing. Implementations should drop older
@@ -346,32 +494,33 @@ interface mixin DatagramTransport {
    but large enough to avoid dropping packets when for the stream is not read
    for short periods of time (due to the reader being paused).
 
-   Datagrams written to the returned {{WritableStream}} member will be sent.
+   Datagrams written to the {{DatagramDuplexStream/writable}} member will be
+   sent.
 
    The getter steps for the `datagrams` attribute SHALL be:
      1. Return the value of the {{[[Datagrams]]}} internal slot.
 
 ## Procedures ## {#datagrams-transport-procedures}
 
-The <dfn>readDatagrams</dfn> algorithm is given a |transport| as parameter. It
+The <dfn>read datagrams</dfn> algorithm is given a |transport| as parameter. It
 is defined by running the following steps:
-1. TODO
+1. TODO: Flesh out underlying queue details and backpressure.
 1. [=ReadableStream/enqueue=] |data| in |transport|.`[[IncomingDatagrams]]`.
 
-The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
-|data| as input. It is defined by running the following steps:
-1. TODO
-1. Enqueue data for datagram transmission.
+The <dfn>write datagrams</dfn> algorithm is given a |transport| as parameter and
+|chunk| as input. It is defined by running the following steps:
+1. TODO: Flesh out underlying queue details and backpressure.
+1. Enqueue |chunk| for datagram transmission.
 1. Return [=a promise resolved with=] undefined.
 
-# `DatagramDuplexStream` Interface #  {#duplex-stream}
+# `DatagramDuplexStream` Interface #  {#datagram-duplex-stream}
 
-A <dfn interface>DatagramDuplexStream</dfn> is a generic duplex stream.
+A <dfn interface>DatagramDuplexStream</dfn> is a duplex stream of datagrams.
 
 <pre class="idl">
 interface DatagramDuplexStream {
-  readonly attribute ReadableStream readable;
-  readonly attribute WritableStream writable;
+  readonly attribute ReadableStream /* of Uint8Array */ readable;
+  readonly attribute WritableStream /* of Uint8Array */ writable;
 };
 </pre>
 
@@ -386,7 +535,7 @@ interface DatagramDuplexStream {
  1. Initialize |stream|.`[[writable]]` to |writable|.
  1. Return |stream|.
 
-## Attributes ##  {#duplex-stream-attributes}
+## Attributes ##  {#datagram-duplex-stream-attributes}
 
 : <dfn for="DatagramDuplexStream" attribute>readable</dfn>
 :: The getter steps are:
@@ -434,15 +583,41 @@ agent MUST run the following steps:
 1. Let |transport| be a newly constructed {{WebTransport}} object.
 1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[OutgoingStreams]]</dfn> internal slot
-   representing a sequence of {{OutgoingStream}} objects, initialized to empty.
+   initialized to the result of [=WritableStream/creating=] a {{WritableStream}},
+   its [=WritableStream/create/writeAlgorithm=] set to the
+   [=writing a new unidirectional stream=] algorithm given |transport| as a
+   parameter.
+1. Let |transport| have an
+   <dfn attribute for="WebTransport">\[[IncomingStreams]]</dfn> internal slot
+   initialized to the result of <a dfn for="ReadableStream">creating</a> a
+   {{ReadableStream}}. `transport.[[IncomingStreams]]` is provided
+   {{ReceiveStream}}s by the [=receiving a new unidirectional stream=] algorithm given
+   |transport| as a parameter.
 1. Let |transport| have a
-   <dfn attribute for="WebTransport">\[[ReceivedStreams]]</dfn> internal slot
-   representing a {{ReadableStream}} of {{IncomingStream}} objects, initialized
-   to empty.
+   <dfn attribute for="WebTransport">\[[UnidirectionalStreams]]</dfn> internal
+   slot initialized to the result of [=UnidirectionalStreamDuplexStream/creating=]
+   a {{UnidirectionalStreamDuplexStream}},
+   its [=UnidirectionalStreamDuplexStream/create/readable=] set to |transport|.{{[[IncomingStreams]]}},
+   and its [=UnidirectionalStreamDuplexStream/create/writable=] set to |transport|.{{[[OutgoingStreams]]}}.
+1. Let |transport| have an
+   <dfn attribute for="WebTransport">\[[OutgoingBidirectionalStreams]]</dfn>
+   internal slot initialized to the result of [=WritableStream/creating=] a
+   {{WritableStream}}, its [=WritableStream/create/writeAlgorithm=] set to the
+   [=writing a new bidirectional stream=] algorithm given |transport| as a parameter.
+1. Let |transport| have an
+   <dfn attribute for="WebTransport">\[[IncomingBidirectionalStreams]]</dfn>
+   internal slot initialized to the result of <a dfn for="ReadableStream">creating</a>
+   a {{ReadableStream}}. `transport.[[IncomingBidirectionalStreams]]` is provided
+   {{BidirectionalStream}}s by the [=receiving a new bidirectional stream=]
+   algorithm given |transport| as a parameter.
 1. Let |transport| have a
-  <dfn attribute for="WebTransport">\[[ReceivedBidirectionalStreams]]</dfn>
-  internal slot representing a {{ReadableStream}} of {{BidirectionalStream}}
-  objects, initialized to empty.
+   <dfn attribute for="WebTransport">\[[BidirectionalStreams]]</dfn> internal
+   slot initialized to the result of [=BidirectionalStreamDuplexStream/creating=]
+   a {{BidirectionalStreamDuplexStream}}, its
+   [=BidirectionalStreamDuplexStream/create/readable=] set to
+   |transport|.{{[[IncomingBidirectionalStreams]]}}, and its
+   [=BidirectionalStreamDuplexStream/create/writable=] set to
+   |transport|.{{[[OutgoingBidirectionalStreams]]}}.
 1. Let |transport| have a
    <dfn attribute for="WebTransport">\[[WebTransportState]]</dfn> internal
    slot, initialized to `"connecting"`.
@@ -452,13 +627,13 @@ agent MUST run the following steps:
 1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[OutgoingDatagrams]]</dfn> internal slot
    initialized to the result of [=WritableStream/creating=] a {{WritableStream}},
-   its [=WritableStream/create/writeAlgorithm=] set to [=writeDatagrams=] given
+   its [=WritableStream/create/writeAlgorithm=] set to [=write datagrams=] given
    |transport| as a parameter.
 1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[IncomingDatagrams]]</dfn> internal
    slot initialized to the result of <a dfn for="ReadableStream">creating</a> a
    {{ReadableStream}}. `transport.[[IncomingDatagrams]]` is provided datagrams
-    using the [=readDatagrams=] algorithm given |transport| as a parameter.
+    using the [=read datagrams=] algorithm given |transport| as a parameter.
 1. Let |transport| have a
    <dfn attribute for="WebTransport">\[[Datagrams]]</dfn> internal slot
    initialized to the result of [=DatagramDuplexStream/creating=] a {{DatagramDuplexStream}},
@@ -615,9 +790,9 @@ enum WebTransportState {
    transitions to `closed` the user agent MUST run the following steps:
 
    1. Let |transport| be the {{WebTransport}}.
-   1. Close the {{ReadableStream}} in |transport|'s {{[[ReceivedStreams]]}} internal slot.
+   1. Close the {{ReadableStream}} in |transport|'s {{[[IncomingStreams]]}} internal slot.
    1. Close the {{ReadableStream}} in |transport|'s
-      {{[[ReceivedBidirectionalStreams]]}} internal slot.
+      {{[[IncomingBidirectionalStreams]]}} internal slot.
    1. For each {{OutgoingStream}} in |transport|'s {{[[OutgoingStreams]]}}
       internal slot run the following:
 
@@ -630,10 +805,10 @@ enum WebTransportState {
    an error alert). When the WebTransport's internal {{[[WebTransportState]]}}
    slot transitions to `failed` the user agent MUST run the following steps:
 
-   1. Close the {{ReadableStream}} in |transport|'s {{[[ReceivedStreams]]}}
+   1. Close the {{ReadableStream}} in |transport|'s {{[[IncomingStreams]]}}
       internal slot.
    1. Close the {{ReadableStream}} in |transport|'s
-      {{[[ReceivedBidirectionalStreams]]}} internal slot.
+      {{[[IncomingBidirectionalStreams]]}} internal slot.
    1. For each {{OutgoingStream}} in |transport|'s {{[[OutgoingStreams]]}}
       internal slot run the following:
 
@@ -1084,17 +1259,18 @@ async function sendText(url, readableStreamOfTextData) {
 *This section is non-normative.*
 
 Reading incoming streams can be achieved by iterating over the
-{{UnidirectionalStreamsTransport/incomingUnidirectionalStreams}} attribute,
+{{UnidirectionalStreamsTransport/unidirectionalStreams}}'
+{{UnidirectionalStreamDuplexStream/readable}} attribute,
 and then consuming each {{ReceiveStream}} by iterating over its chunks.
 
 <pre class="example" highlight="js">
 async function receiveData(url, processTheData) {
   const wt = new WebTransport(url);
-  for await (const stream of wt.incomingUnidirectionalStreams) {
+  for await (const {readable} of wt.unidirectionalStreams.readable) {
     // consume streams individually, reporting per-stream errors
     ((async () => {
       try {
-        for await (const chunk of stream.readable.getReader()) {
+        for await (const chunk of readable.getReader()) {
           processTheData(chunk);
         }
       } catch (e) {
@@ -1112,10 +1288,10 @@ interleaved, and therefore only reads one stream at a time.
 <pre class="example" highlight="js">
 async function receiveText(url, createWritableStreamForTextData) {
   const wt = new WebTransport(url);
-  for await (const stream of wt.incomingUnidirectionalStreams) {
+  for await (const {readable} of wt.unidirectionalStreams.readable) {
     // consume sequentially to not interleave output, reporting per-stream errors
     try {
-      await stream.readable
+      await readable
        .pipeThrough(new TextDecoderStream("utf-8"))
        .pipeTo(createWritableStreamForTextData());
     } catch (e) {
@@ -1186,7 +1362,7 @@ sendData.onclick = async () => {
       case 'bidi': {
         const stream = await wt.createBidirectionalStream();
         const n = streamNumber++;
-        readFromIncomingStream(stream, n);
+        readFromIncomingStream(stream.readable, n);
 
         const writer = stream.writable.getWriter();
         await writer.write(data);
@@ -1216,10 +1392,10 @@ async function readDatagrams() {
 
 async function acceptUnidirectionalStreams() {
   try {
-    for await (const stream of wt.incomingUnidirectionalStreams) {
+    for await (const {readable} of wt.unidirectionalStreams.readable) {
       const number = streamNumber++;
       addToEventLog(&#96;New incoming unidirectional stream #${number}&#96;);
-      readFromIncomingStream(stream, number);
+      readFromIncomingStream(readable, number);
     }
     addToEventLog('Done accepting unidirectional streams!');
   } catch (e) {
@@ -1227,10 +1403,10 @@ async function acceptUnidirectionalStreams() {
   }
 }
 
-async function readFromIncomingStream(stream, number) {
+async function readFromIncomingStream(readable, number) {
   try {
     const decoder = new TextDecoderStream('utf-8');
-    for await (const chunk of stream.readable.pipeThrough(decoder)) {
+    for await (const chunk of readable.pipeThrough(decoder)) {
       addToEventLog(&#96;Received data on stream #${number}: ${chunk}&#96;);
     }
     addToEventLog(&#96;Stream #${number} closed&#96;);
