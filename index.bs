@@ -1001,8 +1001,8 @@ following example datagrams are only sent if the {{DatagramTransport}} is ready 
 
 <pre class="example" highlight="js">
 async function sendDatagrams(url, datagrams) {
-  const transport = new WebTransport(url);
-  const writer = transport.datagrams.writable.getWriter();
+  const wt = new WebTransport(url);
+  const writer = wt.datagrams.writable.getWriter();
   for (const datagram of datagrams) {
     await writer.ready;
     writer.write(datagram).catch(() => {});
@@ -1022,9 +1022,9 @@ scenarios can utilize the `ready` attribute.
 <pre class="example" highlight="js">
 // Sends datagrams every 100 ms.
 async function sendFixedRate(url, createDatagram, ms = 100) {
-  const transport = new WebTransport(url);
-  await transport.ready;
-  const writer = transport.datagrams.writable.getWriter();
+  const wt = new WebTransport(url);
+  await wt.ready;
+  const writer = wt.datagrams.writable.getWriter();
   const datagram = createDatagram();
   setInterval(() => writer.write(datagram).catch(() => {}), ms);
 }
@@ -1041,8 +1041,8 @@ enough.
 
 <pre class="example" highlight="js">
 async function receiveDatagrams(url) {
-  const transport = new WebTransport(url);
-  for await (const datagram of transport.datagrams.readable) {
+  const wt = new WebTransport(url);
+  for await (const datagram of wt.datagrams.readable) {
     // Process the datagram
   }
 }
@@ -1058,8 +1058,8 @@ resulting stream's writer.
 
 <pre class="example" highlight="js">
 async function sendData(url, data) {
-  const transport = new WebTransport(url);
-  const stream = await transport.createUnidirectionalStream();
+  const wt = new WebTransport(url);
+  const stream = await wt.createUnidirectionalStream();
   const writer = stream.writable.getWriter();
   await writer.write(data);
   await writer.close();
@@ -1071,8 +1071,8 @@ Encoding can also be done through pipes from a {{ReadableStream}}, for example u
 
 <pre class="example" highlight="js">
 async function sendText(url, readableStreamOfTextData) {
-  const transport = new WebTransport(url);
-  const stream = await transport.createUnidirectionalStream();
+  const wt = new WebTransport(url);
+  const stream = await wt.createUnidirectionalStream();
   await readableStreamOfTextData
     .pipeThrough(new TextEncoderStream("utf-8"))
     .pipeTo(stream.writable);
@@ -1089,8 +1089,8 @@ and then consuming each {{ReceiveStream}} by iterating over its chunks.
 
 <pre class="example" highlight="js">
 async function receiveData(url, processTheData) {
-  const transport = new WebTransport(url);
-  for await (const stream of transport.incomingUnidirectionalStreams) {
+  const wt = new WebTransport(url);
+  for await (const stream of wt.incomingUnidirectionalStreams) {
     // consume streams individually, reporting per-stream errors
     ((async () => {
       try {
@@ -1111,8 +1111,8 @@ interleaved, and therefore only reads one stream at a time.
 
 <pre class="example" highlight="js">
 async function receiveText(url, createWritableStreamForTextData) {
-  const transport = new WebTransport(url);
-  for await (const stream of transport.incomingUnidirectionalStreams) {
+  const wt = new WebTransport(url);
+  for await (const stream of wt.incomingUnidirectionalStreams) {
     // consume sequentially to not interleave output, reporting per-stream errors
     try {
       await stream.readable
@@ -1137,23 +1137,23 @@ the server, and sending and receiving datagrams.
 // Adds an entry to the event log on the page, optionally applying a specified
 // CSS class.
 
-let transport, streamNumber, datagramWriter;
+let wt, streamNumber, datagramWriter;
 
 connect.onclick = async () => {
   try {
     const url = document.getElementById('url').value;
 
-    transport = new WebTransport(url);
+    wt = new WebTransport(url);
     addToEventLog('Initiating connection...');
-    await transport.ready;
+    await wt.ready;
     addToEventLog('Connection ready.');
 
-    transport.closed
+    wt.closed
       .then(() => addToEventLog('Connection closed normally.'))
       .catch(() => addToEventLog('Connection closed abruptly.', 'error'));
 
     streamNumber = 1;
-    datagramWriter = transport.datagrams.writable.getWriter();
+    datagramWriter = wt.datagrams.writable.getWriter();
 
     readDatagrams();
     acceptUnidirectionalStreams();
@@ -1176,7 +1176,7 @@ sendData.onclick = async () => {
         break;
       }
       case 'unidi': {
-        const stream = await transport.createUnidirectionalStream();
+        const stream = await wt.createUnidirectionalStream();
         const writer = stream.writable.getWriter();
         await writer.write(data);
         await writer.close();
@@ -1184,7 +1184,7 @@ sendData.onclick = async () => {
         break;
       }
       case 'bidi': {
-        const stream = await transport.createBidirectionalStream();
+        const stream = await wt.createBidirectionalStream();
         const n = streamNumber++;
         readFromIncomingStream(stream, n);
 
@@ -1205,7 +1205,7 @@ async function readDatagrams() {
   try {
     const decoder = new TextDecoderStream('utf-8');
 
-    for await (const data of transport.datagrams.readable.pipeThrough(decoder)) {
+    for await (const data of wt.datagrams.readable.pipeThrough(decoder)) {
       addToEventLog(&#96;Datagram received: ${data}&#96;);
     }
     addToEventLog('Done reading datagrams!');
@@ -1216,7 +1216,7 @@ async function readDatagrams() {
 
 async function acceptUnidirectionalStreams() {
   try {
-    for await (const stream of transport.incomingUnidirectionalStreams) {
+    for await (const stream of wt.incomingUnidirectionalStreams) {
       const number = streamNumber++;
       addToEventLog(&#96;New incoming unidirectional stream #${number}&#96;);
       readFromIncomingStream(stream, number);
