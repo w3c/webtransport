@@ -22,7 +22,7 @@ Boilerplate: omit conformance
 </pre>
 <pre class="biblio">
 {
-  "quic-transport": {
+  "quic": {
     "authors": ["Jana Iyengar", "Martin Thomson"],
     "href": "https://quicwg.org/base-drafts/draft-ietf-quic-transport.html",
     "title": "QUIC: A UDP-Based Multiplexed and Secure Transport",
@@ -182,7 +182,7 @@ interface mixin UnidirectionalStreamsTransport {
             `"connected"`.
          1. Stream creation flow control is not being violated by exceeding the
             max stream limit set by the remote endpoint, as specified in
-            [[!QUIC-TRANSPORT]].
+            [[!QUIC]].
          1. |p| has not been [=settled=].
      1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
         the following conditions are met:
@@ -275,7 +275,7 @@ interface mixin BidirectionalStreamsTransport {
           `"connected"`.
        1. Stream creation flow control is not being violated by exceeding the
           max stream limit set by the remote endpoint, as specified in
-          [[!QUIC-TRANSPORT]].
+          [[!QUIC]].
        1. |p| has not been [=settled=].
    1. [=Reject=] |p| with a newly created {{InvalidStateError}} when all of
       the following conditions are met:
@@ -316,7 +316,7 @@ To <dfn>add the BidirectionalStream</dfn> to a
 # `DatagramTransport` Mixin #  {#datagram-transport}
 
 A <dfn interface>DatagramTransport</dfn> can send and receive datagrams,
-as defined in [[!HTTP3-DATAGRAM]].
+as defined in [[!HTTP3-DATAGRAM]][[!QUIC-DATAGRAM]].
 Datagrams are sent out of order, unreliably, and have a limited maximum size.
 Datagrams are encrypted and congestion controlled.
 
@@ -428,8 +428,7 @@ agent MUST run the following steps:
 1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
    {{WebTransport/constructor(url, options)/url}}.
 1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
-1. If |parsedURL| [=scheme=] is not `quic-transport` or `https`, [=throw=]
-   a {{SyntaxError}} exception.
+1. If |parsedURL| [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
 1. Let |transport| be a newly constructed {{WebTransport}} object.
 1. Let |transport| have an
@@ -503,8 +502,8 @@ To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
 ## Methods ##  {#webtransport-methods}
 
 : <dfn for="WebTransport" method>close()</dfn>
-:: Closes the WebTransport object. For QUIC, this triggers an <dfn>Immediate
-   Close</dfn> as described in [[!QUIC-TRANSPORT]] section 10.3.
+:: Closes the WebTransport object. For a dedicated connection, this 
+   triggers an <dfn>Immediate Close</dfn> as described in [[!QUIC]] section 10.2.
 
    When close is called, the user agent MUST run the following steps:
      1. Let |transport| be the WebTransport on which `close` is invoked.
@@ -512,19 +511,19 @@ To <dfn>initialize WebTransport over HTTP</dfn> for a given |transport| and
         then abort these steps.
      1. Set |transport|'s {{[[WebTransportState]]}} to `"closed"`.
      1. Let `closeInfo` be the first argument.
-     1. For QUIC, start the [=Immediate Close=] procedure by sending an
-        CONNECTION_CLOSE frame with its error code value set to the value of
-        {{WebTransportCloseInfo/errorCode}} and its reason value set to the
+     1. If the connection is dedicated, start the [=Immediate Close=] procedure
+        by sending an CONNECTION_CLOSE frame with its error code value set to the value
+        of {{WebTransportCloseInfo/errorCode}} and its reason value set to the
         value of {{WebTransportCloseInfo/reason}}.
 
 : <dfn for="WebTransport" method>getStats()</dfn>
-:: Gathers stats for this {{WebTransport}}'s QUIC
+:: Gathers stats for this {{WebTransport}}'s HTTP/3
    connection and reports the result asynchronously.</p>
 
    When close is called, the user agent MUST run the following steps:
      1. Let |transport| be the WebTransport on which `getStats` is invoked.
      1. Let |p| be a new promise.
-     1. If the URL scheme associated with |transport| is not `quic-transport`,
+     1. If the URL scheme associated with |transport| is not `https`,
         [=reject=] |p| with {{NotSupportedError}} and return |p|.
      1. Return |p| and continue the following steps [=in parallel=].
          1. Gather the stats from the underlying QUIC connection.
@@ -543,10 +542,9 @@ dictionary WebTransportOptions {
 that determine how WebTransport connection is established and used.
 
 : <dfn for="WebTransportOptions" dict-member>serverCertificateFingerprints</dfn>
-:: This option is only supported for transports using dedicated TLS
-   connections, such as `quic-transport`.  For transport protocols that do not
-   support this feature, having this field non-empty SHALL result in a
-   {{NotSupportedError}} exception being thrown.
+:: This option is only supported for transports using dedicated connections.
+   For transport protocols that do not support this feature, having this
+   field non-empty SHALL result in a {{NotSupportedError}} exception being thrown.
 :: If supported and non-empty, the user agent SHALL deem a server certificate
    trusted if and only if it can successfully [=verify a certificate
    fingerprint=] against {{WebTransportOptions/serverCertificateFingerprints}}
@@ -643,8 +641,8 @@ enum WebTransportState {
 ## `WebTransportCloseInfo` Dictionary ##  {#web-transport-close-info}
 
 The <dfn dictionary>WebTransportCloseInfo</dfn> dictionary includes information
-relating to the error code for closing a {{WebTransport}}. For QUIC, this
-information is used to set the error code and reason for an CONNECTION_CLOSE
+relating to the error code for closing a {{WebTransport}}. This
+information is used to set the error code and reason for a CONNECTION_CLOSE
 frame.
 
 <pre class="idl">
@@ -664,11 +662,12 @@ The dictionary SHALL have the following attributes:
 ## `WebTransportStats` Dictionary ##  {#web-transport-stats}
 
 The <dfn dictionary>WebTransportStats</dfn> dictionary includes information
-on QUIC connection level stats.
+on HTTP/3 connection stats.
 
-Issue: some of those are safe to expose for HTTP/2 and HTTP/3 connections (like
-min-RTT), while most would either result in information disclosure or are
-impossible to define for pooled connections.
+Issue: Now that quic-transport has been removed, this section needs to be
+revised. Some of those are safe to expose for HTTP/2 and HTTP/3 connections
+(like min-RTT), while most would either result in information disclosure
+or are impossible to define for pooled connections.
 
 <pre class="idl">
 dictionary WebTransportStats {
@@ -772,8 +771,8 @@ The {{OutgoingStream}} will initialize with the following:
 ## `StreamAbortInfo` Dictionary ##  {#stream-abort-info}
 
 The <dfn dictionary>StreamAbortInfo</dfn> dictionary includes information
-relating to the error code for aborting an incoming or outgoing stream. (For
-QUIC, in either a RST_STREAM frame or a STOP_SENDING frame).
+relating to the error code for aborting an incoming or outgoing stream (
+in either a RST_STREAM frame or a STOP_SENDING frame).
 
 <pre class="idl">
 dictionary StreamAbortInfo {
@@ -841,7 +840,7 @@ The {{IncomingStream}} will initialize with the following:
         from.
      1. Let |abortInfo| be the first argument.
      1. Start the closing procedure by sending a message to the remote side
-        indicating that the stream has been aborted (for QUIC, this is a
+        indicating that the stream has been aborted (using a
         STOP_SENDING frame) with its error code set to the value of
         |abortInfo.errorCode|.
 
