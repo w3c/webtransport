@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version b94c7e755, updated Fri Feb 19 16:28:59 2021 -0800" name="generator">
   <link href="https://github.com/w3c/webtransport" rel="canonical">
-  <meta content="e4c4d5031f773c9732eb302584af6aa50ada9388" name="document-revision">
+  <meta content="5adb617b3dbf883453a14aa295955d70dcbb9028" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -580,7 +580,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2021-02-27">27 February 2021</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2021-03-03">3 March 2021</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -793,7 +793,7 @@ unreliability.  All stream data is encrypted and congestion-controlled.</p>
          <p>The <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state①">state</a></code> has transitioned to <code>"connected"</code>.</p>
         <li data-md>
          <p>Stream creation flow control is not being violated by exceeding the
-  max stream limit set by the remote endpoint, as specified in <a data-link-type="biblio" href="#biblio-quic-transport">[QUIC-TRANSPORT]</a>.</p>
+  max stream limit set by the remote endpoint, as specified in <a data-link-type="biblio" href="#biblio-quic">[QUIC]</a>.</p>
         <li data-md>
          <p><var>p</var> has not been <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑦">settled</a>.</p>
        </ol>
@@ -891,7 +891,7 @@ All stream data is encrypted and congestion-controlled.</p>
          <p>The <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state④">state</a></code> has transitioned to <code>"connected"</code>.</p>
         <li data-md>
          <p>Stream creation flow control is not being violated by exceeding the
-  max stream limit set by the remote endpoint, as specified in <a data-link-type="biblio" href="#biblio-quic-transport">[QUIC-TRANSPORT]</a>.</p>
+  max stream limit set by the remote endpoint, as specified in <a data-link-type="biblio" href="#biblio-quic">[QUIC]</a>.</p>
         <li data-md>
          <p><var>p</var> has not been <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①③">settled</a>.</p>
        </ol>
@@ -941,7 +941,7 @@ All stream data is encrypted and congestion-controlled.</p>
    </div>
    <h2 class="heading settled" data-level="6" id="datagram-transport"><span class="secno">6. </span><span class="content"><code>DatagramTransport</code> Mixin</span><a class="self-link" href="#datagram-transport"></a></h2>
    <p>A <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="datagramtransport"><code>DatagramTransport</code></dfn> can send and receive datagrams,
-as defined in <a data-link-type="biblio" href="#biblio-http3-datagram">[HTTP3-DATAGRAM]</a>.
+as defined in <a data-link-type="biblio" href="#biblio-http3-datagram">[HTTP3-DATAGRAM]</a><a data-link-type="biblio" href="#biblio-quic-datagram">[QUIC-DATAGRAM]</a>.
 Datagrams are sent out of order, unreliably, and have a limited maximum size.
 Datagrams are encrypted and congestion controlled.</p>
 <pre class="idl highlight def"><c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#datagramtransport" id="ref-for-datagramtransport"><c- g>DatagramTransport</c-></a> {
@@ -1056,7 +1056,7 @@ agent MUST run the following steps:</p>
     <li data-md>
      <p>If <var>parsedURL</var> is a failure, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw①">throw</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#syntaxerror" id="ref-for-syntaxerror">SyntaxError</a></code> exception.</p>
     <li data-md>
-     <p>If <var>parsedURL</var> <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-scheme" id="ref-for-concept-url-scheme">scheme</a> is not <code>quic-transport</code> or <code>https</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw②">throw</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#syntaxerror" id="ref-for-syntaxerror①">SyntaxError</a></code> exception.</p>
+     <p>If <var>parsedURL</var> <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-scheme" id="ref-for-concept-url-scheme">scheme</a> is not <code>https</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw②">throw</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#syntaxerror" id="ref-for-syntaxerror①">SyntaxError</a></code> exception.</p>
     <li data-md>
      <p>If <var>parsedURL</var> <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-fragment" id="ref-for-concept-url-fragment">fragment</a> is not null, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw③">throw</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#syntaxerror" id="ref-for-syntaxerror②">SyntaxError</a></code> exception.</p>
     <li data-md>
@@ -1133,8 +1133,8 @@ agent MUST run the following steps:</p>
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="method" data-export data-lt="close(closeInfo)|close()" id="dom-webtransport-close"><code>close()</code></dfn>
     <dd data-md>
-     <p>Closes the WebTransport object. For QUIC, this triggers an <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Immediate Close" data-noexport id="immediate-close">Immediate
- Close</dfn> as described in <a data-link-type="biblio" href="#biblio-quic-transport">[QUIC-TRANSPORT]</a> section 10.3.</p>
+     <p>Closes the WebTransport object. For a dedicated connection, this
+ triggers an <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="immediate-close">Immediate Close</dfn> as described in <a data-link-type="biblio" href="#biblio-quic">[QUIC]</a> section 10.2.</p>
      <p>When close is called, the user agent MUST run the following steps:</p>
      <ol>
       <li data-md>
@@ -1147,13 +1147,14 @@ agent MUST run the following steps:</p>
       <li data-md>
        <p>Let <code>closeInfo</code> be the first argument.</p>
       <li data-md>
-       <p>For QUIC, start the <a data-link-type="dfn" href="#immediate-close" id="ref-for-immediate-close">Immediate Close</a> procedure by sending an
-  CONNECTION_CLOSE frame with its error code value set to the value of <code class="idl"><a data-link-type="idl" href="#dom-webtransportcloseinfo-errorcode" id="ref-for-dom-webtransportcloseinfo-errorcode">errorCode</a></code> and its reason value set to the
+       <p>If the connection is dedicated, start the <a data-link-type="dfn" href="#immediate-close" id="ref-for-immediate-close">Immediate Close</a> procedure
+  by sending an CONNECTION_CLOSE frame with its error code value set to the value
+  of <code class="idl"><a data-link-type="idl" href="#dom-webtransportcloseinfo-errorcode" id="ref-for-dom-webtransportcloseinfo-errorcode">errorCode</a></code> and its reason value set to the
   value of <code class="idl"><a data-link-type="idl" href="#dom-webtransportcloseinfo-reason" id="ref-for-dom-webtransportcloseinfo-reason">reason</a></code>.</p>
      </ol>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="method" data-export id="dom-webtransport-getstats"><code>getStats()</code></dfn>
     <dd data-md>
-     <p>Gathers stats for this <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport④">WebTransport</a></code>'s QUIC
+     <p>Gathers stats for this <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport④">WebTransport</a></code>'s HTTP/3
  connection and reports the result asynchronously.</p>
      <p></p>
      <p>When close is called, the user agent MUST run the following steps:</p>
@@ -1163,7 +1164,7 @@ agent MUST run the following steps:</p>
       <li data-md>
        <p>Let <var>p</var> be a new promise.</p>
       <li data-md>
-       <p>If the URL scheme associated with <var>transport</var> is not <code>quic-transport</code>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑦">reject</a> <var>p</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror①">NotSupportedError</a></code> and return <var>p</var>.</p>
+       <p>If the URL scheme associated with <var>transport</var> is not <code>https</code>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑦">reject</a> <var>p</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror①">NotSupportedError</a></code> and return <var>p</var>.</p>
       <li data-md>
        <p>Return <var>p</var> and continue the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①">in parallel</a>.</p>
        <ol>
@@ -1184,9 +1185,9 @@ that determine how WebTransport connection is established and used.</p>
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportOptions" data-dfn-type="dict-member" data-export id="dom-webtransportoptions-servercertificatefingerprints"><code>serverCertificateFingerprints</code></dfn>, <span> of type sequence&lt;<a data-link-type="idl-name" href="https://www.w3.org/TR/webrtc/#dom-rtcdtlsfingerprint" id="ref-for-dom-rtcdtlsfingerprint①">RTCDtlsFingerprint</a>></span>
     <dd data-md>
-     <p>This option is only supported for transports using dedicated TLS
- connections, such as <code>quic-transport</code>.  For transport protocols that do not
- support this feature, having this field non-empty SHALL result in a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror②">NotSupportedError</a></code> exception being thrown.</p>
+     <p>This option is only supported for transports using dedicated connections.
+ For transport protocols that do not support this feature, having this
+ field non-empty SHALL result in a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror②">NotSupportedError</a></code> exception being thrown.</p>
     <dd data-md>
      <p>If supported and non-empty, the user agent SHALL deem a server certificate
  trusted if and only if it can successfully <a data-link-type="dfn" href="#verify-a-certificate-fingerprint" id="ref-for-verify-a-certificate-fingerprint">verify a certificate
@@ -1291,8 +1292,8 @@ without key rotation.</p>
    </dl>
    <h3 class="heading settled" data-level="8.6" id="web-transport-close-info"><span class="secno">8.6. </span><span class="content"><code>WebTransportCloseInfo</code> Dictionary</span><a class="self-link" href="#web-transport-close-info"></a></h3>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-webtransportcloseinfo"><code>WebTransportCloseInfo</code></dfn> dictionary includes information
-relating to the error code for closing a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑦">WebTransport</a></code>. For QUIC, this
-information is used to set the error code and reason for an CONNECTION_CLOSE
+relating to the error code for closing a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑦">WebTransport</a></code>. This
+information is used to set the error code and reason for a CONNECTION_CLOSE
 frame.</p>
 <pre class="idl highlight def"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo④"><c- g>WebTransportCloseInfo</c-></a> {
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-default="0" data-link-type="dict-member" data-type="unsigned long long " href="#dom-webtransportcloseinfo-errorcode" id="ref-for-dom-webtransportcloseinfo-errorcode①"><c- g>errorCode</c-></a> = 0;
@@ -1310,10 +1311,11 @@ frame.</p>
    </dl>
    <h3 class="heading settled" data-level="8.7" id="web-transport-stats"><span class="secno">8.7. </span><span class="content"><code>WebTransportStats</code> Dictionary</span><a class="self-link" href="#web-transport-stats"></a></h3>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-webtransportstats"><code>WebTransportStats</code></dfn> dictionary includes information
-on QUIC connection level stats.</p>
-   <p class="issue" id="issue-908bd92a"><a class="self-link" href="#issue-908bd92a"></a> some of those are safe to expose for HTTP/2 and HTTP/3 connections (like
-min-RTT), while most would either result in information disclosure or are
-impossible to define for pooled connections.</p>
+on HTTP/3 connection stats.</p>
+   <p class="issue" id="issue-29939a8a"><a class="self-link" href="#issue-29939a8a"></a> Now that quic-transport has been removed, this section needs to be
+revised. Some of those are safe to expose for HTTP/2 and HTTP/3 connections
+(like min-RTT), while most would either result in information disclosure
+or are impossible to define for pooled connections.</p>
 <pre class="idl highlight def"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-webtransportstats" id="ref-for-dictdef-webtransportstats②"><c- g>WebTransportStats</c-></a> {
   <a data-link-type="idl-name" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp" id="ref-for-dom-domhighrestimestamp"><c- n>DOMHighResTimeStamp</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMHighResTimeStamp " href="#dom-webtransportstats-timestamp" id="ref-for-dom-webtransportstats-timestamp"><c- g>timestamp</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long②"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long " href="#dom-webtransportstats-bytessent" id="ref-for-dom-webtransportstats-bytessent"><c- g>bytesSent</c-></a>;
@@ -1432,8 +1434,8 @@ either a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-fo
    </dl>
    <h3 class="heading settled" data-level="9.4" id="stream-abort-info"><span class="secno">9.4. </span><span class="content"><code>StreamAbortInfo</code> Dictionary</span><a class="self-link" href="#stream-abort-info"></a></h3>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-streamabortinfo"><code>StreamAbortInfo</code></dfn> dictionary includes information
-relating to the error code for aborting an incoming or outgoing stream. (For
-QUIC, in either a RST_STREAM frame or a STOP_SENDING frame).</p>
+relating to the error code for aborting an incoming or outgoing stream (
+in either a RST_STREAM frame or a STOP_SENDING frame).</p>
 <pre class="idl highlight def"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo④"><c- g>StreamAbortInfo</c-></a> {
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①⓪"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-default="0" data-link-type="dict-member" data-type="unsigned long long " href="#dom-streamabortinfo-errorcode" id="ref-for-dom-streamabortinfo-errorcode①"><c- g>errorCode</c-></a> = 0;
 };
@@ -1507,7 +1509,7 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
        <p>Let <var>abortInfo</var> be the first argument.</p>
       <li data-md>
        <p>Start the closing procedure by sending a message to the remote side
-  indicating that the stream has been aborted (for QUIC, this is a
+  indicating that the stream has been aborted (using a
   STOP_SENDING frame) with its error code set to the value of
   |abortInfo.errorCode|.</p>
      </ol>
@@ -2405,8 +2407,10 @@ and has been adapted for use in this specification.</p>
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/">HTML Standard</a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-http3-datagram">[HTTP3-DATAGRAM]
    <dd>David Schinazi; Lucas Pardue. <a href="https://tools.ietf.org/html/draft-ietf-masque-h3-datagram">Using QUIC Datagrams with HTTP/3</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-masque-h3-datagram">https://tools.ietf.org/html/draft-ietf-masque-h3-datagram</a>
-   <dt id="biblio-quic-transport">[QUIC-TRANSPORT]
+   <dt id="biblio-quic">[QUIC]
    <dd>Jana Iyengar; Martin Thomson. <a href="https://quicwg.org/base-drafts/draft-ietf-quic-transport.html">QUIC: A UDP-Based Multiplexed and Secure Transport</a>. Internet-Draft. URL: <a href="https://quicwg.org/base-drafts/draft-ietf-quic-transport.html">https://quicwg.org/base-drafts/draft-ietf-quic-transport.html</a>
+   <dt id="biblio-quic-datagram">[QUIC-DATAGRAM]
+   <dd>Tommy Pauly; Eric Kinnear; David Schinazi. <a href="https://tools.ietf.org/html/draft-ietf-quic-datagram">An Unreliable Datagram Extension to QUIC</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-quic-datagram">https://tools.ietf.org/html/draft-ietf-quic-datagram</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>. March 1997. Best Current Practice. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
    <dt id="biblio-rfc5280">[RFC5280]
@@ -2545,9 +2549,10 @@ and has been adapted for use in this specification.</p>
 that applications using this for ephemeral certificates can do so without
 having to fight the clock skew, but small enough to discourage long-term use
 without key rotation.<a href="#issue-7e6950b7"> ↵ </a></div>
-   <div class="issue"> some of those are safe to expose for HTTP/2 and HTTP/3 connections (like
-min-RTT), while most would either result in information disclosure or are
-impossible to define for pooled connections.<a href="#issue-908bd92a"> ↵ </a></div>
+   <div class="issue"> Now that quic-transport has been removed, this section needs to be
+revised. Some of those are safe to expose for HTTP/2 and HTTP/3 connections
+(like min-RTT), while most would either result in information disclosure
+or are impossible to define for pooled connections.<a href="#issue-29939a8a"> ↵ </a></div>
   </div>
   <aside class="dfn-panel" data-for="unidirectionalstreamstransport">
    <b><a href="#unidirectionalstreamstransport">#unidirectionalstreamstransport</a></b><b>Referenced in:</b>
