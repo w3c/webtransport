@@ -447,6 +447,9 @@ agent MUST run the following steps:
 1. Let |transport| have a
    <dfn attribute for="WebTransport">\[[Ready]]</dfn> internal
    slot, initialized to a promise.
+1. Let |transport| have a
+   <dfn attribute for="WebTransport">\[[Closed]]</dfn> internal
+   slot, initialized to a promise.
 1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[OutgoingDatagrams]]</dfn> internal slot
    initialized to the result of [=WritableStream/creating=] a {{WritableStream}},
@@ -511,6 +514,7 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 : <dfn for="WebTransport" attribute>ready</dfn>
 :: On getting, it MUST return the value of the {{[[Ready]]}} internal slot.
 : <dfn for="WebTransport" attribute>closed</dfn>
+:: On getting, it MUST return the value of the {{[[Closed]]}} internal slot.
 :: This promise MUST be [=resolved=] when the transport is closed; an
    implementation SHOULD include error information in the `reason` and
    `errorCode` fields of {{WebTransportCloseInfo}}.
