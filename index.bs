@@ -425,13 +425,10 @@ agent MUST run the following steps:
 1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
    {{WebTransport/constructor(url, options)/url}}.
 1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
-1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
-   {{WebTransport/constructor(url, options)/url}}.
 1. If |parsedURL| [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
-1. Let |dedicated| be true.
-1. If {{WebTransport/constructor(url, options)/options}}[`"dedicated"`] exists, then set |dedicated|
-   to it.
+1. Let |dedicated| be {{WebTransport/constructor(url, options)/options}}'s
+   [=WebTransportOptions/dedicated=] if it exists, and true otherwise.
 1. Let |transport| be a newly constructed {{WebTransport}} object.
 1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[OutgoingStreams]]</dfn> internal slot
@@ -467,36 +464,42 @@ agent MUST run the following steps:
    and its [=DatagramDuplexStream/create/writable=] set to |transport|.{{[[OutgoingDatagrams]]}}.
 1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[Connection]]</dfn> internal slot initialized to null.
-1. [=Initialize WebTransport over HTTP=], with |transport|, |parsedURL| and |dedicated|.
+1. Let |promise| be the result of [=initialize WebTransport over HTTP|initializing WebTransport
+   over HTTP=], with |transport|, |parsedURL| and |dedicated|.
+1. [=Upon fulfillment=] of |promise|, run these steps:
+   1. If |transport|'s {{[[WebTransportState]]}} internal slot is not `"connecting"`, then abort
+      these steps.
+   1. Set |transport|'s {{[[WebTransportState]]}} internal slot to `"connected"`.
+   1. Resolve |transport|'s {{[[Ready]]}} internal slot with {{undefined}}.
+1. [=Upon rejection=] of |promise| with |error|, run these steps:
+   1. Set |transport|'s {{[[WebTransportState]]}} internal slot to `"failed"`.
+   1. Reject |transport|'s {{[[Ready]]}} internal slot with |error|.
+   1. Reject |transport|'s {{[[Closed]]}} internal slot with |error|.
 1. Return |transport|.
 
 <div algorithm="initialize WebTransport over HTTP">
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
-<var>transport</var>, a [=URL record=] |url|, a and boolean |dedicated|, run these steps
-[=in parallel=].
+<var>transport</var>, a [=URL record=] |url|, a and boolean |dedicated|, run these steps.
 
+1. Let |promise| be a new promise.
+1. Return |promise| and run the following steps [=in parallel=].
 1. Let |request| be a [=request=]  whose [=request/url=] is |url| and [=request/client=]
    is |transport|'s [=relevant settings object=].
 1. Let |networkPartitionKey| be the result of
    [=determine the network partition key|determining the network partition key=] with |request|.
-1. Let |connection| be the result of the result of [=obtain a connection|obtaining a connection=]
-   with |networkPartitionKey|, |url|'s [=url/origin=], false,
-   [=obtain a connection/http3Only=] set to true, and [=obtain a connection/dedicated=] set to
-   |dedicated|.
-1. If |connection| is failure, set |transport|'s {{[[WebTransportState]]}} internal slot to
-   `"failed"`, reject |transport|'s {{[[Ready]]}} with a {{TypeError}} and abort these steps.
+1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
+   |networkPartitionKey|, |url|'s [=url/origin=], false, [=obtain a connection/http3Only=] set to
+   true, and [=obtain a connection/dedicated=] set to |dedicated|.
+1. If |connection| is failure, then reject |promise| with a {{TypeError}} and abort these steps.
 1. Set |transport|'s {{[[Connection]]}} internal slot to |connection|.
 1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
    represents the SETTINGS frame.
 1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
-   contain H3_DATAGRAM with a value of 1, then set |transport|'s {{[[WebTransportState]]}} internal
-   slot to `"failed"`, reject |transport|'s {{[[Ready]]}} with a {{TypeError}} and abort these
-   steps. [[!WEB-TRANSPORT-HTTP3]][[!HTTP3-DATAGRAM]].
+   contain H3_DATAGRAM with a value of 1, then reject |promise| with a {{TypeError}} and abort
+   these steps.
 1. Create a WebTransport session with |connection|, as described in [[!WEB-TRANSPORT-HTTP3]].
-1. If the previous steps fails, then set |transport|'s {{[[WebTransportState]]}} internal slot to
-   `"failed"`, reject |transport|'s {{[[Ready]]}} with a {{TypeError}} and abort these steps.
-1. Set |transport|'s {{[[WebTransportState]]}} internal slot to `"connected"`.
-1. Resolve |transport|'s {{[[Ready]]}} with {{undefined}}.
+1. If the previous step fails, then reject |promise| with a {{TypeError}} and abort these steps.
+1. Resolve |promise| with {{undefined}}.
 
 </div>
 
