@@ -357,9 +357,40 @@ is defined by running the following steps:
 
 The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
 |data| as input. It is defined by running the following steps:
-1. TODO
-1. Enqueue data for datagram transmission.
-1. Return [=a promise resolved with=] undefined.
+1. Let |timestamp| be a timestamp representing now.
+1. Let |promise| be a new promise.
+1. If |data| is not a {{Uint8Array}} object, then return [=a promise rejected with=] a {{TypeError}}.
+1. Let |bytes| be a copy of bytes which |data| represents.
+1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
+1. Enqueue |chunk| to |transport|'s {{[[OutgoingDatagramsExpirationDuration]]}}.
+1. If the length of |transport|'s {{[[OutgoingDatagramsQueue]]}} is less than
+   |transport|'s {{[[OutgoingDatagramsHighWaterMark]]}}, then [=resolve=] |promise| with undefined.
+1. Return |promise|.
+
+Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
+have been returned by [=writeDatagrams=] have been resolved. Hence the timestamp and the expiration
+duration work well only when the web developer takes care of
+{{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
+
+To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
+1. Let |queue| be |transport|'s {{[[OutgoingDatagramsQueue]]}}.
+1. Let |duration| be |transport|'s {{[[OutgoingDatagramsExpirationDuration]]}}.
+1. If |duration| is null, then set |duration| to an implementation defined {{double}} value.
+1. while |queue| is not empty:
+  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
+  1. If more than |duration| milliseconds have passed since |timestamp|, then:
+     1. [=Resolve=] |promise| with undefined.
+     1. Remove the first element from |queue|.
+  1. Otherwise, break this loop.
+1. while |queue| is not empty:
+  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
+  1. If it is not possible to send |bytes| to the network immediately, then break this loop.
+  1. Send |bytes| to the network. [[!WEB-TRANSPORT-HTTP3]]
+  1. [=Resolve=] |promise| with undefined.
+  1. Remove the first element from |queue|.
+
+The user agent MAY run [=sendDatagrams=] with any {{WebTransport}} object whose
+{{[[WebTransportState]]}} is `"connected"` at any time.
 
 # `DatagramDuplexStream` Interface #  {#duplex-stream}
 
@@ -451,6 +482,12 @@ agent MUST run the following steps:
    its [=WritableStream/create/writeAlgorithm=] set to [=writeDatagrams=] given
    |transport| as a parameter.
 1. Let |transport| have an
+   <dfn attribute for="WebTransport">\[[OutgoingDatagramsQueue]]</dfn> internal slot
+   initialized to an empty queue.
+1. Let |transport| have an
+   <dfn attribute for="WebTransport">\[[OutgoingDatagramsHighWaterMark]]</dfn> internal slot
+   initialized to 1.
+1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[IncomingDatagrams]]</dfn> internal
    slot initialized to the result of <a dfn for="ReadableStream">creating</a> a
    {{ReadableStream}}. `transport.[[IncomingDatagrams]]` is provided datagrams
@@ -460,6 +497,9 @@ agent MUST run the following steps:
    initialized to the result of [=DatagramDuplexStream/creating=] a {{DatagramDuplexStream}},
    its [=DatagramDuplexStream/create/readable=] set to |transport|.{{[[IncomingDatagrams]]}},
    and its [=DatagramDuplexStream/create/writable=] set to |transport|.{{[[OutgoingDatagrams]]}}.
+1. Let |transport| have a
+   <dfn attribute for="WebTransport">\[[OutgoingDatagramsExpirationDuration]]</dfn> internal slot
+   initialized to null.
 1. If the scheme of |parsedURL| is `https`, [=in parallel=],
    [=initialize WebTransport over HTTP=].
 1. Return |transport|.
