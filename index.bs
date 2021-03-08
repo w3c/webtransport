@@ -427,8 +427,13 @@ agent MUST run the following steps:
 1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
-1. Let |dedicated| be {{WebTransport/constructor(url, options)/options}}'s
-   {{WebTransportOptions/dedicated}} if it exists, and true otherwise.
+1. Let |allowPooling| be {{WebTransport/constructor(url, options)/options}}'s
+   {{WebTransportOptions/allowPooling}} if it exists, and false otherwise.
+1. Let |dedicated| be the negation of |allowPooling|.
+1. Let |serverCertificateFingerprints| be {{WebTransport/constructor(url, options)/options}}'s
+   {{WebTransportOptions/serverCertificateFingerprints}} if it exists, and null otherwise.
+1. If |dedicated| is false and |serverCertificateFingerprints| is non-null, then [=throw=] a
+   {{TypeError}}.
 1. Let |transport| be a newly constructed {{WebTransport}} object.
 1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[OutgoingStreams]]</dfn> internal slot
@@ -465,7 +470,7 @@ agent MUST run the following steps:
    initialized to the result of [=DatagramDuplexStream/creating=] a {{DatagramDuplexStream}},
    its [=DatagramDuplexStream/create/readable=] set to |transport|.{{[[IncomingDatagrams]]}},
    and its [=DatagramDuplexStream/create/writable=] set to |transport|.{{[[OutgoingDatagrams]]}}.
-1. Let |transport| have an
+1. Let |transport| have a
    <dfn attribute for="WebTransport">\[[Connection]]</dfn> internal slot initialized to null.
 1. Let |promise| be the result of [=initialize WebTransport over HTTP|initializing WebTransport
    over HTTP=], with |transport|, |parsedURL| and |dedicated|.
@@ -558,7 +563,7 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 
 <pre class="idl">
 dictionary WebTransportOptions {
-  bool dedicated;
+  bool allowPooling;
   sequence&lt;RTCDtlsFingerprint&gt; serverCertificateFingerprints;
 };
 </pre>
@@ -566,9 +571,9 @@ dictionary WebTransportOptions {
 <dfn dictionary>WebTransportOptions</dfn> is a dictionary of parameters
 that determine how WebTransport connection is established and used.
 
-: <dfn for="WebTransportOptions" dict-member>dedicated</dfn>
-:: Represents whether the transport should use a dedicated connection or not. When this member is
-   not specified, WebTransport will be created with a dedicated connection.
+: <dfn for="WebTransportOptions" dict-member>allowPooling</dfn>
+:: When set to true, the WebTransport connection can be pooled, that is, the network connection for
+   the WebTransport session can be shared with other HTTP/3 sessions.
 
 : <dfn for="WebTransportOptions" dict-member>serverCertificateFingerprints</dfn>
 :: This option is only supported for transports using dedicated connections.
@@ -582,6 +587,7 @@ that determine how WebTransport connection is established and used.
    or has a malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent
    SHALL use certificate verification procedures it would use for normal
    [=fetch=] operations.
+:: This cannot be used with {{WebTransportOptions/allowPooling}}.
 
 <div algorithm="compute a certificate fingerprint">
 To <dfn>compute a certificate fingerprint</dfn>, do the following:
