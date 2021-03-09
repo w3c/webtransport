@@ -487,12 +487,12 @@ agent MUST run the following steps:
 
 <div algorithm="initialize WebTransport over HTTP">
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
-<var>transport</var>, a [=URL record=] |url|, a and boolean |dedicated|, run these steps.
+<var>transport</var>, a [=URL record=] |url|, and a boolean |dedicated|, run these steps.
 
 1. Let |promise| be a new promise.
-1. Return |promise| and run the following steps [=in parallel=].
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
+1. Return |promise| and run the following steps [=in parallel=].
 1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
    |networkPartitionKey|, |url|'s [=url/origin=], false, [=obtain a connection/http3Only=] set to
    true, and [=obtain a connection/dedicated=] set to |dedicated|.
