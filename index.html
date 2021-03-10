@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version b94c7e755, updated Fri Feb 19 16:28:59 2021 -0800" name="generator">
   <link href="https://github.com/w3c/webtransport" rel="canonical">
-  <meta content="4ebe916310fa898cf18301faaad7f2ddce24e129" name="document-revision">
+  <meta content="5287928fb59cb97ddc6a2ec46a92b2b29f4f2f61" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -580,7 +580,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2021-03-03">3 March 2021</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2021-03-10">10 March 2021</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -747,7 +747,7 @@ handlers, and the <code class="idl"><a data-link-type="idl" href="https://html.s
    <p>The concepts <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task">queue a task</a> and <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source">networking task source</a> are defined in <a data-link-type="biblio" href="#biblio-html">[HTML]</a>.</p>
    <p>The terms <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event" id="ref-for-concept-event">event</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handlers" id="ref-for-event-handlers">event handlers</a> and <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-event-type" id="ref-for-event-handler-event-type">event handler event types</a> are
 defined in <a data-link-type="biblio" href="#biblio-html">[HTML]</a>.</p>
-   <p>When referring to exceptions, the terms <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw">throw</a> and <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create">create</a> are defined in <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>.</p>
+   <p>When referring to exceptions, the terms <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw">throw</a> and <a data-link-type="dfn" href="#bidirectionalstream-create" id="ref-for-bidirectionalstream-create">create</a> are defined in <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>.</p>
    <p>The terms <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects">fulfilled</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①">rejected</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②">resolved</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③">pending</a> and <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects④">settled</a> used in the context of Promises are defined in <a data-link-type="biblio" href="#biblio-ecmascript-60">[ECMASCRIPT-6.0]</a>.</p>
    <p>The terms <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream">ReadableStream</a></code> and <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream">WritableStream</a></code> are defined in <a data-link-type="biblio" href="#biblio-whatwg-streams">[WHATWG-STREAMS]</a>.  Note that despite sharing the name "stream", these are
 distinct from the IncomingStream, OutgoingStream, and BidirectionalStream
@@ -786,7 +786,7 @@ unreliability.  All stream data is encrypted and congestion-controlled.</p>
       <li data-md>
        <p>Return <var>p</var> and continue the remaining steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel">in parallel</a>.</p>
       <li data-md>
-       <p><a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create①">Create</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②">SendStream</a></code> with <var>transport</var> and <var>p</var> when all
+       <p><a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create">Create</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②">SendStream</a></code> with <var>transport</var> and <var>p</var> when all
   of the following conditions are met:</p>
        <ol>
         <li data-md>
@@ -883,7 +883,7 @@ All stream data is encrypted and congestion-controlled.</p>
       <li data-md>
        <p>Return <var>p</var> and continue the remaining steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①">in parallel</a>.</p>
       <li data-md>
-       <p><a data-link-type="dfn" href="#bidirectionalstream-create" id="ref-for-bidirectionalstream-create">Create</a> a <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream②">BidirectionalStream</a></code> with <var>transport</var> and <var>p</var> when all of the following conditions are met:</p>
+       <p><a data-link-type="dfn" href="#bidirectionalstream-create" id="ref-for-bidirectionalstream-create①">Create</a> a <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream②">BidirectionalStream</a></code> with <var>transport</var> and <var>p</var> when all of the following conditions are met:</p>
        <ol>
         <li data-md>
          <p>The <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state③">state</a></code> is <code>"connected"</code>.</p>
@@ -2422,7 +2422,7 @@ and has been adapted for use in this specification.</p>
    <dt id="biblio-quic">[QUIC]
    <dd>Jana Iyengar; Martin Thomson. <a href="https://quicwg.org/base-drafts/draft-ietf-quic-transport.html">QUIC: A UDP-Based Multiplexed and Secure Transport</a>. Internet-Draft. URL: <a href="https://quicwg.org/base-drafts/draft-ietf-quic-transport.html">https://quicwg.org/base-drafts/draft-ietf-quic-transport.html</a>
    <dt id="biblio-quic-datagram">[QUIC-DATAGRAM]
-   <dd>Tommy Pauly; Eric Kinnear; David Schinazi. <a href="https://tools.ietf.org/html/draft-ietf-quic-datagram">An Unreliable Datagram Extension to QUIC</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-quic-datagram">https://tools.ietf.org/html/draft-ietf-quic-datagram</a>
+   <dd>Tommy Pauly; Eric Kinnear; David Schinazi. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-datagram/">An Unreliable Datagram Extension to QUIC</a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-datagram/">https://datatracker.ietf.org/doc/html/draft-ietf-quic-datagram/</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>. March 1997. Best Current Practice. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
    <dt id="biblio-rfc5280">[RFC5280]
@@ -2432,7 +2432,7 @@ and has been adapted for use in this specification.</p>
    <dt id="biblio-url">[URL]
    <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/">URL Standard</a>. Living Standard. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
    <dt id="biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]
-   <dd>Victor Vasiliev. <a href="https://tools.ietf.org/html/draft-ietf-webtrans-http3">WebTransport over HTTP/3</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-webtrans-http3">https://tools.ietf.org/html/draft-ietf-webtrans-http3</a>
+   <dd>Victor Vasiliev. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/">WebTransport over HTTP/3</a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/">https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/</a>
    <dt id="biblio-web-transport-overview">[WEB-TRANSPORT-OVERVIEW]
    <dd>Victor Vasiliev. <a href="https://tools.ietf.org/html/draft-ietf-webtrans-overview">WebTransport Protocol Framework</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-webtrans-overview">https://tools.ietf.org/html/draft-ietf-webtrans-overview</a>
    <dt id="biblio-webidl">[WEBIDL]
@@ -2590,8 +2590,7 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="sendstream-create">
    <b><a href="#sendstream-create">#sendstream-create</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-sendstream-create">3. Terminology</a>
-    <li><a href="#ref-for-sendstream-create①">4.1. Methods</a>
+    <li><a href="#ref-for-sendstream-create">4.1. Methods</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dictdef-sendstreamparameters">
@@ -2625,7 +2624,8 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="bidirectionalstream-create">
    <b><a href="#bidirectionalstream-create">#bidirectionalstream-create</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-bidirectionalstream-create">5.1. Methods</a>
+    <li><a href="#ref-for-bidirectionalstream-create">3. Terminology</a>
+    <li><a href="#ref-for-bidirectionalstream-create①">5.1. Methods</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="datagramtransport">
