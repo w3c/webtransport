@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version b94c7e755, updated Fri Feb 19 16:28:59 2021 -0800" name="generator">
   <link href="https://github.com/w3c/webtransport" rel="canonical">
-  <meta content="d9c9eb2f21bbc20be816bcdc293c95b2a4b12f3e" name="document-revision">
+  <meta content="a4dc7aaa9c3108c7490f88355b9be8aa45f5dcad" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -747,7 +747,7 @@ handlers, and the <code class="idl"><a data-link-type="idl" href="https://html.s
    <p>The concepts <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task">queue a task</a> and <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source">networking task source</a> are defined in <a data-link-type="biblio" href="#biblio-html">[HTML]</a>.</p>
    <p>The terms <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event" id="ref-for-concept-event">event</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handlers" id="ref-for-event-handlers">event handlers</a> and <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-event-type" id="ref-for-event-handler-event-type">event handler event types</a> are
 defined in <a data-link-type="biblio" href="#biblio-html">[HTML]</a>.</p>
-   <p>When referring to exceptions, the terms <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw">throw</a> and <a data-link-type="dfn" href="#datagramduplexstream-create" id="ref-for-datagramduplexstream-create">create</a> are defined in <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>.</p>
+   <p>When referring to exceptions, the terms <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw">throw</a> and <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create">create</a> are defined in <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>.</p>
    <p>The terms <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects">fulfilled</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①">rejected</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②">resolved</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③">pending</a> and <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects④">settled</a> used in the context of Promises are defined in <a data-link-type="biblio" href="#biblio-ecmascript-60">[ECMASCRIPT-6.0]</a>.</p>
    <p>The terms <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream">ReadableStream</a></code> and <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream">WritableStream</a></code> are defined in <a data-link-type="biblio" href="#biblio-whatwg-streams">[WHATWG-STREAMS]</a>.  Note that despite sharing the name "stream", these are
 distinct from the IncomingStream, OutgoingStream, and BidirectionalStream
@@ -786,7 +786,7 @@ unreliability.  All stream data is encrypted and congestion-controlled.</p>
       <li data-md>
        <p>Return <var>p</var> and continue the remaining steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel">in parallel</a>.</p>
       <li data-md>
-       <p><a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create">Create</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②">SendStream</a></code> with <var>transport</var> and <var>p</var> when all
+       <p><a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create①">Create</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②">SendStream</a></code> with <var>transport</var> and <var>p</var> when all
   of the following conditions are met:</p>
        <ol>
         <li data-md>
@@ -994,7 +994,8 @@ is defined by running the following steps:</p>
    </ol>
    <h2 class="heading settled" data-level="7" id="duplex-stream"><span class="secno">7. </span><span class="content"><code>DatagramDuplexStream</code> Interface</span><a class="self-link" href="#duplex-stream"></a></h2>
    <p>A <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="datagramduplexstream"><code>DatagramDuplexStream</code></dfn> is a generic duplex stream.</p>
-<pre class="idl highlight def"><c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#datagramduplexstream" id="ref-for-datagramduplexstream②"><c- g>DatagramDuplexStream</c-></a> {
+<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
+<c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#datagramduplexstream" id="ref-for-datagramduplexstream②"><c- g>DatagramDuplexStream</c-></a> {
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream⑧"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-datagramduplexstream-readable" id="ref-for-dom-datagramduplexstream-readable"><c- g>readable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream②"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-datagramduplexstream-writable" id="ref-for-dom-datagramduplexstream-writable①"><c- g>writable</c-></a>;
 };
@@ -1033,7 +1034,7 @@ is defined by running the following steps:</p>
    <p><code>WebTransport</code> provides an API to the HTTP/3 transport functionality
 defined in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>. It implements all of the transport
 mixins (<code class="idl"><a data-link-type="idl" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport①">UnidirectionalStreamsTransport</a></code>, <code class="idl"><a data-link-type="idl" href="#bidirectionalstreamstransport" id="ref-for-bidirectionalstreamstransport②">BidirectionalStreamsTransport</a></code>, <code class="idl"><a data-link-type="idl" href="#datagramtransport" id="ref-for-datagramtransport①">DatagramTransport</a></code>), as well as stats and transport state information.</p>
-<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
+<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="webtransport"><code><c- g>WebTransport</c-></code></dfn> {
   <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="constructor" data-export data-lt="WebTransport(url, options)|constructor(url, options)|WebTransport(url)|constructor(url)" id="dom-webtransport-webtransport"><code><c- g>constructor</c-></code></dfn>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString" id="ref-for-idl-USVString"><c- b>USVString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport/WebTransport(url, options), WebTransport/constructor(url, options), WebTransport/WebTransport(url), WebTransport/constructor(url)" data-dfn-type="argument" data-export id="dom-webtransport-webtransport-url-options-url"><code><c- g>url</c-></code></dfn>, <c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransportoptions" id="ref-for-dictdef-webtransportoptions"><c- n>WebTransportOptions</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport/WebTransport(url, options), WebTransport/constructor(url, options), WebTransport/WebTransport(url), WebTransport/constructor(url)" data-dfn-type="argument" data-export id="dom-webtransport-webtransport-url-options-options"><code><c- g>options</c-></code></dfn> = {});
 
@@ -1099,7 +1100,7 @@ agent MUST run the following steps:</p>
   using the <a data-link-type="dfn" href="#readdatagrams" id="ref-for-readdatagrams">readDatagrams</a> algorithm given <var>transport</var> as a parameter.</p>
     <li data-md>
      <p>Let <var>transport</var> have a <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-datagrams-slot"><code>[[Datagrams]]</code></dfn> internal slot
- initialized to the result of <a data-link-type="dfn" href="#datagramduplexstream-create" id="ref-for-datagramduplexstream-create①">creating</a> a <code class="idl"><a data-link-type="idl" href="#datagramduplexstream" id="ref-for-datagramduplexstream⑤">DatagramDuplexStream</a></code>,
+ initialized to the result of <a data-link-type="dfn" href="#datagramduplexstream-create" id="ref-for-datagramduplexstream-create">creating</a> a <code class="idl"><a data-link-type="idl" href="#datagramduplexstream" id="ref-for-datagramduplexstream⑤">DatagramDuplexStream</a></code>,
  its <a data-link-type="dfn" href="#datagramduplexstream-create-readable" id="ref-for-datagramduplexstream-create-readable">readable</a> set to <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingdatagrams-slot" id="ref-for-dom-webtransport-incomingdatagrams-slot">[[IncomingDatagrams]]</a></code>,
  and its <a data-link-type="dfn" href="#datagramduplexstream-create-writable" id="ref-for-datagramduplexstream-create-writable">writable</a> set to <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-outgoingdatagrams-slot" id="ref-for-dom-webtransport-outgoingdatagrams-slot">[[OutgoingDatagrams]]</a></code>.</p>
     <li data-md>
@@ -1427,7 +1428,7 @@ or are impossible to define for pooled connections.</p>
    <h2 class="heading settled" data-level="9" id="outgoing-stream"><span class="secno">9. </span><span class="content">Interface Mixin <code>OutgoingStream</code></span><a class="self-link" href="#outgoing-stream"></a></h2>
    <p>An <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="outgoingstream"><code>OutgoingStream</code></dfn> is a stream that can be written to, as
 either a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream⑤">SendStream</a></code> or a <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream①⓪">BidirectionalStream</a></code>.</p>
-<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
+<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed②"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
 <c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#outgoingstream" id="ref-for-outgoingstream④"><c- g>OutgoingStream</c-></a> {
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑤"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable"><c- g>writable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise" id="ref-for-idl-promise⑤"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-outgoingstream-writingaborted" id="ref-for-dom-outgoingstream-writingaborted"><c- g>writingAborted</c-></a>;
@@ -1510,7 +1511,7 @@ in either a RST_STREAM frame or a STOP_SENDING frame).</p>
    <h2 class="heading settled" data-level="10" id="incoming-stream"><span class="secno">10. </span><span class="content">Interface Mixin <code>IncomingStream</code></span><a class="self-link" href="#incoming-stream"></a></h2>
    <p>An <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="incomingstream"><code>IncomingStream</code></dfn> is a stream that can be read from, as
 either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream②">ReceiveStream</a></code> or a <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream①①">BidirectionalStream</a></code>.</p>
-<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed②"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
+<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
 <c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#incomingstream" id="ref-for-incomingstream①"><c- g>IncomingStream</c-></a> {
   /* a ReadableStream of Uint8Array */
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑦"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable"><c- g>readable</c-></a>;
@@ -1576,20 +1577,20 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
      </ol>
    </dl>
    <h2 class="heading settled" data-level="11" id="bidirectional-stream"><span class="secno">11. </span><span class="content">Interface <code>BidirectionalStream</code></span><a class="self-link" href="#bidirectional-stream"></a></h2>
-<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
+<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="bidirectionalstream"><code><c- g>BidirectionalStream</c-></code></dfn> {
 };
 <a data-link-type="idl-name" href="#bidirectionalstream" id="ref-for-bidirectionalstream①②"><c- n>BidirectionalStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#outgoingstream" id="ref-for-outgoingstream①②"><c- n>OutgoingStream</c-></a>;
 <a data-link-type="idl-name" href="#bidirectionalstream" id="ref-for-bidirectionalstream①③"><c- n>BidirectionalStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#incomingstream" id="ref-for-incomingstream①⓪"><c- n>IncomingStream</c-></a>;
 </pre>
    <h2 class="heading settled" data-level="12" id="send-stream"><span class="secno">12. </span><span class="content">Interface <code>SendStream</code></span><a class="self-link" href="#send-stream"></a></h2>
-<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
+<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑤"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="sendstream"><code><c- g>SendStream</c-></code></dfn> {
 };
 <a data-link-type="idl-name" href="#sendstream" id="ref-for-sendstream⑥"><c- n>SendStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#outgoingstream" id="ref-for-outgoingstream①③"><c- n>OutgoingStream</c-></a>;
 </pre>
    <h2 class="heading settled" data-level="13" id="receive-stream"><span class="secno">13. </span><span class="content">Interface <code>ReceiveStream</code></span><a class="self-link" href="#receive-stream"></a></h2>
-<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑤"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
+<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑥"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="receivestream"><code><c- g>ReceiveStream</c-></code></dfn> {
 };
 <a data-link-type="idl-name" href="#receivestream" id="ref-for-receivestream③"><c- n>ReceiveStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#incomingstream" id="ref-for-incomingstream①①"><c- n>IncomingStream</c-></a>;
@@ -2230,12 +2231,13 @@ and has been adapted for use in this specification.</p>
   <aside class="dfn-panel" data-for="term-for-Exposed">
    <a href="https://heycam.github.io/webidl/#Exposed">https://heycam.github.io/webidl/#Exposed</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-Exposed">8. WebTransport Interface</a>
-    <li><a href="#ref-for-Exposed①">9. Interface Mixin OutgoingStream</a>
-    <li><a href="#ref-for-Exposed②">10. Interface Mixin IncomingStream</a>
-    <li><a href="#ref-for-Exposed③">11. Interface BidirectionalStream</a>
-    <li><a href="#ref-for-Exposed④">12. Interface SendStream</a>
-    <li><a href="#ref-for-Exposed⑤">13. Interface ReceiveStream</a>
+    <li><a href="#ref-for-Exposed">7. DatagramDuplexStream Interface</a>
+    <li><a href="#ref-for-Exposed①">8. WebTransport Interface</a>
+    <li><a href="#ref-for-Exposed②">9. Interface Mixin OutgoingStream</a>
+    <li><a href="#ref-for-Exposed③">10. Interface Mixin IncomingStream</a>
+    <li><a href="#ref-for-Exposed④">11. Interface BidirectionalStream</a>
+    <li><a href="#ref-for-Exposed⑤">12. Interface SendStream</a>
+    <li><a href="#ref-for-Exposed⑥">13. Interface ReceiveStream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-invalidstateerror">
@@ -2542,7 +2544,7 @@ and has been adapted for use in this specification.</p>
    <dt id="biblio-html">[HTML]
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/">HTML Standard</a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-http3-datagram">[HTTP3-DATAGRAM]
-   <dd>David Schinazi; Lucas Pardue. <a href="https://tools.ietf.org/html/draft-ietf-masque-h3-datagram">Using QUIC Datagrams with HTTP/3</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-masque-h3-datagram">https://tools.ietf.org/html/draft-ietf-masque-h3-datagram</a>
+   <dd>David Schinazi; Lucas Pardue. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-masque-h3-datagram">Using QUIC Datagrams with HTTP/3</a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-masque-h3-datagram">https://datatracker.ietf.org/doc/html/draft-ietf-masque-h3-datagram</a>
    <dt id="biblio-quic">[QUIC]
    <dd>Jana Iyengar; Martin Thomson. <a href="https://quicwg.org/base-drafts/draft-ietf-quic-transport.html">QUIC: A UDP-Based Multiplexed and Secure Transport</a>. Internet-Draft. URL: <a href="https://quicwg.org/base-drafts/draft-ietf-quic-transport.html">https://quicwg.org/base-drafts/draft-ietf-quic-transport.html</a>
    <dt id="biblio-quic-datagram">[QUIC-DATAGRAM]
@@ -2558,7 +2560,7 @@ and has been adapted for use in this specification.</p>
    <dt id="biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]
    <dd>Victor Vasiliev. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/">WebTransport over HTTP/3</a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/">https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/</a>
    <dt id="biblio-web-transport-overview">[WEB-TRANSPORT-OVERVIEW]
-   <dd>Victor Vasiliev. <a href="https://tools.ietf.org/html/draft-ietf-webtrans-overview">WebTransport Protocol Framework</a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-webtrans-overview">https://tools.ietf.org/html/draft-ietf-webtrans-overview</a>
+   <dd>Victor Vasiliev. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview">WebTransport Protocol Framework</a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview">https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview</a>
    <dt id="biblio-webidl">[WEBIDL]
    <dd>Boris Zbarsky. <a href="https://heycam.github.io/webidl/">Web IDL</a>. 15 December 2016. ED. URL: <a href="https://heycam.github.io/webidl/">https://heycam.github.io/webidl/</a>
    <dt id="biblio-webrtc-1">[WEBRTC-1]
@@ -2594,6 +2596,7 @@ and has been adapted for use in this specification.</p>
     <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#datagramduplexstream"><c- n>DatagramDuplexStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DatagramDuplexStream" href="#dom-datagramtransport-datagrams"><c- g>datagrams</c-></a>;
 };
 
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#datagramduplexstream"><c- g>DatagramDuplexStream</c-></a> {
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-datagramduplexstream-readable"><c- g>readable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-datagramduplexstream-writable"><c- g>writable</c-></a>;
@@ -2715,7 +2718,8 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="sendstream-create">
    <b><a href="#sendstream-create">#sendstream-create</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-sendstream-create">4.1. Methods</a>
+    <li><a href="#ref-for-sendstream-create">3. Terminology</a>
+    <li><a href="#ref-for-sendstream-create①">4.1. Methods</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dictdef-sendstreamparameters">
@@ -2801,8 +2805,7 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="datagramduplexstream-create">
    <b><a href="#datagramduplexstream-create">#datagramduplexstream-create</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-datagramduplexstream-create">3. Terminology</a>
-    <li><a href="#ref-for-datagramduplexstream-create①">8.1. Constructor</a>
+    <li><a href="#ref-for-datagramduplexstream-create">8.1. Constructor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="datagramduplexstream-create-readable">
