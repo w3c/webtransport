@@ -498,7 +498,10 @@ agent MUST run the following steps:
    initialized to an empty queue.
 1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[OutgoingDatagramsHighWaterMark]]</dfn> internal slot
-   initialized to 1.
+   initialized to an [=implementation-defined=] value.
+   <div class="note">
+     <p>This implementation-defined value should be tuned to ensure decent throughput, without jeopardizing the timeliness of transmitted data.</p>
+    </div>
 1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[IncomingDatagrams]]</dfn> internal
    slot initialized to the result of <a dfn for="ReadableStream">creating</a> a
