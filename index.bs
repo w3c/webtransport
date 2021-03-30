@@ -138,8 +138,8 @@ The terms [=fulfilled=], [=rejected=], [=resolved=], [=pending=] and
 
 The terms {{ReadableStream}} and {{WritableStream}} are defined in
 [[!WHATWG-STREAMS]].  Note that despite sharing the name "stream", these are
-distinct from the IncomingStream, OutgoingStream, and BidirectionalStream
-defined here. The IncomingStream, OutgoingStream, and BidirectionalStream
+distinct from the IncomingStream, OutgoingStream, and WebTransportBidirectionalStream
+defined here. The IncomingStream, OutgoingStream, and WebTransportBidirectionalStream
 defined here correspend to a higher level of abstraction that contain and
 depend on the lower-level concepts of "streams" defined in [[!WHATWG-STREAMS]].
 
@@ -153,8 +153,8 @@ unreliability.  All stream data is encrypted and congestion-controlled.
 
 <pre class="idl">
 interface mixin UnidirectionalStreamsTransport {
-  Promise&lt;SendStream&gt; createUnidirectionalStream(optional SendStreamParameters parameters = {});
-  /* a ReadableStream of ReceiveStream objects */
+  Promise&lt;WebTransportSendStream&gt; createUnidirectionalStream(optional WebTransportSendStreamParameters parameters = {});
+  /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 };
 </pre>
@@ -163,7 +163,7 @@ interface mixin UnidirectionalStreamsTransport {
 
 : <dfn for="UnidirectionalStreamsTransport" method>createUnidirectionalStream()</dfn>
 
-:: Creates a {{SendStream}} object for an outgoing unidirectional stream.  Note
+:: Creates a {{WebTransportSendStream}} object for an outgoing unidirectional stream.  Note
    that in some transports, the mere creation of a stream is not immediately
    visible to the peer until it is used to send data.
 
@@ -176,7 +176,7 @@ interface mixin UnidirectionalStreamsTransport {
         {{InvalidStateError}} and abort these steps.
      1. Let |p| be a new promise.
      1. Return |p| and continue the remaining steps [=in parallel=].
-     1. [=SendStream/Create=] a {{SendStream}} with |transport| and |p| when all
+     1. [=WebTransportSendStream/Create=] a {{WebTransportSendStream}} with |transport| and |p| when all
         of the following conditions are met:
          1. The |transport|'s {{WebTransport/state}} is `"connected"`.
          1. Stream creation flow control is not being violated by exceeding the
@@ -190,44 +190,44 @@ interface mixin UnidirectionalStreamsTransport {
 
 : <dfn for="UnidirectionalStreamsTransport" attribute>incomingUnidirectionalStreams</dfn>
 :: A {{ReadableStream}} of unidirectional streams, each represented by a
-   {{ReceiveStream}} object, that have been received from the remote host.
+   {{WebTransportReceiveStream}} object, that have been received from the remote host.
 
    The getter steps for `incomingUnidirectionalStreams` are:
      1. Let |transport| be the `UnidirectionalStreamsTransport` on which
         the `incomingUnidirectionalStreams` getter is invoked.
      1. Return the value of the {{[[ReceivedStreams]]}} internal slot.
      1. For each unidirectional stream received, create a corresponding
-        {{ReceiveStream}} and insert it into {{[[ReceivedStreams]]}}. As data
+        {{WebTransportReceiveStream}} and insert it into {{[[ReceivedStreams]]}}. As data
         is received over the unidirectional stream, insert that data into the
-        corresponding `ReceiveStream` object.  When the remote side closes or
-        aborts the stream, close or abort the corresponding `ReceiveStream`.
+        corresponding `WebTransportReceiveStream` object.  When the remote side closes or
+        aborts the stream, close or abort the corresponding `WebTransportReceiveStream`.
 
 ## Procedures ##  {#unidirectional-streams-transport-procedures}
 
-### Add SendStream to UnidirectionalStreamsTransport ### {#add-sendstream}
+### Add WebTransportSendStream to UnidirectionalStreamsTransport ### {#add-sendstream}
 
-<div algorithm="create a SendStream">
+<div algorithm="create a WebTransportSendStream">
 
-To <dfn export for="SendStream" lt="create|creating">create</dfn> a
-{{SendStream}} given a <var>transport</var> and a promise |p|, run the following
+To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
+{{WebTransportSendStream}} given a <var>transport</var> and a promise |p|, run the following
 steps:
 
 1. Reserve a unidirectional stream |association| in the underlying transport.
 1. Queue a task to run the following sub-steps:
   1. If |transport|'s state is `"closed"` or `"failed"`, abort these sub-steps.
-  1. Let |stream| be a newly created {{SendStream}} for |association|.
+  1. Let |stream| be a newly created {{WebTransportSendStream}} for |association|.
   1. Add |stream| to |transport|'s {{[[OutgoingStreams]]}} slot.
   1. Resolve |p| with |stream|.
 
 </div>
 
-## SendStreamParameters Dictionary ##  {#send-stream-parameters}
+## WebTransportSendStreamParameters Dictionary ##  {#send-stream-parameters}
 
-The <dfn dictionary>SendStreamParameters</dfn> dictionary includes information
+The <dfn dictionary>WebTransportSendStreamParameters</dfn> dictionary includes information
 relating to stream configuration.
 
 <pre class="idl">
-dictionary SendStreamParameters {
+dictionary WebTransportSendStreamParameters {
 };
 </pre>
 
@@ -241,8 +241,8 @@ All stream data is encrypted and congestion-controlled.
 
 <pre class="idl">
 interface mixin BidirectionalStreamsTransport {
-    Promise&lt;BidirectionalStream&gt; createBidirectionalStream();
-    /* a ReadableStream of BidirectionalStream objects */
+    Promise&lt;WebTransportBidirectionalStream&gt; createBidirectionalStream();
+    /* a ReadableStream of WebTransportBidirectionalStream objects */
     readonly attribute ReadableStream incomingBidirectionalStreams;
 };
 </pre>
@@ -251,7 +251,7 @@ interface mixin BidirectionalStreamsTransport {
 ## Methods ##  {#bidirectional-streams-transport-methods}
 
 : <dfn for="BidirectionalStreamsTransport" method>createBidirectionalStream()</dfn>
-:: Creates a {{BidirectionalStream}} object for an outgoing bidirectional
+:: Creates a {{WebTransportBidirectionalStream}} object for an outgoing bidirectional
    stream.  Note that in some transports, the mere creation of a stream is not
    immediately visible to the peer until it is used to send data.
 
@@ -265,7 +265,7 @@ interface mixin BidirectionalStreamsTransport {
       {{InvalidStateError}} and abort these steps.
    1. Let |p| be a new promise.
    1. Return |p| and continue the remaining steps [=in parallel=].
-   1. [=BidirectionalStream/Create=] a {{BidirectionalStream}} with |transport|
+   1. [=WebTransportBidirectionalStream/Create=] a {{WebTransportBidirectionalStream}} with |transport|
       and |p| when all of the following conditions are met:
        1. The |transport|'s {{WebTransport/state}} is `"connected"`.
        1. Stream creation flow control is not being violated by exceeding the
@@ -278,32 +278,32 @@ interface mixin BidirectionalStreamsTransport {
        1. |p| has not been [=settled=].
 
 : <dfn for="BidirectionalStreamsTransport" attribute>incomingBidirectionalStreams</dfn>
-:: Returns a {{ReadableStream}} of {{BidirectionalStream}}s that have been
+:: Returns a {{ReadableStream}} of {{WebTransportBidirectionalStream}}s that have been
    received from the remote host.
 
    The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
 
      1. Return the value of the {{[[ReceivedBidirectionalStreams]]}} internal slot.
      1. For each bidirectional stream received, create a corresponding
-        {{BidirectionalStream}} and insert it into {{[[ReceivedBidirectionalStreams]]}}.
+        {{WebTransportBidirectionalStream}} and insert it into {{[[ReceivedBidirectionalStreams]]}}.
         As data is received over the bidirectional stream, insert that data into the
-        corresponding {{BidirectionalStream}}.  When the remote side closes or aborts
-        the stream, close or abort the corresponding {{BidirectionalStream}}.
+        corresponding {{WebTransportBidirectionalStream}}.  When the remote side closes or aborts
+        the stream, close or abort the corresponding {{WebTransportBidirectionalStream}}.
 
 ## Procedures ##  {#bidirectional-streams-transport-procedures}
 
-### Add BidirectionalStream to BidirectionalStreamsTransport ### {#add-bidirectionalstream}
+### Add WebTransportBidirectionalStream to BidirectionalStreamsTransport ### {#add-bidirectionalstream}
 
-<div algorithm="create a BidirectionalStream">
+<div algorithm="create a WebTransportBidirectionalStream">
 
- To <dfn export for="BidirectionalStream" lt="create|creating">create</dfn> a
- {{BidirectionalStream}} given a <var>transport</var> and a promise |p|, run
+ To <dfn export for="WebTransportBidirectionalStream" lt="create|creating">create</dfn> a
+ {{WebTransportBidirectionalStream}} given a <var>transport</var> and a promise |p|, run
   the following steps:
 
 1. Reserve a bidirectional stream |association| in the underlying transport.
 1. Queue a task to run the following sub-steps:
   1. If |transport|'s state is `"closed"` or `"failed"`, abort these sub-steps.
-  1. Let |stream| be a newly created {{BidirectionalStream}} object for |association|.
+  1. Let |stream| be a newly created {{WebTransportBidirectionalStream}} object for |association|.
   1. Add |stream| to |transport|'s {{[[ReceivedBidirectionalStreams]]}} slot.
   1. Add |stream| to |transport|'s {{[[OutgoingStreams]]}} slot.
   1. Resolve |p| with |stream|.
@@ -445,7 +445,7 @@ agent MUST run the following steps:
    to empty.
 1. Let |transport| have a
   <dfn attribute for="WebTransport">\[[ReceivedBidirectionalStreams]]</dfn>
-  internal slot representing a {{ReadableStream}} of {{BidirectionalStream}}
+  internal slot representing a {{ReadableStream}} of {{WebTransportBidirectionalStream}}
   objects, initialized to empty.
 1. Let |transport| have a
    <dfn attribute for="WebTransport">\[[WebTransportState]]</dfn> internal
@@ -746,7 +746,7 @@ The dictionary SHALL have the following attributes:
 # Interface Mixin `OutgoingStream` #  {#outgoing-stream}
 
 An <dfn interface>OutgoingStream</dfn> is a stream that can be written to, as
-either a {{SendStream}} or a {{BidirectionalStream}}.
+either a {{WebTransportSendStream}} or a {{WebTransportBidirectionalStream}}.
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
@@ -822,7 +822,7 @@ The dictionary SHALL have the following fields:
 # Interface Mixin `IncomingStream` #  {#incoming-stream}
 
 An <dfn interface>IncomingStream</dfn> is a stream that can be read from, as
-either a {{ReceiveStream}} or a {{BidirectionalStream}}.
+either a {{WebTransportReceiveStream}} or a {{WebTransportBidirectionalStream}}.
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
@@ -878,32 +878,32 @@ The {{IncomingStream}} will initialize with the following:
         STOP_SENDING frame) with its error code set to the value of
         |abortInfo.errorCode|.
 
-# Interface `BidirectionalStream` #  {#bidirectional-stream}
+# Interface `WebTransportBidirectionalStream` #  {#bidirectional-stream}
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
-interface BidirectionalStream {
+interface WebTransportBidirectionalStream {
 };
-BidirectionalStream includes OutgoingStream;
-BidirectionalStream includes IncomingStream;
+WebTransportBidirectionalStream includes OutgoingStream;
+WebTransportBidirectionalStream includes IncomingStream;
 </pre>
 
-# Interface `SendStream` #  {#send-stream}
+# Interface `WebTransportSendStream` #  {#send-stream}
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
-interface SendStream {
+interface WebTransportSendStream {
 };
-SendStream includes OutgoingStream;
+WebTransportSendStream includes OutgoingStream;
 </pre>
 
-# Interface `ReceiveStream` #  {#receive-stream}
+# Interface `WebTransportReceiveStream` #  {#receive-stream}
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
-interface ReceiveStream {
+interface WebTransportReceiveStream {
 };
-ReceiveStream includes IncomingStream;
+WebTransportReceiveStream includes IncomingStream;
 </pre>
 
 # Protocol Mappings # {#protocol-mapping}
@@ -1118,7 +1118,7 @@ async function sendText(url, readableStreamOfTextData) {
 
 Reading incoming streams can be achieved by iterating over the
 {{UnidirectionalStreamsTransport/incomingUnidirectionalStreams}} attribute,
-and then consuming each {{ReceiveStream}} by iterating over its chunks.
+and then consuming each {{WebTransportReceiveStream}} by iterating over its chunks.
 
 <pre class="example" highlight="js">
 async function receiveData(url, processTheData) {
