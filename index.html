@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version b94c7e755, updated Fri Feb 19 16:28:59 2021 -0800" name="generator">
   <link href="https://github.com/w3c/webtransport" rel="canonical">
-  <meta content="f76cf8f97742903040d529fe44110720145e0821" name="document-revision">
+  <meta content="dc59f89c292a269fb9e11cae1859f4052880047c" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -747,13 +747,9 @@ handlers, and the <code class="idl"><a data-link-type="idl" href="https://html.s
    <p>The concepts <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task">queue a task</a> and <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source">networking task source</a> are defined in <a data-link-type="biblio" href="#biblio-html">[HTML]</a>.</p>
    <p>The terms <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event" id="ref-for-concept-event">event</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handlers" id="ref-for-event-handlers">event handlers</a> and <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-event-type" id="ref-for-event-handler-event-type">event handler event types</a> are
 defined in <a data-link-type="biblio" href="#biblio-html">[HTML]</a>.</p>
-   <p>When referring to exceptions, the terms <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw">throw</a> and <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create">create</a> are defined in <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>.</p>
+   <p>When referring to exceptions, the terms <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw">throw</a> and <a data-link-type="dfn" href="#datagramduplexstream-create" id="ref-for-datagramduplexstream-create">create</a> are defined in <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>.</p>
    <p>The terms <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects">fulfilled</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①">rejected</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②">resolved</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③">pending</a> and <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects④">settled</a> used in the context of Promises are defined in <a data-link-type="biblio" href="#biblio-ecmascript-60">[ECMASCRIPT-6.0]</a>.</p>
-   <p>The terms <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream">ReadableStream</a></code> and <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream">WritableStream</a></code> are defined in <a data-link-type="biblio" href="#biblio-whatwg-streams">[WHATWG-STREAMS]</a>.  Note that despite sharing the name "stream", these are
-distinct from the IncomingStream, OutgoingStream, and BidirectionalStream
-defined here. The IncomingStream, OutgoingStream, and BidirectionalStream
-defined here correspend to a higher level of abstraction that contain and
-depend on the lower-level concepts of "streams" defined in <a data-link-type="biblio" href="#biblio-whatwg-streams">[WHATWG-STREAMS]</a>.</p>
+   <p>The terms <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream">ReadableStream</a></code> and <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream">WritableStream</a></code> are defined in <a data-link-type="biblio" href="#biblio-whatwg-streams">[WHATWG-STREAMS]</a>.</p>
    <h2 class="heading settled" data-level="4" id="unidirectional-streams-transport"><span class="secno">4. </span><span class="content"><code>UnidirectionalStreamsTransport</code> Mixin</span><a class="self-link" href="#unidirectional-streams-transport"></a></h2>
    <p>A <code class="idl"><a data-link-type="idl" href="#unidirectionalstreamstransport" id="ref-for-unidirectionalstreamstransport">UnidirectionalStreamsTransport</a></code> can send and receive unidirectional
 streams.  Data within a stream is delivered in order, but data between streams
@@ -786,7 +782,7 @@ unreliability.  All stream data is encrypted and congestion-controlled.</p>
       <li data-md>
        <p>Return <var>p</var> and continue the remaining steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel">in parallel</a>.</p>
       <li data-md>
-       <p><a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create①">Create</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②">SendStream</a></code> with <var>transport</var> and <var>p</var> when all
+       <p><a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create">Create</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②">SendStream</a></code> with <var>transport</var> and <var>p</var> when all
   of the following conditions are met:</p>
        <ol>
         <li data-md>
@@ -1163,7 +1159,7 @@ agent MUST run the following steps:</p>
   using the <a data-link-type="dfn" href="#readdatagrams" id="ref-for-readdatagrams">readDatagrams</a> algorithm given <var>transport</var> as a parameter.</p>
     <li data-md>
      <p>Let <var>transport</var> have a <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-datagrams-slot"><code>[[Datagrams]]</code></dfn> internal slot
- initialized to the result of <a data-link-type="dfn" href="#datagramduplexstream-create" id="ref-for-datagramduplexstream-create">creating</a> a <code class="idl"><a data-link-type="idl" href="#datagramduplexstream" id="ref-for-datagramduplexstream⑤">DatagramDuplexStream</a></code>,
+ initialized to the result of <a data-link-type="dfn" href="#datagramduplexstream-create" id="ref-for-datagramduplexstream-create①">creating</a> a <code class="idl"><a data-link-type="idl" href="#datagramduplexstream" id="ref-for-datagramduplexstream⑤">DatagramDuplexStream</a></code>,
  its <a data-link-type="dfn" href="#datagramduplexstream-create-readable" id="ref-for-datagramduplexstream-create-readable">readable</a> set to <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingdatagrams-slot" id="ref-for-dom-webtransport-incomingdatagrams-slot">[[IncomingDatagrams]]</a></code>,
  and its <a data-link-type="dfn" href="#datagramduplexstream-create-writable" id="ref-for-datagramduplexstream-create-writable">writable</a> set to <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-outgoingdatagrams-slot" id="ref-for-dom-webtransport-outgoingdatagrams-slot">[[OutgoingDatagrams]]</a></code>.</p>
     <li data-md>
@@ -1492,30 +1488,18 @@ or are impossible to define for pooled connections.</p>
  between calls to <code class="idl"><a data-link-type="idl" href="#dom-datagramtransport-datagrams" id="ref-for-dom-datagramtransport-datagrams②">datagrams</a></code>' <code class="idl"><a data-link-type="idl" href="#dom-datagramduplexstream-readable" id="ref-for-dom-datagramduplexstream-readable①">readable</a></code>.</p>
    </dl>
    <h2 class="heading settled" data-level="9" id="outgoing-stream"><span class="secno">9. </span><span class="content">Interface Mixin <code>OutgoingStream</code></span><a class="self-link" href="#outgoing-stream"></a></h2>
-   <p>An <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="outgoingstream"><code>OutgoingStream</code></dfn> is a stream that can be written to, as
-either a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream⑤">SendStream</a></code> or a <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream①⓪">BidirectionalStream</a></code>.</p>
+   <p>An <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="outgoingstream"><code>OutgoingStream</code></dfn> is a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑥">WritableStream</a></code> of <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-Uint8Array" id="ref-for-idl-Uint8Array①">Uint8Array</a></code> that can be written to, as either a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream⑤">SendStream</a></code> or the <code class="idl"><a data-link-type="idl" href="#dom-bidirectionalstream-writable" id="ref-for-dom-bidirectionalstream-writable">writable</a></code> or a <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream①⓪">BidirectionalStream</a></code>, to transmit data
+over the connection.</p>
 <pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed②"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
-<c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#outgoingstream" id="ref-for-outgoingstream④"><c- g>OutgoingStream</c-></a> {
-  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑥"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable"><c- g>writable</c-></a>;
+<c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#outgoingstream" id="ref-for-outgoingstream④"><c- g>OutgoingStream</c-></a> : <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑦"><c- n>WritableStream</c-></a> /* of Uint8Array */ {
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise" id="ref-for-idl-promise⑤"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-outgoingstream-writingaborted" id="ref-for-dom-outgoingstream-writingaborted"><c- g>writingAborted</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined⑤"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-outgoingstream-abortwriting" id="ref-for-dom-outgoingstream-abortwriting"><c- g>abortWriting</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo①"><c- n>StreamAbortInfo</c-></a> <dfn class="idl-code" data-dfn-for="OutgoingStream/abortWriting(abortInfo), OutgoingStream/abortWriting()" data-dfn-type="argument" data-export id="dom-outgoingstream-abortwriting-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code><a class="self-link" href="#dom-outgoingstream-abortwriting-abortinfo-abortinfo"></a></dfn> = {});
 };
 </pre>
    <h3 class="heading settled" data-level="9.1" id="outgoing-stream-overview"><span class="secno">9.1. </span><span class="content">Overview</span><a class="self-link" href="#outgoing-stream-overview"></a></h3>
-   <p>The <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑤">OutgoingStream</a></code> will initialize with the following:</p>
-   <ol>
-    <li data-md>
-     <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑥">OutgoingStream</a></code>.</p>
-    <li data-md>
-     <p>Let <var>stream</var> have a <dfn class="dfn-paneled idl-code" data-dfn-for="OutgoingStream" data-dfn-type="attribute" data-export id="dom-outgoingstream-writable-slot"><code>[[Writable]]</code></dfn> internal slot initialized to a new <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑦">WritableStream</a></code>.</p>
-   </ol>
+   <p>The <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑤">OutgoingStream</a></code> will be initialized by running the <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑧">WritableStream</a></code> initialization steps.</p>
    <h3 class="heading settled" data-level="9.2" id="outgoing-stream-attributes"><span class="secno">9.2. </span><span class="content">Attributes</span><a class="self-link" href="#outgoing-stream-attributes"></a></h3>
    <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="OutgoingStream" data-dfn-type="attribute" data-export id="dom-outgoingstream-writable"><code>writable</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑧">WritableStream</a>, readonly</span>
-    <dd data-md>
-     <p>The <code>writable</code> attribute represents a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑨">WritableStream</a></code> (of bytes) that can
- be used to write to the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑦">OutgoingStream</a></code>. On getting it MUST return the
- value of the <code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable-slot" id="ref-for-dom-outgoingstream-writable-slot">[[Writable]]</a></code> slot.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="OutgoingStream" data-dfn-type="attribute" data-export id="dom-outgoingstream-writingaborted"><code>writingAborted</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo②">StreamAbortInfo</a>>, readonly</span>
     <dd data-md>
      <p>The <code>writingAborted</code> attribute represents a promise that is <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑧">fulfilled</a> when the a message from the remote side aborting the stream is received.
@@ -1523,7 +1507,7 @@ either a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-fo
   this mesage, the user agent MUST run the following:</p>
      <ol>
       <li data-md>
-       <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑧">OutgoingStream</a></code> object.</p>
+       <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑥">OutgoingStream</a></code> object.</p>
       <li data-md>
        <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①②">WebTransport</a></code>, which the <var>stream</var> was created
  from.</p>
@@ -1539,13 +1523,13 @@ either a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-fo
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="OutgoingStream" data-dfn-type="method" data-export data-lt="abortWriting(abortInfo)|abortWriting()" id="dom-outgoingstream-abortwriting"><code>abortWriting()</code></dfn>
     <dd data-md>
-     <p>A hard shutdown of the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑨">OutgoingStream</a></code>. It may be called regardless of
- whether the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream①⓪">OutgoingStream</a></code> was created by the local or remote peer. When
+     <p>A hard shutdown of the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑦">OutgoingStream</a></code>. It may be called regardless of
+ whether the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑧">OutgoingStream</a></code> was created by the local or remote peer. When
  the <code>abortWriting</code> method is called, the user agent MUST run the following
  steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream①①">OutgoingStream</a></code> object which is about to abort
+       <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#outgoingstream" id="ref-for-outgoingstream⑨">OutgoingStream</a></code> object which is about to abort
   writing.</p>
       <li data-md>
        <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①③">WebTransport</a></code>, which the <var>stream</var> was created
@@ -1575,31 +1559,19 @@ in either a RST_STREAM frame or a STOP_SENDING frame).</p>
      <p>The error code. The default value of 0 means "CLOSING."</p>
    </dl>
    <h2 class="heading settled" data-level="10" id="incoming-stream"><span class="secno">10. </span><span class="content">Interface Mixin <code>IncomingStream</code></span><a class="self-link" href="#incoming-stream"></a></h2>
-   <p>An <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="incomingstream"><code>IncomingStream</code></dfn> is a stream that can be read from, as
-either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream②">ReceiveStream</a></code> or a <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream①①">BidirectionalStream</a></code>.</p>
+   <p>An <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="incomingstream"><code>IncomingStream</code></dfn> is a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑦">ReadableStream</a></code> of {Uint8Array}}
+that can be read from, as either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream②">ReceiveStream</a></code> or the <code class="idl"><a data-link-type="idl" href="#dom-bidirectionalstream-readable" id="ref-for-dom-bidirectionalstream-readable">readable</a></code> of a <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream①①">BidirectionalStream</a></code>, to consume data
+received over the connection.</p>
 <pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
-<c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#incomingstream" id="ref-for-incomingstream①"><c- g>IncomingStream</c-></a> {
-  /* a ReadableStream of Uint8Array */
-  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑦"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable"><c- g>readable</c-></a>;
+<c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#incomingstream" id="ref-for-incomingstream①"><c- g>IncomingStream</c-></a> : <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑧"><c- n>ReadableStream</c-></a> /* of Uint8Array */ {
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise" id="ref-for-idl-promise⑥"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑤"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-incomingstream-readingaborted" id="ref-for-dom-incomingstream-readingaborted"><c- g>readingAborted</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined⑥"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-abortreading" id="ref-for-dom-incomingstream-abortreading"><c- g>abortReading</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑥"><c- n>StreamAbortInfo</c-></a> <dfn class="idl-code" data-dfn-for="IncomingStream/abortReading(abortInfo), IncomingStream/abortReading()" data-dfn-type="argument" data-export id="dom-incomingstream-abortreading-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code><a class="self-link" href="#dom-incomingstream-abortreading-abortinfo-abortinfo"></a></dfn> = {});
 };
 </pre>
    <h3 class="heading settled" data-level="10.1" id="incoming-stream-overview"><span class="secno">10.1. </span><span class="content">Overview</span><a class="self-link" href="#incoming-stream-overview"></a></h3>
-   <p>The <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream②">IncomingStream</a></code> will initialize with the following:</p>
-   <ol>
-    <li data-md>
-     <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream③">IncomingStream</a></code>.</p>
-    <li data-md>
-     <p>Let <var>stream</var> have a <dfn class="dfn-paneled idl-code" data-dfn-for="IncomingStream" data-dfn-type="attribute" data-export id="dom-incomingstream-readable-slot"><code>[[Readable]]</code></dfn> internal slot initialized to a new <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑧">ReadableStream</a></code>.</p>
-   </ol>
+   <p>The <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream②">IncomingStream</a></code> will be initialized by running the <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑨">ReadableStream</a></code> initialization steps.</p>
    <h3 class="heading settled" data-level="10.2" id="incoming-stream-attributes"><span class="secno">10.2. </span><span class="content">Attributes</span><a class="self-link" href="#incoming-stream-attributes"></a></h3>
    <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="IncomingStream" data-dfn-type="attribute" data-export id="dom-incomingstream-readable"><code>readable</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑨">ReadableStream</a>, readonly</span>
-    <dd data-md>
-     <p>The <code>readable</code> attribute represents a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream②⓪">ReadableStream</a></code> that can
- be used to read from the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream④">IncomingStream</a></code>. On getting it MUST return the
- value of the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream⑤">IncomingStream</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-incomingstream-readable-slot" id="ref-for-dom-incomingstream-readable-slot">[[Readable]]</a></code> slot.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="IncomingStream" data-dfn-type="attribute" data-export id="dom-incomingstream-readingaborted"><code>readingAborted</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo" id="ref-for-dictdef-streamabortinfo⑦">StreamAbortInfo</a>>, readonly</span>
     <dd data-md>
      <p>The <code>readingAborted</code> attribute represents a promise that is <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②⓪">fulfilled</a> when the a message from the remote side aborting the stream is received.
@@ -1607,7 +1579,7 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
   this mesage, the user agent MUST run the following:</p>
      <ol>
       <li data-md>
-       <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream⑥">IncomingStream</a></code> object for which the abort
+       <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream③">IncomingStream</a></code> object for which the abort
  message was received.</p>
       <li data-md>
        <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①④">WebTransport</a></code>, which the <var>stream</var> was created
@@ -1622,13 +1594,13 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="IncomingStream" data-dfn-type="method" data-export data-lt="abortReading(abortInfo)|abortReading()" id="dom-incomingstream-abortreading"><code>abortReading()</code></dfn>
     <dd data-md>
-     <p>A hard shutdown of the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream⑦">IncomingStream</a></code>. It may be called regardless of
- whether the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream⑧">IncomingStream</a></code> was created by the local or remote peer. When
+     <p>A hard shutdown of the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream④">IncomingStream</a></code>. It may be called regardless of
+ whether the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream⑤">IncomingStream</a></code> was created by the local or remote peer. When
  the <code>abortWriting</code> method is called, the user agent MUST run the following
  steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream⑨">IncomingStream</a></code> object which is about to abort
+       <p>Let <var>stream</var> be the <code class="idl"><a data-link-type="idl" href="#incomingstream" id="ref-for-incomingstream⑥">IncomingStream</a></code> object which is about to abort
   reading.</p>
       <li data-md>
        <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①⑤">WebTransport</a></code>, which the <var>stream</var> was created
@@ -1645,21 +1617,30 @@ either a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref
    <h2 class="heading settled" data-level="11" id="bidirectional-stream"><span class="secno">11. </span><span class="content">Interface <code>BidirectionalStream</code></span><a class="self-link" href="#bidirectional-stream"></a></h2>
 <pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="bidirectionalstream"><code><c- g>BidirectionalStream</c-></code></dfn> {
+  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#receivestream" id="ref-for-receivestream③"><c- n>ReceiveStream</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="BidirectionalStream" data-dfn-type="attribute" data-export data-readonly data-type="ReceiveStream" id="dom-bidirectionalstream-readable"><code><c- g>readable</c-></code></dfn>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#sendstream" id="ref-for-sendstream⑥"><c- n>SendStream</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="BidirectionalStream" data-dfn-type="attribute" data-export data-readonly data-type="SendStream" id="dom-bidirectionalstream-writable"><code><c- g>writable</c-></code></dfn>;
 };
-<a data-link-type="idl-name" href="#bidirectionalstream" id="ref-for-bidirectionalstream①②"><c- n>BidirectionalStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#outgoingstream" id="ref-for-outgoingstream①②"><c- n>OutgoingStream</c-></a>;
-<a data-link-type="idl-name" href="#bidirectionalstream" id="ref-for-bidirectionalstream①③"><c- n>BidirectionalStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#incomingstream" id="ref-for-incomingstream①⓪"><c- n>IncomingStream</c-></a>;
 </pre>
+   <p>The <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream①②">BidirectionalStream</a></code> will initialize with the following:</p>
+   <ol>
+    <li data-md>
+     <p>Let <var>duplexStream</var> be the <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream①③">BidirectionalStream</a></code>.</p>
+    <li data-md>
+     <p>Let <var>duplexStream</var> have a <dfn class="idl-code" data-dfn-for="BidirectionalStream" data-dfn-type="attribute" data-export id="dom-bidirectionalstream-readable-slot"><code>[[Readable]]</code><a class="self-link" href="#dom-bidirectionalstream-readable-slot"></a></dfn> internal slot initialized to a new <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream④">ReceiveStream</a></code>.</p>
+    <li data-md>
+     <p>Let <var>duplexStream</var> have a <dfn class="idl-code" data-dfn-for="BidirectionalStream" data-dfn-type="attribute" data-export id="dom-bidirectionalstream-writable-slot"><code>[[Writable]]</code><a class="self-link" href="#dom-bidirectionalstream-writable-slot"></a></dfn> internal slot initialized to a new <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream⑦">SendStream</a></code>.</p>
+   </ol>
    <h2 class="heading settled" data-level="12" id="send-stream"><span class="secno">12. </span><span class="content">Interface <code>SendStream</code></span><a class="self-link" href="#send-stream"></a></h2>
 <pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑤"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="sendstream"><code><c- g>SendStream</c-></code></dfn> {
 };
-<a data-link-type="idl-name" href="#sendstream" id="ref-for-sendstream⑥"><c- n>SendStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#outgoingstream" id="ref-for-outgoingstream①③"><c- n>OutgoingStream</c-></a>;
+<a data-link-type="idl-name" href="#sendstream" id="ref-for-sendstream⑧"><c- n>SendStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#outgoingstream" id="ref-for-outgoingstream①⓪"><c- n>OutgoingStream</c-></a>;
 </pre>
    <h2 class="heading settled" data-level="13" id="receive-stream"><span class="secno">13. </span><span class="content">Interface <code>ReceiveStream</code></span><a class="self-link" href="#receive-stream"></a></h2>
 <pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑥"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="receivestream"><code><c- g>ReceiveStream</c-></code></dfn> {
 };
-<a data-link-type="idl-name" href="#receivestream" id="ref-for-receivestream③"><c- n>ReceiveStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#incomingstream" id="ref-for-incomingstream①①"><c- n>IncomingStream</c-></a>;
+<a data-link-type="idl-name" href="#receivestream" id="ref-for-receivestream⑤"><c- n>ReceiveStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#incomingstream" id="ref-for-incomingstream⑦"><c- n>IncomingStream</c-></a>;
 </pre>
    <h2 class="heading settled" data-level="14" id="protocol-mapping"><span class="secno">14. </span><span class="content">Protocol Mappings</span><a class="self-link" href="#protocol-mapping"></a></h2>
    <p><em>This section is non-normative.</em></p>
@@ -1680,28 +1661,28 @@ in this specification, utilizing <a data-link-type="biblio" href="#biblio-web-tr
       <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-abortwriting" id="ref-for-dom-outgoingstream-abortwriting①">abortWriting</a></code>
       <td>send RESET_STREAM with code
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable①">writable</a></code>.abort()
+      <td><code class="idl"><a data-link-type="idl" href="#dom-bidirectionalstream-writable" id="ref-for-dom-bidirectionalstream-writable①">writable</a></code>.abort()
       <td>send RESET_STREAM
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable②">writable</a></code>.close()
+      <td><code class="idl"><a data-link-type="idl" href="#dom-bidirectionalstream-writable" id="ref-for-dom-bidirectionalstream-writable②">writable</a></code>.close()
       <td>send STREAM_FINAL
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable③">writable</a></code>.getWriter().write()
+      <td><code class="idl"><a data-link-type="idl" href="#dom-bidirectionalstream-writable" id="ref-for-dom-bidirectionalstream-writable③">writable</a></code>.getWriter().write()
       <td>send STREAM
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable④">writable</a></code>.getWriter().close()
+      <td><code class="idl"><a data-link-type="idl" href="#dom-bidirectionalstream-writable" id="ref-for-dom-bidirectionalstream-writable④">writable</a></code>.getWriter().close()
       <td>send STREAM_FINAL
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-outgoingstream-writable" id="ref-for-dom-outgoingstream-writable⑤">writable</a></code>.getWriter().abort()
+      <td><code class="idl"><a data-link-type="idl" href="#dom-bidirectionalstream-writable" id="ref-for-dom-bidirectionalstream-writable⑤">writable</a></code>.getWriter().abort()
       <td>send RESET_STREAM
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable①">readable</a></code>.cancel()
+      <td><code class="idl"><a data-link-type="idl" href="#dom-bidirectionalstream-readable" id="ref-for-dom-bidirectionalstream-readable①">readable</a></code>.cancel()
       <td>send STOP_SENDING
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable②">readable</a></code>.getReader().read()
+      <td><code class="idl"><a data-link-type="idl" href="#dom-bidirectionalstream-readable" id="ref-for-dom-bidirectionalstream-readable②">readable</a></code>.getReader().read()
       <td>receive STREAM or STREAM_FINAL
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-incomingstream-readable" id="ref-for-dom-incomingstream-readable③">readable</a></code>.getReader().cancel()
+      <td><code class="idl"><a data-link-type="idl" href="#dom-bidirectionalstream-readable" id="ref-for-dom-bidirectionalstream-readable③">readable</a></code>.getReader().cancel()
       <td>send STOP_SENDING
    </table>
    <h2 class="heading settled" data-level="15" id="privacy-security"><span class="secno">15. </span><span class="content">Privacy and Security Considerations</span><a class="self-link" href="#privacy-security"></a></h2>
@@ -1791,34 +1772,34 @@ enough.</p>
    <p><em>This section is non-normative.</em></p>
    <p>Sending data as a one-way stream can be achieved by using the <code class="idl"><a data-link-type="idl" href="#dom-unidirectionalstreamstransport-createunidirectionalstream" id="ref-for-dom-unidirectionalstreamstransport-createunidirectionalstream①">createUnidirectionalStream</a></code> function and the
 resulting stream’s writer.</p>
-<pre class="example highlight" id="example-8484b408"><a class="self-link" href="#example-8484b408"></a><c- k>async</c-> <c- a>function</c-> sendData<c- p>(</c->url<c- p>,</c-> data<c- p>)</c-> <c- p>{</c->
+<pre class="example highlight" id="example-c3aaf81c"><a class="self-link" href="#example-c3aaf81c"></a><c- k>async</c-> <c- a>function</c-> sendData<c- p>(</c->url<c- p>,</c-> data<c- p>)</c-> <c- p>{</c->
   <c- a>const</c-> wt <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
-  <c- a>const</c-> stream <c- o>=</c-> <c- k>await</c-> wt<c- p>.</c->createUnidirectionalStream<c- p>();</c->
-  <c- a>const</c-> writer <c- o>=</c-> stream<c- p>.</c->writable<c- p>.</c->getWriter<c- p>();</c->
+  <c- a>const</c-> writable <c- o>=</c-> <c- k>await</c-> wt<c- p>.</c->createUnidirectionalStream<c- p>();</c->
+  <c- a>const</c-> writer <c- o>=</c-> writable<c- p>.</c->getWriter<c- p>();</c->
   <c- k>await</c-> writer<c- p>.</c->write<c- p>(</c->data<c- p>);</c->
   <c- k>await</c-> writer<c- p>.</c->close<c- p>();</c->
 <c- p>}</c->
 </pre>
-   <p>Encoding can also be done through pipes from a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream②①">ReadableStream</a></code>, for example using <code class="idl"><a data-link-type="idl" href="https://encoding.spec.whatwg.org/#textencoderstream" id="ref-for-textencoderstream">TextEncoderStream</a></code>.</p>
-<pre class="example highlight" id="example-1127d390"><a class="self-link" href="#example-1127d390"></a><c- k>async</c-> <c- a>function</c-> sendText<c- p>(</c->url<c- p>,</c-> readableStreamOfTextData<c- p>)</c-> <c- p>{</c->
+   <p>Encoding can also be done through pipes from a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream②⓪">ReadableStream</a></code>, for example using <code class="idl"><a data-link-type="idl" href="https://encoding.spec.whatwg.org/#textencoderstream" id="ref-for-textencoderstream">TextEncoderStream</a></code>.</p>
+<pre class="example highlight" id="example-14e60a4e"><a class="self-link" href="#example-14e60a4e"></a><c- k>async</c-> <c- a>function</c-> sendText<c- p>(</c->url<c- p>,</c-> readableStreamOfTextData<c- p>)</c-> <c- p>{</c->
   <c- a>const</c-> wt <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
-  <c- a>const</c-> stream <c- o>=</c-> <c- k>await</c-> wt<c- p>.</c->createUnidirectionalStream<c- p>();</c->
+  <c- a>const</c-> writable <c- o>=</c-> <c- k>await</c-> wt<c- p>.</c->createUnidirectionalStream<c- p>();</c->
   <c- k>await</c-> readableStreamOfTextData
     <c- p>.</c->pipeThrough<c- p>(</c-><c- k>new</c-> TextEncoderStream<c- p>(</c-><c- u>"utf-8"</c-><c- p>))</c->
-    <c- p>.</c->pipeTo<c- p>(</c->stream<c- p>.</c->writable<c- p>);</c->
+    <c- p>.</c->pipeTo<c- p>(</c->writable<c- p>);</c->
 <c- p>}</c->
 </pre>
    <h3 class="heading settled" data-level="16.5" id="example-receiving-incoming-streams"><span class="secno">16.5. </span><span class="content">Receiving incoming streams</span><a class="self-link" href="#example-receiving-incoming-streams"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Reading incoming streams can be achieved by iterating over the <code class="idl"><a data-link-type="idl" href="#dom-unidirectionalstreamstransport-incomingunidirectionalstreams" id="ref-for-dom-unidirectionalstreamstransport-incomingunidirectionalstreams①">incomingUnidirectionalStreams</a></code> attribute,
-and then consuming each <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream④">ReceiveStream</a></code> by iterating over its chunks.</p>
-<pre class="example highlight" id="example-0b99b284"><a class="self-link" href="#example-0b99b284"></a><c- k>async</c-> <c- a>function</c-> receiveData<c- p>(</c->url<c- p>,</c-> processTheData<c- p>)</c-> <c- p>{</c->
+and then consuming each <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream⑥">ReceiveStream</a></code> by iterating over its chunks.</p>
+<pre class="example highlight" id="example-46f8ad3e"><a class="self-link" href="#example-46f8ad3e"></a><c- k>async</c-> <c- a>function</c-> receiveData<c- p>(</c->url<c- p>,</c-> processTheData<c- p>)</c-> <c- p>{</c->
   <c- a>const</c-> wt <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
-  <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> stream <c- k>of</c-> wt<c- p>.</c->incomingUnidirectionalStreams<c- p>)</c-> <c- p>{</c->
+  <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> readable <c- k>of</c-> wt<c- p>.</c->incomingUnidirectionalStreams<c- p>)</c-> <c- p>{</c->
     <c- c1>// consume streams individually, reporting per-stream errors</c->
     <c- p>((</c-><c- k>async</c-> <c- p>()</c-> <c- p>=></c-> <c- p>{</c->
       <c- k>try</c-> <c- p>{</c->
-        <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> chunk <c- k>of</c-> stream<c- p>.</c->readable<c- p>.</c->getReader<c- p>())</c-> <c- p>{</c->
+        <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> chunk <c- k>of</c-> readable<c- p>.</c->getReader<c- p>())</c-> <c- p>{</c->
           processTheData<c- p>(</c->chunk<c- p>);</c->
         <c- p>}</c->
       <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
@@ -1830,12 +1811,12 @@ and then consuming each <code class="idl"><a data-link-type="idl" href="#receive
 </pre>
    <p>Decoding can also be done through pipes to new WritableStreams, for example using <code class="idl"><a data-link-type="idl" href="https://encoding.spec.whatwg.org/#textdecoderstream" id="ref-for-textdecoderstream">TextDecoderStream</a></code>. This example assumes text output should not be
 interleaved, and therefore only reads one stream at a time.</p>
-<pre class="example highlight" id="example-06dedfb0"><a class="self-link" href="#example-06dedfb0"></a><c- k>async</c-> <c- a>function</c-> receiveText<c- p>(</c->url<c- p>,</c-> createWritableStreamForTextData<c- p>)</c-> <c- p>{</c->
+<pre class="example highlight" id="example-b6b74950"><a class="self-link" href="#example-b6b74950"></a><c- k>async</c-> <c- a>function</c-> receiveText<c- p>(</c->url<c- p>,</c-> createWritableStreamForTextData<c- p>)</c-> <c- p>{</c->
   <c- a>const</c-> wt <c- o>=</c-> <c- k>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
-  <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> stream <c- k>of</c-> wt<c- p>.</c->incomingUnidirectionalStreams<c- p>)</c-> <c- p>{</c->
+  <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> readable <c- k>of</c-> wt<c- p>.</c->incomingUnidirectionalStreams<c- p>)</c-> <c- p>{</c->
     <c- c1>// consume sequentially to not interleave output, reporting per-stream errors</c->
     <c- k>try</c-> <c- p>{</c->
-      <c- k>await</c-> stream<c- p>.</c->readable
+      <c- k>await</c-> readable
        <c- p>.</c->pipeThrough<c- p>(</c-><c- k>new</c-> TextDecoderStream<c- p>(</c-><c- u>"utf-8"</c-><c- p>))</c->
        <c- p>.</c->pipeTo<c- p>(</c->createWritableStreamForTextData<c- p>());</c->
     <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
@@ -1849,7 +1830,7 @@ interleaved, and therefore only reads one stream at a time.</p>
    <p>This example illustrates use of the closed and ready promises, opening
 of uni-directional and bi-directional streams by either the client or
 the server, and sending and receiving datagrams.</p>
-<pre class="example highlight" id="example-539f6d07"><a class="self-link" href="#example-539f6d07"></a><c- c1>// Adds an entry to the event log on the page, optionally applying a specified</c->
+<pre class="example highlight" id="example-5d82f6aa"><a class="self-link" href="#example-5d82f6aa"></a><c- c1>// Adds an entry to the event log on the page, optionally applying a specified</c->
 <c- c1>// CSS class.</c->
 
 <c- a>let</c-> wt<c- p>,</c-> streamNumber<c- p>,</c-> datagramWriter<c- p>;</c->
@@ -1891,19 +1872,19 @@ sendData<c- p>.</c->onclick <c- o>=</c-> <c- k>async</c-> <c- p>()</c-> <c- p>=>
         <c- k>break</c-><c- p>;</c->
       <c- p>}</c->
       <c- k>case</c-> <c- t>'unidi'</c-><c- o>:</c-> <c- p>{</c->
-        <c- a>const</c-> stream <c- o>=</c-> <c- k>await</c-> wt<c- p>.</c->createUnidirectionalStream<c- p>();</c->
-        <c- a>const</c-> writer <c- o>=</c-> stream<c- p>.</c->writable<c- p>.</c->getWriter<c- p>();</c->
+        <c- a>const</c-> writable <c- o>=</c-> <c- k>await</c-> wt<c- p>.</c->createUnidirectionalStream<c- p>();</c->
+        <c- a>const</c-> writer <c- o>=</c-> writable<c- p>.</c->getWriter<c- p>();</c->
         <c- k>await</c-> writer<c- p>.</c->write<c- p>(</c->data<c- p>);</c->
         <c- k>await</c-> writer<c- p>.</c->close<c- p>();</c->
         addToEventLog<c- p>(</c-><c- sb>`Sent a unidirectional stream with data: </c-><c- si>${</c->rawData<c- si>}</c-><c- sb>`</c-><c- p>);</c->
         <c- k>break</c-><c- p>;</c->
       <c- p>}</c->
       <c- k>case</c-> <c- t>'bidi'</c-><c- o>:</c-> <c- p>{</c->
-        <c- a>const</c-> stream <c- o>=</c-> <c- k>await</c-> wt<c- p>.</c->createBidirectionalStream<c- p>();</c->
+        <c- a>const</c-> duplexStream <c- o>=</c-> <c- k>await</c-> wt<c- p>.</c->createBidirectionalStream<c- p>();</c->
         <c- a>const</c-> n <c- o>=</c-> streamNumber<c- o>++</c-><c- p>;</c->
-        readFromIncomingStream<c- p>(</c->stream<c- p>,</c-> n<c- p>);</c->
+        readFromIncomingStream<c- p>(</c->duplexStream<c- p>.</c->readable<c- p>,</c-> n<c- p>);</c->
 
-        <c- a>const</c-> writer <c- o>=</c-> stream<c- p>.</c->writable<c- p>.</c->getWriter<c- p>();</c->
+        <c- a>const</c-> writer <c- o>=</c-> duplexStream<c- p>.</c->writable<c- p>.</c->getWriter<c- p>();</c->
         <c- k>await</c-> writer<c- p>.</c->write<c- p>(</c->data<c- p>);</c->
         <c- k>await</c-> writer<c- p>.</c->close<c- p>();</c->
         addToEventLog<c- p>(</c-><c- sb>`Sent bidirectional stream #</c-><c- si>${</c->n<c- si>}</c-><c- sb> with data: </c-><c- si>${</c->rawData<c- si>}</c-><c- sb>`</c-><c- p>);</c->
@@ -1931,10 +1912,10 @@ sendData<c- p>.</c->onclick <c- o>=</c-> <c- k>async</c-> <c- p>()</c-> <c- p>=>
 
 <c- k>async</c-> <c- a>function</c-> acceptUnidirectionalStreams<c- p>()</c-> <c- p>{</c->
   <c- k>try</c-> <c- p>{</c->
-    <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> stream <c- k>of</c-> wt<c- p>.</c->incomingUnidirectionalStreams<c- p>)</c-> <c- p>{</c->
+    <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> readable <c- k>of</c-> wt<c- p>.</c->incomingUnidirectionalStreams<c- p>)</c-> <c- p>{</c->
       <c- a>const</c-> number <c- o>=</c-> streamNumber<c- o>++</c-><c- p>;</c->
       addToEventLog<c- p>(</c-><c- sb>`New incoming unidirectional stream #</c-><c- si>${</c->number<c- si>}</c-><c- sb>`</c-><c- p>);</c->
-      readFromIncomingStream<c- p>(</c->stream<c- p>,</c-> number<c- p>);</c->
+      readFromIncomingStream<c- p>(</c->readable<c- p>,</c-> number<c- p>);</c->
     <c- p>}</c->
     addToEventLog<c- p>(</c-><c- t>'Done accepting unidirectional streams!'</c-><c- p>);</c->
   <c- p>}</c-> <c- k>catch</c-> <c- p>(</c->e<c- p>)</c-> <c- p>{</c->
@@ -1942,10 +1923,10 @@ sendData<c- p>.</c->onclick <c- o>=</c-> <c- k>async</c-> <c- p>()</c-> <c- p>=>
   <c- p>}</c->
 <c- p>}</c->
 
-<c- k>async</c-> <c- a>function</c-> readFromIncomingStream<c- p>(</c->stream<c- p>,</c-> number<c- p>)</c-> <c- p>{</c->
+<c- k>async</c-> <c- a>function</c-> readFromIncomingStream<c- p>(</c->readable<c- p>,</c-> number<c- p>)</c-> <c- p>{</c->
   <c- k>try</c-> <c- p>{</c->
     <c- a>const</c-> decoder <c- o>=</c-> <c- k>new</c-> TextDecoderStream<c- p>(</c-><c- t>'utf-8'</c-><c- p>);</c->
-    <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> chunk <c- k>of</c-> stream<c- p>.</c->readable<c- p>.</c->pipeThrough<c- p>(</c->decoder<c- p>))</c-> <c- p>{</c->
+    <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> chunk <c- k>of</c-> readable<c- p>.</c->pipeThrough<c- p>(</c->decoder<c- p>))</c-> <c- p>{</c->
       addToEventLog<c- p>(</c-><c- sb>`Received data on stream #</c-><c- si>${</c->number<c- si>}</c-><c- sb>: </c-><c- si>${</c->chunk<c- si>}</c-><c- sb>`</c-><c- p>);</c->
     <c- p>}</c->
     addToEventLog<c- p>(</c-><c- sb>`Stream #</c-><c- si>${</c->number<c- si>}</c-><c- sb> closed`</c-><c- p>);</c->
@@ -2051,12 +2032,12 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-webtransport-outgoingstreams-slot">[[OutgoingStreams]]</a><span>, in §8.1</span>
    <li><a href="#dom-webtransportstats-packetsreceived">packetsReceived</a><span>, in §8.7</span>
    <li><a href="#dom-webtransportstats-packetssent">packetsSent</a><span>, in §8.7</span>
-   <li><a href="#dom-incomingstream-readable-slot">[[Readable]]</a><span>, in §10.1</span>
+   <li><a href="#dom-bidirectionalstream-readable-slot">[[Readable]]</a><span>, in §11</span>
    <li>
     readable
     <ul>
+     <li><a href="#dom-bidirectionalstream-readable">attribute for BidirectionalStream</a><span>, in §11</span>
      <li><a href="#dom-datagramduplexstream-readable">attribute for DatagramDuplexStream</a><span>, in §7.1</span>
-     <li><a href="#dom-incomingstream-readable">attribute for IncomingStream</a><span>, in §10.2</span>
      <li><a href="#datagramduplexstream-create-readable">dfn for DatagramDuplexStream/create</a><span>, in §7</span>
     </ul>
    <li><a href="#readdatagrams">readDatagrams</a><span>, in §6.2</span>
@@ -2084,12 +2065,12 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dictdef-webtransportstats">WebTransportStats</a><span>, in §8.7</span>
    <li><a href="#dom-webtransport-webtransport">WebTransport(url)</a><span>, in §8</span>
    <li><a href="#dom-webtransport-webtransport">WebTransport(url, options)</a><span>, in §8</span>
-   <li><a href="#dom-outgoingstream-writable-slot">[[Writable]]</a><span>, in §9.1</span>
+   <li><a href="#dom-bidirectionalstream-writable-slot">[[Writable]]</a><span>, in §11</span>
    <li>
     writable
     <ul>
+     <li><a href="#dom-bidirectionalstream-writable">attribute for BidirectionalStream</a><span>, in §11</span>
      <li><a href="#dom-datagramduplexstream-writable">attribute for DatagramDuplexStream</a><span>, in §7.1</span>
-     <li><a href="#dom-outgoingstream-writable">attribute for OutgoingStream</a><span>, in §9.2</span>
      <li><a href="#datagramduplexstream-create-writable">dfn for DatagramDuplexStream/create</a><span>, in §7</span>
     </ul>
    <li><a href="#writedatagrams">writeDatagrams</a><span>, in §6.2</span>
@@ -2369,6 +2350,7 @@ and has been adapted for use in this specification.</p>
    <a href="https://heycam.github.io/webidl/#idl-Uint8Array">https://heycam.github.io/webidl/#idl-Uint8Array</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-Uint8Array">6.2. Procedures</a>
+    <li><a href="#ref-for-idl-Uint8Array①">9. Interface Mixin OutgoingStream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-a-promise-rejected-with">
@@ -2482,10 +2464,9 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-readablestream⑨">7.1. Attributes</a>
     <li><a href="#ref-for-readablestream①⓪">8.1. Constructor</a> <a href="#ref-for-readablestream①①">(2)</a> <a href="#ref-for-readablestream①②">(3)</a>
     <li><a href="#ref-for-readablestream①③">8.5. WebTransportState Enum</a> <a href="#ref-for-readablestream①④">(2)</a> <a href="#ref-for-readablestream①⑤">(3)</a> <a href="#ref-for-readablestream①⑥">(4)</a>
-    <li><a href="#ref-for-readablestream①⑦">10. Interface Mixin IncomingStream</a>
-    <li><a href="#ref-for-readablestream①⑧">10.1. Overview</a>
-    <li><a href="#ref-for-readablestream①⑨">10.2. Attributes</a> <a href="#ref-for-readablestream②⓪">(2)</a>
-    <li><a href="#ref-for-readablestream②①">16.4. Sending a stream</a>
+    <li><a href="#ref-for-readablestream①⑦">10. Interface Mixin IncomingStream</a> <a href="#ref-for-readablestream①⑧">(2)</a>
+    <li><a href="#ref-for-readablestream①⑨">10.1. Overview</a>
+    <li><a href="#ref-for-readablestream②⓪">16.4. Sending a stream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-writablestream">
@@ -2497,9 +2478,8 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-writablestream③">7. DatagramDuplexStream Interface</a>
     <li><a href="#ref-for-writablestream④">7.1. Attributes</a>
     <li><a href="#ref-for-writablestream⑤">8.1. Constructor</a>
-    <li><a href="#ref-for-writablestream⑥">9. Interface Mixin OutgoingStream</a>
-    <li><a href="#ref-for-writablestream⑦">9.1. Overview</a>
-    <li><a href="#ref-for-writablestream⑧">9.2. Attributes</a> <a href="#ref-for-writablestream⑨">(2)</a>
+    <li><a href="#ref-for-writablestream⑥">9. Interface Mixin OutgoingStream</a> <a href="#ref-for-writablestream⑦">(2)</a>
+    <li><a href="#ref-for-writablestream⑧">9.1. Overview</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-writablestream-create">
@@ -2753,8 +2733,7 @@ and has been adapted for use in this specification.</p>
 };
 
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
-<c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#outgoingstream"><c- g>OutgoingStream</c-></a> {
-  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-outgoingstream-writable"><c- g>writable</c-></a>;
+<c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#outgoingstream"><c- g>OutgoingStream</c-></a> : <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream"><c- n>WritableStream</c-></a> /* of Uint8Array */ {
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-outgoingstream-writingaborted"><c- g>writingAborted</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-undefined"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-outgoingstream-abortwriting"><c- g>abortWriting</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-streamabortinfo"><c- n>StreamAbortInfo</c-></a> <a href="#dom-outgoingstream-abortwriting-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code></a> = {});
 };
@@ -2764,18 +2743,16 @@ and has been adapted for use in this specification.</p>
 };
 
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
-<c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#incomingstream"><c- g>IncomingStream</c-></a> {
-  /* a ReadableStream of Uint8Array */
-  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-incomingstream-readable"><c- g>readable</c-></a>;
+<c- b>interface</c-> <c- b>mixin</c-> <a class="idl-code" data-link-type="interface" href="#incomingstream"><c- g>IncomingStream</c-></a> : <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream"><c- n>ReadableStream</c-></a> /* of Uint8Array */ {
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-streamabortinfo"><c- n>StreamAbortInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<StreamAbortInfo>" href="#dom-incomingstream-readingaborted"><c- g>readingAborted</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-undefined"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-incomingstream-abortreading"><c- g>abortReading</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-streamabortinfo"><c- n>StreamAbortInfo</c-></a> <a href="#dom-incomingstream-abortreading-abortinfo-abortinfo"><code><c- g>abortInfo</c-></code></a> = {});
 };
 
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
 <c- b>interface</c-> <a href="#bidirectionalstream"><code><c- g>BidirectionalStream</c-></code></a> {
+  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#receivestream"><c- n>ReceiveStream</c-></a> <a data-readonly data-type="ReceiveStream" href="#dom-bidirectionalstream-readable"><code><c- g>readable</c-></code></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#sendstream"><c- n>SendStream</c-></a> <a data-readonly data-type="SendStream" href="#dom-bidirectionalstream-writable"><code><c- g>writable</c-></code></a>;
 };
-<a data-link-type="idl-name" href="#bidirectionalstream"><c- n>BidirectionalStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#outgoingstream"><c- n>OutgoingStream</c-></a>;
-<a data-link-type="idl-name" href="#bidirectionalstream"><c- n>BidirectionalStream</c-></a> <c- b>includes</c-> <a data-link-type="idl-name" href="#incomingstream"><c- n>IncomingStream</c-></a>;
 
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->) ]
 <c- b>interface</c-> <a href="#sendstream"><code><c- g>SendStream</c-></code></a> {
@@ -2823,8 +2800,7 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="sendstream-create">
    <b><a href="#sendstream-create">#sendstream-create</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-sendstream-create">3. Terminology</a>
-    <li><a href="#ref-for-sendstream-create①">4.1. Methods</a>
+    <li><a href="#ref-for-sendstream-create">4.1. Methods</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dictdef-sendstreamparameters">
@@ -2917,7 +2893,8 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="datagramduplexstream-create">
    <b><a href="#datagramduplexstream-create">#datagramduplexstream-create</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-datagramduplexstream-create">8.1. Constructor</a>
+    <li><a href="#ref-for-datagramduplexstream-create">3. Terminology</a>
+    <li><a href="#ref-for-datagramduplexstream-create①">8.1. Constructor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="datagramduplexstream-create-readable">
@@ -3287,24 +3264,10 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
     <li><a href="#ref-for-outgoingstream">8.1. Constructor</a>
     <li><a href="#ref-for-outgoingstream①">8.5. WebTransportState Enum</a> <a href="#ref-for-outgoingstream②">(2)</a> <a href="#ref-for-outgoingstream③">(3)</a>
     <li><a href="#ref-for-outgoingstream④">9. Interface Mixin OutgoingStream</a>
-    <li><a href="#ref-for-outgoingstream⑤">9.1. Overview</a> <a href="#ref-for-outgoingstream⑥">(2)</a>
-    <li><a href="#ref-for-outgoingstream⑦">9.2. Attributes</a> <a href="#ref-for-outgoingstream⑧">(2)</a>
-    <li><a href="#ref-for-outgoingstream⑨">9.3. Methods</a> <a href="#ref-for-outgoingstream①⓪">(2)</a> <a href="#ref-for-outgoingstream①①">(3)</a>
-    <li><a href="#ref-for-outgoingstream①②">11. Interface BidirectionalStream</a>
-    <li><a href="#ref-for-outgoingstream①③">12. Interface SendStream</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="dom-outgoingstream-writable-slot">
-   <b><a href="#dom-outgoingstream-writable-slot">#dom-outgoingstream-writable-slot</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-outgoingstream-writable-slot">9.2. Attributes</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="dom-outgoingstream-writable">
-   <b><a href="#dom-outgoingstream-writable">#dom-outgoingstream-writable</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-outgoingstream-writable">9. Interface Mixin OutgoingStream</a>
-    <li><a href="#ref-for-dom-outgoingstream-writable①">14. Protocol Mappings</a> <a href="#ref-for-dom-outgoingstream-writable②">(2)</a> <a href="#ref-for-dom-outgoingstream-writable③">(3)</a> <a href="#ref-for-dom-outgoingstream-writable④">(4)</a> <a href="#ref-for-dom-outgoingstream-writable⑤">(5)</a>
+    <li><a href="#ref-for-outgoingstream⑤">9.1. Overview</a>
+    <li><a href="#ref-for-outgoingstream⑥">9.2. Attributes</a>
+    <li><a href="#ref-for-outgoingstream⑦">9.3. Methods</a> <a href="#ref-for-outgoingstream⑧">(2)</a> <a href="#ref-for-outgoingstream⑨">(3)</a>
+    <li><a href="#ref-for-outgoingstream①⓪">12. Interface SendStream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-outgoingstream-writingaborted">
@@ -3343,24 +3306,10 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
    <ul>
     <li><a href="#ref-for-incomingstream">8.1. Constructor</a>
     <li><a href="#ref-for-incomingstream①">10. Interface Mixin IncomingStream</a>
-    <li><a href="#ref-for-incomingstream②">10.1. Overview</a> <a href="#ref-for-incomingstream③">(2)</a>
-    <li><a href="#ref-for-incomingstream④">10.2. Attributes</a> <a href="#ref-for-incomingstream⑤">(2)</a> <a href="#ref-for-incomingstream⑥">(3)</a>
-    <li><a href="#ref-for-incomingstream⑦">10.3. Methods</a> <a href="#ref-for-incomingstream⑧">(2)</a> <a href="#ref-for-incomingstream⑨">(3)</a>
-    <li><a href="#ref-for-incomingstream①⓪">11. Interface BidirectionalStream</a>
-    <li><a href="#ref-for-incomingstream①①">13. Interface ReceiveStream</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="dom-incomingstream-readable-slot">
-   <b><a href="#dom-incomingstream-readable-slot">#dom-incomingstream-readable-slot</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-incomingstream-readable-slot">10.2. Attributes</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="dom-incomingstream-readable">
-   <b><a href="#dom-incomingstream-readable">#dom-incomingstream-readable</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-incomingstream-readable">10. Interface Mixin IncomingStream</a>
-    <li><a href="#ref-for-dom-incomingstream-readable①">14. Protocol Mappings</a> <a href="#ref-for-dom-incomingstream-readable②">(2)</a> <a href="#ref-for-dom-incomingstream-readable③">(3)</a>
+    <li><a href="#ref-for-incomingstream②">10.1. Overview</a>
+    <li><a href="#ref-for-incomingstream③">10.2. Attributes</a>
+    <li><a href="#ref-for-incomingstream④">10.3. Methods</a> <a href="#ref-for-incomingstream⑤">(2)</a> <a href="#ref-for-incomingstream⑥">(3)</a>
+    <li><a href="#ref-for-incomingstream⑦">13. Interface ReceiveStream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-incomingstream-readingaborted">
@@ -3388,6 +3337,20 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
     <li><a href="#ref-for-bidirectionalstream①②">11. Interface BidirectionalStream</a> <a href="#ref-for-bidirectionalstream①③">(2)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="dom-bidirectionalstream-readable">
+   <b><a href="#dom-bidirectionalstream-readable">#dom-bidirectionalstream-readable</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bidirectionalstream-readable">10. Interface Mixin IncomingStream</a>
+    <li><a href="#ref-for-dom-bidirectionalstream-readable①">14. Protocol Mappings</a> <a href="#ref-for-dom-bidirectionalstream-readable②">(2)</a> <a href="#ref-for-dom-bidirectionalstream-readable③">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bidirectionalstream-writable">
+   <b><a href="#dom-bidirectionalstream-writable">#dom-bidirectionalstream-writable</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bidirectionalstream-writable">9. Interface Mixin OutgoingStream</a>
+    <li><a href="#ref-for-dom-bidirectionalstream-writable①">14. Protocol Mappings</a> <a href="#ref-for-dom-bidirectionalstream-writable②">(2)</a> <a href="#ref-for-dom-bidirectionalstream-writable③">(3)</a> <a href="#ref-for-dom-bidirectionalstream-writable④">(4)</a> <a href="#ref-for-dom-bidirectionalstream-writable⑤">(5)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="sendstream">
    <b><a href="#sendstream">#sendstream</a></b><b>Referenced in:</b>
    <ul>
@@ -3395,7 +3358,8 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
     <li><a href="#ref-for-sendstream①">4.1. Methods</a> <a href="#ref-for-sendstream②">(2)</a>
     <li><a href="#ref-for-sendstream③">4.2.1. Add SendStream to UnidirectionalStreamsTransport</a> <a href="#ref-for-sendstream④">(2)</a>
     <li><a href="#ref-for-sendstream⑤">9. Interface Mixin OutgoingStream</a>
-    <li><a href="#ref-for-sendstream⑥">12. Interface SendStream</a>
+    <li><a href="#ref-for-sendstream⑥">11. Interface BidirectionalStream</a> <a href="#ref-for-sendstream⑦">(2)</a>
+    <li><a href="#ref-for-sendstream⑧">12. Interface SendStream</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="receivestream">
@@ -3403,8 +3367,9 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
    <ul>
     <li><a href="#ref-for-receivestream">4.1. Methods</a> <a href="#ref-for-receivestream①">(2)</a>
     <li><a href="#ref-for-receivestream②">10. Interface Mixin IncomingStream</a>
-    <li><a href="#ref-for-receivestream③">13. Interface ReceiveStream</a>
-    <li><a href="#ref-for-receivestream④">16.5. Receiving incoming streams</a>
+    <li><a href="#ref-for-receivestream③">11. Interface BidirectionalStream</a> <a href="#ref-for-receivestream④">(2)</a>
+    <li><a href="#ref-for-receivestream⑤">13. Interface ReceiveStream</a>
+    <li><a href="#ref-for-receivestream⑥">16.5. Receiving incoming streams</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
