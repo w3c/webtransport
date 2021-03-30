@@ -137,11 +137,7 @@ The terms [=fulfilled=], [=rejected=], [=resolved=], [=pending=] and
 [=settled=] used in the context of Promises are defined in [[!ECMASCRIPT-6.0]].
 
 The terms {{ReadableStream}} and {{WritableStream}} are defined in
-[[!WHATWG-STREAMS]].  Note that despite sharing the name "stream", these are
-distinct from the IncomingStream, OutgoingStream, and BidirectionalStream
-defined here. The IncomingStream, OutgoingStream, and BidirectionalStream
-defined here correspend to a higher level of abstraction that contain and
-depend on the lower-level concepts of "streams" defined in [[!WHATWG-STREAMS]].
+[[!WHATWG-STREAMS]].
 
 # `UnidirectionalStreamsTransport` Mixin #  {#unidirectional-streams-transport}
 
@@ -789,13 +785,14 @@ The dictionary SHALL have the following attributes:
 
 # Interface Mixin `OutgoingStream` #  {#outgoing-stream}
 
-An <dfn interface>OutgoingStream</dfn> is a stream that can be written to, as
-either a {{SendStream}} or a {{BidirectionalStream}}.
+An <dfn interface>OutgoingStream</dfn> is a {{WritableStream}} of {{Uint8Array}}
+that can be written to, as either a {{SendStream}} or the
+{{BidirectionalStream/writable}} or a {{BidirectionalStream}}, to transmit data
+over the connection.
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
-interface mixin OutgoingStream {
-  readonly attribute WritableStream writable;
+interface mixin OutgoingStream : WritableStream /* of Uint8Array */ {
   readonly attribute Promise&lt;StreamAbortInfo&gt; writingAborted;
   undefined abortWriting(optional StreamAbortInfo abortInfo = {});
 };
@@ -803,18 +800,11 @@ interface mixin OutgoingStream {
 
 ## Overview ##  {#outgoing-stream-overview}
 
-The {{OutgoingStream}} will initialize with the following:
-
-1. Let |stream| be the {{OutgoingStream}}.
-1. Let |stream| have a <dfn attribute for="OutgoingStream">\[[Writable]]</dfn>
-   internal slot initialized to a new {{WritableStream}}.
+The {{OutgoingStream}} will be initialized by running the {{WritableStream}}
+initialization steps.
 
 ## Attributes ##  {#outgoing-stream-attributes}
 
-: <dfn attribute for="OutgoingStream">writable</dfn>
-:: The `writable` attribute represents a {{WritableStream}} (of bytes) that can
-   be used to write to the {{OutgoingStream}}. On getting it MUST return the
-   value of the {{[[Writable]]}} slot.
 : <dfn attribute for="OutgoingStream">writingAborted</dfn>
 :: The `writingAborted` attribute represents a promise that is [=fulfilled=]
     when the a message from the remote side aborting the stream is received.
@@ -865,14 +855,14 @@ The dictionary SHALL have the following fields:
 
 # Interface Mixin `IncomingStream` #  {#incoming-stream}
 
-An <dfn interface>IncomingStream</dfn> is a stream that can be read from, as
-either a {{ReceiveStream}} or a {{BidirectionalStream}}.
+An <dfn interface>IncomingStream</dfn> is a {{ReadableStream}} of {Uint8Array}}
+that can be read from, as either a {{ReceiveStream}} or the
+{{BidirectionalStream/readable}} of a {{BidirectionalStream}}, to consume data
+received over the connection.
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
-interface mixin IncomingStream {
-  /* a ReadableStream of Uint8Array */
-  readonly attribute ReadableStream readable;
+interface mixin IncomingStream : ReadableStream /* of Uint8Array */ {
   readonly attribute Promise&lt;StreamAbortInfo&gt; readingAborted;
   undefined abortReading(optional StreamAbortInfo abortInfo = {});
 };
@@ -880,18 +870,11 @@ interface mixin IncomingStream {
 
 ## Overview ##  {#incoming-stream-overview}
 
-The {{IncomingStream}} will initialize with the following:
-
-1. Let |stream| be the {{IncomingStream}}.
-1. Let |stream| have a <dfn attribute for="IncomingStream">\[[Readable]]</dfn>
-   internal slot initialized to a new {{ReadableStream}}.
+The {{IncomingStream}} will be initialized by running the {{ReadableStream}}
+initialization steps.
 
 ## Attributes ##  {#incoming-stream-attributes}
 
-: <dfn attribute for="IncomingStream">readable</dfn>
-:: The `readable` attribute represents a {{ReadableStream}} that can
-   be used to read from the {{IncomingStream}}. On getting it MUST return the
-   value of the {{IncomingStream}}'s {{[[Readable]]}} slot.
 : <dfn attribute for="IncomingStream">readingAborted</dfn>
 :: The `readingAborted` attribute represents a promise that is [=fulfilled=]
     when the a message from the remote side aborting the stream is received.
@@ -927,10 +910,18 @@ The {{IncomingStream}} will initialize with the following:
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
 interface BidirectionalStream {
+  readonly attribute ReceiveStream readable;
+  readonly attribute SendStream writable;
 };
-BidirectionalStream includes OutgoingStream;
-BidirectionalStream includes IncomingStream;
 </pre>
+
+The {{BidirectionalStream}} will initialize with the following:
+
+1. Let |duplexStream| be the {{BidirectionalStream}}.
+1. Let |duplexStream| have a <dfn attribute for="BidirectionalStream">\[[Readable]]</dfn>
+   internal slot initialized to a new {{ReceiveStream}}.
+1. Let |duplexStream| have a <dfn attribute for="BidirectionalStream">\[[Writable]]</dfn>
+   internal slot initialized to a new {{SendStream}}.
 
 # Interface `SendStream` #  {#send-stream}
 
@@ -976,35 +967,35 @@ in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
         <td>send RESET_STREAM with code</td>
       </tr>
       <tr>
-        <td>{{OutgoingStream/writable}}.abort()</td>
+        <td>{{BidirectionalStream/writable}}.abort()</td>
         <td>send RESET_STREAM</td>
       </tr>
       <tr>
-        <td>{{OutgoingStream/writable}}.close()</td>
+        <td>{{BidirectionalStream/writable}}.close()</td>
         <td>send STREAM_FINAL</td>
       </tr>
       <tr>
-        <td>{{OutgoingStream/writable}}.getWriter().write()</td>
+        <td>{{BidirectionalStream/writable}}.getWriter().write()</td>
         <td>send STREAM</td>
       </tr>
       <tr>
-        <td>{{OutgoingStream/writable}}.getWriter().close()</td>
+        <td>{{BidirectionalStream/writable}}.getWriter().close()</td>
         <td>send STREAM_FINAL</td>
       </tr>
       <tr>
-        <td>{{OutgoingStream/writable}}.getWriter().abort()</td>
+        <td>{{BidirectionalStream/writable}}.getWriter().abort()</td>
         <td>send RESET_STREAM</td>
       </tr>
       <tr>
-        <td>{{IncomingStream/readable}}.cancel()</td>
+        <td>{{BidirectionalStream/readable}}.cancel()</td>
         <td>send STOP_SENDING</td>
       </tr>
       <tr>
-        <td>{{IncomingStream/readable}}.getReader().read()</td>
+        <td>{{BidirectionalStream/readable}}.getReader().read()</td>
         <td>receive STREAM or STREAM_FINAL</td>
       </tr>
       <tr>
-        <td>{{IncomingStream/readable}}.getReader().cancel()</td>
+        <td>{{BidirectionalStream/readable}}.getReader().cancel()</td>
         <td>send STOP_SENDING</td>
       </tr>
     </tbody>
@@ -1136,8 +1127,8 @@ resulting stream's writer.
 <pre class="example" highlight="js">
 async function sendData(url, data) {
   const wt = new WebTransport(url);
-  const stream = await wt.createUnidirectionalStream();
-  const writer = stream.writable.getWriter();
+  const writable = await wt.createUnidirectionalStream();
+  const writer = writable.getWriter();
   await writer.write(data);
   await writer.close();
 }
@@ -1149,10 +1140,10 @@ Encoding can also be done through pipes from a {{ReadableStream}}, for example u
 <pre class="example" highlight="js">
 async function sendText(url, readableStreamOfTextData) {
   const wt = new WebTransport(url);
-  const stream = await wt.createUnidirectionalStream();
+  const writable = await wt.createUnidirectionalStream();
   await readableStreamOfTextData
     .pipeThrough(new TextEncoderStream("utf-8"))
-    .pipeTo(stream.writable);
+    .pipeTo(writable);
 }
 </pre>
 
@@ -1167,11 +1158,11 @@ and then consuming each {{ReceiveStream}} by iterating over its chunks.
 <pre class="example" highlight="js">
 async function receiveData(url, processTheData) {
   const wt = new WebTransport(url);
-  for await (const stream of wt.incomingUnidirectionalStreams) {
+  for await (const readable of wt.incomingUnidirectionalStreams) {
     // consume streams individually, reporting per-stream errors
     ((async () => {
       try {
-        for await (const chunk of stream.readable.getReader()) {
+        for await (const chunk of readable.getReader()) {
           processTheData(chunk);
         }
       } catch (e) {
@@ -1189,10 +1180,10 @@ interleaved, and therefore only reads one stream at a time.
 <pre class="example" highlight="js">
 async function receiveText(url, createWritableStreamForTextData) {
   const wt = new WebTransport(url);
-  for await (const stream of wt.incomingUnidirectionalStreams) {
+  for await (const readable of wt.incomingUnidirectionalStreams) {
     // consume sequentially to not interleave output, reporting per-stream errors
     try {
-      await stream.readable
+      await readable
        .pipeThrough(new TextDecoderStream("utf-8"))
        .pipeTo(createWritableStreamForTextData());
     } catch (e) {
@@ -1253,19 +1244,19 @@ sendData.onclick = async () => {
         break;
       }
       case 'unidi': {
-        const stream = await wt.createUnidirectionalStream();
-        const writer = stream.writable.getWriter();
+        const writable = await wt.createUnidirectionalStream();
+        const writer = writable.getWriter();
         await writer.write(data);
         await writer.close();
         addToEventLog(&#96;Sent a unidirectional stream with data: ${rawData}&#96;);
         break;
       }
       case 'bidi': {
-        const stream = await wt.createBidirectionalStream();
+        const duplexStream = await wt.createBidirectionalStream();
         const n = streamNumber++;
-        readFromIncomingStream(stream, n);
+        readFromIncomingStream(duplexStream.readable, n);
 
-        const writer = stream.writable.getWriter();
+        const writer = duplexStream.writable.getWriter();
         await writer.write(data);
         await writer.close();
         addToEventLog(&#96;Sent bidirectional stream #${n} with data: ${rawData}&#96;);
@@ -1293,10 +1284,10 @@ async function readDatagrams() {
 
 async function acceptUnidirectionalStreams() {
   try {
-    for await (const stream of wt.incomingUnidirectionalStreams) {
+    for await (const readable of wt.incomingUnidirectionalStreams) {
       const number = streamNumber++;
       addToEventLog(&#96;New incoming unidirectional stream #${number}&#96;);
-      readFromIncomingStream(stream, number);
+      readFromIncomingStream(readable, number);
     }
     addToEventLog('Done accepting unidirectional streams!');
   } catch (e) {
@@ -1304,10 +1295,10 @@ async function acceptUnidirectionalStreams() {
   }
 }
 
-async function readFromIncomingStream(stream, number) {
+async function readFromIncomingStream(readable, number) {
   try {
     const decoder = new TextDecoderStream('utf-8');
-    for await (const chunk of stream.readable.pipeThrough(decoder)) {
+    for await (const chunk of readable.pipeThrough(decoder)) {
       addToEventLog(&#96;Received data on stream #${number}: ${chunk}&#96;);
     }
     addToEventLog(&#96;Stream #${number} closed&#96;);
