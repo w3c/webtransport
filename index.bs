@@ -466,10 +466,10 @@ agent MUST run the following steps:
 1. Let |transport| be a newly constructed {{WebTransport}} object.
 1. Let |transport| have an
    <dfn attribute for="WebTransport">\[[OutgoingStreams]]</dfn> internal slot
-   representing a sequence of {{OutgoingStream}} objects, initialized to empty.
+   representing a sequence of {{SendStream}} objects, initialized to empty.
 1. Let |transport| have a
    <dfn attribute for="WebTransport">\[[ReceivedStreams]]</dfn> internal slot
-   representing a {{ReadableStream}} of {{IncomingStream}} objects, initialized
+   representing a {{ReadableStream}} of {{ReceiveStream}} objects, initialized
    to empty.
 1. Let |transport| have a
   <dfn attribute for="WebTransport">\[[ReceivedBidirectionalStreams]]</dfn>
@@ -690,10 +690,10 @@ enum WebTransportState {
    1. Close the {{ReadableStream}} in |transport|'s {{[[ReceivedStreams]]}} internal slot.
    1. Close the {{ReadableStream}} in |transport|'s
       {{[[ReceivedBidirectionalStreams]]}} internal slot.
-   1. For each {{OutgoingStream}} in |transport|'s {{[[OutgoingStreams]]}}
+   1. For each {{SendStream}} in |transport|'s {{[[OutgoingStreams]]}}
       internal slot run the following:
 
-     1. Let |stream| be the {{OutgoingStream}}.
+     1. Let |stream| be the {{SendStream}}.
      1. Remove the |stream| from the |transport|'s {{[[OutgoingStreams]]}}
         internal slot.
 
@@ -706,7 +706,7 @@ enum WebTransportState {
       internal slot.
    1. Close the {{ReadableStream}} in |transport|'s
       {{[[ReceivedBidirectionalStreams]]}} internal slot.
-   1. For each {{OutgoingStream}} in |transport|'s {{[[OutgoingStreams]]}}
+   1. For each {{SendStream}} in |transport|'s {{[[OutgoingStreams]]}}
       internal slot run the following:
 
      1. Remove the |stream| from the |transport|'s {{[[OutgoingStreams]]}}
@@ -783,16 +783,14 @@ The dictionary SHALL have the following attributes:
 :: The number of datagrams that were dropped, due to too many datagrams buffered
    between calls to {{DatagramTransport/datagrams}}' {{DatagramDuplexStream/readable}}.
 
-# Interface Mixin `OutgoingStream` #  {#outgoing-stream}
+# Interface `SendStream` #  {#send-stream}
 
-An <dfn interface>OutgoingStream</dfn> is a {{WritableStream}} of {{Uint8Array}}
-that can be written to, as either a {{SendStream}} or the
-{{BidirectionalStream/writable}} or a {{BidirectionalStream}}, to transmit data
-over the connection.
+A <dfn interface>SendStream</dfn> is a {{WritableStream}} of {{Uint8Array}}
+that can be written to, to transmit data to the remote host.
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
-interface mixin OutgoingStream : WritableStream /* of Uint8Array */ {
+interface SendStream : WritableStream /* of Uint8Array */ {
   readonly attribute Promise&lt;StreamAbortInfo&gt; writingAborted;
   undefined abortWriting(optional StreamAbortInfo abortInfo = {});
 };
@@ -800,17 +798,17 @@ interface mixin OutgoingStream : WritableStream /* of Uint8Array */ {
 
 ## Overview ##  {#outgoing-stream-overview}
 
-The {{OutgoingStream}} will be initialized by running the {{WritableStream}}
+The {{SendStream}} will be initialized by running the {{WritableStream}}
 initialization steps.
 
 ## Attributes ##  {#outgoing-stream-attributes}
 
-: <dfn attribute for="OutgoingStream">writingAborted</dfn>
+: <dfn attribute for="SendStream">writingAborted</dfn>
 :: The `writingAborted` attribute represents a promise that is [=fulfilled=]
     when the a message from the remote side aborting the stream is received.
     For QUIC, that message is a STOP_SENDING frame. When the stream receives
     this mesage, the user agent MUST run the following:
-      1. Let |stream| be the {{OutgoingStream}} object.
+      1. Let |stream| be the {{SendStream}} object.
       1. Let |transport| be the {{WebTransport}}, which the |stream| was created
          from.
       1. Remove the stream from the |transport|'s {{[[OutgoingStreams]]}}
@@ -821,12 +819,12 @@ initialization steps.
 
 ## Methods ##  {#outgoing-stream-methods}
 
-: <dfn method for="OutgoingStream">abortWriting()</dfn>
-:: A hard shutdown of the {{OutgoingStream}}. It may be called regardless of
-   whether the {{OutgoingStream}} was created by the local or remote peer. When
+: <dfn method for="SendStream">abortWriting()</dfn>
+:: A hard shutdown of the {{SendStream}}. It may be called regardless of
+   whether the {{SendStream}} was created by the local or remote peer. When
    the `abortWriting` method is called, the user agent MUST run the following
    steps:
-     1. Let |stream| be the {{OutgoingStream}} object which is about to abort
+     1. Let |stream| be the {{SendStream}} object which is about to abort
         writing.
      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
         from.
@@ -853,16 +851,14 @@ The dictionary SHALL have the following fields:
 : <dfn for="StreamAbortInfo" dict-member>errorCode</dfn>
 :: The error code. The default value of 0 means "CLOSING."
 
-# Interface Mixin `IncomingStream` #  {#incoming-stream}
+# Interface `ReceiveStream` #  {#receive-stream}
 
-An <dfn interface>IncomingStream</dfn> is a {{ReadableStream}} of {Uint8Array}}
-that can be read from, as either a {{ReceiveStream}} or the
-{{BidirectionalStream/readable}} of a {{BidirectionalStream}}, to consume data
-received over the connection.
+A <dfn interface>ReceiveStream</dfn> is a {{ReadableStream}} of {{Uint8Array}}
+that can be read from, to consume data received from the remote host.
 
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
-interface mixin IncomingStream : ReadableStream /* of Uint8Array */ {
+interface ReceiveStream : ReadableStream /* of Uint8Array */ {
   readonly attribute Promise&lt;StreamAbortInfo&gt; readingAborted;
   undefined abortReading(optional StreamAbortInfo abortInfo = {});
 };
@@ -870,17 +866,17 @@ interface mixin IncomingStream : ReadableStream /* of Uint8Array */ {
 
 ## Overview ##  {#incoming-stream-overview}
 
-The {{IncomingStream}} will be initialized by running the {{ReadableStream}}
+The {{ReceiveStream}} will be initialized by running the {{ReadableStream}}
 initialization steps.
 
 ## Attributes ##  {#incoming-stream-attributes}
 
-: <dfn attribute for="IncomingStream">readingAborted</dfn>
+: <dfn attribute for="ReceiveStream">readingAborted</dfn>
 :: The `readingAborted` attribute represents a promise that is [=fulfilled=]
     when the a message from the remote side aborting the stream is received.
     For QUIC, that message is a RST_STREAM frame. When the stream receives
     this mesage, the user agent MUST run the following:
-      1. Let |stream| be the {{IncomingStream}} object for which the abort
+      1. Let |stream| be the {{ReceiveStream}} object for which the abort
          message was received.
       1. Let |transport| be the {{WebTransport}}, which the |stream| was created
          from.
@@ -890,12 +886,12 @@ initialization steps.
 
 ## Methods ##  {#incoming-stream-methods}
 
-: <dfn method for="IncomingStream">abortReading()</dfn>
-:: A hard shutdown of the {{IncomingStream}}. It may be called regardless of
-   whether the {{IncomingStream}} was created by the local or remote peer. When
+: <dfn method for="ReceiveStream">abortReading()</dfn>
+:: A hard shutdown of the {{ReceiveStream}}. It may be called regardless of
+   whether the {{ReceiveStream}} was created by the local or remote peer. When
    the `abortWriting` method is called, the user agent MUST run the following
    steps:
-     1. Let |stream| be the {{IncomingStream}} object which is about to abort
+     1. Let |stream| be the {{ReceiveStream}} object which is about to abort
         reading.
      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
         from.
@@ -923,24 +919,6 @@ The {{BidirectionalStream}} will initialize with the following:
 1. Let |duplexStream| have a <dfn attribute for="BidirectionalStream">\[[Writable]]</dfn>
    internal slot initialized to a new {{SendStream}}.
 
-# Interface `SendStream` #  {#send-stream}
-
-<pre class="idl">
-[ Exposed=(Window,Worker) ]
-interface SendStream {
-};
-SendStream includes OutgoingStream;
-</pre>
-
-# Interface `ReceiveStream` #  {#receive-stream}
-
-<pre class="idl">
-[ Exposed=(Window,Worker) ]
-interface ReceiveStream {
-};
-ReceiveStream includes IncomingStream;
-</pre>
-
 # Protocol Mappings # {#protocol-mapping}
 
 *This section is non-normative.*
@@ -959,11 +937,11 @@ in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
     </thead>
     <tbody>
       <tr>
-        <td>{{IncomingStream/abortReading}}</td>
+        <td>{{ReceiveStream/abortReading}}</td>
         <td>send STOP_SENDING with code</td>
       </tr>
       <tr>
-        <td>{{OutgoingStream/abortWriting}}</td>
+        <td>{{SendStream/abortWriting}}</td>
         <td>send RESET_STREAM with code</td>
       </tr>
       <tr>
