@@ -626,9 +626,9 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 
    When close is called, the user agent MUST run the following steps:
      1. Let |transport| be the WebTransport on which `close` is invoked.
-     1. If |transport|'s [=[[WebTransportState]]=] is `"closed"` or `"failed"`,
+     1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`,
         then abort these steps.
-     1. Set |transport|'s [=[[WebTransportState]]=] to `"closed"`.
+     1. Set |transport|'s [=[[State]]=] to `"closed"`.
      1. Let `closeInfo` be the first argument.
      1. If the connection is dedicated, start the [=Immediate Close=] procedure
         by sending an CONNECTION_CLOSE frame with its error code value set to the value
