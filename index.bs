@@ -527,36 +527,36 @@ agent MUST run the following steps:
 1. If |dedicated| is false and |serverCertificateFingerprints| is non-null, then [=throw=] a
    {{TypeError}}.
 1. Let |transport| be a newly constructed {{WebTransport}} object, with:
-: [=[[OutgoingStreams]]=]
-:: empty
-: [=[[ReceivedStreams]]=]
-:: a new {{ReadableStream}}
-: [=[[ReceivedBidirectionalStreams]]=]
-:: a new {{ReadableStream}}
-: [=[[State]]=]
-:: `"connecting"`
-: [=[[Ready]]=]
-:: a new promise
-: [=[[Closed]]=]
-:: a new promise
-: [=[[Datagrams]]=]
-:: null
-   <div class="note">
-    <p>This slot cannot be set to null, but this case is fine because we set a value in the
-       subsequent steps.</p>
-   </div>
-: [=[[OutgoingDatagramsQueue]]=]
-:: an empty queue
-: [=[[OutgoingDatagramsHighWaterMark]]=]
-:: an [=implementation-defined=] integer
-   <div class="note">
-    <p>This implementation-defined value should be tuned to ensure decent throughput, without
-       jeopardizing the timeliness of transmitted data.</p>
-   </div>
-: [=[[OutgoingDatagramsExpirationDuration]]=]
-:: null
-: [=[[Connection]]=]
-:: null
+   : [=[[OutgoingStreams]]=]
+   :: empty
+   : [=[[ReceivedStreams]]=]
+   :: a new {{ReadableStream}}
+   : [=[[ReceivedBidirectionalStreams]]=]
+   :: a new {{ReadableStream}}
+   : [=[[State]]=]
+   :: `"connecting"`
+   : [=[[Ready]]=]
+   :: a new promise
+   : [=[[Closed]]=]
+   :: a new promise
+   : [=[[Datagrams]]=]
+   :: null
+      <div class="note">
+       <p>This slot cannot be set to null, but this case is fine because we set a value in the
+          subsequent steps.</p>
+      </div>
+   : [=[[OutgoingDatagramsQueue]]=]
+   :: an empty queue
+   : [=[[OutgoingDatagramsHighWaterMark]]=]
+   :: an [=implementation-defined=] integer
+      <div class="note">
+       <p>This implementation-defined value should be tuned to ensure decent throughput, without
+          jeopardizing the timeliness of transmitted data.</p>
+      </div>
+   : [=[[OutgoingDatagramsExpirationDuration]]=]
+   :: null
+   : [=[[Connection]]=]
+   :: null
 1. Let |outgoingDatagrams| be the result of [=WritableStream/creating=] a {{WritableStream}},
    its [=WritableStream/create/writeAlgorithm=] set to [=writeDatagrams=] given
    |transport| as a parameter.
