@@ -1038,46 +1038,67 @@ that can be written to, to transmit data to the remote host.
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
 interface SendStream : WritableStream /* of Uint8Array */ {
-  readonly attribute Promise&lt;StreamAbortInfo&gt; writingAborted;
-  undefined abortWriting(optional StreamAbortInfo abortInfo = {});
+  readonly attribute Promise&lt;StreamAbortInfo&gt; dropped;
+  undefined drop(optional StreamAbortInfo abortInfo = {});
 };
 </pre>
 
-## Overview ##  {#outgoing-stream-overview}
+## Overview ##  {#send-stream-overview}
 
 The {{SendStream}} will be initialized by running the {{WritableStream}}
 initialization steps.
 
-## Attributes ##  {#outgoing-stream-attributes}
+## Attributes ##  {#send-stream-attributes}
 
-: <dfn attribute for="SendStream">writingAborted</dfn>
-:: The `writingAborted` attribute represents a promise that is [=fulfilled=]
+: <dfn attribute for="SendStream">dropped</dfn>
+:: The `dropped` attribute represents a promise that is [=fulfilled=]
     when the a message from the remote side aborting the stream is received.
-    For QUIC, that message is a STOP_SENDING frame. When the stream receives
-    this mesage, the user agent MUST run the following:
-      1. Let |stream| be the {{SendStream}} object.
-      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
-         from.
-      1. Remove the stream from the |transport|'s [=[[OutgoingStreams]]=].
-      1. [=Resolve=] the promise with the resulting {{StreamAbortInfo}} with
-         the {{StreamAbortInfo/errorCode}} set to the value from the aborting
-         message from the remote side.
+    For QUIC, that message is a STOP_SENDING frame.
 
-## Methods ##  {#outgoing-stream-methods}
+## Methods ##  {#send-stream-methods}
 
-: <dfn method for="SendStream">abortWriting()</dfn>
+: <dfn method for="SendStream">drop()</dfn>
 :: A hard shutdown of the {{SendStream}}. It may be called regardless of
    whether the {{SendStream}} was created by the local or remote peer. When
-   the `abortWriting` method is called, the user agent MUST run the following
+   the `drop` method is called, the user agent MUST run the following
    steps:
      1. Let |stream| be the {{SendStream}} object which is about to abort
         writing.
      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
         from.
-     1. Remove the stream from the transport's [=[[OutgoingStreams]]=].
+     1. Remove |stream| from the transport's [=[[OutgoingStreams]]=].
      1. Let |abortInfo| be the first argument.
-     1. Start the closing procedure by sending a RST_STREAM frame with its
-        error code set to the value of |abortInfo.errorCode|.
+     1. Let |reason| be |abortInfo|.errorCode.
+     1. If it hasn't started already, start the closing procedure by sending a
+        RST_STREAM frame with its error code set to the value of |reason|.
+     1. Let |p| be the result of [=WritableStream/abort|aborting=] |stream|, with |reason|.
+     1. [=Upon fulfillment=] or [=upon rejection|rejection=] of |p|, do nothing.
+
+## Procedures ##  {#send-stream-procedures}
+
+When a {{SendStream}} receives a STOP_SENDING frame from the remote side,
+the user agent MUST queue a task to run the following:
+      1. Let |stream| be the {{SendStream}} object.
+      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
+         from.
+      1. Remove |stream| from the |transport|'s [=[[OutgoingStreams]]=]
+         internal slot.
+      1. Let |reason| be the value from the STOP_SENDING frame from the remote side.
+      1. Let |p| be the result of [=WritableStream/abort|aborting=] |stream|, with |reason|.
+      1. [=Upon fulfillment=] or [=upon rejection|rejection=] of |p|, do nothing.
+      1. [=Resolve=] {{SendStream}}.{{SendStream/dropped}} with a new
+         {{StreamAbortInfo}} with the {{StreamAbortInfo/errorCode}} set to
+         |reason|.
+
+The {{SendStream}}'s <dfn>abortAlgorithm</dfn> (TODO) is:
+     1. Let |stream| be the {{ReceiveStream}} object.
+     1. Let |transport| be the {{WebTransport}}, which the |stream| was created
+        from.
+     1. Let |reason| be the first argument, if it is numeric, or 0.
+     1. If |stream| was aborted by a STOP_SENDING frame, abort these steps.
+     1. If it hasn't started already, start the closing procedure by sending a
+        STOP_SENDING frame to the remote side, with its error code set to the
+        value of |reason|.
 
 ## `StreamAbortInfo` Dictionary ##  {#stream-abort-info}
 
@@ -1104,47 +1125,42 @@ that can be read from, to consume data received from the remote host.
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
 interface ReceiveStream : ReadableStream /* of Uint8Array */ {
-  readonly attribute Promise&lt;StreamAbortInfo&gt; readingAborted;
-  undefined abortReading(optional StreamAbortInfo abortInfo = {});
+  readonly attribute Promise&lt;StreamAbortInfo&gt; remoteReset;
 };
 </pre>
 
-## Overview ##  {#incoming-stream-overview}
+## Overview ##  {#receive-stream-overview}
 
 The {{ReceiveStream}} will be initialized by running the {{ReadableStream}}
 initialization steps.
 
-## Attributes ##  {#incoming-stream-attributes}
+## Attributes ##  {#receive-stream-attributes}
 
-: <dfn attribute for="ReceiveStream">readingAborted</dfn>
-:: The `readingAborted` attribute represents a promise that is [=fulfilled=]
+:: The `remoteReset` attribute represents a promise that is [=fulfilled=]
     when the a message from the remote side aborting the stream is received.
-    For QUIC, that message is a RST_STREAM frame. When the stream receives
-    this mesage, the user agent MUST run the following:
-      1. Let |stream| be the {{ReceiveStream}} object for which the abort
+    For QUIC, that message is a RST_STREAM frame.
+
+## Procedures ##  {#receive-stream-procedures}
+
+When an {{ReceiveStream}} receives a RST_STREAM frame from the remote side, the
+user agent MUST queue a task to run the following:
+      1. Let |stream| be the {{ReceiveStream}} object for which the reset
          message was received.
       1. Let |transport| be the {{WebTransport}}, which the |stream| was created
          from.
-      1. [=Resolve=] the promise with the resulting {{StreamAbortInfo}} with
-         the {{StreamAbortInfo/errorCode}} set to the value from the aborting
-         message from the remote side.
+      1. Let |reason| be the value from the RST_STREAM frame from the remote side.
+      1. Let |p| be the result of [=ReadableStream/cancel|canceling=] |stream|,
+         with |reason|.
+     1. [=Upon fulfillment=] or [=upon rejection|rejection=] of |p|, do nothing.
 
-## Methods ##  {#incoming-stream-methods}
-
-: <dfn method for="ReceiveStream">abortReading()</dfn>
-:: A hard shutdown of the {{ReceiveStream}}. It may be called regardless of
-   whether the {{ReceiveStream}} was created by the local or remote peer. When
-   the `abortWriting` method is called, the user agent MUST run the following
-   steps:
-     1. Let |stream| be the {{ReceiveStream}} object which is about to abort
-        reading.
+The {{ReceiveStream}}'s <dfn>cancelAlgorithm</dfn> (TODO) is:
+     1. Let |stream| be the {{ReceiveStream}} object.
      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
         from.
-     1. Let |abortInfo| be the first argument.
-     1. Start the closing procedure by sending a message to the remote side
-        indicating that the stream has been aborted (using a
-        STOP_SENDING frame) with its error code set to the value of
-        |abortInfo.errorCode|.
+     1. Let |reason| be the first argument, if it is numeric, or 0.
+     1. If |stream| was canceled by a RST_STREAM frame, abort these steps.
+     1. Start the closing procedure by sending a STOP_SENDING frame to the
+        remote side, with its error code set to the value of |reason|.
 
 # Interface `BidirectionalStream` #  {#bidirectional-stream}
 
@@ -1182,16 +1198,12 @@ in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
     </thead>
     <tbody>
       <tr>
-        <td>{{ReceiveStream/abortReading}}</td>
-        <td>send STOP_SENDING with code</td>
-      </tr>
-      <tr>
-        <td>{{SendStream/abortWriting}}</td>
+        <td>{{BidirectionalStream/writable}}.{{OutgoingStream/drop}}()</td>
         <td>send RESET_STREAM with code</td>
       </tr>
       <tr>
         <td>{{BidirectionalStream/writable}}.abort()</td>
-        <td>send RESET_STREAM</td>
+        <td>send RESET_STREAM with code</td>
       </tr>
       <tr>
         <td>{{BidirectionalStream/writable}}.close()</td>
@@ -1207,11 +1219,11 @@ in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
       </tr>
       <tr>
         <td>{{BidirectionalStream/writable}}.getWriter().abort()</td>
-        <td>send RESET_STREAM</td>
+        <td>send RESET_STREAM with code</td>
       </tr>
       <tr>
         <td>{{BidirectionalStream/readable}}.cancel()</td>
-        <td>send STOP_SENDING</td>
+        <td>send STOP_SENDING with code</td>
       </tr>
       <tr>
         <td>{{BidirectionalStream/readable}}.getReader().read()</td>
@@ -1219,7 +1231,7 @@ in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
       </tr>
       <tr>
         <td>{{BidirectionalStream/readable}}.getReader().cancel()</td>
-        <td>send STOP_SENDING</td>
+        <td>send STOP_SENDING with code</td>
       </tr>
     </tbody>
   </table>
