@@ -346,10 +346,47 @@ interface mixin DatagramTransport {
 
 ## Procedures ## {#datagrams-transport-procedures}
 
-The <dfn>readDatagrams</dfn> algorithm is given a |transport| as parameter. It
-is defined by running the following steps:
-1. TODO
-1. [=ReadableStream/enqueue=] |data| in |transport|.`[[IncomingDatagrams]]`.
+To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
+1. Let |queue| be |transport|'s [=[[IncomingDatagramsQueue]]=].
+1. If |queue| is empty, then:
+  1. Assert: |transport|'s [=[[IncomingDatagramsPullPromise]]=] is null.
+  1. Set |transport|'s [=[[IncomingDatagramsPullPromise]]=] to a new promise.
+  1. Return |transport|'s [=[[IncomingDatagramsPullPromise]]=].
+1. Let |bytes| and |timestamp| be |queue|'s first element.
+1. Remove the first element from |queue|.
+1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
+1. [=ReadableStream/Enqueue=] |chunk| to |transport|'s [=[[IncomingDatagrams]]=].
+1. Return [=a promise resolved with=] undefined.
+
+To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
+1. Let |timestamp| be a timestamp representing now.
+1. Let |queue| be |transport|'s [=[[IncomingDatagramsQueue]]=].
+1. Let |duration| be |transport|'s [=[[IncomingDatagramsExpirationDuration]]=].
+1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
+1. Let |connection| be |transport|'s [=[[Connection]]=].
+1. While there are available incoming datagrams on |connection|: [[!WEB-TRANSPORT-HTTP3]]
+
+  Issue: We should probably use "session" instead of "connection", to support pooling.
+
+  1. Let |datagram| be the first datagram, and remove it from |connection|.
+  1. Let |timestamp| be a timestamp representing now.
+  1. Let |chunk| be a pair of |datagram| and |timestamp|.
+  1. Enqueue |chunk| to |transort|'s [=[[IncomingDatagramsQueue]]=].
+1. Let |toBeRemoved| be the length of |queue| minus |transport|'s
+  [=[[IncomingDatagramsHighWaterMark]]=].
+1. If |toBeRemoved| is positive, remove first |toBeRemoved| elements from |queue|.
+1. While |queue| is not empty:
+  1. Let |bytes| and |timestamp| be |queue|'s first element.
+  1. If more than |duration| seconds have passed since |timestamp|, then remove the first element
+     from |queue|.
+  1. Otherwise, break this loop.
+1. If |queue| is not empty and |transport|'s [=[[IncomingDatagramsPullPromise]]=] is non-null, then:
+   1. [=resolve=] |transport|'s [=[[IncomingDatagramsPullPromise]]=] with undefined.
+   1. Set |transport|'s [=[[IncomingDatagramsPullPromise]]=] to null.
+
+The user agent SHOULD run [=receiveDatagrams=] for any {{WebTransport}} object whose
+[=[[State]]=] is `"connected"` as soon as reasonably possible whenever the algorithm can make
+progress.
 
 The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
 |data| as input. It is defined by running the following steps:
@@ -490,6 +527,25 @@ A {{WebTransport}} object has the following internal slots.
    <td class="non-normative">A {{DatagramDuplexStream}}.
   </tr>
   <tr>
+   <td><dfn>\[[IncomingDatagramsQueue]]</dfn>
+   <td class="non-normative">A queue of tuples of an incoming datagram and a timestamp.
+  </tr>
+  <tr>
+   <td><dfn>\[[IncomingDatagramsPullPromise]]</dfn>
+   <td class="non-normative">A promise returned by [=pullDatagrams=], fulfilled when a new
+   datagram arrives.
+  </tr>
+  <tr>
+   <td><dfn>\[[IncomingDatagramsHighWaterMark]]</dfn>
+   <td class="non-normative">An integer representing the [=high water mark=] of the incoming
+   datagrams.
+  </tr>
+  <tr>
+   <td><dfn>\[[IncomingDatagramsExpirationDuration]]</dfn>
+   <td class="non-normative">A {{double}} value representing the expiration duration for incoming
+   datagrams (in seconds), or null.
+  </tr>
+  <tr>
    <td><dfn>\[[OutgoingDatagramsQueue]]</dfn>
    <td class="non-normative">A queue of tuples of an outgoing datagram, a timestamp and a promise
    which is resolved when the datagram is sent or discarded.
@@ -526,6 +582,11 @@ agent MUST run the following steps:
    {{WebTransportOptions/serverCertificateFingerprints}} if it exists, and null otherwise.
 1. If |dedicated| is false and |serverCertificateFingerprints| is non-null, then [=throw=] a
    {{TypeError}}.
+1. Let |incomingDatagrams| be a new {{ReadableStream}}.
+1. Let |outgoingDatagrams| be a new {{WritableStream}}.
+1. Let |datagrams| be the result of [=DatagramDuplexStream/creating=] a
+   {{DatagramDuplexStream}}, its [=DatagramDuplexStream/create/readable=] set to
+   |incomingDatagrams| and its [=DatagramDuplexStream/create/writable=] set to |outgoingDatagrams|.
 1. Let |transport| be a newly constructed {{WebTransport}} object, with:
     : [=[[OutgoingStreams]]=]
     :: empty
@@ -540,11 +601,15 @@ agent MUST run the following steps:
     : [=[[Closed]]=]
     :: a new promise
     : [=[[Datagrams]]=]
+    :: |datagrams|
+    : [=[[IncomingDatagramsQueue]]=]
+    :: an empty queue
+    : [=[[IncomingDatagramsPullPromise]]=]
     :: null
-       <div class="note">
-        <p>This slot cannot be set to null, but this case is fine because we set a value in the
-           subsequent steps.</p>
-       </div>
+    : [=[[IncomingDatagramsHighWaterMark]]=]
+    :: an [=implementation-defined=] integer
+    : [=[[IncomingDatagramsExpirationDuration]]=]
+    :: null
     : [=[[OutgoingDatagramsQueue]]=]
     :: an empty queue
     : [=[[OutgoingDatagramsHighWaterMark]]=]
@@ -557,15 +622,12 @@ agent MUST run the following steps:
     :: null
     : [=[[Connection]]=]
     :: null
-1. Let |outgoingDatagrams| be the result of [=WritableStream/creating=] a {{WritableStream}},
-   its [=WritableStream/create/writeAlgorithm=] set to [=writeDatagrams=] given
-   |transport| as a parameter.
-1. Let |incomingDatagrams| be the result of <a dfn for="ReadableStream">creating</a> a
-   {{ReadableStream}}. `transport.[[IncomingDatagrams]]` is provided datagrams
-    using the [=readDatagrams=] algorithm given |transport| as a parameter.
-1. Set |transport|'s [=[[Datagrams]]=] to the result of [=DatagramDuplexStream/creating=] a
-   {{DatagramDuplexStream}}, its [=DatagramDuplexStream/create/readable=] set to
-   |incomingDatagrams| and its [=DatagramDuplexStream/create/writable=] set to |outgoingDatagrams|.
+1. Let |pullAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
+1. Let |writeAlgorithm| be an action that runs [=writeDatagrams=] with |transport|.
+1. [=ReadableStream/Set up=] |incomingDatagrams| with [=ReadableStream/set up/pullAlgorithm=]
+   set to |pullAlgorithm|, and [=ReadableStream/set up/highWaterMark=] set to 0.
+1. [=WritableStream/Set up=] |outgoingDatagrams| with [=WritableStream/set up/writeAlgorithm=]
+   set to |writeAlgorithm|.
 1. Let |promise| be the result of [=initialize WebTransport over HTTP|initializing WebTransport
    over HTTP=], with |transport|, |parsedURL| and |dedicated|.
 1. [=Upon fulfillment=] of |promise|, run these steps:
