@@ -359,8 +359,7 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
        [=DatagramDuplexStream/[[Readable]]=].
     1. [=Resolve=] |promise| with undefined.
   1. Return |promise|.
-1. Let |bytes| and |timestamp| be |queue|'s first element.
-1. Remove the first element from |queue|.
+1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
 1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
 1. [=ReadableStream/Enqueue=] |chunk| to |transport|'s [=[[Datagrams]]=]'
    [=DatagramDuplexStream/[[Readable]]=].
@@ -385,14 +384,12 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
 1. If |toBeRemoved| is positive, remove first |toBeRemoved| elements from |queue|.
 1. While |queue| is not empty:
   1. Let |bytes| and |timestamp| be |queue|'s first element.
-  1. If more than |duration| milliseconds have passed since |timestamp|, then remove the first
-     element from |queue|.
+  1. If more than |duration| milliseconds have passed since |timestamp|, then [=dequeue=] |queue|.
   1. Otherwise, [=break=] this loop.
 1. If |queue| is not empty and |transport|'s [=[[IncomingDatagramsPullPromise]]=] is non-null, then
   [=queue a global task=] on the [=network task source=] with |transport|'s
   [=relevant global object=] and a task that runs the following steps:
-  1. Let |bytes| and |timestamp| be |queue|'s first element.
-  1. Remove the first element from |queue|.
+  1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
   1. [=Resolve=] |transport|'s [=[[IncomingDatagramsPullPromise]]=] with |bytes|.
   1. Set |transport|'s [=[[IncomingDatagramsPullPromise]]=] to null.
 
