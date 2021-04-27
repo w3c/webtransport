@@ -1052,7 +1052,7 @@ initialization steps.
 
 : <dfn attribute for="SendStream">dropped</dfn>
 :: The `dropped` attribute represents a promise that is [=fulfilled=]
-    when the a message from the remote side aborting the stream is received.
+    when a message from the remote side aborting the stream is received.
     For QUIC, that message is a STOP_SENDING frame.
 
 ## Methods ##  {#send-stream-methods}
@@ -1072,7 +1072,7 @@ initialization steps.
      1. If it hasn't started already, start the closing procedure by sending a
         RST_STREAM frame with its error code set to the value of |reason|.
      1. Let |p| be the result of [=WritableStream/abort|aborting=] |stream|, with |reason|.
-     1. [=Upon fulfillment=] or [=upon rejection|rejection=] of |p|, do nothing.
+     1. Set |p|.[[PromiseIsHandled]] to true.
 
 ## Procedures ##  {#send-stream-procedures}
 
@@ -1085,7 +1085,7 @@ the user agent MUST queue a task to run the following:
          internal slot.
       1. Let |reason| be the value from the STOP_SENDING frame from the remote side.
       1. Let |p| be the result of [=WritableStream/abort|aborting=] |stream|, with |reason|.
-      1. [=Upon fulfillment=] or [=upon rejection|rejection=] of |p|, do nothing.
+      1. Set |p|.[=[[PromiseIsHandled]]=] to true.
       1. [=Resolve=] {{SendStream}}.{{SendStream/dropped}} with a new
          {{StreamAbortInfo}} with the {{StreamAbortInfo/errorCode}} set to
          |reason|.
@@ -1142,16 +1142,17 @@ initialization steps.
 
 ## Procedures ##  {#receive-stream-procedures}
 
-When an {{ReceiveStream}} receives a RST_STREAM frame from the remote side, the
-user agent MUST queue a task to run the following:
+When a {{ReceiveStream}} receives a message from the remote side aborting the
+stream (For QUIC, that message is an RST_STREAM frame), the user agent MUST
+queue a task to run the following:
       1. Let |stream| be the {{ReceiveStream}} object for which the reset
          message was received.
       1. Let |transport| be the {{WebTransport}}, which the |stream| was created
          from.
-      1. Let |reason| be the value from the RST_STREAM frame from the remote side.
+      1. Let |reason| be the value from the message from the remote side.
       1. Let |p| be the result of [=ReadableStream/cancel|canceling=] |stream|,
          with |reason|.
-     1. [=Upon fulfillment=] or [=upon rejection|rejection=] of |p|, do nothing.
+      1. Set |p|.[[PromiseIsHandled]] to true.
 
 The {{ReceiveStream}}'s <dfn>cancelAlgorithm</dfn> (TODO) is:
      1. Let |stream| be the {{ReceiveStream}} object.
@@ -1198,12 +1199,12 @@ in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
     </thead>
     <tbody>
       <tr>
-        <td>{{BidirectionalStream/writable}}.{{OutgoingStream/drop}}()</td>
-        <td>send RESET_STREAM with code</td>
+        <td>{{BidirectionalStream/writable}}.{{OutgoingStream/drop}}({errorCode})</td>
+        <td>send RESET_STREAM with errorCode</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/writable}}.abort()</td>
-        <td>send RESET_STREAM with code</td>
+        <td>{{BidirectionalStream/writable}}.abort(errorCode)</td>
+        <td>send RESET_STREAM with errorCode</td>
       </tr>
       <tr>
         <td>{{BidirectionalStream/writable}}.close()</td>
@@ -1218,20 +1219,20 @@ in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
         <td>send STREAM_FINAL</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/writable}}.getWriter().abort()</td>
-        <td>send RESET_STREAM with code</td>
+        <td>{{BidirectionalStream/writable}}.getWriter().abort(errorCode)</td>
+        <td>send RESET_STREAM with errorCode</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/readable}}.cancel()</td>
-        <td>send STOP_SENDING with code</td>
+        <td>{{BidirectionalStream/readable}}.cancel(errorCode)</td>
+        <td>send STOP_SENDING with errorCode</td>
       </tr>
       <tr>
         <td>{{BidirectionalStream/readable}}.getReader().read()</td>
         <td>receive STREAM or STREAM_FINAL</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/readable}}.getReader().cancel()</td>
-        <td>send STOP_SENDING with code</td>
+        <td>{{BidirectionalStream/readable}}.getReader().cancel(errorCode)</td>
+        <td>send STOP_SENDING with errorCode</td>
       </tr>
     </tbody>
   </table>
