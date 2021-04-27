@@ -1038,8 +1038,8 @@ that can be written to, to transmit data to the remote host.
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
 interface SendStream : WritableStream /* of Uint8Array */ {
-  readonly attribute Promise&lt;StreamAbortInfo&gt; dropped;
-  undefined drop(optional StreamAbortInfo abortInfo = {});
+  readonly attribute Promise&lt;StreamAbortInfo&gt; remoteReset;
+  undefined reset(optional StreamAbortInfo abortInfo = {});
 };
 </pre>
 
@@ -1050,17 +1050,17 @@ initialization steps.
 
 ## Attributes ##  {#send-stream-attributes}
 
-: <dfn attribute for="SendStream">dropped</dfn>
-:: The `dropped` attribute represents a promise that is [=fulfilled=]
+: <dfn attribute for="SendStream">remoteReset</dfn>
+:: The `remoteReset` attribute represents a promise that is [=fulfilled=]
     when a message from the remote side aborting the stream is received.
     For QUIC, that message is a STOP_SENDING frame.
 
 ## Methods ##  {#send-stream-methods}
 
-: <dfn method for="SendStream">drop()</dfn>
+: <dfn method for="SendStream">reset()</dfn>
 :: A hard shutdown of the {{SendStream}}. It may be called regardless of
    whether the {{SendStream}} was created by the local or remote peer. When
-   the `drop` method is called, the user agent MUST run the following
+   the `reset` method is called, the user agent MUST run the following
    steps:
      1. Let |stream| be the {{SendStream}} object which is about to abort
         writing.
@@ -1086,7 +1086,7 @@ the user agent MUST queue a task to run the following:
       1. Let |reason| be the value from the STOP_SENDING frame from the remote side.
       1. Let |p| be the result of [=WritableStream/abort|aborting=] |stream|, with |reason|.
       1. Set |p|.[=[[PromiseIsHandled]]=] to true.
-      1. [=Resolve=] {{SendStream}}.{{SendStream/dropped}} with a new
+      1. [=Resolve=] {{SendStream}}.{{SendStream/remoteReset}} with a new
          {{StreamAbortInfo}} with the {{StreamAbortInfo/errorCode}} set to
          |reason|.
 
@@ -1199,7 +1199,7 @@ in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
     </thead>
     <tbody>
       <tr>
-        <td>{{BidirectionalStream/writable}}.{{OutgoingStream/drop}}({errorCode})</td>
+        <td>{{BidirectionalStream/writable}}.{{OutgoingStream/reset}}({errorCode})</td>
         <td>send RESET_STREAM with errorCode</td>
       </tr>
       <tr>
