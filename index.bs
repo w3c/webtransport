@@ -350,15 +350,8 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 1. Assert: |transport|'s [=[[IncomingDatagramsPullPromise]]=] is null.
 1. Let |queue| be |transport|'s [=[[IncomingDatagramsQueue]]=].
 1. If |queue| is empty, then:
-  1. Let |promise| be a new promise.
   1. Set |transport|'s [=[[IncomingDatagramsPullPromise]]=] to a new promise.
-  1. [=Upon fulfillment=] of |transport|'s [=[[IncomingDatagramsPullPromise]]=] with |bytes|, run
-     these steps:
-    1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
-    1. [=ReadableStream/Enqueue=] |chunk| to |transport|'s [=[[Datagrams]]=]' s
-       [=DatagramDuplexStream/[[Readable]]=].
-    1. [=Resolve=] |promise| with undefined.
-  1. Return |promise|.
+  1. Return |transport|'s [=[[IncomingDatagramsPullPromise]]=].
 1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
 1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
 1. [=ReadableStream/Enqueue=] |chunk| to |transport|'s [=[[Datagrams]]=]' s
@@ -386,12 +379,16 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
   1. Let |bytes| and |timestamp| be |queue|'s first element.
   1. If more than |duration| milliseconds have passed since |timestamp|, then [=dequeue=] |queue|.
   1. Otherwise, [=break=] this loop.
-1. If |queue| is not empty and |transport|'s [=[[IncomingDatagramsPullPromise]]=] is non-null, then
-   [=queue a global task=] on the [=network task source=] with |transport|'s
-   [=relevant global object=] and a task that runs the following steps:
+1. If |queue| is not empty and |transport|'s [=[[IncomingDatagramsPullPromise]]=] is non-null, then:
   1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
-  1. [=Resolve=] |transport|'s [=[[IncomingDatagramsPullPromise]]=] with |bytes|.
+  1. Let |promise| be |transport|'s [=[[IncomingDatagramsPullPromise]]=].
   1. Set |transport|'s [=[[IncomingDatagramsPullPromise]]=] to null.
+  1. [=queue a global task=] on the [=network task source=] with |transport|'s
+     [=relevant global object=] and a task that runs the following steps:
+    1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
+    1. [=ReadableStream/Enqueue=] |chunk| to |transport|'s [=[[Datagrams]]=]' s
+       [=DatagramDuplexStream/[[Readable]]=].
+    1. [=Resolve=] |promise| with undefined.
 
 The user agent SHOULD run [=receiveDatagrams=] for any {{WebTransport}} object whose
 [=[[State]]=] is `"connected"` as soon as reasonably possible whenever the algorithm can make
