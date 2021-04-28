@@ -1072,7 +1072,7 @@ initialization steps.
      1. If it hasn't started already, start the closing procedure by sending a
         RST_STREAM frame with its error code set to the value of |reason|.
      1. Let |p| be the result of [=WritableStream/abort|aborting=] |stream|, with |reason|.
-     1. Set |p|.[[PromiseIsHandled]] to true.
+     1. Set |p|.[=[[PromiseIsHandled]]=] to true.
 
 ## Procedures ##  {#send-stream-procedures}
 
@@ -1152,7 +1152,7 @@ queue a task to run the following:
       1. Let |reason| be the value from the message from the remote side.
       1. Let |p| be the result of [=ReadableStream/cancel|canceling=] |stream|,
          with |reason|.
-      1. Set |p|.[[PromiseIsHandled]] to true.
+      1. Set |p|.[=[[PromiseIsHandled]]=] to true.
 
 The {{ReceiveStream}}'s <dfn>cancelAlgorithm</dfn> (TODO) is:
      1. Let |stream| be the {{ReceiveStream}} object.
