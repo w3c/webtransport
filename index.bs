@@ -457,11 +457,12 @@ interface mixin DatagramTransport {
 ## Procedures ## {#datagrams-transport-procedures}
 
 To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
-1. Assert: |transport|'s [=[[IncomingDatagramsPullPromise]]=] is null.
-1. Let |queue| be |transport|'s [=[[IncomingDatagramsQueue]]=].
+1. Let |datagrams| be |transport|'s [=[[Datagrams]]=].
+1. Assert: |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] is null.
+1. Let |queue| be |datagrams|'s [=[[IncomingDatagramsQueue]]=].
 1. If |queue| is empty, then:
-  1. Set |transport|'s [=[[IncomingDatagramsPullPromise]]=] to a new promise.
-  1. Return |transport|'s [=[[IncomingDatagramsPullPromise]]=].
+  1. Set |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] to a new promise.
+  1. Return |datagrams|'s [=[[IncomingDatagramsPullPromise]]=].
 1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
 1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
 1. [=ReadableStream/Enqueue=] |chunk| to |transport|'s [=[[Datagrams]]=]' s
@@ -470,8 +471,8 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 
 To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
 1. Let |timestamp| be a timestamp representing now.
-1. Let |queue| be |transport|'s [=[[IncomingDatagramsQueue]]=].
-1. Let |duration| be |transport|'s [=[[IncomingDatagramsExpirationDuration]]=].
+1. Let |queue| be |datagrams|'s [=[[IncomingDatagramsQueue]]=].
+1. Let |duration| be |datagrams|'s [=[[IncomingDatagramsExpirationDuration]]=].
 1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
 1. Let |session| be |transport|'s [=[[Session]]=].
 1. While there are [=session/receive a datagram|available incoming datagrams=] on |session|:
@@ -479,22 +480,21 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
   1. Let |timestamp| be a timestamp representing now.
   1. Let |chunk| be a [=pair=] of |datagram| and |timestamp|.
   1. [=Enqueue=] |chunk| to |queue|.
-1. Let |toBeRemoved| be the length of |queue| minus |transport|'s
+1. Let |toBeRemoved| be the length of |queue| minus |datagrams|'s
    [=[[IncomingDatagramsHighWaterMark]]=].
 1. If |toBeRemoved| is positive, repeat [=dequeuing=] |queue| |toBeRemoved| times.
 1. While |queue| is not empty:
   1. Let |bytes| and |timestamp| be |queue|'s first element.
   1. If more than |duration| milliseconds have passed since |timestamp|, then [=dequeue=] |queue|.
   1. Otherwise, [=break=] this loop.
-1. If |queue| is not empty and |transport|'s [=[[IncomingDatagramsPullPromise]]=] is non-null, then:
+1. If |queue| is not empty and |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] is non-null, then:
   1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
-  1. Let |promise| be |transport|'s [=[[IncomingDatagramsPullPromise]]=].
-  1. Set |transport|'s [=[[IncomingDatagramsPullPromise]]=] to null.
+  1. Let |promise| be |datagrams|'s [=[[IncomingDatagramsPullPromise]]=].
+  1. Set |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] to null.
   1. [=Queue a global task=] on the [=network task source=] with |transport|'s
      [=relevant global object=] and a task that runs the following steps:
     1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
-    1. [=ReadableStream/Enqueue=] |chunk| to |transport|'s [=[[Datagrams]]=]'s
-       [=DatagramDuplexStream/[[Readable]]=].
+    1. [=ReadableStream/Enqueue=] |chunk| to |datagrams|'s [=DatagramDuplexStream/[[Readable]]=].
     1. [=Resolve=] |promise| with undefined.
 
 The user agent SHOULD run [=receiveDatagrams=] for any {{WebTransport}} object whose
@@ -509,9 +509,10 @@ The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
 1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of bytes which |data| represents.
 1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
-1. Enqueue |chunk| to |transport|'s [=[[OutgoingDatagramsQueue]]=].
-1. If the length of |transport|'s [=[[OutgoingDatagramsQueue]]=] is less than
-   |transport|'s [=[[OutgoingDatagramsHighWaterMark]]=], then [=resolve=] |promise| with undefined.
+1. Let |datagrams| be |transport|'s [=[[Datagrams]]=].
+1. Enqueue |chunk| to |datagrams|'s [=[[OutgoingDatagramsQueue]]=].
+1. If the length of |datagrams|'s [=[[OutgoingDatagramsQueue]]=] is less than
+   |datagrams|'s [=[[OutgoingDatagramsHighWaterMark]]=], then [=resolve=] |promise| with undefined.
 1. Return |promise|.
 
 Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
@@ -520,8 +521,8 @@ duration work well only when the web developer pays attention to
 {{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
 
 To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
-1. Let |queue| be |transport|'s [=[[OutgoingDatagramsQueue]]=].
-1. Let |duration| be |transport|'s [=[[OutgoingDatagramsExpirationDuration]]=].
+1. Let |queue| be |datagrams|'s [=[[OutgoingDatagramsQueue]]=].
+1. Let |duration| be |datagrams|'s [=[[OutgoingDatagramsExpirationDuration]]=].
 1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
 1. While |queue| is not empty:
   1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
@@ -572,6 +573,39 @@ A {{DatagramDuplexStream}} object has the following internal slots.
    <td><dfn>\[[Writable]]</dfn>
    <td class="non-normative">A {{WritableStream}} for outgoing datagrams.
   </tr>
+  <tr>
+   <td><dfn>\[[IncomingDatagramsQueue]]</dfn>
+   <td class="non-normative">A queue of [=pairs=] of an incoming datagram and a timestamp.
+  </tr>
+  <tr>
+   <td><dfn>\[[IncomingDatagramsPullPromise]]</dfn>
+   <td class="non-normative">A promise set by [=pullDatagrams=], to wait for an incoming datagram.
+  </tr>
+  <tr>
+   <td><dfn>\[[IncomingDatagramsHighWaterMark]]</dfn>
+   <td class="non-normative">An integer representing the [=high water mark=] of the incoming
+   datagrams.
+  </tr>
+  <tr>
+   <td><dfn>\[[IncomingDatagramsExpirationDuration]]</dfn>
+   <td class="non-normative">A {{double}} value representing the expiration duration for incoming
+   datagrams (in milliseconds), or null.
+  </tr>
+  <tr>
+   <td><dfn>\[[OutgoingDatagramsQueue]]</dfn>
+   <td class="non-normative">A queue of tuples of an outgoing datagram, a timestamp and a promise
+   which is resolved when the datagram is sent or discarded.
+  </tr>
+  <tr>
+   <td><dfn>\[[OutgoingDatagramsHighWaterMark]]</dfn>
+   <td class="non-normative">An integer representing the [=high water mark=] of the outgoing
+   datagrams.
+  </tr>
+  <tr>
+   <td><dfn>\[[OutgoingDatagramsExpirationDuration]]</dfn>
+   <td class="non-normative">A {{double}} value representing the expiration duration for outgoing
+   datagrams (in milliseconds), or null.
+  </tr>
  </tbody>
 </table>
 
@@ -586,6 +620,24 @@ A {{DatagramDuplexStream}} object has the following internal slots.
     :: |readable|
     : [=[[Writable]]=]
     :: |writable|
+    : [=[[IncomingDatagramsQueue]]=]
+    :: an empty queue
+    : [=[[IncomingDatagramsPullPromise]]=]
+    :: null
+    : [=[[IncomingDatagramsHighWaterMark]]=]
+    :: an [=implementation-defined=] integer
+    : [=[[IncomingDatagramsExpirationDuration]]=]
+    :: null
+    : [=[[OutgoingDatagramsQueue]]=]
+    :: an empty queue
+    : [=[[OutgoingDatagramsHighWaterMark]]=]
+    :: an [=implementation-defined=] integer
+       <div class="note">
+        <p>This implementation-defined value should be tuned to ensure decent throughput, without
+           jeopardizing the timeliness of transmitted data.</p>
+       </div>
+    : [=[[OutgoingDatagramsExpirationDuration]]=]
+    :: null
  1. Return |stream|.
 
 ## Attributes ##  {#duplex-stream-attributes}
@@ -667,38 +719,6 @@ A {{WebTransport}} object has the following internal slots.
    <td class="non-normative">A {{DatagramDuplexStream}}.
   </tr>
   <tr>
-   <td><dfn>\[[IncomingDatagramsQueue]]</dfn>
-   <td class="non-normative">A queue of [=pairs=] of an incoming datagram and a timestamp.
-  </tr>
-  <tr>
-   <td><dfn>\[[IncomingDatagramsPullPromise]]</dfn>
-   <td class="non-normative">A promise set by [=pullDatagrams=], to wait for an incoming datagram.
-  </tr>
-  <tr>
-   <td><dfn>\[[IncomingDatagramsHighWaterMark]]</dfn>
-   <td class="non-normative">An integer representing the [=high water mark=] of the incoming
-   datagrams.
-  </tr>
-  <tr>
-   <td><dfn>\[[IncomingDatagramsExpirationDuration]]</dfn>
-   <td class="non-normative">A {{double}} value representing the expiration duration for incoming
-   datagrams (in milliseconds), or null.
-  </tr>
-  <tr>
-   <td><dfn>\[[OutgoingDatagramsQueue]]</dfn>
-   <td class="non-normative">A queue of tuples of an outgoing datagram, a timestamp and a promise
-   which is resolved when the datagram is sent or discarded.
-  </tr>
-  <tr>
-   <td><dfn>\[[OutgoingDatagramsHighWaterMark]]</dfn>
-   <td class="non-normative">An integer representing the [=high water mark=] of the outgoing
-   datagrams.
-  </tr>
-  <tr>
-   <td><dfn>\[[OutgoingDatagramsExpirationDuration]]</dfn>
-   <td class="non-normative">A {{double}} value representing the expiration duration for outgoing
-   datagrams (in milliseconds), or null.
-  </tr>
   <tr>
    <td><dfn>\[[Session]]</dfn>
    <td class="non-normative">A [=WebTransport session=] for this {{WebTransport}} object, or null.
@@ -741,24 +761,6 @@ agent MUST run the following steps:
     :: a new promise
     : [=[[Datagrams]]=]
     :: |datagrams|
-    : [=[[IncomingDatagramsQueue]]=]
-    :: an empty queue
-    : [=[[IncomingDatagramsPullPromise]]=]
-    :: null
-    : [=[[IncomingDatagramsHighWaterMark]]=]
-    :: an [=implementation-defined=] integer
-    : [=[[IncomingDatagramsExpirationDuration]]=]
-    :: null
-    : [=[[OutgoingDatagramsQueue]]=]
-    :: an empty queue
-    : [=[[OutgoingDatagramsHighWaterMark]]=]
-    :: an [=implementation-defined=] integer
-       <div class="note">
-        <p>This implementation-defined value should be tuned to ensure decent throughput, without
-           jeopardizing the timeliness of transmitted data.</p>
-       </div>
-    : [=[[OutgoingDatagramsExpirationDuration]]=]
-    :: null
     : [=[[Session]]=]
     :: null
 1. Let |pullAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
