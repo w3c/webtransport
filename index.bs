@@ -1057,21 +1057,18 @@ initialization steps.
 
 ## Methods ##  {#send-stream-methods}
 
-: <dfn method for="SendStream">reset()</dfn>
+: <dfn method for="SendStream">reset(abortInfo)</dfn>
 :: A hard shutdown of the {{SendStream}}. It may be called regardless of
    whether the {{SendStream}} was created by the local or remote peer. When
    the `reset` method is called, the user agent MUST run the following
    steps:
-     1. Let |stream| be the {{SendStream}} object which is about to abort
-        writing.
-     1. Let |transport| be the {{WebTransport}}, which the |stream| was created
+     1. Let |transport| be the {{WebTransport}}, which [=this=] stream was created
         from.
-     1. Remove |stream| from the transport's [=[[OutgoingStreams]]=].
-     1. Let |abortInfo| be the first argument.
+     1. Remove [=this=] from the transport's [=[[OutgoingStreams]]=].
      1. Let |reason| be |abortInfo|.errorCode.
      1. If it hasn't started already, start the closing procedure by sending a
         RST_STREAM frame with its error code set to the value of |reason|.
-     1. Let |p| be the result of [=WritableStream/abort|aborting=] |stream|, with |reason|.
+     1. Let |p| be the result of [=WritableStream/abort|aborting=] [=this=], with |reason|.
      1. Set |p|.[=[[PromiseIsHandled]]=] to true.
 
 ## Procedures ##  {#send-stream-procedures}
@@ -1081,8 +1078,7 @@ the user agent MUST queue a task to run the following:
       1. Let |stream| be the {{SendStream}} object.
       1. Let |transport| be the {{WebTransport}}, which the |stream| was created
          from.
-      1. Remove |stream| from the |transport|'s [=[[OutgoingStreams]]=]
-         internal slot.
+      1. Remove |stream| from the |transport|'s [=[[OutgoingStreams]]=].
       1. Let |reason| be the value from the STOP_SENDING frame from the remote side.
       1. Let |p| be the result of [=WritableStream/abort|aborting=] |stream|, with |reason|.
       1. Set |p|.[=[[PromiseIsHandled]]=] to true.
