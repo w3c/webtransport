@@ -140,6 +140,115 @@ The terms [=fulfilled=], [=rejected=], [=resolved=], [=pending=] and
 The terms {{ReadableStream}} and {{WritableStream}} are defined in
 [[!WHATWG-STREAMS]].
 
+# Protocol concepts # {#protocol-concepts}
+
+A <dfn>WebTransport session</dfn> is a session of WebTransport over HTTP/3.
+There may be multiple [=WebTransport session=]s on one [=connection=], when pooling is enabled.
+
+[=WebTransport session=] has the following capabilities defined in [[!WEB-TRANSPORT-HTTP3]].
+
+<table class="data" dfn-for="session">
+ <thead>
+  <tr>
+   <th>capability
+   <th>definition
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>send a datagram</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
+  </tr>
+  <tr>
+   <td><dfn>receive a datagram</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
+  </tr>
+  <tr>
+   <td><dfn>create an [=stream/outgoing=] stream</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
+  </tr>
+  <tr>
+   <td><dfn>create a [=stream/bidirectional=] stream</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2)
+  </tr>
+  <tr>
+   <td><dfn>receive an [=stream/incoming=] stream</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
+  </tr>
+  <tr>
+   <td><dfn>receive a [=stream/bidirectional=] stream</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.3)
+  </tr>
+ </tbody>
+</table>
+
+To <dfn for=session>establish</dfn> a [=WebTransport session=], follow [[!WEB-TRANSPORT-HTTP3]]
+[section 3.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.3).
+
+To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an integer |code|,
+follow [[!WEB-TRANSPORT-HTTP3]]
+[section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
+
+<dfn>WebTransport stream</dfn> is a concept for HTTP/3 stream on a [=WebTransport session=].
+
+A [=WebTransport stream=] is one of <dfn for=stream>incoming</dfn>, <dfn for=stream>outgoing</dfn>
+or <dfn for=stream>bidirectional</dfn>.
+
+[=WebTransport stream=] has the following capabilities:
+
+<table class="data" dfn-for="stream">
+ <thead>
+  <tr>
+   <th>capability
+   <th>definition
+   <th>incoming
+   <th>outgoing
+   <th>bidirectional
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>send</dfn> bytes (potentially with FIN)
+   <td>[[!QUIC]]
+   [section 2.2](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-2.2)
+   <td>No
+   <td>Yes
+   <td>Yes
+  </tr>
+  <tr>
+   <td><dfn>receive</dfn> bytes (potentially with FIN)
+   <td>[[!QUIC]]
+   [section 2.2](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-2.2)
+   <td>Yes
+   <td>No
+   <td>Yes
+  </tr>
+  <tr>
+   <td><dfn>send STOP_SENDING</dfn>
+   <td>[[!QUIC]]
+   [section 3.5](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-3.5)
+   <td>Yes
+   <td>No
+   <td>Yes
+  </tr>
+  <tr>
+   <td><dfn>reset</dfn> a [=WebTransport stream=]
+   <td>[[!QUIC]]
+   [section 19.4](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-19.4)
+   <td>No
+   <td>Yes
+   <td>Yes
+  </tr>
+ </tbody>
+</table>
+
+
 # `UnidirectionalStreamsTransport` Mixin #  {#unidirectional-streams-transport}
 
 A {{UnidirectionalStreamsTransport}} can send and receive unidirectional
@@ -364,12 +473,9 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
 1. Let |queue| be |transport|'s [=[[IncomingDatagramsQueue]]=].
 1. Let |duration| be |transport|'s [=[[IncomingDatagramsExpirationDuration]]=].
 1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
-1. Let |connection| be |transport|'s [=[[Connection]]=].
-1. While there are available incoming datagrams on |connection|: [[!WEB-TRANSPORT-HTTP3]]
-
-  Issue: We should probably use "session" instead of "connection", to support pooling.
-
-  1. Let |datagram| be the first datagram, and remove it from |connection|.
+1. Let |session| be |transport|'s [=[[Session]]=].
+1. While there are [=session/receive a datagram|available incoming datagrams=] on |session|:
+  1. Let |datagram| be the result of [=session/receiving a datagram=] with |session|.
   1. Let |timestamp| be a timestamp representing now.
   1. Let |chunk| be a [=pair=] of |datagram| and |timestamp|.
   1. [=Enqueue=] |chunk| to |queue|.
@@ -397,6 +503,7 @@ progress.
 
 The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
 |data| as input. It is defined by running the following steps:
+1. Let |session| be |transport|'s [=[[Session]]=].
 1. Let |timestamp| be a timestamp representing now.
 1. If |data| is not a {{Uint8Array}} object, then return [=a promise rejected with=] a {{TypeError}}.
 1. Let |promise| be a new promise.
@@ -425,7 +532,7 @@ To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 1. While |queue| is not empty:
   1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
   1. If it is not possible to send |bytes| to the network immediately, then break this loop.
-  1. Send |bytes| to the network. [[!WEB-TRANSPORT-HTTP3]]
+  1. [=session/Send a datagram=], with |session| and |bytes|.
   1. [=Resolve=] |promise| with undefined.
   1. Remove the first element from |queue|.
 
@@ -546,8 +653,9 @@ A {{WebTransport}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>\[[Ready]]</dfn>
-   <td class="non-normative">A promise fulfilled when the associated {{WebTransport}} object is
-   ready to use, or rejected if it failed to connect.
+   <td class="non-normative">A promise fulfilled when the associated [=WebTransport session=]
+   gets [=session/established=], or rejected if the [=session/establish|establishment process=]
+   failed.
   </tr>
   <tr>
    <td><dfn>\[[Closed]]</dfn>
@@ -592,8 +700,8 @@ A {{WebTransport}} object has the following internal slots.
    datagrams (in milliseconds), or null.
   </tr>
   <tr>
-   <td><dfn>\[[Connection]]</dfn>
-   <td class="non-normative">A [=connection=] for this {{WebTransport}} object, or null.
+   <td><dfn>\[[Session]]</dfn>
+   <td class="non-normative">A [=WebTransport session=] for this {{WebTransport}} object, or null.
   </tr>
 </table>
 
@@ -651,7 +759,7 @@ agent MUST run the following steps:
        </div>
     : [=[[OutgoingDatagramsExpirationDuration]]=]
     :: null
-    : [=[[Connection]]=]
+    : [=[[Session]]=]
     :: null
 1. Let |pullAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
 1. Let |writeAlgorithm| be an action that runs [=writeDatagrams=] with |transport|.
@@ -683,14 +791,14 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
    |networkPartitionKey|, |url|'s [=url/origin=], false, [=obtain a connection/http3Only=] set to
    true, and [=obtain a connection/dedicated=] set to |dedicated|.
 1. If |connection| is failure, then reject |promise| with a {{TypeError}} and abort these steps.
-1. Set |transport|'s [=[[Connection]]=] to |connection|.
 1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
    represents the SETTINGS frame.
 1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
    contain H3_DATAGRAM with a value of 1, then reject |promise| with a {{TypeError}} and abort
    these steps.
-1. Create a WebTransport session with |connection|, as described in [[!WEB-TRANSPORT-HTTP3]].
+1. [=session/Establish=] a [=WebTransport session=] on |connection|.
 1. If the previous step fails, then reject |promise| with a {{TypeError}} and abort these steps.
+1. Set |transport|'s [=[[Session]]=] to the established [=WebTransport session=].
 1. Resolve |promise| with {{undefined}}.
 
 </div>
@@ -713,20 +821,16 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 
 ## Methods ##  {#webtransport-methods}
 
-: <dfn for="WebTransport" method>close()</dfn>
-:: Closes the WebTransport object. For a dedicated connection, this 
-   triggers an <dfn>Immediate Close</dfn> as described in [[!QUIC]] section 10.2.
+: <dfn for="WebTransport" method>close(closeInfo)</dfn>
+:: Terminates the [=WebTransport session=] associated with the WebTransport object.
 
    When close is called, the user agent MUST run the following steps:
-     1. Let |transport| be the WebTransport on which `close` is invoked.
+     1. Let |transport| be [=this=].
      1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`,
         then abort these steps.
      1. Set |transport|'s [=[[State]]=] to `"closed"`.
-     1. Let `closeInfo` be the first argument.
-     1. If the connection is dedicated, start the [=Immediate Close=] procedure
-        by sending an CONNECTION_CLOSE frame with its error code value set to the value
-        of {{WebTransportCloseInfo/errorCode}} and its reason value set to the
-        value of {{WebTransportCloseInfo/reason}}.
+     1. Let |session| be |transport|'s [=[[Session]]=].
+     1. [=session/Terminate=] |session| with |closeInfo|.{{WebTransportCloseInfo/errorCode}}.
 
 : <dfn for="WebTransport" method>getStats()</dfn>
 :: Gathers stats for this {{WebTransport}}'s HTTP/3
