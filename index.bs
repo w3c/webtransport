@@ -416,131 +416,6 @@ interface mixin BidirectionalStreamsTransport {
 
 </div>
 
-# `DatagramTransport` Mixin #  {#datagram-transport}
-
-A <dfn interface>DatagramTransport</dfn> can send and receive datagrams,
-as defined in [[!HTTP3-DATAGRAM]][[!QUIC-DATAGRAM]].
-Datagrams are sent out of order, unreliably, and have a limited maximum size.
-Datagrams are encrypted and congestion controlled.
-
-<pre class="idl">
-interface mixin DatagramTransport {
-    readonly attribute unsigned short maxDatagramSize;
-    readonly attribute DatagramDuplexStream datagrams;
-};
-</pre>
-
-## Attributes ##  {#datagram-transport-attributes}
-
-: <dfn for="DatagramTransport" attribute>maxDatagramSize</dfn>
-:: The maximum size data that may be passed to
-   {{DatagramTransport/datagrams}}' {{DatagramDuplexStream/writable}}.
-
-: <dfn for="DatagramTransport" attribute>datagrams</dfn>
-:: A single duplex stream for sending and receiving datagrams over this connection.
-
-   Each datagram received will be readable on the {{ReadableStream}} member.
-
-   If too many datagrams are queued because the stream is not being read quickly
-   enough, datagrams are dropped to avoid queueing. Implementations should drop older
-   datagrams in favor of newer datagrams. The number of datagrams to queue
-   should be kept small enough to avoid adding significant latency to packet
-   delivery when the stream is being read slowly (due to the reader being slow)
-   but large enough to avoid dropping packets when for the stream is not read
-   for short periods of time (due to the reader being paused).
-
-   Datagrams written to the returned {{WritableStream}} member will be sent.
-
-   The getter steps for the `datagrams` attribute SHALL be:
-     1. Return [=this=]'s [=[[Datagrams]]=].
-
-## Procedures ## {#datagrams-transport-procedures}
-
-To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
-1. Let |datagrams| be |transport|'s [=[[Datagrams]]=].
-1. Assert: |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] is null.
-1. Let |queue| be |datagrams|'s [=[[IncomingDatagramsQueue]]=].
-1. If |queue| is empty, then:
-  1. Set |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] to a new promise.
-  1. Return |datagrams|'s [=[[IncomingDatagramsPullPromise]]=].
-1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
-1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
-1. [=ReadableStream/Enqueue=] |chunk| to |transport|'s [=[[Datagrams]]=]' s
-   [=DatagramDuplexStream/[[Readable]]=].
-1. Return [=a promise resolved with=] undefined.
-
-To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
-1. Let |timestamp| be a timestamp representing now.
-1. Let |queue| be |datagrams|'s [=[[IncomingDatagramsQueue]]=].
-1. Let |duration| be |datagrams|'s [=[[IncomingDatagramsExpirationDuration]]=].
-1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
-1. Let |session| be |transport|'s [=[[Session]]=].
-1. While there are [=session/receive a datagram|available incoming datagrams=] on |session|:
-  1. Let |datagram| be the result of [=session/receiving a datagram=] with |session|.
-  1. Let |timestamp| be a timestamp representing now.
-  1. Let |chunk| be a [=pair=] of |datagram| and |timestamp|.
-  1. [=Enqueue=] |chunk| to |queue|.
-1. Let |toBeRemoved| be the length of |queue| minus |datagrams|'s
-   [=[[IncomingDatagramsHighWaterMark]]=].
-1. If |toBeRemoved| is positive, repeat [=dequeuing=] |queue| |toBeRemoved| times.
-1. While |queue| is not empty:
-  1. Let |bytes| and |timestamp| be |queue|'s first element.
-  1. If more than |duration| milliseconds have passed since |timestamp|, then [=dequeue=] |queue|.
-  1. Otherwise, [=break=] this loop.
-1. If |queue| is not empty and |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] is non-null, then:
-  1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
-  1. Let |promise| be |datagrams|'s [=[[IncomingDatagramsPullPromise]]=].
-  1. Set |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] to null.
-  1. [=Queue a global task=] on the [=network task source=] with |transport|'s
-     [=relevant global object=] and a task that runs the following steps:
-    1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
-    1. [=ReadableStream/Enqueue=] |chunk| to |datagrams|'s [=DatagramDuplexStream/[[Readable]]=].
-    1. [=Resolve=] |promise| with undefined.
-
-The user agent SHOULD run [=receiveDatagrams=] for any {{WebTransport}} object whose
-[=[[State]]=] is `"connected"` as soon as reasonably possible whenever the algorithm can make
-progress.
-
-The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
-|data| as input. It is defined by running the following steps:
-1. Let |session| be |transport|'s [=[[Session]]=].
-1. Let |timestamp| be a timestamp representing now.
-1. If |data| is not a {{Uint8Array}} object, then return [=a promise rejected with=] a {{TypeError}}.
-1. Let |promise| be a new promise.
-1. Let |bytes| be a copy of bytes which |data| represents.
-1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
-1. Let |datagrams| be |transport|'s [=[[Datagrams]]=].
-1. Enqueue |chunk| to |datagrams|'s [=[[OutgoingDatagramsQueue]]=].
-1. If the length of |datagrams|'s [=[[OutgoingDatagramsQueue]]=] is less than
-   |datagrams|'s [=[[OutgoingDatagramsHighWaterMark]]=], then [=resolve=] |promise| with undefined.
-1. Return |promise|.
-
-Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
-have been returned by [=writeDatagrams=] have been resolved. Hence the timestamp and the expiration
-duration work well only when the web developer pays attention to
-{{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
-
-To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
-1. Let |queue| be |datagrams|'s [=[[OutgoingDatagramsQueue]]=].
-1. Let |duration| be |datagrams|'s [=[[OutgoingDatagramsExpirationDuration]]=].
-1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
-1. While |queue| is not empty:
-  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-  1. If more than |duration| milliseconds have passed since |timestamp|, then:
-     1. [=Resolve=] |promise| with undefined.
-     1. Remove the first element from |queue|.
-  1. Otherwise, break this loop.
-1. While |queue| is not empty:
-  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-  1. If it is not possible to send |bytes| to the network immediately, then break this loop.
-  1. [=session/Send a datagram=], with |session| and |bytes|.
-  1. [=Resolve=] |promise| with undefined.
-  1. Remove the first element from |queue|.
-
-The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whose
-[=[[State]]=] is `"connected"` as soon as reasonably possible whenever the algorithm can make
-progress.
-
 # `DatagramDuplexStream` Interface #  {#duplex-stream}
 
 A <dfn interface>DatagramDuplexStream</dfn> is a generic duplex stream.
@@ -640,7 +515,7 @@ A {{DatagramDuplexStream}} object has the following internal slots.
     :: null
  1. Return |stream|.
 
-## Attributes ##  {#duplex-stream-attributes}
+## Attributes ##  {#datagram-duplex-stream-attributes}
 
 : <dfn for="DatagramDuplexStream" attribute>readable</dfn>
 :: The getter steps are:
@@ -650,12 +525,99 @@ A {{DatagramDuplexStream}} object has the following internal slots.
 :: The getter steps are:
      1. Return [=this=].`[[Writable]]`.
 
+## Procedures ## {#datagram-duplex-stream-procedures}
+
+To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
+1. Let |datagrams| be |transport|'s [=[[Datagrams]]=].
+1. Assert: |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] is null.
+1. Let |queue| be |datagrams|'s [=[[IncomingDatagramsQueue]]=].
+1. If |queue| is empty, then:
+  1. Set |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] to a new promise.
+  1. Return |datagrams|'s [=[[IncomingDatagramsPullPromise]]=].
+1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
+1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
+1. [=ReadableStream/Enqueue=] |chunk| to |transport|'s [=[[Datagrams]]=]' s
+   [=DatagramDuplexStream/[[Readable]]=].
+1. Return [=a promise resolved with=] undefined.
+
+To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
+1. Let |timestamp| be a timestamp representing now.
+1. Let |queue| be |datagrams|'s [=[[IncomingDatagramsQueue]]=].
+1. Let |duration| be |datagrams|'s [=[[IncomingDatagramsExpirationDuration]]=].
+1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
+1. Let |session| be |transport|'s [=[[Session]]=].
+1. While there are [=session/receive a datagram|available incoming datagrams=] on |session|:
+  1. Let |datagram| be the result of [=session/receiving a datagram=] with |session|.
+  1. Let |timestamp| be a timestamp representing now.
+  1. Let |chunk| be a [=pair=] of |datagram| and |timestamp|.
+  1. [=Enqueue=] |chunk| to |queue|.
+1. Let |toBeRemoved| be the length of |queue| minus |datagrams|'s
+   [=[[IncomingDatagramsHighWaterMark]]=].
+1. If |toBeRemoved| is positive, repeat [=dequeuing=] |queue| |toBeRemoved| times.
+1. While |queue| is not empty:
+  1. Let |bytes| and |timestamp| be |queue|'s first element.
+  1. If more than |duration| milliseconds have passed since |timestamp|, then [=dequeue=] |queue|.
+  1. Otherwise, [=break=] this loop.
+1. If |queue| is not empty and |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] is non-null, then:
+  1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
+  1. Let |promise| be |datagrams|'s [=[[IncomingDatagramsPullPromise]]=].
+  1. Set |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] to null.
+  1. [=Queue a global task=] on the [=network task source=] with |transport|'s
+     [=relevant global object=] and a task that runs the following steps:
+    1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
+    1. [=ReadableStream/Enqueue=] |chunk| to |datagrams|'s [=DatagramDuplexStream/[[Readable]]=].
+    1. [=Resolve=] |promise| with undefined.
+
+The user agent SHOULD run [=receiveDatagrams=] for any {{WebTransport}} object whose
+[=[[State]]=] is `"connected"` as soon as reasonably possible whenever the algorithm can make
+progress.
+
+The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
+|data| as input. It is defined by running the following steps:
+1. Let |session| be |transport|'s [=[[Session]]=].
+1. Let |timestamp| be a timestamp representing now.
+1. If |data| is not a {{Uint8Array}} object, then return [=a promise rejected with=] a {{TypeError}}.
+1. Let |promise| be a new promise.
+1. Let |bytes| be a copy of bytes which |data| represents.
+1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
+1. Let |datagrams| be |transport|'s [=[[Datagrams]]=].
+1. Enqueue |chunk| to |datagrams|'s [=[[OutgoingDatagramsQueue]]=].
+1. If the length of |datagrams|'s [=[[OutgoingDatagramsQueue]]=] is less than
+   |datagrams|'s [=[[OutgoingDatagramsHighWaterMark]]=], then [=resolve=] |promise| with undefined.
+1. Return |promise|.
+
+Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
+have been returned by [=writeDatagrams=] have been resolved. Hence the timestamp and the expiration
+duration work well only when the web developer pays attention to
+{{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
+
+To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
+1. Let |queue| be |datagrams|'s [=[[OutgoingDatagramsQueue]]=].
+1. Let |duration| be |datagrams|'s [=[[OutgoingDatagramsExpirationDuration]]=].
+1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
+1. While |queue| is not empty:
+  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
+  1. If more than |duration| milliseconds have passed since |timestamp|, then:
+     1. [=Resolve=] |promise| with undefined.
+     1. Remove the first element from |queue|.
+  1. Otherwise, break this loop.
+1. While |queue| is not empty:
+  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
+  1. If it is not possible to send |bytes| to the network immediately, then break this loop.
+  1. [=session/Send a datagram=], with |session| and |bytes|.
+  1. [=Resolve=] |promise| with undefined.
+  1. Remove the first element from |queue|.
+
+The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whose
+[=[[State]]=] is `"connected"` as soon as reasonably possible whenever the algorithm can make
+progress.
+
 # `WebTransport` Interface #  {#web-transport}
 
 `WebTransport` provides an API to the HTTP/3 transport functionality
 defined in [[!WEB-TRANSPORT-HTTP3]]. It implements all of the transport
-mixins ({{UnidirectionalStreamsTransport}}, {{BidirectionalStreamsTransport}},
-{{DatagramTransport}}), as well as stats and transport state information.
+mixins ({{UnidirectionalStreamsTransport}}, {{BidirectionalStreamsTransport}}),
+as well as stats and transport state information.
 
 <pre class="idl">
 [Exposed=(Window,Worker)]
@@ -668,11 +630,13 @@ interface WebTransport {
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   undefined close(optional WebTransportCloseInfo closeInfo = {});
   attribute EventHandler onstatechange;
+
+  readonly attribute unsigned short maxDatagramSize;
+  readonly attribute DatagramDuplexStream datagrams;
 };
 
 WebTransport includes UnidirectionalStreamsTransport;
 WebTransport includes BidirectionalStreamsTransport;
-WebTransport includes DatagramTransport;
 </pre>
 
 ## Internal slots ## {#webtransport-internal-slots}
@@ -820,6 +784,14 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 :: This event handler, of event handler event type `statechange`, MUST be fired
    any time the [=[[State]]=] changes, unless the state changes
    due to calling {{WebTransport/close}}.
+: <dfn for="WebTransport" attribute>maxDatagramSize</dfn>
+:: The maximum size data that may be passed to
+   {{DatagramTransport/datagrams}}' {{DatagramDuplexStream/writable}}.
+: <dfn for="WebTransport" attribute>datagrams</dfn>
+:: A single duplex stream for sending and receiving datagrams over this session.
+   The getter steps for the `datagrams` attribute SHALL be:
+     1. Return [=this=]'s [=[[Datagrams]]=].
+
 
 ## Methods ##  {#webtransport-methods}
 
