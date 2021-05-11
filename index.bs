@@ -1038,7 +1038,7 @@ that can be written to, to transmit data to the remote host.
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
 interface SendStream : WritableStream /* of Uint8Array */ {
-  readonly attribute Promise&lt;StreamAbortInfo&gt; remoteReset;
+  readonly attribute Promise&lt;StreamAbortInfo&gt; remoteCanceled;
   undefined reset(optional StreamAbortInfo abortInfo = {});
 };
 </pre>
@@ -1050,8 +1050,8 @@ initialization steps.
 
 ## Attributes ##  {#send-stream-attributes}
 
-: <dfn attribute for="SendStream">remoteReset</dfn>
-:: The `remoteReset` attribute represents a promise that is [=fulfilled=]
+: <dfn attribute for="SendStream">remoteCanceled</dfn>
+:: The `remoteCanceled` attribute represents a promise that is [=fulfilled=]
     when a message from the remote side aborting the stream is received.
     For QUIC, that message is a STOP_SENDING frame.
 
@@ -1067,40 +1067,39 @@ initialization steps.
      1. Remove [=this=] from the transport's [=[[OutgoingStreams]]=].
      1. Let |reason| be |abortInfo|.errorCode.
      1. If it hasn't started already, start the closing procedure by sending a
-        RST_STREAM frame with its error code set to the value of |reason|.
+        RESET_STREAM frame with its error code set to the value of |reason|.
      1. Let |p| be the result of [=WritableStream/abort|aborting=] [=this=], with |reason|.
      1. Set |p|.[=[[PromiseIsHandled]]=] to true.
 
 ## Procedures ##  {#send-stream-procedures}
 
-When a {{SendStream}} receives a STOP_SENDING frame from the remote side,
-the user agent MUST queue a task to run the following:
+When a {{SendStream}} receives a message from the remote side aborting the
+stream (for QUIC, that message is a STOP_SENDING frame), the user agent MUST
+queue a task to run the following:
       1. Let |stream| be the {{SendStream}} object.
       1. Let |transport| be the {{WebTransport}}, which the |stream| was created
          from.
       1. Remove |stream| from the |transport|'s [=[[OutgoingStreams]]=].
       1. Let |reason| be the value from the STOP_SENDING frame from the remote side.
-      1. Let |p| be the result of [=WritableStream/abort|aborting=] |stream|, with |reason|.
-      1. Set |p|.[=[[PromiseIsHandled]]=] to true.
-      1. [=Resolve=] {{SendStream}}.{{SendStream/remoteReset}} with a new
+      1. [=Resolve=] {{SendStream}}.{{SendStream/remoteCanceled}} with a new
          {{StreamAbortInfo}} with the {{StreamAbortInfo/errorCode}} set to
          |reason|.
 
-The {{SendStream}}'s <dfn>abortAlgorithm</dfn> (TODO) is:
-     1. Let |stream| be the {{ReceiveStream}} object.
+The {{SendStream}}'s <dfn>abortAlgorithm</dfn> is:
+     1. Let |stream| be the {{SendStream}} object.
      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
         from.
      1. Let |reason| be the first argument, if it is numeric, or 0.
-     1. If |stream| was aborted by a STOP_SENDING frame, abort these steps.
+     1. If |stream| has received a STOP_SENDING frame, abort these steps.
      1. If it hasn't started already, start the closing procedure by sending a
-        STOP_SENDING frame to the remote side, with its error code set to the
+        RESET_STREAM frame to the remote side, with its error code set to the
         value of |reason|.
 
 ## `StreamAbortInfo` Dictionary ##  {#stream-abort-info}
 
 The <dfn dictionary>StreamAbortInfo</dfn> dictionary includes information
 relating to the error code for aborting an incoming or outgoing stream (
-in either a RST_STREAM frame or a STOP_SENDING frame).
+in either a RESET_STREAM frame or a STOP_SENDING frame).
 
 <pre class="idl">
 dictionary StreamAbortInfo {
@@ -1134,28 +1133,26 @@ initialization steps.
 
 :: The `remoteReset` attribute represents a promise that is [=fulfilled=]
     when the a message from the remote side aborting the stream is received.
-    For QUIC, that message is a RST_STREAM frame.
+    For QUIC, that message is a RESET_STREAM frame.
 
 ## Procedures ##  {#receive-stream-procedures}
 
 When a {{ReceiveStream}} receives a message from the remote side aborting the
-stream (for QUIC, that message is an RST_STREAM frame), the user agent MUST
+stream (for QUIC, that message is an RESET_STREAM frame), the user agent MUST
 queue a task to run the following:
       1. Let |stream| be the {{ReceiveStream}} object for which the reset
          message was received.
       1. Let |transport| be the {{WebTransport}}, which the |stream| was created
          from.
       1. Let |reason| be the value from the message from the remote side.
-      1. Let |p| be the result of [=ReadableStream/cancel|canceling=] |stream|,
-         with |reason|.
-      1. Set |p|.[=[[PromiseIsHandled]]=] to true.
+      1. Error |stream| with |reason| (TODO).
 
-The {{ReceiveStream}}'s <dfn>cancelAlgorithm</dfn> (TODO) is:
+The {{ReceiveStream}}'s <dfn>cancelAlgorithm</dfn> is:
      1. Let |stream| be the {{ReceiveStream}} object.
      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
         from.
      1. Let |reason| be the first argument, if it is numeric, or 0.
-     1. If |stream| was canceled by a RST_STREAM frame, abort these steps.
+     1. If |stream| was received a RESET_STREAM frame, abort these steps.
      1. Start the closing procedure by sending a STOP_SENDING frame to the
         remote side, with its error code set to the value of |reason|.
 
