@@ -1081,6 +1081,7 @@ queue a task to run the following:
          from.
       1. Remove |stream| from the |transport|'s [=[[OutgoingStreams]]=].
       1. Let |reason| be the value from the STOP_SENDING frame from the remote side.
+      1. Perform ! [$WritableStreamStartErroring$](|stream|, |reason|).
       1. [=Resolve=] {{SendStream}}.{{SendStream/remoteCanceled}} with a new
          {{StreamAbortInfo}} with the {{StreamAbortInfo/errorCode}} set to
          |reason|.
@@ -1145,7 +1146,7 @@ queue a task to run the following:
       1. Let |transport| be the {{WebTransport}}, which the |stream| was created
          from.
       1. Let |reason| be the value from the message from the remote side.
-      1. Error |stream| with |reason| (TODO).
+      1. Perform ! [$ReadableStreamError$](|stream|, |reason|).
 
 The {{ReceiveStream}}'s <dfn>cancelAlgorithm</dfn> is:
      1. Let |stream| be the {{ReceiveStream}} object.
