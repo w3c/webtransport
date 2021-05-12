@@ -337,85 +337,6 @@ dictionary SendStreamParameters {
 };
 </pre>
 
-# `BidirectionalStreamsTransport` Mixin #  {#bidirectional-streams-transport}
-
-A {{BidirectionalStreamsTransport}} can send and receive bidirectional streams.
-Data within a stream is delivered in order, but data between streams may be
-delivered out of order. Data is generally sent reliably, but retransmissions
-may be disabled or the stream may aborted to produce a form of unreliability.
-All stream data is encrypted and congestion-controlled.
-
-<pre class="idl">
-interface mixin BidirectionalStreamsTransport {
-    Promise&lt;BidirectionalStream&gt; createBidirectionalStream();
-    /* a ReadableStream of BidirectionalStream objects */
-    readonly attribute ReadableStream incomingBidirectionalStreams;
-};
-</pre>
-
-
-## Methods ##  {#bidirectional-streams-transport-methods}
-
-: <dfn for="BidirectionalStreamsTransport" method>createBidirectionalStream()</dfn>
-:: Creates a {{BidirectionalStream}} object for an outgoing bidirectional
-   stream.  Note that in some transports, the mere creation of a stream is not
-   immediately visible to the peer until it is used to send data.
-
-   When `createBidirectionalStream` is called, the user agent MUST run the
-   following steps:
-
-   1. Let |transport| be the {{BidirectionalStreamsTransport}} on which
-      {{BidirectionalStreamsTransport/createBidirectionalStream}} is invoked.
-   1. If |transport|'s {{WebTransport/state}} is `"closed"` or `"failed"`,
-      immediately return a new [=rejected=] promise with a newly created
-      {{InvalidStateError}} and abort these steps.
-   1. Let |p| be a new promise.
-   1. Return |p| and continue the remaining steps [=in parallel=].
-   1. [=BidirectionalStream/Create=] a {{BidirectionalStream}} with |transport|
-      and |p| when all of the following conditions are met:
-       1. The |transport|'s {{WebTransport/state}} is `"connected"`.
-       1. Stream creation flow control is not being violated by exceeding the
-          max stream limit set by the remote endpoint, as specified in
-          [[!QUIC]].
-       1. |p| has not been [=settled=].
-   1. Queue a task to [=reject=] |p| with a newly created {{InvalidStateError}}
-      when all of the following conditions are met:
-       1. The |transport|'s state is `"closed"` or `"failed"`.
-       1. |p| has not been [=settled=].
-
-: <dfn for="BidirectionalStreamsTransport" attribute>incomingBidirectionalStreams</dfn>
-:: Returns a {{ReadableStream}} of {{BidirectionalStream}}s that have been
-   received from the remote host.
-
-   The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
-
-     1. Return [=[[ReceivedBidirectionalStreams]]=].
-     1. For each bidirectional stream received, create a corresponding
-        {{BidirectionalStream}} and insert it into [=[[ReceivedBidirectionalStreams]]=].
-        As data is received over the bidirectional stream, insert that data into the
-        corresponding {{BidirectionalStream}}.  When the remote side closes or aborts
-        the stream, close or abort the corresponding {{BidirectionalStream}}.
-
-## Procedures ##  {#bidirectional-streams-transport-procedures}
-
-### Add BidirectionalStream to BidirectionalStreamsTransport ### {#add-bidirectionalstream}
-
-<div algorithm="create a BidirectionalStream">
-
- To <dfn export for="BidirectionalStream" lt="create|creating">create</dfn> a
- {{BidirectionalStream}} given a <var>transport</var> and a promise |p|, run
-  the following steps:
-
-1. Reserve a bidirectional stream |association| in the underlying transport.
-1. Queue a task to run the following sub-steps:
-  1. If |transport|'s state is `"closed"` or `"failed"`, abort these sub-steps.
-  1. Let |stream| be a newly created {{BidirectionalStream}} object for |association|.
-  1. Add |stream| to |transport|'s [=[[ReceivedBidirectionalStreams]]=].
-  1. Add |stream| to |transport|'s [=[[OutgoingStreams]]=].
-  1. Resolve |p| with |stream|.
-
-</div>
-
 # `DatagramDuplexStream` Interface #  {#duplex-stream}
 
 A <dfn interface>DatagramDuplexStream</dfn> is a generic duplex stream.
@@ -615,8 +536,7 @@ progress.
 # `WebTransport` Interface #  {#web-transport}
 
 `WebTransport` provides an API to the HTTP/3 transport functionality
-defined in [[!WEB-TRANSPORT-HTTP3]]. It implements all of the transport
-mixins ({{UnidirectionalStreamsTransport}}, {{BidirectionalStreamsTransport}}),
+defined in [[!WEB-TRANSPORT-HTTP3]]. It implements {{UnidirectionalStreamsTransport}}
 as well as stats and transport state information.
 
 <pre class="idl">
@@ -633,10 +553,13 @@ interface WebTransport {
 
   readonly attribute unsigned short maxDatagramSize;
   readonly attribute DatagramDuplexStream datagrams;
+
+  Promise&lt;BidirectionalStream&gt; createBidirectionalStream();
+  /* a ReadableStream of BidirectionalStream objects */
+  readonly attribute ReadableStream incomingBidirectionalStreams;
 };
 
 WebTransport includes UnidirectionalStreamsTransport;
-WebTransport includes BidirectionalStreamsTransport;
 </pre>
 
 ## Internal slots ## {#webtransport-internal-slots}
@@ -791,6 +714,18 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 :: A single duplex stream for sending and receiving datagrams over this session.
    The getter steps for the `datagrams` attribute SHALL be:
      1. Return [=this=]'s [=[[Datagrams]]=].
+: <dfn for="WebTransport" attribute>incomingBidirectionalStreams</dfn>
+:: Returns a {{ReadableStream}} of {{BidirectionalStream}}s that have been
+   received from the remote host.
+
+   The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
+
+     1. Return [=[[ReceivedBidirectionalStreams]]=].
+     1. For each bidirectional stream received, create a corresponding
+        {{BidirectionalStream}} and insert it into [=[[ReceivedBidirectionalStreams]]=].
+        As data is received over the bidirectional stream, insert that data into the
+        corresponding {{BidirectionalStream}}.  When the remote side closes or aborts
+        the stream, close or abort the corresponding {{BidirectionalStream}}.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -818,6 +753,47 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
          1. Gather the stats from the underlying QUIC connection.
          1. Once stats have been gathered, resolve |p| with the
             {{WebTransportStats}} object, representing the gathered stats.
+
+: <dfn for="WebTransport" method>createBidirectionalStream()</dfn>
+:: Creates a {{BidirectionalStream}} object for an outgoing bidirectional
+   stream.  Note that in some transports, the mere creation of a stream is not
+   immediately visible to the peer until it is used to send data.
+
+   When `createBidirectionalStream` is called, the user agent MUST run the
+   following steps:
+
+   1. Let |transport| be [=this=].
+   1. If |transport|'s {{WebTransport/state}} is `"closed"` or `"failed"`,
+      immediately return a new [=rejected=] promise with a newly created
+      {{InvalidStateError}} and abort these steps.
+   1. Let |p| be a new promise.
+   1. Return |p| and continue the remaining steps [=in parallel=].
+   1. [=WebTransport/create a BidirectionalStream=] with |transport|
+      and |p| when all of the following conditions are met:
+       1. The |transport|'s {{WebTransport/state}} is `"connected"`.
+       1. Stream creation flow control is not being violated by exceeding the
+          max stream limit set by the remote endpoint, as specified in
+          [[!QUIC]].
+       1. |p| has not been [=settled=].
+   1. Queue a task to [=reject=] |p| with a newly created {{InvalidStateError}}
+      when all of the following conditions are met:
+       1. The |transport|'s state is `"closed"` or `"failed"`.
+       1. |p| has not been [=settled=].
+
+<div algorithm="create a BidirectionalStream">
+
+ To <dfn for="WebTransport">create a {{BidirectionalStream}}</dfn>
+ given a <var>transport</var> and a promise |p|, run the following steps:
+
+1. Reserve a bidirectional stream |association| in the underlying transport.
+1. Queue a task to run the following sub-steps:
+  1. If |transport|'s state is `"closed"` or `"failed"`, abort these sub-steps.
+  1. Let |stream| be a newly created {{BidirectionalStream}} object for |association|.
+  1. Add |stream| to |transport|'s [=[[ReceivedBidirectionalStreams]]=].
+  1. Add |stream| to |transport|'s [=[[OutgoingStreams]]=].
+  1. Resolve |p| with |stream|.
+
+</div>
 
 ## Configuration ##  {#web-transport-configuration}
 
