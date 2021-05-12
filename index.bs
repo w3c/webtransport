@@ -1066,10 +1066,11 @@ initialization steps.
         from.
      1. Remove [=this=] from the transport's [=[[OutgoingStreams]]=].
      1. Let |reason| be |abortInfo|.errorCode.
-     1. If it hasn't started already, start the closing procedure by sending a
-        RESET_STREAM frame with its error code set to the value of |reason|.
      1. Let |p| be the result of [=WritableStream/abort|aborting=] [=this=], with |reason|.
      1. Set |p|.[=[[PromiseIsHandled]]=] to true.
+     1. If it hasn't been done already, [=in parallel=], [=reset=] [=this=]
+        [=WebTransport stream=] with |reason| as the Application Protocol Error
+         Code.
 
 ## Procedures ##  {#send-stream-procedures}
 
@@ -1092,9 +1093,9 @@ The {{SendStream}}'s <dfn>abortAlgorithm</dfn> is:
         from.
      1. Let |reason| be the first argument, if it is numeric, or 0.
      1. If |stream| has received a STOP_SENDING frame, abort these steps.
-     1. If it hasn't started already, start the closing procedure by sending a
-        RESET_STREAM frame to the remote side, with its error code set to the
-        value of |reason|.
+     1. If it hasn't been done already, [=in parallel=], [=reset=] |stream|'s
+        [=WebTransport stream=] with |reason| as the Application Protocol Error
+         Code.
 
 ## `StreamAbortInfo` Dictionary ##  {#stream-abort-info}
 
@@ -1153,9 +1154,10 @@ The {{ReceiveStream}}'s <dfn>cancelAlgorithm</dfn> is:
      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
         from.
      1. Let |reason| be the first argument, if it is numeric, or 0.
-     1. If |stream| was received a RESET_STREAM frame, abort these steps.
-     1. Start the closing procedure by sending a STOP_SENDING frame to the
-        remote side, with its error code set to the value of |reason|.
+     1. If |stream| has received a RESET_STREAM frame, abort these steps.
+     1. [=In parallel=], [=send STOP_SENDING=] over |stream|'s
+        [=WebTransport stream=] with |reason| as the Application Protocol Error
+         Code.
 
 # Interface `BidirectionalStream` #  {#bidirectional-stream}
 
