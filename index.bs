@@ -1280,7 +1280,7 @@ enough.
 <pre class="example" highlight="js">
 async function receiveDatagrams(url) {
   const wt = new WebTransport(url);
-  for await (const datagram of wt.datagrams.readable) {
+  for await (const datagram of wt.datagrams.readable.getReader()) {
     // Process the datagram
   }
 }
