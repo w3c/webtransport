@@ -1280,7 +1280,7 @@ enough.
 <pre class="example" highlight="js">
 async function receiveDatagrams(url) {
   const wt = new WebTransport(url);
-  for await (const datagram of wt.datagrams.readable.getReader()) {
+  for await (const datagram of wt.datagrams.readable) {
     // Process the datagram
   }
 }
@@ -1332,7 +1332,7 @@ async function receiveData(url, processTheData) {
     // consume streams individually, reporting per-stream errors
     ((async () => {
       try {
-        for await (const chunk of readable.getReader()) {
+        for await (const chunk of readable) {
           processTheData(chunk);
         }
       } catch (e) {
