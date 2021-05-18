@@ -258,6 +258,11 @@ A <dfn interface>DatagramDuplexStream</dfn> is a generic duplex stream.
 interface DatagramDuplexStream {
   readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
+
+  undefined setIncomingExpirationDuration(double ms);
+  undefined setOutgoingExpirationDuration(double ms);
+  undefined setIncomingHighWaterMark(long highWaterMark);
+  undefined setOutgoingHighWaterMark(long highWaterMark);
 };
 </pre>
 
@@ -357,6 +362,33 @@ A {{DatagramDuplexStream}} object has the following internal slots.
 : <dfn for="DatagramDuplexStream" attribute>writable</dfn>
 :: The getter steps are:
      1. Return [=this=].`[[Writable]]`.
+
+
+## Methods ##  {#datagram-duplex-stream-attributes}
+
+: <dfn for="DatagramDuplexStream" method>setIncomingExpirationDuration(ms)</dfn>
+:: Sets the expiration duration (in milliseconds) for incoming datagrams.
+
+   When the method is called, the user agent MUST run the following step:
+     1. Set [=this=]'s [=[[IncomingDatagramsExpirationDuration]]=] to |ms|.
+
+: <dfn for="DatagramDuplexStream" method>setOutgoingExpirationDuration(ms)</dfn>
+:: Sets the expiration duration (in milliseconds) for outgoing datagrams.
+
+   When the method is called, the user agent MUST run the following step:
+     1. Set [=this=]'s [=[[OutgoingDatagramsExpirationDuration]]=] to |ms|.
+
+: <dfn for="DatagramDuplexStream" method>setIncomingHighWaterMark(highWaterMark)</dfn>
+:: Sets the high water mark for incoming datagrams.
+
+   When the method is called, the user agent MUST run the following step:
+     1. Set [=this=]'s [=[[IncomingDatagramsHighWaterMark]]=] to |highWaterMark|.
+
+: <dfn for="DatagramDuplexStream" method>setOutgoingHighWaterMark(highWaterMark)</dfn>
+:: Sets the high water mark for outgoing datagrams.
+
+   When the method is called, the user agent MUST run the following step:
+     1. Set [=this=]'s [=[[OutgoingDatagramsHighWaterMark]]=] to |highWaterMark|.
 
 ## Procedures ## {#datagram-duplex-stream-procedures}
 
