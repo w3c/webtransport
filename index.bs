@@ -833,14 +833,14 @@ To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |re
 1. Set |transport|'s [=[[ReceiveStreams]]=] to an empty [=set=].
 1. If |abruptly| is true, then set |transport|'s [=[[State]]=] to `"failed"`.
 1. Otherwise, set |transport|'s [=[[State]]=] to `"closed"`.
+1. [=For each=] |sendStream| in |sendStreams|, [=WritableStream/error=] |sendStream| with |error|.
+1. [=For each=] |receiveStream| in |receiveStreams|, [=ReadableStream/error=] |receiveStream|
+   with |error|.
 
   Note: Script authors can inject code which runs in Promise resolution synchronously. Hence
   from here, do not touch |transport| as it may be mutated by scripts in an unpredicted way.
   This applies to logic calling this procedure, too.
 
-1. [=For each=] |sendStream| in |sendStreams|, [=WritableStream/error=] |sendStream| with |error|.
-1. [=For each=] |receiveStream| in |receiveStreams|, [=ReadableStream/error=] |receiveStream|
-   with |error|.
 1. If |abruptly| is true, then:
   1. [=Reject=] |closed| with |error|.
   1. If |ready| is not [=settled=], then [=reject=] |ready| with |error|.
