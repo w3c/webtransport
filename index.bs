@@ -668,6 +668,30 @@ agent MUST run the following steps:
    1. Reject |transport|'s [=[[Closed]]=] with |error|.
 1. Return |transport|.
 
+<div algorithm="initialize WebTransport over HTTP">
+To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
+<var>transport</var>, a [=URL record=] |url|, and a boolean |dedicated|, run these steps.
+
+1. Let |promise| be a new promise.
+1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
+   |transport|'s [=relevant settings object=].
+1. Return |promise| and run the following steps [=in parallel=].
+1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
+   |networkPartitionKey|, |url|'s [=url/origin=], false, [=obtain a connection/http3Only=] set to
+   true, and [=obtain a connection/dedicated=] set to |dedicated|.
+1. If |connection| is failure, then reject |promise| with a {{TypeError}} and abort these steps.
+1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
+   represents the SETTINGS frame.
+1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
+   contain H3_DATAGRAM with a value of 1, then reject |promise| with a {{TypeError}} and abort
+   these steps.
+1. [=session/Establish=] a [=WebTransport session=] on |connection|.
+1. If the previous step fails, then reject |promise| with a {{TypeError}} and abort these steps.
+1. Set |transport|'s [=[[Session]]=] to the established [=WebTransport session=].
+1. Resolve |promise| with {{undefined}}.
+
+</div>
+
 ## Attributes ##  {#webtransport-attributes}
 
 : <dfn for="WebTransport" attribute>state</dfn>
@@ -761,30 +785,6 @@ agent MUST run the following steps:
 
 ## Procedures ##  {#webtransport-procedures}
 
-<div algorithm="initialize WebTransport over HTTP">
-To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
-<var>transport</var>, a [=URL record=] |url|, and a boolean |dedicated|, run these steps.
-
-1. Let |promise| be a new promise.
-1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
-   |transport|'s [=relevant settings object=].
-1. Return |promise| and run the following steps [=in parallel=].
-1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
-   |networkPartitionKey|, |url|'s [=url/origin=], false, [=obtain a connection/http3Only=] set to
-   true, and [=obtain a connection/dedicated=] set to |dedicated|.
-1. If |connection| is failure, then reject |promise| with a {{TypeError}} and abort these steps.
-1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
-   represents the SETTINGS frame.
-1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
-   contain H3_DATAGRAM with a value of 1, then reject |promise| with a {{TypeError}} and abort
-   these steps.
-1. [=session/Establish=] a [=WebTransport session=] on |connection|.
-1. If the previous step fails, then reject |promise| with a {{TypeError}} and abort these steps.
-1. Set |transport|'s [=[[Session]]=] to the established [=WebTransport session=].
-1. Resolve |promise| with {{undefined}}.
-
-</div>
-
 <div algorithm="create a BidirectionalStream">
 
  To <dfn for="WebTransport">create a {{BidirectionalStream}}</dfn>
@@ -797,28 +797,6 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
   1. Add |stream| to |transport|'s [=[[ReceivedBidirectionalStreams]]=].
   1. Add |stream| to |transport|'s [=[[OutgoingStreams]]=].
   1. Resolve |p| with |stream|.
-
-</div>
-
-<div algorithm="compute a certificate fingerprint">
-To <dfn>compute a certificate fingerprint</dfn>, do the following:
-1. Let |cert| be the input certificate, represented as a DER encoding of
-   Certificate message defined in [[!RFC5280]].
-1. Compute the SHA-256 hash of |cert|.  Format it as `fingerprint` BNF
-   rule described in Section 5 of [[!RFC8122]].
-
-</div>
-
-<div algorithm="verify a certificate fingerprint">
-To <dfn>verify a certificate fingerprint</dfn>, do the following:
-1. Let |fingerprints| be the input array of fingerprints.
-1. Let |referenceFingerprint| be the [=compute a certificate fingerprint|computed
-   fingerprint=] of the input certificate.
-1. For every fingerprint |fingerprint| in |fingerprints|:
-   1. If {{RTCDtlsFingerprint/algorithm}} of |fingerprint| is equal to "sha-256",
-      and {{RTCDtlsFingerprint/value}} of |fingerprint| is equal to
-      |referenceFingerprint|, the certificate is valid.  Return true.
-1. Return false.
 
 </div>
 
@@ -879,6 +857,28 @@ that determine how WebTransport connection is established and used.
    SHALL use certificate verification procedures it would use for normal
    [=fetch=] operations.
 :: This cannot be used with {{WebTransportOptions/allowPooling}}.
+
+<div algorithm="compute a certificate fingerprint">
+To <dfn>compute a certificate fingerprint</dfn>, do the following:
+1. Let |cert| be the input certificate, represented as a DER encoding of
+   Certificate message defined in [[!RFC5280]].
+1. Compute the SHA-256 hash of |cert|.  Format it as `fingerprint` BNF
+   rule described in Section 5 of [[!RFC8122]].
+
+</div>
+
+<div algorithm="verify a certificate fingerprint">
+To <dfn>verify a certificate fingerprint</dfn>, do the following:
+1. Let |fingerprints| be the input array of fingerprints.
+1. Let |referenceFingerprint| be the [=compute a certificate fingerprint|computed
+   fingerprint=] of the input certificate.
+1. For every fingerprint |fingerprint| in |fingerprints|:
+   1. If {{RTCDtlsFingerprint/algorithm}} of |fingerprint| is equal to "sha-256",
+      and {{RTCDtlsFingerprint/value}} of |fingerprint| is equal to
+      |referenceFingerprint|, the certificate is valid.  Return true.
+1. Return false.
+
+</div>
 
 The <dfn>custom certificate requirements</dfn> are as follows: the certificate
 MUST be an X.509v3 certificate as defined in [[!RFC5280]], the current time
