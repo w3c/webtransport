@@ -713,7 +713,7 @@ agent MUST run the following steps:
      1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`,
         then abort these steps.
      1. Let |session| be |transport|'s [=[[Session]]=].
-     1. [=session/Terminate=] |session| with |closeInfo|.{{WebTransportCloseInfo/errorCode}}.
+     1. In parallel, [=session/terminate=] |session| with |closeInfo|.{{WebTransportCloseInfo/errorCode}}.
 
        Note: This also [=resets=] or [=sends STOP_SENDING=] [=WebTransport streams=] contained in
        |transport|'s [=[[SendStreams]]=] and [=[[ReceiveStreams]]=].
