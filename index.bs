@@ -367,25 +367,33 @@ A {{DatagramDuplexStream}} object has the following internal slots.
 :: The getter steps are:
      1. Return [=this=]'s [=[[IncomingDatagramsExpirationDuration]]=].
 :: The setter steps are:
-     1. Set [=this=]'s [=[[IncomingDatagramsExpirationDuration]]=] to the given value.
+     1. Let |value| be the given value.
+     1. If |value| > 0:
+       1. Set [=this=]'s [=[[IncomingDatagramsExpirationDuration]]=] to |value|.
 
 : <dfn for="DatagramDuplexStream" attribute>outgoingMaxAge</dfn>
 :: The getter steps are:
      1. Return [=this=]'s [=[[OutgoingDatagramsExpirationDuration]]=].
 :: The setter steps are:
-     1. Set [=this=]'s [=[[OutgoingDatagramsExpirationDuration]]=] to the given value.
+     1. Let |value| be the given value.
+     1. If |value| > 0:
+       1. Set [=this=]'s [=[[OutgoingDatagramsExpirationDuration]]=] to |value|.
 
 : <dfn for="DatagramDuplexStream" attribute>incomingHighWaterMark</dfn>
 :: The getter steps are:
      1. Return [=this=]'s [=[[IncomingDatagramsHighWaterMark]]=].
 :: The setter steps are:
-     1. Set [=this=]'s [=[[IncomingDatagramsHighWaterMark]]=] to the given value.
+     1. Let |value| be the given value.
+     1. If |value| >= 0:
+       1. Set [=this=]'s [=[[IncomingDatagramsHighWaterMark]]=] to |value|.
 
 : <dfn for="DatagramDuplexStream" attribute>outgoingHighWaterMark</dfn>
 :: The getter steps are:
      1. Return [=this=]'s [=[[OutgoingDatagramsHighWaterMark]]=].
 :: The setter steps are:
-     1. Set [=this=]'s [=[[OutgoingDatagramsHighWaterMark]]=] to the given value.
+     1. Let |value| be the given value.
+     1. If |value| >= 0:
+       1. Set [=this=]'s [=[[OutgoingDatagramsHighWaterMark]]=] to |value|.
 
 ## Procedures ## {#datagram-duplex-stream-procedures}
 
