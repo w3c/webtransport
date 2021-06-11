@@ -575,6 +575,15 @@ A {{WebTransport}} object has the following internal slots.
  </thead>
  <tbody>
   <tr>
+   <td><dfn>\[[SendStreams]]</dfn>
+   <td class="non-normative">An [=ordered set=] of {{SendStream}} objects owned by this {{WebTransport}}.
+  </tr>
+  <tr>
+   <td><dfn>\[[ReceiveStreams]]</dfn>
+   <td class="non-normative">An [=ordered set=] of {{ReceiveStream}} objects owned by this
+   {{WebTransport}}.
+  </tr>
+  <tr>
    <td><dfn>\[[OutgoingStreams]]</dfn>
    <td class="non-normative">A sequence of {{SendStream}} objects.
   </tr>
@@ -634,6 +643,10 @@ agent MUST run the following steps:
    {{DatagramDuplexStream}}, its [=DatagramDuplexStream/create/readable=] set to
    |incomingDatagrams| and its [=DatagramDuplexStream/create/writable=] set to |outgoingDatagrams|.
 1. Let |transport| be a newly constructed {{WebTransport}} object, with:
+    : [=[[SendStreams]]=]
+    :: an empty [=ordered set=]
+    : [=[[ReceiveStreams]]=]
+    :: an empty [=ordered set=]
     : [=[[OutgoingStreams]]=]
     :: empty
     : [=[[ReceivedStreams]]=]
