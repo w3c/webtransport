@@ -575,6 +575,15 @@ A {{WebTransport}} object has the following internal slots.
  </thead>
  <tbody>
   <tr>
+   <td><dfn>\[[SendStreams]]</dfn>
+   <td class="non-normative">An [=ordered set=] of {{SendStream}} objects owned by this {{WebTransport}}.
+  </tr>
+  <tr>
+   <td><dfn>\[[ReceiveStreams]]</dfn>
+   <td class="non-normative">An [=ordered set=] of {{ReceiveStream}} objects owned by this
+   {{WebTransport}}.
+  </tr>
+  <tr>
    <td><dfn>\[[OutgoingStreams]]</dfn>
    <td class="non-normative">A sequence of {{SendStream}} objects.
   </tr>
@@ -634,6 +643,10 @@ agent MUST run the following steps:
    {{DatagramDuplexStream}}, its [=DatagramDuplexStream/create/readable=] set to
    |incomingDatagrams| and its [=DatagramDuplexStream/create/writable=] set to |outgoingDatagrams|.
 1. Let |transport| be a newly constructed {{WebTransport}} object, with:
+    : [=[[SendStreams]]=]
+    :: an empty [=ordered set=]
+    : [=[[ReceiveStreams]]=]
+    :: an empty [=ordered set=]
     : [=[[OutgoingStreams]]=]
     :: empty
     : [=[[ReceivedStreams]]=]
@@ -736,9 +749,12 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
      1. Let |transport| be [=this=].
      1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`,
         then abort these steps.
-     1. Set |transport|'s [=[[State]]=] to `"closed"`.
      1. Let |session| be |transport|'s [=[[Session]]=].
-     1. [=session/Terminate=] |session| with |closeInfo|.{{WebTransportCloseInfo/errorCode}}.
+     1. In parallel, [=session/terminate=] |session| with |closeInfo|.{{WebTransportCloseInfo/errorCode}}.
+
+       Note: This also [=resets=] or [=sends STOP_SENDING=] [=WebTransport streams=] contained in
+       |transport|'s [=[[SendStreams]]=] and [=[[ReceiveStreams]]=].
+     1. [=Cleanup=] |transport| with |closeInfo|, an {{AbortError}} and false.
 
 : <dfn for="WebTransport" method>getStats()</dfn>
 :: Gathers stats for this {{WebTransport}}'s HTTP/3
@@ -780,6 +796,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
        1. The |transport|'s state is `"closed"` or `"failed"`.
        1. |p| has not been [=settled=].
 
+## Procedures ##  {#webtransport-procedures}
+
 <div algorithm="create a BidirectionalStream">
 
  To <dfn for="WebTransport">create a {{BidirectionalStream}}</dfn>
@@ -792,6 +810,34 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
   1. Add |stream| to |transport|'s [=[[ReceivedBidirectionalStreams]]=].
   1. Add |stream| to |transport|'s [=[[OutgoingStreams]]=].
   1. Resolve |p| with |stream|.
+
+</div>
+
+<div algorithm="cleanup a WebTransport">
+To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |reason|,
+|error| and a boolean |abruptly|, run these steps:
+1. Let |sendStreams| be a copy of |transport|'s [=[[SendStreams]]=].
+1. Let |receiveStreams| be a copy of |transport|'s [=[[ReceiveStreams]]=].
+1. Let |ready| be |transport|'s [=[[Ready]]=].
+1. Let |closed| be |transport|'s [=[[Closed]]=].
+1. Set |transport|'s [=[[SendStreams]]=] to an empty [=set=].
+1. Set |transport|'s [=[[ReceiveStreams]]=] to an empty [=set=].
+1. If |abruptly| is true, then set |transport|'s [=[[State]]=] to `"failed"`.
+1. Otherwise, set |transport|'s [=[[State]]=] to `"closed"`.
+1. [=For each=] |sendStream| in |sendStreams|, [=WritableStream/error=] |sendStream| with |error|.
+1. [=For each=] |receiveStream| in |receiveStreams|, [=ReadableStream/error=] |receiveStream|
+   with |error|.
+
+  Note: Script authors can inject code which runs in Promise resolution synchronously. Hence
+  from here, do not touch |transport| as it may be mutated by scripts in an unpredictable way.
+  This applies to logic calling this procedure, too.
+
+1. If |abruptly| is true, then:
+  1. [=Reject=] |closed| with |error|.
+  1. If |ready| is not [=settled=], then [=reject=] |ready| with |error|.
+1. Otherwise:
+  1. [=Resolve=] |closed| with |reason|.
+  1. Assert: |ready| is [=settled=].
 
 </div>
 
