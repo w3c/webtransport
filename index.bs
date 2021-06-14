@@ -470,8 +470,7 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
   1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
   1. Let |promise| be |datagrams|'s [=[[IncomingDatagramsPullPromise]]=].
   1. Set |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] to null.
-  1. [=Queue a global task=] on the [=network task source=] with |transport|'s
-     [=relevant global object=] and a task that runs the following steps:
+  1. [=Queue a network task=] with |transport| to run the following steps:
     1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
     1. [=ReadableStream/Enqueue=] |chunk| to |datagrams|'s [=DatagramDuplexStream/[[Readable]]=].
     1. [=Resolve=] |promise| with undefined.
@@ -826,6 +825,15 @@ To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |re
 1. Otherwise:
   1. [=Resolve=] |closed| with |reason|.
   1. Assert: |ready| is [=settled=].
+
+</div>
+
+<div algorithm>
+
+To <dfn for="WebTransport">queue a network task</dfn> with a {{WebTransport}} |transport| and a
+series of steps |steps|, run these steps:
+1. [=Queue a global task=] on the [=network task source=] with |transport|'s
+   [=relevant global object=] to run |steps|.
 
 </div>
 
