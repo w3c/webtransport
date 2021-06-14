@@ -277,22 +277,26 @@ interface mixin UnidirectionalStreamsTransport {
    run the following steps:
      1. Let |transport| be the `UnidirectionalStreamsTransport` on which
         `createUnidirectionalStream` is invoked.
-     1. If |transport|'s {{WebTransport/state}} is `"closed"` or `"failed"`,
-        immediately return a new [=rejected=] promise with a newly created
-        {{InvalidStateError}} and abort these steps.
+     1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
+        return a new [=rejected=] promise with an {{InvalidStateError}}.
      1. Let |p| be a new promise.
-     1. Return |p| and continue the remaining steps [=in parallel=].
-     1. [=SendStream/Create=] a {{SendStream}} with |transport| and |p| when all
-        of the following conditions are met:
-         1. The |transport|'s {{WebTransport/state}} is `"connected"`.
-         1. Stream creation flow control is not being violated by exceeding the
-            max stream limit set by the remote endpoint, as specified in
-            [[!QUIC]].
-         1. |p| has not been [=settled=].
-     1. Queue a task to [=reject=] |p| with a newly created {{InvalidStateError}}
-        when all of the following conditions are met:
-         1. The |transport|'s state is `"closed"` or `"failed"`.
-         1. |p| has not been [=settled=].
+     1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
+        [=WebTransport/[[State]]=] becomes `"closed"` or `"failed"`, and instead
+        [=queue a global task=] on the [=network task source=] with |transport|'s
+        [=relevant global object=] and a task that [=rejects=] |p| with an {{InvalidStateError}}.
+        1. Wait for |transport|'s [=WebTransport/[[State]]=] to be `"connected"`.
+        1. Let |internalStream| be the result of [=creating an outgoing stream=] with
+           |transport|'s [=[[Session]]=].
+
+          Note: This operation may take time, for example when the stream ID is exhausted. [[!QUIC]]
+        1. [=Queue a global task=] on the [=network task source=] with |transport|'s
+           [=relevant global object=] and a task that runs the following steps:
+          1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
+             [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
+          1. Let |stream| be the result of [=SendStream/creating=] a {{SendStream}} with
+             |internalStream| and |transport|.
+          1. [=Resolve=] |p| with |stream|.
+     1. return |p|.
 
 : <dfn for="UnidirectionalStreamsTransport" attribute>incomingUnidirectionalStreams</dfn>
 :: A {{ReadableStream}} of unidirectional streams, each represented by a
@@ -309,23 +313,6 @@ interface mixin UnidirectionalStreamsTransport {
         aborts the stream, close or abort the corresponding `ReceiveStream`.
 
 ## Procedures ##  {#unidirectional-streams-transport-procedures}
-
-### Add SendStream to UnidirectionalStreamsTransport ### {#add-sendstream}
-
-<div algorithm="create a SendStream">
-
-To <dfn export for="SendStream" lt="create|creating">create</dfn> a
-{{SendStream}} given a <var>transport</var> and a promise |p|, run the following
-steps:
-
-1. Reserve a unidirectional stream |association| in the underlying transport.
-1. Queue a task to run the following sub-steps:
-  1. If |transport|'s state is `"closed"` or `"failed"`, abort these sub-steps.
-  1. Let |stream| be a newly created {{SendStream}} for |association|.
-  1. Add |stream| to |transport|'s [=[[OutgoingStreams]]=].
-  1. Resolve |p| with |stream|.
-
-</div>
 
 ## SendStreamParameters Dictionary ##  {#send-stream-parameters}
 
@@ -592,7 +579,7 @@ A {{WebTransport}} object has the following internal slots.
    <td class="non-normative">A {{ReadableStream}} consisting of {{ReceiveStream}} objects.
   </tr>
   <tr>
-   <td><dfn>\[[ReceivedBidirectionalStreams]]</dfn>
+   <td><dfn>\[[IncomingBidirectionalStreams]]</dfn>
    <td class="non-normative">A {{ReadableStream}} consisting of {{BidirectionalStream}} objects.
   </tr>
   <tr>
@@ -651,7 +638,7 @@ agent MUST run the following steps:
     :: empty
     : [=[[ReceivedStreams]]=]
     :: a new {{ReadableStream}}
-    : [=[[ReceivedBidirectionalStreams]]=]
+    : [=[[IncomingBidirectionalStreams]]=]
     :: a new {{ReadableStream}}
     : [=[[State]]=]
     :: `"connecting"`
@@ -663,12 +650,17 @@ agent MUST run the following steps:
     :: |datagrams|
     : [=[[Session]]=]
     :: null
-1. Let |pullAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
-1. Let |writeAlgorithm| be an action that runs [=writeDatagrams=] with |transport|.
+1. Let |pullDatagramsAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
+1. Let |writeDatagramsAlgorithm| be an action that runs [=writeDatagrams=] with |transport|.
 1. [=ReadableStream/Set up=] |incomingDatagrams| with [=ReadableStream/set up/pullAlgorithm=]
-   set to |pullAlgorithm|, and [=ReadableStream/set up/highWaterMark=] set to 0.
+   set to |pullDatagramsAlgorithm|, and [=ReadableStream/set up/highWaterMark=] set to 0.
 1. [=WritableStream/Set up=] |outgoingDatagrams| with [=WritableStream/set up/writeAlgorithm=]
-   set to |writeAlgorithm|.
+   set to |writeDatagramsAlgorithm|.
+1. Let |pullBidirectionalStreamAlgorithm| be an action that runs [=pullBidirectionalStream=]
+   with |transport|.
+1. [=ReadableStream/Set up=] |transport|'s [=[[IncomingBidirectionalStreams]]=] with
+   [=ReadableStream/set up/pullAlgorithm=] set to |pullBidirectionalStreamAlgorithm|, and
+   [=ReadableStream/set up/highWaterMark=] set to 0.
 1. Let |promise| be the result of [=initialize WebTransport over HTTP|initializing WebTransport
    over HTTP=], with |transport|, |parsedURL| and |dedicated|.
 1. [=Upon fulfillment=] of |promise|, run these steps:
@@ -705,6 +697,24 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 
 </div>
 
+<div algorithm="pullBidirectionalStream">
+To <dfn>pullBidirectionalStream</dfn>, given a {{WebTransport}} object <var>transport</var>, run
+these steps.
+
+1. Let |session| be |transport|'s [=[[Session]]=].
+1. Let |p| be a new promise.
+1. Return |p| and run the remaining steps [=in parallel=].
+1. Wait until there is an [=session/receive a bidirectional stream|available incoming bidirectional
+   stream=].
+1. Let |internalStream| be the result of [=session/receiving a bidirectional stream=].
+1. Let |stream| be the result of [=BidirectionalStream/creating=] a {{BidirectionalStream}} with
+   |internalStream| and |transport|.
+1. [=ReadableStream/Enqueue=] |stream| to |transport|'s [=[[IncomingBidirectionalStreams]]=].
+1. [=Queue a global task=] on the [=network task source=] with |transport|'s
+   [=relevant global object=] and a task which [=resolves=] |p| with undefined.
+
+</div>
+
 ## Attributes ##  {#webtransport-attributes}
 
 : <dfn for="WebTransport" attribute>state</dfn>
@@ -729,16 +739,9 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
      1. Return [=this=]'s [=[[Datagrams]]=].
 : <dfn for="WebTransport" attribute>incomingBidirectionalStreams</dfn>
 :: Returns a {{ReadableStream}} of {{BidirectionalStream}}s that have been
-   received from the remote host.
-
+   received from the server.
    The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
-
-     1. Return [=[[ReceivedBidirectionalStreams]]=].
-     1. For each bidirectional stream received, create a corresponding
-        {{BidirectionalStream}} and insert it into [=[[ReceivedBidirectionalStreams]]=].
-        As data is received over the bidirectional stream, insert that data into the
-        corresponding {{BidirectionalStream}}.  When the remote side closes or aborts
-        the stream, close or abort the corresponding {{BidirectionalStream}}.
+     1. Return [=this=]'s [=[[IncomingBidirectionalStreams]]=].
 
 ## Methods ##  {#webtransport-methods}
 
@@ -784,7 +787,7 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
       {{InvalidStateError}} and abort these steps.
    1. Let |p| be a new promise.
    1. Return |p| and continue the remaining steps [=in parallel=].
-   1. [=WebTransport/create a BidirectionalStream=] with |transport|
+   1. [=BidirectionalStream/create=] a {{BidirectionalStream}} with |transport|
       and |p| when all of the following conditions are met:
        1. The |transport|'s {{WebTransport/state}} is `"connected"`.
        1. Stream creation flow control is not being violated by exceeding the
@@ -797,21 +800,6 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
        1. |p| has not been [=settled=].
 
 ## Procedures ##  {#webtransport-procedures}
-
-<div algorithm="create a BidirectionalStream">
-
- To <dfn for="WebTransport">create a {{BidirectionalStream}}</dfn>
- given a <var>transport</var> and a promise |p|, run the following steps:
-
-1. Reserve a bidirectional stream |association| in the underlying transport.
-1. Queue a task to run the following sub-steps:
-  1. If |transport|'s state is `"closed"` or `"failed"`, abort these sub-steps.
-  1. Let |stream| be a newly created {{BidirectionalStream}} object for |association|.
-  1. Add |stream| to |transport|'s [=[[ReceivedBidirectionalStreams]]=].
-  1. Add |stream| to |transport|'s [=[[OutgoingStreams]]=].
-  1. Resolve |p| with |stream|.
-
-</div>
 
 <div algorithm="cleanup a WebTransport">
 To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |reason|,
@@ -1036,10 +1024,40 @@ interface SendStream : WritableStream /* of Uint8Array */ {
 };
 </pre>
 
-## Overview ##  {#send-stream-overview}
+## Internal Slots ## {#send-stream-internal-slots}
 
-The {{SendStream}} will be initialized by running the {{WritableStream}}
-initialization steps.
+A {{SendStream}} has the following internal slots.
+
+<table class="data" dfn-for="SendStream">
+ <thead>
+  <tr>
+   <th>Internal Slot
+   <th>Description (<em>non-normative</em>)
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>\[[InternalStream]]</dfn>
+   <td class="non-normative">An [=outgoing=] or [=bidirectional=] [=WebTransport stream=].
+  </tr>
+</table>
+
+## Procedures ##  {#send-stream-procedures}
+
+<div algorithm="create a SendStream">
+
+To <dfn export for="SendStream" lt="create|creating">create</dfn> a
+{{SendStream}}, with an [=outgoing=] or [=bidirectional=] [=WebTransport stream=]
+|internalStream| and a {{WebTransport}} |transport|, run these steps:
+
+1. Let |stream| be a [=new=] {{SendStream}}, with:
+    : [=[[InternalStream]]=]
+    :: |internalStream|
+1. [=WritableStream/Set up=] |stream| with TBD.
+1. [=set/Add=] |stream| to |transport|'s [=[[SendStreams]]=].
+1. Return |stream|.
+
+</div>
 
 ## Attributes ##  {#send-stream-attributes}
 
@@ -1119,10 +1137,40 @@ interface ReceiveStream : ReadableStream /* of Uint8Array */ {
 };
 </pre>
 
-## Overview ##  {#receive-stream-overview}
+## Internal Slots ## {#receive-stream-internal-slots}
 
-The {{ReceiveStream}} will be initialized by running the {{ReadableStream}}
-initialization steps.
+A {{ReceiveStream}} has the following internal slots.
+
+<table class="data" dfn-for="ReceiveStream">
+ <thead>
+  <tr>
+   <th>Internal Slot
+   <th>Description (<em>non-normative</em>)
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>\[[InternalStream]]</dfn>
+   <td class="non-normative">An [=incoming=] or [=bidirectional=] [=WebTransport stream=].
+  </tr>
+</table>
+
+## Procedures ##  {#receive-stream-procedures}
+
+<div algorithm="create a ReceiveStream">
+
+To <dfn export for="ReceiveStream" lt="create|creating">create</dfn> a
+{{ReceiveStream}}, with an [=incoming=] or [=bidirectional=] [=WebTransport stream=]
+|internalStream| and a {{WebTransport}} |transport|, run these steps:
+
+1. Let |stream| be a [=new=] {{ReceiveStream}}, with:
+    : [=[[InternalStream]]=]
+    :: |internalStream|
+1. [=ReadableStream/Set up=] |stream| with TBD.
+1. [=set/Add=] |stream| to |transport|'s [=[[ReceiveStreams]]=].
+1. Return |stream|.
+
+</div>
 
 ## Attributes ##  {#receive-stream-attributes}
 
@@ -1165,13 +1213,53 @@ interface BidirectionalStream {
 };
 </pre>
 
-The {{BidirectionalStream}} will initialize with the following:
+## Internal slots ## {#bidirectional-stream-internal-slots}
 
-1. Let |duplexStream| be the {{BidirectionalStream}}.
-1. Let |duplexStream| have a <dfn attribute for="BidirectionalStream">\[[Readable]]</dfn>
-   internal slot initialized to a new {{ReceiveStream}}.
-1. Let |duplexStream| have a <dfn attribute for="BidirectionalStream">\[[Writable]]</dfn>
-   internal slot initialized to a new {{SendStream}}.
+A {{BidirectionalStream}} has the following internal slots.
+
+<table class="data" dfn-for="BidirectionalStream">
+ <thead>
+  <tr>
+   <th>Internal Slot
+   <th>Description (<em>non-normative</em>)
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>\[[Readable]]</dfn>
+   <td class="non-normative">A {{ReceiveStream}}.
+  </tr>
+  <tr>
+   <td><dfn>\[[Writable]]</dfn>
+   <td class="non-normative">A {{SendStream}}.
+  </tr>
+  <tr>
+   <td><dfn>\[[Transport]]</dfn>
+   <td class="non-normative">The {{WebTransport}} object owning this {{BidirectionalStream}}.
+  </tr>
+</table>
+
+## Procedures ## {#bidirectional-stream-procedures}
+
+<div algorithm="create a BidirectionalStream">
+To <dfn for=BidirectionalStream>create</dfn> a {{BidirectionalStream}} with a
+[=bidirectional=] [=WebTransport stream=] |internalStream| and a {{WebTransport}}
+object |transport|, run these steps.
+
+1. Let |readable| be the result of [=ReceiveStream/creating=] a {{ReceiveStream}} with
+   |internalStream| and |transport|.
+1. Let |writable| be the result of [=SendStream/creating=] a {{SendStream}} with
+   |internalStream| and |transport|.
+1. Let |stream| be a [=new=] {{BidirectionalStream}}, with:
+    : [=[[Readable]]=]
+    :: |readable|
+    : [=[[Writable]]=]
+    :: |writable|
+    : [=[[Transport]]=]
+    :: |transport|
+1. Return |stream|.
+
+</div>
 
 # Protocol Mappings # {#protocol-mapping}
 
