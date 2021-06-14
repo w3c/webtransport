@@ -280,10 +280,10 @@ interface mixin UnidirectionalStreamsTransport {
      1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
         return a new [=rejected=] promise with an {{InvalidStateError}}.
      1. Let |p| be a new promise.
-     1. Run the following steps, but abort them and [=queue a global task=] on the
-        [=network task source=] with |transport|'s [=relevant global object=] and a task that
-        [=rejects=] |p| with an {{InvalidStateError}} whenever |transport|'s
-        [=WebTransport/[[State]]=] becomes `"closed"` or `"failed"`, [=in parallel=].
+     1. Run the following steps [=in parallel=], but abort them if |transport|'s [=WebTransport/[[State]]=]
+        becomes `"closed"` or `"failed"`, and instead [=queue a global task=] on the
+        [=network task source=] with |transport|'s [=relevant global object=] and a task that [=rejects=] |p|
+        with an {{InvalidStateError}}.
         1. Wait for |transport|'s [=WebTransport/[[State]]=] to be `"connected"`.
         1. Let |internalStream| be the result of [=creating an outgoing stream=] with
            |transport|'s [=[[Session]]=]
