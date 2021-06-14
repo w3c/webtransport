@@ -674,7 +674,8 @@ these steps.
    {{ReceiveStream}} object, that have been received from the remote host.
 
    The getter steps for `incomingUnidirectionalStreams` are:
-     1. Let |transport| be [=this=]'s [=[[ReceivedStreams]]=].
+     1. Let |transport| be [=this=].
+     1. Return this's [=[[ReceivedStreams]]=].
      1. For each unidirectional stream received, create a corresponding
         {{ReceiveStream}} and insert it into [=[[ReceivedStreams]]=]. As data
         is received over the unidirectional stream, insert that data into the
@@ -740,8 +741,8 @@ these steps.
 : <dfn for="WebTransport" method>createUnidirectionalStream()</dfn>
 
 :: Creates a {{SendStream}} object for an outgoing unidirectional stream.  Note
-   that in some transports, the mere creation of a stream is not immediately
-   visible to the peer until it is used to send data.
+   that the mere creation of a stream is not immediately visible to the server until it is used
+   to send data.
 
    When `createUnidirectionalStream()` method is called, the user agent MUST
    run the following steps:
