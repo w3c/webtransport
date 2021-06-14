@@ -249,81 +249,6 @@ or <dfn for=stream>bidirectional</dfn>.
 </table>
 
 
-# `UnidirectionalStreamsTransport` Mixin #  {#unidirectional-streams-transport}
-
-A {{UnidirectionalStreamsTransport}} can send and receive unidirectional
-streams.  Data within a stream is delivered in order, but data between streams
-may be delivered out of order.  Data is generally sent reliably, but
-retransmissions may be disabled or the stream may aborted to produce a form of
-unreliability.  All stream data is encrypted and congestion-controlled.
-
-<pre class="idl">
-interface mixin UnidirectionalStreamsTransport {
-  Promise&lt;SendStream&gt; createUnidirectionalStream(optional SendStreamParameters parameters = {});
-  /* a ReadableStream of ReceiveStream objects */
-  readonly attribute ReadableStream incomingUnidirectionalStreams;
-};
-</pre>
-
-## Methods ##  {#unidirectional-streams-transport-methods}
-
-: <dfn for="UnidirectionalStreamsTransport" method>createUnidirectionalStream()</dfn>
-
-:: Creates a {{SendStream}} object for an outgoing unidirectional stream.  Note
-   that in some transports, the mere creation of a stream is not immediately
-   visible to the peer until it is used to send data.
-
-   When `createUnidirectionalStream()` method is called, the user agent MUST
-   run the following steps:
-     1. Let |transport| be the `UnidirectionalStreamsTransport` on which
-        `createUnidirectionalStream` is invoked.
-     1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
-        return a new [=rejected=] promise with an {{InvalidStateError}}.
-     1. Let |p| be a new promise.
-     1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
-        [=WebTransport/[[State]]=] becomes `"closed"` or `"failed"`, and instead
-        [=queue a global task=] on the [=network task source=] with |transport|'s
-        [=relevant global object=] and a task that [=rejects=] |p| with an {{InvalidStateError}}.
-        1. Wait for |transport|'s [=WebTransport/[[State]]=] to be `"connected"`.
-        1. Let |internalStream| be the result of [=creating an outgoing stream=] with
-           |transport|'s [=[[Session]]=].
-
-          Note: This operation may take time, for example when the stream ID is exhausted. [[!QUIC]]
-        1. [=Queue a global task=] on the [=network task source=] with |transport|'s
-           [=relevant global object=] and a task that runs the following steps:
-          1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
-             [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
-          1. Let |stream| be the result of [=SendStream/creating=] a {{SendStream}} with
-             |internalStream| and |transport|.
-          1. [=Resolve=] |p| with |stream|.
-     1. return |p|.
-
-: <dfn for="UnidirectionalStreamsTransport" attribute>incomingUnidirectionalStreams</dfn>
-:: A {{ReadableStream}} of unidirectional streams, each represented by a
-   {{ReceiveStream}} object, that have been received from the remote host.
-
-   The getter steps for `incomingUnidirectionalStreams` are:
-     1. Let |transport| be the `UnidirectionalStreamsTransport` on which
-        the `incomingUnidirectionalStreams` getter is invoked.
-     1. Return |transport|'s [=[[ReceivedStreams]]=].
-     1. For each unidirectional stream received, create a corresponding
-        {{ReceiveStream}} and insert it into [=[[ReceivedStreams]]=]. As data
-        is received over the unidirectional stream, insert that data into the
-        corresponding `ReceiveStream` object.  When the remote side closes or
-        aborts the stream, close or abort the corresponding `ReceiveStream`.
-
-## Procedures ##  {#unidirectional-streams-transport-procedures}
-
-## SendStreamParameters Dictionary ##  {#send-stream-parameters}
-
-The <dfn dictionary>SendStreamParameters</dfn> dictionary includes information
-relating to stream configuration.
-
-<pre class="idl">
-dictionary SendStreamParameters {
-};
-</pre>
-
 # `DatagramDuplexStream` Interface #  {#duplex-stream}
 
 A <dfn interface>DatagramDuplexStream</dfn> is a generic duplex stream.
@@ -522,8 +447,7 @@ progress.
 # `WebTransport` Interface #  {#web-transport}
 
 `WebTransport` provides an API to the HTTP/3 transport functionality
-defined in [[!WEB-TRANSPORT-HTTP3]]. It implements {{UnidirectionalStreamsTransport}}
-as well as stats and transport state information.
+defined in [[!WEB-TRANSPORT-HTTP3]].
 
 <pre class="idl">
 [Exposed=(Window,Worker)]
@@ -543,9 +467,12 @@ interface WebTransport {
   Promise&lt;BidirectionalStream&gt; createBidirectionalStream();
   /* a ReadableStream of BidirectionalStream objects */
   readonly attribute ReadableStream incomingBidirectionalStreams;
+
+  Promise&lt;SendStream&gt; createUnidirectionalStream(optional SendStreamParameters parameters = {});
+  /* a ReadableStream of ReceiveStream objects */
+  readonly attribute ReadableStream incomingUnidirectionalStreams;
 };
 
-WebTransport includes UnidirectionalStreamsTransport;
 </pre>
 
 ## Internal slots ## {#webtransport-internal-slots}
@@ -741,6 +668,18 @@ these steps.
    received from the server.
    The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
      1. Return [=this=]'s [=[[IncomingBidirectionalStreams]]=].
+: <dfn for="WebTransport" attribute>incomingUnidirectionalStreams</dfn>
+:: A {{ReadableStream}} of unidirectional streams, each represented by a
+   {{ReceiveStream}} object, that have been received from the remote host.
+
+   The getter steps for `incomingUnidirectionalStreams` are:
+     1. Let |transport| be [=this=].
+     1. Return this's [=[[ReceivedStreams]]=].
+     1. For each unidirectional stream received, create a corresponding
+        {{ReceiveStream}} and insert it into [=[[ReceivedStreams]]=]. As data
+        is received over the unidirectional stream, insert that data into the
+        corresponding `ReceiveStream` object.  When the remote side closes or
+        aborts the stream, close or abort the corresponding `ReceiveStream`.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -797,6 +736,36 @@ these steps.
       when all of the following conditions are met:
        1. The |transport|'s state is `"closed"` or `"failed"`.
        1. |p| has not been [=settled=].
+
+: <dfn for="WebTransport" method>createUnidirectionalStream()</dfn>
+
+:: Creates a {{SendStream}} object for an outgoing unidirectional stream.  Note
+   that the mere creation of a stream is not immediately visible to the server until it is used
+   to send data.
+
+   When `createUnidirectionalStream()` method is called, the user agent MUST
+   run the following steps:
+     1. Let |transport| be [=this=].
+     1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
+        return a new [=rejected=] promise with an {{InvalidStateError}}.
+     1. Let |p| be a new promise.
+     1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
+        [=WebTransport/[[State]]=] becomes `"closed"` or `"failed"`, and instead
+        [=queue a global task=] on the [=network task source=] with |transport|'s
+        [=relevant global object=] and a task that [=rejects=] |p| with an {{InvalidStateError}}.
+        1. Wait for |transport|'s [=WebTransport/[[State]]=] to be `"connected"`.
+        1. Let |internalStream| be the result of [=creating an outgoing stream=] with
+           |transport|'s [=[[Session]]=].
+
+          Note: This operation may take time, for example when the stream ID is exhausted. [[!QUIC]]
+        1. [=Queue a global task=] on the [=network task source=] with |transport|'s
+           [=relevant global object=] and a task that runs the following steps:
+          1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
+             [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
+          1. Let |stream| be the result of [=SendStream/creating=] a {{SendStream}} with
+             |internalStream| and |transport|.
+          1. [=Resolve=] |p| with |stream|.
+     1. return |p|.
 
 ## Procedures ##  {#webtransport-procedures}
 
@@ -866,6 +835,14 @@ that determine how WebTransport connection is established and used.
    SHALL use certificate verification procedures it would use for normal
    [=fetch=] operations.
 :: This cannot be used with {{WebTransportOptions/allowPooling}}.
+
+<pre class="idl">
+dictionary SendStreamParameters {
+};
+</pre>
+
+The <dfn dictionary>SendStreamParameters</dfn> dictionary includes information
+relating to stream configuration.
 
 <div algorithm="compute a certificate fingerprint">
 To <dfn>compute a certificate fingerprint</dfn>, do the following:
@@ -1445,8 +1422,7 @@ async function receiveDatagrams(url) {
 *This section is non-normative.*
 
 Sending data as a one-way stream can be achieved by using the
-{{UnidirectionalStreamsTransport/createUnidirectionalStream}} function and the
-resulting stream's writer.
+{{WebTransport/createUnidirectionalStream}} function and the resulting stream's writer.
 
 <pre class="example" highlight="js">
 async function sendData(url, data) {
@@ -1476,7 +1452,7 @@ async function sendText(url, readableStreamOfTextData) {
 *This section is non-normative.*
 
 Reading incoming streams can be achieved by iterating over the
-{{UnidirectionalStreamsTransport/incomingUnidirectionalStreams}} attribute,
+{{WebTransport/incomingUnidirectionalStreams}} attribute,
 and then consuming each {{ReceiveStream}} by iterating over its chunks.
 
 <pre class="example" highlight="js">
