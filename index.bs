@@ -195,6 +195,11 @@ To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an
 follow [[!WEB-TRANSPORT-HTTP3]]
 [section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
 
+A [=WebTransport session=] |session| can be <dfn for=session>terminated</dfn>, when
+the HTTP/3 stream associated with the CONNECT request that initiated |session| is closed by
+the server, as described at [[!WEB-TRANSPORT-HTTP3]]
+[section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
+
 <dfn>WebTransport stream</dfn> is a concept for HTTP/3 stream on a [=WebTransport session=].
 
 A [=WebTransport stream=] is one of <dfn for=stream>incoming</dfn>, <dfn for=stream>outgoing</dfn>
@@ -803,6 +808,34 @@ To <dfn for="WebTransport">queue a network task</dfn> with a {{WebTransport}} |t
 series of steps |steps|, run these steps:
 1. [=Queue a global task=] on the [=network task source=] with |transport|'s
    [=relevant global object=] to run |steps|.
+
+</div>
+
+## Session termination not initiated by the client ## {#web-transport-termination}
+
+<div algorithm>
+Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} |transport| is
+[=session/terminated=], run these steps:
+
+1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
+1. Let |cleanly| be a boolean representing whether the HTTP/3 stream associated with the CONNECT
+   request that initiated |transport|'s [=[[Session]]=] is in the "Data Recvd" state. [[!QUIC]]
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
+  1. Let |error| be TBD.
+  1. [=Cleanup=] |transport| with |error|, |error| and the negation of |cleanly|.
+
+</div>
+
+<div algorithm>
+Whenever a [=connection=] associated with a {{WebTransport}} |transport| gets a connection error,
+run these steps:
+
+1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
+  1. Let |error| be TBD.
+  1. [=Cleanup=] |transport| with |error|, |error| and true.
 
 </div>
 
