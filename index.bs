@@ -817,13 +817,13 @@ series of steps |steps|, run these steps:
 Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} |transport| is
 [=session/terminated=], run these steps:
 
-1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
 1. Let |cleanly| be a boolean representing whether the HTTP/3 stream associated with the CONNECT
    request that initiated |transport|'s [=[[Session]]=] is in the "Data Recvd" state. [[!QUIC]]
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
+  1. Let |reason| be TBD.
   1. Let |error| be TBD.
-  1. [=Cleanup=] |transport| with |error|, |error| and the negation of |cleanly|.
+  1. [=Cleanup=] |transport| with |reason|, |error| and the negation of |cleanly|.
 
 </div>
 
@@ -831,7 +831,6 @@ Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} 
 Whenever a [=connection=] associated with a {{WebTransport}} |transport| gets a connection error,
 run these steps:
 
-1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
   1. Let |error| be TBD.
