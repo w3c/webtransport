@@ -4,11 +4,10 @@
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <title>WebTransport</title>
   <meta content="w3c/ED" name="w3c-status">
-  <link href="https://www.w3.org/StyleSheets/TR/2016/W3C-ED" rel="stylesheet">
-  <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
-  <meta content="Bikeshed version 800b43329, updated Tue May 25 14:13:32 2021 -0700" name="generator">
+  <link href="https://www.w3.org/StyleSheets/TR/2016/W3C-ED" rel="stylesheet" type="text/css">
+  <meta content="Bikeshed version 21183bac3, updated Tue Jun 15 10:19:19 2021 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="dec79adcb7b143f4365ebaa745026f7a5c060a8a" name="document-revision">
+  <meta content="809721b17ffef48f3138735e98abd8f891b9712a" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -580,13 +579,15 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="profile-and-date"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2021-06-14">14 June 2021</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="profile-and-date"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2021-06-16">16 June 2021</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://w3c.github.io/webtransport/">https://w3c.github.io/webtransport/</a>
      <dt>Latest published version:
      <dd><a href="https://www.w3.org/TR/webtransport/">https://www.w3.org/TR/webtransport/</a>
+     <dt>Feedback:
+     <dd><span><a href="mailto:public-webtransport@w3.org?subject=%5Bwebtransport%5D%20YOUR%20TOPIC%20HERE">public-webtransport@w3.org</a> with subject line “<kbd>[webtransport] <i data-lt>… message topic …</i></kbd>” (<a href="https://lists.w3.org/Archives/Public/public-webtransport/" rel="discussion">archives</a>)</span>
      <dt>Issue Tracking:
      <dd><a href="https://github.com/w3c/webtransport/issues/">GitHub</a>
      <dd><a href="#issues-index">Inline In Spec</a>
@@ -600,7 +601,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     </dl>
    </div>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="https://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2021 <a href="https://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup> (<a href="https://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a href="https://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="https://www.keio.ac.jp/">Keio</a>, <a href="https://ev.buaa.edu.cn/">Beihang</a>). W3C <a href="https://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="https://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document" rel="license">permissive document license</a> rules apply. </p>
+   <p class="copyright" data-fill-with="copyright"><a href="https://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2021 <a href="https://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup> (<a href="https://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a href="https://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="https://www.keio.ac.jp/">Keio</a>, <a href="https://ev.buaa.edu.cn/">Beihang</a>). W3C <a href="https://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="https://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="https://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply. </p>
    <hr title="Separator for header">
   </div>
   <div class="p-summary" data-fill-with="abstract">
@@ -613,6 +614,18 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   </div>
   <h2 class="no-num no-toc no-ref heading settled" id="sotd"><span class="content">Status of this document</span></h2>
   <div data-fill-with="status">
+   <p> This is a public copy of the editors’ draft.
+	It is provided for discussion only and may change at any moment.
+	Its publication here does not imply endorsement of its contents by W3C.
+	Don’t cite this document other than as work in progress. </p>
+   <p> Feedback and comments on this document are welcome. Please <a href="https://github.com/w3c/webtransport/issues">file an issue</a> in this document’s <a href="https://github.com/w3c/webtransport/">GitHub repository</a>. </p>
+   <p> This document was produced by the <a href="https://www.w3.org/groups/wg/webtransport">WebTransport Working Group</a>. </p>
+   <p> This document was produced by a group operating under
+	the <a href="https://www.w3.org/Consortium/Patent-Policy/">W3C Patent Policy</a>.
+	W3C maintains a <a href="https://www.w3.org/2004/01/pp-impl/125908/status" rel="disclosure">public list of any patent disclosures</a> made in connection with the deliverables of the group;
+	that page also includes instructions for disclosing a patent.
+	An individual who has actual knowledge of a patent which the individual believes contains <a href="https://www.w3.org/Consortium/Patent-Policy/#def-essential">Essential Claim(s)</a> must disclose the information in accordance with <a href="https://www.w3.org/Consortium/Patent-Policy/#sec-Disclosure">section 6 of the W3C Patent Policy</a>. </p>
+   <p> This document is governed by the <a href="https://www.w3.org/2020/Process-20200915/" id="w3c_process_revision">15 September 2020 W3C Process Document</a>. </p>
    <p></p>
   </div>
   <div data-fill-with="at-risk"></div>
@@ -733,7 +746,7 @@ handlers, and the <code class="idl"><a data-link-type="idl" href="https://html.s
    <p>The concepts <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task">queue a task</a> and <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source">networking task source</a> are defined in <a data-link-type="biblio" href="#biblio-html">[HTML]</a>.</p>
    <p>The terms <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event" id="ref-for-concept-event">event</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handlers" id="ref-for-event-handlers">event handlers</a> and <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-event-type" id="ref-for-event-handler-event-type">event handler event types</a> are
 defined in <a data-link-type="biblio" href="#biblio-html">[HTML]</a>.</p>
-   <p>When referring to exceptions, the terms <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw">throw</a> and <a data-link-type="dfn" href="#datagramduplexstream-create" id="ref-for-datagramduplexstream-create">create</a> are defined in <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>.</p>
+   <p>When referring to exceptions, the terms <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw">throw</a> and <a data-link-type="dfn" href="#receivestream-create" id="ref-for-receivestream-create">create</a> are defined in <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>.</p>
    <p>The terms <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects">fulfilled</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①">rejected</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②">resolved</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③">pending</a> and <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects④">settled</a> used in the context of Promises are defined in <a data-link-type="biblio" href="#biblio-ecmascript-60">[ECMASCRIPT-6.0]</a>.</p>
    <p>The terms <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream">ReadableStream</a></code> and <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream">WritableStream</a></code> are defined in <a data-link-type="biblio" href="#biblio-whatwg-streams">[WHATWG-STREAMS]</a>.</p>
    <h2 class="heading settled" data-level="4" id="protocol-concepts"><span class="secno">4. </span><span class="content">Protocol concepts</span><a class="self-link" href="#protocol-concepts"></a></h2>
@@ -811,6 +824,11 @@ follow <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSP
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#datagramduplexstream" id="ref-for-datagramduplexstream"><c- g>DatagramDuplexStream</c-></a> {
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-datagramduplexstream-readable" id="ref-for-dom-datagramduplexstream-readable"><c- g>readable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream①"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-datagramduplexstream-writable" id="ref-for-dom-datagramduplexstream-writable"><c- g>writable</c-></a>;
+
+  <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double"><c- b>double</c-></a>? <a class="idl-code" data-link-type="attribute" data-type="double?" href="#dom-datagramduplexstream-incomingmaxage" id="ref-for-dom-datagramduplexstream-incomingmaxage"><c- g>incomingMaxAge</c-></a>;
+  <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double①"><c- b>double</c-></a>? <a class="idl-code" data-link-type="attribute" data-type="double?" href="#dom-datagramduplexstream-outgoingmaxage" id="ref-for-dom-datagramduplexstream-outgoingmaxage"><c- g>outgoingMaxAge</c-></a>;
+  <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-long" id="ref-for-idl-long"><c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-type="long" href="#dom-datagramduplexstream-incominghighwatermark" id="ref-for-dom-datagramduplexstream-incominghighwatermark"><c- g>incomingHighWaterMark</c-></a>;
+  <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-long" id="ref-for-idl-long①"><c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-type="long" href="#dom-datagramduplexstream-outgoinghighwatermark" id="ref-for-dom-datagramduplexstream-outgoinghighwatermark"><c- g>outgoingHighWaterMark</c-></a>;
 };
 </pre>
    <h3 class="heading settled" data-level="5.1" id="datagramduplexstream-internal-slots"><span class="secno">5.1. </span><span class="content">Internal slots</span><a class="self-link" href="#datagramduplexstream-internal-slots"></a></h3>
@@ -825,7 +843,7 @@ follow <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSP
       <td><dfn class="dfn-paneled" data-dfn-for="DatagramDuplexStream" data-dfn-type="dfn" data-noexport id="datagramduplexstream-readable">[[Readable]]</dfn> 
       <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream②">ReadableStream</a></code> for incoming datagrams. 
      <tr>
-      <td><dfn class="dfn-paneled" data-dfn-for="DatagramDuplexStream" data-dfn-type="dfn" data-noexport id="datagramduplexstream-writable">[[Writable]]</dfn> 
+      <td><dfn data-dfn-for="DatagramDuplexStream" data-dfn-type="dfn" data-noexport id="datagramduplexstream-writable">[[Writable]]<a class="self-link" href="#datagramduplexstream-writable"></a></dfn> 
       <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream②">WritableStream</a></code> for outgoing datagrams. 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="DatagramDuplexStream" data-dfn-type="dfn" data-noexport id="datagramduplexstream-incomingdatagramsqueue">[[IncomingDatagramsQueue]]</dfn> 
@@ -839,7 +857,7 @@ follow <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSP
    datagrams. 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="DatagramDuplexStream" data-dfn-type="dfn" data-noexport id="datagramduplexstream-incomingdatagramsexpirationduration">[[IncomingDatagramsExpirationDuration]]</dfn> 
-      <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double">double</a></code> value representing the expiration duration for incoming
+      <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double②">double</a></code> value representing the expiration duration for incoming
    datagrams (in milliseconds), or null. 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="DatagramDuplexStream" data-dfn-type="dfn" data-noexport id="datagramduplexstream-outgoingdatagramsqueue">[[OutgoingDatagramsQueue]]</dfn> 
@@ -851,7 +869,7 @@ follow <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSP
    datagrams. 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="DatagramDuplexStream" data-dfn-type="dfn" data-noexport id="datagramduplexstream-outgoingdatagramsexpirationduration">[[OutgoingDatagramsExpirationDuration]]</dfn> 
-      <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double①">double</a></code> value representing the expiration duration for outgoing
+      <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double③">double</a></code> value representing the expiration duration for outgoing
    datagrams (in milliseconds), or null. 
    </table>
    <p>To <dfn class="dfn-paneled" data-dfn-for="DatagramDuplexStream" data-dfn-type="dfn" data-export data-lt="create|creating" id="datagramduplexstream-create">create</dfn> a <code class="idl"><a data-link-type="idl" href="#datagramduplexstream" id="ref-for-datagramduplexstream②">DatagramDuplexStream</a></code> given a <dfn class="dfn-paneled" data-dfn-for="DatagramDuplexStream/create" data-dfn-type="dfn" data-export id="datagramduplexstream-create-readable"><var>readable</var></dfn>, and
@@ -912,6 +930,82 @@ follow <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSP
       <li data-md>
        <p>Return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①">this</a>.<code>[[Writable]]</code>.</p>
      </ol>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="DatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-datagramduplexstream-incomingmaxage"><code>incomingMaxAge</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double④">double</a>, nullable</span>
+    <dd data-md>
+     <p>The getter steps are:</p>
+     <ol>
+      <li data-md>
+       <p>Return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this②">this</a>'s <a data-link-type="dfn" href="#datagramduplexstream-incomingdatagramsexpirationduration" id="ref-for-datagramduplexstream-incomingdatagramsexpirationduration①">[[IncomingDatagramsExpirationDuration]]</a>.</p>
+     </ol>
+    <dd data-md>
+     <p>The setter steps are:</p>
+     <ol>
+      <li data-md>
+       <p>Let <var>value</var> be the given value.</p>
+      <li data-md>
+       <p>If <var>value</var> is null or <var>value</var> > 0:</p>
+       <ol>
+        <li data-md>
+         <p>Set <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this③">this</a>'s <a data-link-type="dfn" href="#datagramduplexstream-incomingdatagramsexpirationduration" id="ref-for-datagramduplexstream-incomingdatagramsexpirationduration②">[[IncomingDatagramsExpirationDuration]]</a> to <var>value</var>.</p>
+       </ol>
+     </ol>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="DatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-datagramduplexstream-outgoingmaxage"><code>outgoingMaxAge</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double⑤">double</a>, nullable</span>
+    <dd data-md>
+     <p>The getter steps are:</p>
+     <ol>
+      <li data-md>
+       <p>Return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this④">this</a>'s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramsexpirationduration" id="ref-for-datagramduplexstream-outgoingdatagramsexpirationduration①">[[OutgoingDatagramsExpirationDuration]]</a>.</p>
+     </ol>
+    <dd data-md>
+     <p>The setter steps are:</p>
+     <ol>
+      <li data-md>
+       <p>Let <var>value</var> be the given value.</p>
+      <li data-md>
+       <p>If <var>value</var> is null or <var>value</var> > 0:</p>
+       <ol>
+        <li data-md>
+         <p>Set <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this⑤">this</a>'s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramsexpirationduration" id="ref-for-datagramduplexstream-outgoingdatagramsexpirationduration②">[[OutgoingDatagramsExpirationDuration]]</a> to <var>value</var>.</p>
+       </ol>
+     </ol>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="DatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-datagramduplexstream-incominghighwatermark"><code>incomingHighWaterMark</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-long" id="ref-for-idl-long②">long</a></span>
+    <dd data-md>
+     <p>The getter steps are:</p>
+     <ol>
+      <li data-md>
+       <p>Return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this⑥">this</a>'s <a data-link-type="dfn" href="#datagramduplexstream-incomingdatagramshighwatermark" id="ref-for-datagramduplexstream-incomingdatagramshighwatermark①">[[IncomingDatagramsHighWaterMark]]</a>.</p>
+     </ol>
+    <dd data-md>
+     <p>The setter steps are:</p>
+     <ol>
+      <li data-md>
+       <p>Let <var>value</var> be the given value.</p>
+      <li data-md>
+       <p>If <var>value</var> ≥ 0:</p>
+       <ol>
+        <li data-md>
+         <p>Set <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this⑦">this</a>'s <a data-link-type="dfn" href="#datagramduplexstream-incomingdatagramshighwatermark" id="ref-for-datagramduplexstream-incomingdatagramshighwatermark②">[[IncomingDatagramsHighWaterMark]]</a> to <var>value</var>.</p>
+       </ol>
+     </ol>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="DatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-datagramduplexstream-outgoinghighwatermark"><code>outgoingHighWaterMark</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-long" id="ref-for-idl-long③">long</a></span>
+    <dd data-md>
+     <p>The getter steps are:</p>
+     <ol>
+      <li data-md>
+       <p>Return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this⑧">this</a>'s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramshighwatermark" id="ref-for-datagramduplexstream-outgoingdatagramshighwatermark①">[[OutgoingDatagramsHighWaterMark]]</a>.</p>
+     </ol>
+    <dd data-md>
+     <p>The setter steps are:</p>
+     <ol>
+      <li data-md>
+       <p>Let <var>value</var> be the given value.</p>
+      <li data-md>
+       <p>If <var>value</var> ≥ 0:</p>
+       <ol>
+        <li data-md>
+         <p>Set <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this⑨">this</a>'s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramshighwatermark" id="ref-for-datagramduplexstream-outgoingdatagramshighwatermark②">[[OutgoingDatagramsHighWaterMark]]</a> to <var>value</var>.</p>
+       </ol>
+     </ol>
    </dl>
    <h3 class="heading settled" data-level="5.3" id="datagram-duplex-stream-procedures"><span class="secno">5.3. </span><span class="content">Procedures</span><a class="self-link" href="#datagram-duplex-stream-procedures"></a></h3>
    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="pulldatagrams">pullDatagrams</dfn>, given a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport">WebTransport</a></code> object <var>transport</var>, run these steps:</p>
@@ -946,7 +1040,7 @@ follow <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSP
     <li data-md>
      <p>Let <var>queue</var> be <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-incomingdatagramsqueue" id="ref-for-datagramduplexstream-incomingdatagramsqueue②">[[IncomingDatagramsQueue]]</a>.</p>
     <li data-md>
-     <p>Let <var>duration</var> be <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-incomingdatagramsexpirationduration" id="ref-for-datagramduplexstream-incomingdatagramsexpirationduration①">[[IncomingDatagramsExpirationDuration]]</a>.</p>
+     <p>Let <var>duration</var> be <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-incomingdatagramsexpirationduration" id="ref-for-datagramduplexstream-incomingdatagramsexpirationduration③">[[IncomingDatagramsExpirationDuration]]</a>.</p>
     <li data-md>
      <p>If <var>duration</var> is null, then set <var>duration</var> to an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined②">implementation-defined</a> value.</p>
     <li data-md>
@@ -964,7 +1058,7 @@ follow <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSP
        <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-enqueue" id="ref-for-queue-enqueue">Enqueue</a> <var>chunk</var> to <var>queue</var>.</p>
      </ol>
     <li data-md>
-     <p>Let <var>toBeRemoved</var> be the length of <var>queue</var> minus <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-incomingdatagramshighwatermark" id="ref-for-datagramduplexstream-incomingdatagramshighwatermark①">[[IncomingDatagramsHighWaterMark]]</a>.</p>
+     <p>Let <var>toBeRemoved</var> be the length of <var>queue</var> minus <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-incomingdatagramshighwatermark" id="ref-for-datagramduplexstream-incomingdatagramshighwatermark③">[[IncomingDatagramsHighWaterMark]]</a>.</p>
     <li data-md>
      <p>If <var>toBeRemoved</var> is positive, repeat <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-dequeue" id="ref-for-queue-dequeue①">dequeuing</a> <var>queue</var> <var>toBeRemoved</var> times.</p>
     <li data-md>
@@ -1019,7 +1113,7 @@ progress.</p>
     <li data-md>
      <p>Enqueue <var>chunk</var> to <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramsqueue" id="ref-for-datagramduplexstream-outgoingdatagramsqueue①">[[OutgoingDatagramsQueue]]</a>.</p>
     <li data-md>
-     <p>If the length of <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramsqueue" id="ref-for-datagramduplexstream-outgoingdatagramsqueue②">[[OutgoingDatagramsQueue]]</a> is less than <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramshighwatermark" id="ref-for-datagramduplexstream-outgoingdatagramshighwatermark①">[[OutgoingDatagramsHighWaterMark]]</a>, then <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑥">resolve</a> <var>promise</var> with undefined.</p>
+     <p>If the length of <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramsqueue" id="ref-for-datagramduplexstream-outgoingdatagramsqueue②">[[OutgoingDatagramsQueue]]</a> is less than <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramshighwatermark" id="ref-for-datagramduplexstream-outgoingdatagramshighwatermark③">[[OutgoingDatagramsHighWaterMark]]</a>, then <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑥">resolve</a> <var>promise</var> with undefined.</p>
     <li data-md>
      <p>Return <var>promise</var>.</p>
    </ol>
@@ -1031,7 +1125,7 @@ duration work well only when the web developer pays attention to <code class="id
     <li data-md>
      <p>Let <var>queue</var> be <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramsqueue" id="ref-for-datagramduplexstream-outgoingdatagramsqueue③">[[OutgoingDatagramsQueue]]</a>.</p>
     <li data-md>
-     <p>Let <var>duration</var> be <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramsexpirationduration" id="ref-for-datagramduplexstream-outgoingdatagramsexpirationduration①">[[OutgoingDatagramsExpirationDuration]]</a>.</p>
+     <p>Let <var>duration</var> be <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-outgoingdatagramsexpirationduration" id="ref-for-datagramduplexstream-outgoingdatagramsexpirationduration③">[[OutgoingDatagramsExpirationDuration]]</a>.</p>
     <li data-md>
      <p>If <var>duration</var> is null, then set <var>duration</var> to an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined③">implementation-defined</a> value.</p>
     <li data-md>
@@ -1160,7 +1254,7 @@ agent MUST run the following steps:</p>
     <li data-md>
      <p>Let <var>outgoingDatagrams</var> be a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#new" id="ref-for-new②">new</a> <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑤">WritableStream</a></code>.</p>
     <li data-md>
-     <p>Let <var>datagrams</var> be the result of <a data-link-type="dfn" href="#datagramduplexstream-create" id="ref-for-datagramduplexstream-create①">creating</a> a <code class="idl"><a data-link-type="idl" href="#datagramduplexstream" id="ref-for-datagramduplexstream⑥">DatagramDuplexStream</a></code>, its <a data-link-type="dfn" href="#datagramduplexstream-create-readable" id="ref-for-datagramduplexstream-create-readable">readable</a> set to <var>incomingDatagrams</var> and its <a data-link-type="dfn" href="#datagramduplexstream-create-writable" id="ref-for-datagramduplexstream-create-writable">writable</a> set to <var>outgoingDatagrams</var>.</p>
+     <p>Let <var>datagrams</var> be the result of <a data-link-type="dfn" href="#datagramduplexstream-create" id="ref-for-datagramduplexstream-create">creating</a> a <code class="idl"><a data-link-type="idl" href="#datagramduplexstream" id="ref-for-datagramduplexstream⑥">DatagramDuplexStream</a></code>, its <a data-link-type="dfn" href="#datagramduplexstream-create-readable" id="ref-for-datagramduplexstream-create-readable">readable</a> set to <var>incomingDatagrams</var> and its <a data-link-type="dfn" href="#datagramduplexstream-create-writable" id="ref-for-datagramduplexstream-create-writable">writable</a> set to <var>outgoingDatagrams</var>.</p>
     <li data-md>
      <p>Let <var>transport</var> be a newly constructed <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①⓪">WebTransport</a></code> object, with:</p>
      <dl>
@@ -1291,13 +1385,13 @@ these steps.
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-state"><code>state</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransportstate" id="ref-for-enumdef-webtransportstate②">WebTransportState</a>, readonly</span>
     <dd data-md>
-     <p>The current state of the transport. On getting, it MUST return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this②">this</a>'s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state⑥">[[State]]</a>.</p>
+     <p>The current state of the transport. On getting, it MUST return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①⓪">this</a>'s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state⑥">[[State]]</a>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-ready"><code>ready</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-undefined" id="ref-for-idl-undefined④">undefined</a>>, readonly</span>
     <dd data-md>
-     <p>On getting, it MUST return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this③">this</a>'s <a data-link-type="dfn" href="#webtransport-ready" id="ref-for-webtransport-ready③">[[Ready]]</a>.</p>
+     <p>On getting, it MUST return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①①">this</a>'s <a data-link-type="dfn" href="#webtransport-ready" id="ref-for-webtransport-ready③">[[Ready]]</a>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-closed"><code>closed</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo②">WebTransportCloseInfo</a>>, readonly</span>
     <dd data-md>
-     <p>On getting, it MUST return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this④">this</a>'s <a data-link-type="dfn" href="#webtransport-closed" id="ref-for-webtransport-closed②">[[Closed]]</a>.</p>
+     <p>On getting, it MUST return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①②">this</a>'s <a data-link-type="dfn" href="#webtransport-closed" id="ref-for-webtransport-closed②">[[Closed]]</a>.</p>
     <dd data-md>
      <p>This promise MUST be <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑨">resolved</a> when the transport is closed; an
  implementation SHOULD include error information in the <code>reason</code> and <code>errorCode</code> fields of <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo③">WebTransportCloseInfo</a></code>.</p>
@@ -1315,7 +1409,7 @@ these steps.
  The getter steps for the <code>datagrams</code> attribute SHALL be:</p>
      <ol>
       <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this⑤">this</a>'s <a data-link-type="dfn" href="#webtransport-datagrams" id="ref-for-webtransport-datagrams④">[[Datagrams]]</a>.</p>
+       <p>Return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①③">this</a>'s <a data-link-type="dfn" href="#webtransport-datagrams" id="ref-for-webtransport-datagrams④">[[Datagrams]]</a>.</p>
      </ol>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-incomingbidirectionalstreams"><code>incomingBidirectionalStreams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①①">ReadableStream</a>, readonly</span>
     <dd data-md>
@@ -1324,7 +1418,7 @@ these steps.
  The getter steps for the <code>incomingBidirectionalStreams</code> attribute SHALL be:</p>
      <ol>
       <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this⑥">this</a>'s <a data-link-type="dfn" href="#webtransport-incomingbidirectionalstreams" id="ref-for-webtransport-incomingbidirectionalstreams③">[[IncomingBidirectionalStreams]]</a>.</p>
+       <p>Return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①④">this</a>'s <a data-link-type="dfn" href="#webtransport-incomingbidirectionalstreams" id="ref-for-webtransport-incomingbidirectionalstreams③">[[IncomingBidirectionalStreams]]</a>.</p>
      </ol>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-incomingunidirectionalstreams"><code>incomingUnidirectionalStreams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①③">ReadableStream</a>, readonly</span>
     <dd data-md>
@@ -1332,7 +1426,7 @@ these steps.
      <p>The getter steps for <code>incomingUnidirectionalStreams</code> are:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this⑦">this</a>.</p>
+       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①⑤">this</a>.</p>
       <li data-md>
        <p>Return this’s <a data-link-type="dfn" href="#webtransport-receivedstreams" id="ref-for-webtransport-receivedstreams①">[[ReceivedStreams]]</a>.</p>
       <li data-md>
@@ -1350,7 +1444,7 @@ these steps.
      <p>When close is called, the user agent MUST run the following steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this⑧">this</a>.</p>
+       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①⑥">this</a>.</p>
       <li data-md>
        <p>If <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state⑧">[[State]]</a> is <code>"closed"</code> or <code>"failed"</code>,
   then abort these steps.</p>
@@ -1393,7 +1487,7 @@ these steps.
  following steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this⑨">this</a>.</p>
+       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①⑦">this</a>.</p>
       <li data-md>
        <p>If <var>transport</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state" id="ref-for-dom-webtransport-state①">state</a></code> is <code>"closed"</code> or <code>"failed"</code>,
   immediately return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①①">rejected</a> promise with a newly created <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror">InvalidStateError</a></code> and abort these steps.</p>
@@ -1430,7 +1524,7 @@ these steps.
  run the following steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①⓪">this</a>.</p>
+       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①⑧">this</a>.</p>
       <li data-md>
        <p>If <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state⑨">[[State]]</a> is <code>"closed"</code> or <code>"failed"</code>,
   return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑤">rejected</a> promise with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror②">InvalidStateError</a></code>.</p>
@@ -1767,18 +1861,18 @@ or are impossible to define for pooled connections.</p>
  steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②①">WebTransport</a></code>, which <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①①">this</a> stream was created
+       <p>Let <var>transport</var> be the <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②①">WebTransport</a></code>, which <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①⑨">this</a> stream was created
   from.</p>
       <li data-md>
-       <p>Remove <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①②">this</a> from the transport’s <a data-link-type="dfn" href="#webtransport-outgoingstreams" id="ref-for-webtransport-outgoingstreams⑤">[[OutgoingStreams]]</a>.</p>
+       <p>Remove <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this②⓪">this</a> from the transport’s <a data-link-type="dfn" href="#webtransport-outgoingstreams" id="ref-for-webtransport-outgoingstreams⑤">[[OutgoingStreams]]</a>.</p>
       <li data-md>
        <p>Let <var>reason</var> be <var>abortInfo</var>.errorCode.</p>
       <li data-md>
-       <p>Let <var>p</var> be the result of <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-abort" id="ref-for-writablestream-abort">aborting</a> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①③">this</a>, with <var>reason</var>.</p>
+       <p>Let <var>p</var> be the result of <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-abort" id="ref-for-writablestream-abort">aborting</a> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this②①">this</a>, with <var>reason</var>.</p>
       <li data-md>
        <p>Set <var>p</var>.<a data-link-type="dfn">[[PromiseIsHandled]]</a> to true.</p>
       <li data-md>
-       <p>If it hasn’t been done already, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑤">in parallel</a>, <a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset①">reset</a> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this①④">this</a> <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream⑥">WebTransport stream</a> with <var>reason</var> as the Application Protocol Error
+       <p>If it hasn’t been done already, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑤">in parallel</a>, <a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset①">reset</a> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this②②">this</a> <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream⑥">WebTransport stream</a> with <var>reason</var> as the Application Protocol Error
    Code.</p>
      </ol>
    </dl>
@@ -1937,16 +2031,16 @@ queue a task to run the following:</p>
      To <dfn class="dfn-paneled" data-dfn-for="BidirectionalStream" data-dfn-type="dfn" data-noexport id="bidirectionalstream-create">create</dfn> a <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream⑧">BidirectionalStream</a></code> with a <a data-link-type="dfn" href="#stream-bidirectional" id="ref-for-stream-bidirectional⑥">bidirectional</a> <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream①①">WebTransport stream</a> <var>internalStream</var> and a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②⑧">WebTransport</a></code> object <var>transport</var>, run these steps. 
     <ol>
      <li data-md>
-      <p>Let <var>readable</var> be the result of <a data-link-type="dfn" href="#receivestream-create" id="ref-for-receivestream-create">creating</a> a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream①⑤">ReceiveStream</a></code> with <var>internalStream</var> and <var>transport</var>.</p>
+      <p>Let <var>readable</var> be the result of <a data-link-type="dfn" href="#receivestream-create" id="ref-for-receivestream-create①">creating</a> a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream①⑤">ReceiveStream</a></code> with <var>internalStream</var> and <var>transport</var>.</p>
      <li data-md>
       <p>Let <var>writable</var> be the result of <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create①">creating</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②①">SendStream</a></code> with <var>internalStream</var> and <var>transport</var>.</p>
      <li data-md>
       <p>Let <var>stream</var> be a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#new" id="ref-for-new⑤">new</a> <code class="idl"><a data-link-type="idl" href="#bidirectionalstream" id="ref-for-bidirectionalstream⑨">BidirectionalStream</a></code>, with:</p>
       <dl>
-       <dt data-md><a data-link-type="dfn" href="#bidirectionalstream-readable" id="ref-for-bidirectionalstream-readable①">[[Readable]]</a>
+       <dt data-md><a data-link-type="dfn" href="#datagramduplexstream-readable" id="ref-for-datagramduplexstream-readable②">[[Readable]]</a>
        <dd data-md>
         <p><var>readable</var></p>
-       <dt data-md><a data-link-type="dfn" href="#datagramduplexstream-writable" id="ref-for-datagramduplexstream-writable">[[Writable]]</a>
+       <dt data-md><a data-link-type="dfn" href="#bidirectionalstream-writable" id="ref-for-bidirectionalstream-writable①">[[Writable]]</a>
        <dd data-md>
         <p><var>writable</var></p>
        <dt data-md><a data-link-type="dfn" href="#bidirectionalstream-transport" id="ref-for-bidirectionalstream-transport">[[Transport]]</a>
@@ -2333,6 +2427,8 @@ and has been adapted for use in this specification.</p>
    <li><a href="#datagramduplexstream-incomingdatagramshighwatermark">[[IncomingDatagramsHighWaterMark]]</a><span>, in §5.1</span>
    <li><a href="#datagramduplexstream-incomingdatagramspullpromise">[[IncomingDatagramsPullPromise]]</a><span>, in §5.1</span>
    <li><a href="#datagramduplexstream-incomingdatagramsqueue">[[IncomingDatagramsQueue]]</a><span>, in §5.1</span>
+   <li><a href="#dom-datagramduplexstream-incominghighwatermark">incomingHighWaterMark</a><span>, in §5.2</span>
+   <li><a href="#dom-datagramduplexstream-incomingmaxage">incomingMaxAge</a><span>, in §5.2</span>
    <li><a href="#dom-webtransport-incomingunidirectionalstreams">incomingUnidirectionalStreams</a><span>, in §6.3</span>
    <li><a href="#initialize-webtransport-over-http">initialize WebTransport over HTTP</a><span>, in §6.2</span>
    <li>
@@ -2351,6 +2447,8 @@ and has been adapted for use in this specification.</p>
    <li><a href="#datagramduplexstream-outgoingdatagramsexpirationduration">[[OutgoingDatagramsExpirationDuration]]</a><span>, in §5.1</span>
    <li><a href="#datagramduplexstream-outgoingdatagramshighwatermark">[[OutgoingDatagramsHighWaterMark]]</a><span>, in §5.1</span>
    <li><a href="#datagramduplexstream-outgoingdatagramsqueue">[[OutgoingDatagramsQueue]]</a><span>, in §5.1</span>
+   <li><a href="#dom-datagramduplexstream-outgoinghighwatermark">outgoingHighWaterMark</a><span>, in §5.2</span>
+   <li><a href="#dom-datagramduplexstream-outgoingmaxage">outgoingMaxAge</a><span>, in §5.2</span>
    <li><a href="#webtransport-outgoingstreams">[[OutgoingStreams]]</a><span>, in §6.1</span>
    <li><a href="#dom-webtransportstats-packetsreceived">packetsReceived</a><span>, in §6.9</span>
    <li><a href="#dom-webtransportstats-packetssent">packetsSent</a><span>, in §6.9</span>
@@ -2813,7 +2911,16 @@ and has been adapted for use in this specification.</p>
   <aside class="dfn-panel" data-for="term-for-idl-double">
    <a href="https://heycam.github.io/webidl/#idl-double">https://heycam.github.io/webidl/#idl-double</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-idl-double">5.1. Internal slots</a> <a href="#ref-for-idl-double①">(2)</a>
+    <li><a href="#ref-for-idl-double">5. DatagramDuplexStream Interface</a> <a href="#ref-for-idl-double①">(2)</a>
+    <li><a href="#ref-for-idl-double②">5.1. Internal slots</a> <a href="#ref-for-idl-double③">(2)</a>
+    <li><a href="#ref-for-idl-double④">5.2. Attributes</a> <a href="#ref-for-idl-double⑤">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-long">
+   <a href="https://heycam.github.io/webidl/#idl-long">https://heycam.github.io/webidl/#idl-long</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-long">5. DatagramDuplexStream Interface</a> <a href="#ref-for-idl-long①">(2)</a>
+    <li><a href="#ref-for-idl-long②">5.2. Attributes</a> <a href="#ref-for-idl-long③">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-new">
@@ -2847,10 +2954,10 @@ and has been adapted for use in this specification.</p>
   <aside class="dfn-panel" data-for="term-for-this">
    <a href="https://heycam.github.io/webidl/#this">https://heycam.github.io/webidl/#this</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-this">5.2. Attributes</a> <a href="#ref-for-this①">(2)</a>
-    <li><a href="#ref-for-this②">6.3. Attributes</a> <a href="#ref-for-this③">(2)</a> <a href="#ref-for-this④">(3)</a> <a href="#ref-for-this⑤">(4)</a> <a href="#ref-for-this⑥">(5)</a> <a href="#ref-for-this⑦">(6)</a>
-    <li><a href="#ref-for-this⑧">6.4. Methods</a> <a href="#ref-for-this⑨">(2)</a> <a href="#ref-for-this①⓪">(3)</a>
-    <li><a href="#ref-for-this①①">7.4. Methods</a> <a href="#ref-for-this①②">(2)</a> <a href="#ref-for-this①③">(3)</a> <a href="#ref-for-this①④">(4)</a>
+    <li><a href="#ref-for-this">5.2. Attributes</a> <a href="#ref-for-this①">(2)</a> <a href="#ref-for-this②">(3)</a> <a href="#ref-for-this③">(4)</a> <a href="#ref-for-this④">(5)</a> <a href="#ref-for-this⑤">(6)</a> <a href="#ref-for-this⑥">(7)</a> <a href="#ref-for-this⑦">(8)</a> <a href="#ref-for-this⑧">(9)</a> <a href="#ref-for-this⑨">(10)</a>
+    <li><a href="#ref-for-this①⓪">6.3. Attributes</a> <a href="#ref-for-this①①">(2)</a> <a href="#ref-for-this①②">(3)</a> <a href="#ref-for-this①③">(4)</a> <a href="#ref-for-this①④">(5)</a> <a href="#ref-for-this①⑤">(6)</a>
+    <li><a href="#ref-for-this①⑥">6.4. Methods</a> <a href="#ref-for-this①⑦">(2)</a> <a href="#ref-for-this①⑧">(3)</a>
+    <li><a href="#ref-for-this①⑨">7.4. Methods</a> <a href="#ref-for-this②⓪">(2)</a> <a href="#ref-for-this②①">(3)</a> <a href="#ref-for-this②②">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dfn-throw">
@@ -3123,6 +3230,7 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="term-for-a-promise-resolved-with">a promise resolved with</span>
      <li><span class="dfn-paneled" id="term-for-idl-boolean">boolean</span>
      <li><span class="dfn-paneled" id="term-for-idl-double">double</span>
+     <li><span class="dfn-paneled" id="term-for-idl-long">long</span>
      <li><span class="dfn-paneled" id="term-for-new">new</span>
      <li><span class="dfn-paneled" id="term-for-idl-octet">octet</span>
      <li><span class="dfn-paneled" id="term-for-reject">reject</span>
@@ -3215,6 +3323,11 @@ and has been adapted for use in this specification.</p>
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#datagramduplexstream"><c- g>DatagramDuplexStream</c-></a> {
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-datagramduplexstream-readable"><c- g>readable</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream"><c- n>WritableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WritableStream" href="#dom-datagramduplexstream-writable"><c- g>writable</c-></a>;
+
+  <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double"><c- b>double</c-></a>? <a class="idl-code" data-link-type="attribute" data-type="double?" href="#dom-datagramduplexstream-incomingmaxage"><c- g>incomingMaxAge</c-></a>;
+  <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double"><c- b>double</c-></a>? <a class="idl-code" data-link-type="attribute" data-type="double?" href="#dom-datagramduplexstream-outgoingmaxage"><c- g>outgoingMaxAge</c-></a>;
+  <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-long"><c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-type="long" href="#dom-datagramduplexstream-incominghighwatermark"><c- g>incomingHighWaterMark</c-></a>;
+  <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-long"><c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-type="long" href="#dom-datagramduplexstream-outgoinghighwatermark"><c- g>outgoingHighWaterMark</c-></a>;
 };
 
 [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
@@ -3424,12 +3537,7 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
    <b><a href="#datagramduplexstream-readable">#datagramduplexstream-readable</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-datagramduplexstream-readable">5.3. Procedures</a> <a href="#ref-for-datagramduplexstream-readable①">(2)</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="datagramduplexstream-writable">
-   <b><a href="#datagramduplexstream-writable">#datagramduplexstream-writable</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-datagramduplexstream-writable">9.2. Procedures</a>
+    <li><a href="#ref-for-datagramduplexstream-readable②">9.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="datagramduplexstream-incomingdatagramsqueue">
@@ -3450,14 +3558,16 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
    <b><a href="#datagramduplexstream-incomingdatagramshighwatermark">#datagramduplexstream-incomingdatagramshighwatermark</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-datagramduplexstream-incomingdatagramshighwatermark">5.1. Internal slots</a>
-    <li><a href="#ref-for-datagramduplexstream-incomingdatagramshighwatermark①">5.3. Procedures</a>
+    <li><a href="#ref-for-datagramduplexstream-incomingdatagramshighwatermark①">5.2. Attributes</a> <a href="#ref-for-datagramduplexstream-incomingdatagramshighwatermark②">(2)</a>
+    <li><a href="#ref-for-datagramduplexstream-incomingdatagramshighwatermark③">5.3. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="datagramduplexstream-incomingdatagramsexpirationduration">
    <b><a href="#datagramduplexstream-incomingdatagramsexpirationduration">#datagramduplexstream-incomingdatagramsexpirationduration</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-datagramduplexstream-incomingdatagramsexpirationduration">5.1. Internal slots</a>
-    <li><a href="#ref-for-datagramduplexstream-incomingdatagramsexpirationduration①">5.3. Procedures</a>
+    <li><a href="#ref-for-datagramduplexstream-incomingdatagramsexpirationduration①">5.2. Attributes</a> <a href="#ref-for-datagramduplexstream-incomingdatagramsexpirationduration②">(2)</a>
+    <li><a href="#ref-for-datagramduplexstream-incomingdatagramsexpirationduration③">5.3. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="datagramduplexstream-outgoingdatagramsqueue">
@@ -3471,21 +3581,22 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
    <b><a href="#datagramduplexstream-outgoingdatagramshighwatermark">#datagramduplexstream-outgoingdatagramshighwatermark</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-datagramduplexstream-outgoingdatagramshighwatermark">5.1. Internal slots</a>
-    <li><a href="#ref-for-datagramduplexstream-outgoingdatagramshighwatermark①">5.3. Procedures</a>
+    <li><a href="#ref-for-datagramduplexstream-outgoingdatagramshighwatermark①">5.2. Attributes</a> <a href="#ref-for-datagramduplexstream-outgoingdatagramshighwatermark②">(2)</a>
+    <li><a href="#ref-for-datagramduplexstream-outgoingdatagramshighwatermark③">5.3. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="datagramduplexstream-outgoingdatagramsexpirationduration">
    <b><a href="#datagramduplexstream-outgoingdatagramsexpirationduration">#datagramduplexstream-outgoingdatagramsexpirationduration</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-datagramduplexstream-outgoingdatagramsexpirationduration">5.1. Internal slots</a>
-    <li><a href="#ref-for-datagramduplexstream-outgoingdatagramsexpirationduration①">5.3. Procedures</a>
+    <li><a href="#ref-for-datagramduplexstream-outgoingdatagramsexpirationduration①">5.2. Attributes</a> <a href="#ref-for-datagramduplexstream-outgoingdatagramsexpirationduration②">(2)</a>
+    <li><a href="#ref-for-datagramduplexstream-outgoingdatagramsexpirationduration③">5.3. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="datagramduplexstream-create">
    <b><a href="#datagramduplexstream-create">#datagramduplexstream-create</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-datagramduplexstream-create">3. Terminology</a>
-    <li><a href="#ref-for-datagramduplexstream-create①">6.2. Constructor</a>
+    <li><a href="#ref-for-datagramduplexstream-create">6.2. Constructor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="datagramduplexstream-create-readable">
@@ -3515,6 +3626,30 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
     <li><a href="#ref-for-dom-datagramduplexstream-writable①">6.3. Attributes</a>
     <li><a href="#ref-for-dom-datagramduplexstream-writable②">12.1. Sending a buffer of datagrams</a>
     <li><a href="#ref-for-dom-datagramduplexstream-writable③">12.2. Sending datagrams at a fixed rate</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-datagramduplexstream-incomingmaxage">
+   <b><a href="#dom-datagramduplexstream-incomingmaxage">#dom-datagramduplexstream-incomingmaxage</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-datagramduplexstream-incomingmaxage">5. DatagramDuplexStream Interface</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-datagramduplexstream-outgoingmaxage">
+   <b><a href="#dom-datagramduplexstream-outgoingmaxage">#dom-datagramduplexstream-outgoingmaxage</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-datagramduplexstream-outgoingmaxage">5. DatagramDuplexStream Interface</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-datagramduplexstream-incominghighwatermark">
+   <b><a href="#dom-datagramduplexstream-incominghighwatermark">#dom-datagramduplexstream-incominghighwatermark</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-datagramduplexstream-incominghighwatermark">5. DatagramDuplexStream Interface</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-datagramduplexstream-outgoinghighwatermark">
+   <b><a href="#dom-datagramduplexstream-outgoinghighwatermark">#dom-datagramduplexstream-outgoinghighwatermark</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-datagramduplexstream-outgoinghighwatermark">5. DatagramDuplexStream Interface</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="pulldatagrams">
@@ -4022,7 +4157,8 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="receivestream-create">
    <b><a href="#receivestream-create">#receivestream-create</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-receivestream-create">9.2. Procedures</a>
+    <li><a href="#ref-for-receivestream-create">3. Terminology</a>
+    <li><a href="#ref-for-receivestream-create①">9.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bidirectionalstream">
@@ -4053,13 +4189,13 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
    <b><a href="#bidirectionalstream-readable">#bidirectionalstream-readable</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bidirectionalstream-readable">5.1. Internal slots</a>
-    <li><a href="#ref-for-bidirectionalstream-readable①">9.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bidirectionalstream-writable">
    <b><a href="#bidirectionalstream-writable">#bidirectionalstream-writable</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bidirectionalstream-writable">5.1. Internal slots</a>
+    <li><a href="#ref-for-bidirectionalstream-writable①">9.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bidirectionalstream-transport">
