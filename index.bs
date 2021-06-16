@@ -248,6 +248,37 @@ or <dfn for=stream>bidirectional</dfn>.
  </tbody>
 </table>
 
+[=WebTransport stream=] has the following signals:
+
+<table class="data" dfn-for="stream-event">
+ <thead>
+  <tr>
+   <th>event
+   <th>definition
+   <th>incoming
+   <th>outgoing
+   <th>bidirectional
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>STOP_SENDING</dfn>
+   <td>[[!QUIC]]
+   [section 3.5](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-3.5)
+   <td>No
+   <td>Yes
+   <td>Yes
+  </tr>
+  <tr>
+   <td><dfn>reset</dfn>
+   <td>[[!QUIC]]
+   [section 19.4](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-19.4)
+   <td>Yes
+   <td>No
+   <td>Yes
+  </tr>
+ </tbody>
+</table>
 
 # `DatagramDuplexStream` Interface #  {#duplex-stream}
 
@@ -1068,6 +1099,11 @@ A {{SendStream}} has the following internal slots.
    <td><dfn>\[[InternalStream]]</dfn>
    <td class="non-normative">An [=outgoing=] or [=bidirectional=] [=WebTransport stream=].
   </tr>
+  <tr>
+   <td><dfn>\[[Transport]]</dfn>
+   <td class="non-normative">A {{WebTransport}} which owns this {{SendStream}}.
+  </tr>
+ <tbody>
 </table>
 
 ## Procedures ##  {#send-stream-procedures}
@@ -1081,9 +1117,64 @@ To <dfn export for="SendStream" lt="create|creating">create</dfn> a
 1. Let |stream| be a [=new=] {{SendStream}}, with:
     : [=[[InternalStream]]=]
     :: |internalStream|
-1. [=WritableStream/Set up=] |stream| with TBD.
-1. [=set/Add=] |stream| to |transport|'s [=[[SendStreams]]=].
+    : [=[[Transport]]=]
+    :: |transport|
+1. Let |writeAlgorithm| be an action that [=writes=] |chunk| with |stream|, given |chunk|.
+1. Let |closeAlgorithm| be an action that [=closes=] |stream|.
+1. Let |abortAlgorithm| be an action that [=aborts=] |stream| with |reason|, given |reason|.
+1. [=WritableStream/Set up=] |stream| with [=WritableStream/set up/writeAlgorithm=] set to
+   |writeAlgorithm|, [=WritableStream/set up/closeAlgorithm=] set to |closeAlgorithm|,
+   [=WritableStream/set up/abortAlgorithm=] set to |abortAlgorithm|.
+1. [=set/Append=] |stream| to |transport|'s [=[[SendStreams]]=].
 1. Return |stream|.
+
+</div>
+
+<div algorithm>
+To <dfn for="SendStream">write</dfn> |chunk| to a {{SendStream}} |stream|, run these steps:
+
+1. Let |transport| be |stream|'s [=[[Transport]]=].
+1. If |chunk| is not a {{Uint8Array}}, return [=a promise rejected with=] a {{TypeError}}.
+1. Let |promise| be a new promise.
+1. Let |bytes| be a copy of the [=byte sequence=] which |chunk| represents.
+1. Return |promise| and run the remaining steps [=in parallel=].
+1. [=stream/Send=] |bytes| on |stream|'s [=[[InternalStream]]=] and wait for the operation to
+   complete.
+1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+
+Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
+SHOULD have a fixed size, to carry the backpressure information to the user of {{SendStream}}. This
+also means the [=fulfillment=] of the promise returned from this algorithm (or,
+{{WritableStreamDefaultWriter.write}}) does **NOT** necessarily mean that the chunk is acked by
+the server [[!QUIC]]. It may just mean that the chunk is appended to the buffer. To make sure that
+the chunk arrives at the server, use an application-level protocol.
+
+</div>
+
+<div algorithm>
+To <dfn for="SendStream">close</dfn> a {{SendStream}} |stream|, run these steps:
+
+1. Let |transport| be |stream|'s [=[[Transport]]=].
+1. Let |promise| be a new promise.
+1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
+1. Return |promise| and run the remaining steps [=in parallel=].
+1. [=stream/Send=] FIN on |stream|'s [=[[InternalStream]]=] and wait for the operation to
+   complete.
+1. Wait for |stream|'s [=[[InternalStream]]=] to enter the "Data Recvd" state. [[!QUIC]]
+1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+
+</div>
+
+<div algorithm>
+To <dfn for="SendStream">abort</dfn> a {{SendStream}} |stream| with |reason|, run these steps:
+
+1. Let |transport| be |stream|'s [=[[Transport]]=].
+1. Let |promise| be a new promise.
+1. Let |code| be TBD.
+1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
+1. Return |promise| and run the remaining steps [=in parallel=].
+1. [=stream/Reset=] |stream|'s [=[[InternalStream]]=] with |code|.
+1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
 
 </div>
 
@@ -1104,27 +1195,23 @@ To <dfn export for="SendStream" lt="create|creating">create</dfn> a
         [=WebTransport stream=] with |reason| as the Application Protocol Error
          Code.
 
-## Procedures ##  {#send-stream-procedures}
+## STOP_SENDING signal coming from the server ##  {#send-stream-STOP_SENDING}
 
-When a {{SendStream}} receives a message from the remote side aborting the
-stream (for QUIC, that message is a STOP_SENDING frame), the user agent MUST
-queue a task to run the following:
-      1. Let |stream| be the {{SendStream}} object.
-      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
-         from.
-      1. Remove |stream| from the |transport|'s [=[[OutgoingStreams]]=].
-      1. Let |reason| be the value from the STOP_SENDING frame from the remote side.
-      1. [=WritableStream/Error=] |stream| with |reason|.
+<div algorithm="STOP_SENDING event">
+Whenever a [=WebTransport stream=] associated with a {{SendStream}} |stream| gets a
+[=stream-event/STOP_SENDING=] signal from the server, run these steps:
 
-The {{SendStream}}'s <dfn>abortAlgorithm</dfn> is:
-     1. Let |stream| be the {{SendStream}} object.
-     1. Let |transport| be the {{WebTransport}}, which the |stream| was created
-        from.
-     1. Let |reason| be the first argument, if it is numeric, or 0.
-     1. If |stream| has received a STOP_SENDING frame, abort these steps.
-     1. If it hasn't been done already, [=in parallel=], [=reset=] |stream|'s
-        [=WebTransport stream=] with |reason| as the Application Protocol Error
-         Code.
+1. Let |transport| be |stream|'s [=[[Transport]]=].
+1. Let |code| be the application protocol error code attached to the STOP_SENDING frame. [[!QUIC]]
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
+  1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
+  1. Let |error| be TBD.
+  1. [=WritableStream/Error=] |stream| with |error|.
+  1. [=Resolve=] {{SendStream}}.{{SendStream/remoteCanceled}} with a new
+     {{StreamAbortInfo}} with the {{StreamAbortInfo/errorCode}} set to |code|.
+
+</div>
 
 ## `StreamAbortInfo` Dictionary ##  {#stream-abort-info}
 
