@@ -258,6 +258,11 @@ A <dfn interface>DatagramDuplexStream</dfn> is a generic duplex stream.
 interface DatagramDuplexStream {
   readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
+
+  attribute double? incomingMaxAge;
+  attribute double? outgoingMaxAge;
+  attribute long incomingHighWaterMark;
+  attribute long outgoingHighWaterMark;
 };
 </pre>
 
@@ -357,6 +362,38 @@ A {{DatagramDuplexStream}} object has the following internal slots.
 : <dfn for="DatagramDuplexStream" attribute>writable</dfn>
 :: The getter steps are:
      1. Return [=this=].`[[Writable]]`.
+
+: <dfn for="DatagramDuplexStream" attribute>incomingMaxAge</dfn>
+:: The getter steps are:
+     1. Return [=this=]'s [=[[IncomingDatagramsExpirationDuration]]=].
+:: The setter steps are:
+     1. Let |value| be the given value.
+     1. If |value| is null or |value| > 0:
+       1. Set [=this=]'s [=[[IncomingDatagramsExpirationDuration]]=] to |value|.
+
+: <dfn for="DatagramDuplexStream" attribute>outgoingMaxAge</dfn>
+:: The getter steps are:
+     1. Return [=this=]'s [=[[OutgoingDatagramsExpirationDuration]]=].
+:: The setter steps are:
+     1. Let |value| be the given value.
+     1. If |value| is null or |value| > 0:
+       1. Set [=this=]'s [=[[OutgoingDatagramsExpirationDuration]]=] to |value|.
+
+: <dfn for="DatagramDuplexStream" attribute>incomingHighWaterMark</dfn>
+:: The getter steps are:
+     1. Return [=this=]'s [=[[IncomingDatagramsHighWaterMark]]=].
+:: The setter steps are:
+     1. Let |value| be the given value.
+     1. If |value| ≥ 0:
+       1. Set [=this=]'s [=[[IncomingDatagramsHighWaterMark]]=] to |value|.
+
+: <dfn for="DatagramDuplexStream" attribute>outgoingHighWaterMark</dfn>
+:: The getter steps are:
+     1. Return [=this=]'s [=[[OutgoingDatagramsHighWaterMark]]=].
+:: The setter steps are:
+     1. Let |value| be the given value.
+     1. If |value| ≥ 0:
+       1. Set [=this=]'s [=[[OutgoingDatagramsHighWaterMark]]=] to |value|.
 
 ## Procedures ## {#datagram-duplex-stream-procedures}
 
