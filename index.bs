@@ -1048,7 +1048,6 @@ that can be written to, to transmit data to the server.
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
 interface SendStream : WritableStream /* of Uint8Array */ {
-  readonly attribute Promise&lt;StreamAbortInfo&gt; remoteCanceled;
   undefined reset(optional StreamAbortInfo abortInfo = {});
 };
 </pre>
@@ -1088,13 +1087,6 @@ To <dfn export for="SendStream" lt="create|creating">create</dfn> a
 
 </div>
 
-## Attributes ##  {#send-stream-attributes}
-
-: <dfn attribute for="SendStream">remoteCanceled</dfn>
-:: The `remoteCanceled` attribute represents a promise that is [=fulfilled=]
-    when a message from the remote side aborting the stream is received.
-    For QUIC, that message is a STOP_SENDING frame.
-
 ## Methods ##  {#send-stream-methods}
 
 : <dfn method for="SendStream">reset(abortInfo)</dfn>
@@ -1123,9 +1115,6 @@ queue a task to run the following:
       1. Remove |stream| from the |transport|'s [=[[OutgoingStreams]]=].
       1. Let |reason| be the value from the STOP_SENDING frame from the remote side.
       1. [=WritableStream/Error=] |stream| with |reason|.
-      1. [=Resolve=] {{SendStream}}.{{SendStream/remoteCanceled}} with a new
-         {{StreamAbortInfo}} with the {{StreamAbortInfo/errorCode}} set to
-         |reason|.
 
 The {{SendStream}}'s <dfn>abortAlgorithm</dfn> is:
      1. Let |stream| be the {{SendStream}} object.
@@ -1162,7 +1151,6 @@ that can be read from, to consume data received from the server.
 <pre class="idl">
 [ Exposed=(Window,Worker) ]
 interface ReceiveStream : ReadableStream /* of Uint8Array */ {
-  readonly attribute Promise&lt;StreamAbortInfo&gt; remoteReset;
 };
 </pre>
 
@@ -1201,12 +1189,6 @@ To <dfn export for="ReceiveStream" lt="create|creating">create</dfn> a
 
 </div>
 
-## Attributes ##  {#receive-stream-attributes}
-
-:: The `remoteReset` attribute represents a promise that is [=fulfilled=]
-    when the a message from the remote side aborting the stream is received.
-    For QUIC, that message is a RESET_STREAM frame.
-
 ## Procedures ##  {#receive-stream-procedures}
 
 When a {{ReceiveStream}} receives a message from the remote side aborting the
@@ -1218,9 +1200,6 @@ queue a task to run the following:
          from.
       1. Let |reason| be the value from the message from the remote side.
       1. [=ReadableStream/Error=] |stream| with |reason|.
-      1. [=Resolve=] {{ReceiveStream}}.{{ReceiveStream/remoteReset}} with a new
-         {{StreamAbortInfo}} with the {{StreamAbortInfo/errorCode}} set to
-         |reason|.
 
 The {{ReceiveStream}}'s <dfn>cancelAlgorithm</dfn> is:
      1. Let |stream| be the {{ReceiveStream}} object.
