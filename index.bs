@@ -467,15 +467,15 @@ To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 1. While |queue| is not empty:
   1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
   1. If more than |duration| milliseconds have passed since |timestamp|, then:
-     1. [=Resolve=] |promise| with undefined.
      1. Remove the first element from |queue|.
+     1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with |undefined|.
   1. Otherwise, break this loop.
 1. While |queue| is not empty:
   1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
   1. If it is not possible to send |bytes| to the network immediately, then break this loop.
   1. [=session/Send a datagram=], with |session| and |bytes|.
-  1. [=Resolve=] |promise| with undefined.
   1. Remove the first element from |queue|.
+  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with |undefined|.
 
 The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whose
 [=[[State]]=] is `"connected"` as soon as reasonably possible whenever the algorithm can make
@@ -647,16 +647,23 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
    |networkPartitionKey|, |url|'s [=url/origin=], false, [=obtain a connection/http3Only=] set to
    true, and [=obtain a connection/dedicated=] set to |dedicated|.
-1. If |connection| is failure, then reject |promise| with a {{TypeError}} and abort these steps.
+1. If |connection| is failure:
+  1. [=Queue a network task=] with |transport| to [=reject=] |promise| with a {{TypeError}}.
+  1. Abort these steps.
 1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
    represents the SETTINGS frame.
 1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
-   contain H3_DATAGRAM with a value of 1, then reject |promise| with a {{TypeError}} and abort
-   these steps.
+   contain H3_DATAGRAM with a value of 1:
+  1. [=Queue a network task=] with |transport| to  [=reject=] |promise| with a {{TypeError}}.
+  1. Abort these steps.
 1. [=session/Establish=] a [=WebTransport session=] on |connection|.
-1. If the previous step fails, then reject |promise| with a {{TypeError}} and abort these steps.
-1. Set |transport|'s [=[[Session]]=] to the established [=WebTransport session=].
-1. Resolve |promise| with {{undefined}}.
+1. If the previous step fails:
+  1. [=Queue a network task=] with |transport| to  [=reject=] |promise| with a {{TypeError}}.
+  1. Abort these steps.
+1. Let |session| be the established [=WebTransport session=].
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. Set |transport|'s [=[[Session]]=] to |session|.
+  1. [=Resolve=] |promise| with {{undefined}}.
 
 </div>
 
@@ -670,11 +677,11 @@ these steps.
 1. Wait until there is an [=session/receive a bidirectional stream|available incoming bidirectional
    stream=].
 1. Let |internalStream| be the result of [=session/receiving a bidirectional stream=].
-1. Let |stream| be the result of [=BidirectionalStream/creating=] a {{BidirectionalStream}} with
-   |internalStream| and |transport|.
-1. [=ReadableStream/Enqueue=] |stream| to |transport|'s [=[[IncomingBidirectionalStreams]]=].
-1. [=Queue a global task=] on the [=network task source=] with |transport|'s
-   [=relevant global object=] and a task which [=resolves=] |p| with undefined.
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. Let |stream| be the result of [=BidirectionalStream/creating=] a {{BidirectionalStream}} with
+     |internalStream| and |transport|.
+  1. [=ReadableStream/Enqueue=] |stream| to |transport|'s [=[[IncomingBidirectionalStreams]]=].
+  1. [=Resolve=] |p| with undefined.
 
 </div>
 
@@ -738,15 +745,17 @@ these steps.
 :: Gathers stats for this {{WebTransport}}'s HTTP/3
    connection and reports the result asynchronously.</p>
 
-   When close is called, the user agent MUST run the following steps:
-     1. Let |transport| be the WebTransport on which `getStats` is invoked.
+   When getStats is called, the user agent MUST run the following steps:
+     1. Let |transport| be [=this=].
      1. Let |p| be a new promise.
      1. If the URL scheme associated with |transport| is not `https`,
         [=reject=] |p| with {{NotSupportedError}} and return |p|.
      1. Return |p| and continue the following steps [=in parallel=].
          1. Gather the stats from the underlying QUIC connection.
-         1. Once stats have been gathered, resolve |p| with the
-            {{WebTransportStats}} object, representing the gathered stats.
+         1. Wait for the stats to be ready.
+         1. [=Queue a network task=] with |transport| to run the following steps:
+           1. Let |stats| be a [=new=] {{WebTransportStats}} object representing the gathered stats.
+           1. [=Resolve=] |p| with |stats|.
 
 : <dfn for="WebTransport" method>createBidirectionalStream()</dfn>
 :: Creates a {{BidirectionalStream}} object for an outgoing bidirectional
@@ -788,15 +797,13 @@ these steps.
      1. Let |p| be a new promise.
      1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
         [=WebTransport/[[State]]=] becomes `"closed"` or `"failed"`, and instead
-        [=queue a global task=] on the [=network task source=] with |transport|'s
-        [=relevant global object=] and a task that [=rejects=] |p| with an {{InvalidStateError}}.
+        [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}.
         1. Wait for |transport|'s [=WebTransport/[[State]]=] to be `"connected"`.
         1. Let |internalStream| be the result of [=creating an outgoing stream=] with
            |transport|'s [=[[Session]]=].
 
           Note: This operation may take time, for example when the stream ID is exhausted. [[!QUIC]]
-        1. [=Queue a global task=] on the [=network task source=] with |transport|'s
-           [=relevant global object=] and a task that runs the following steps:
+        1. [=Queue a network task=] with |transport| to run the following steps:
           1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
              [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
           1. Let |stream| be the result of [=SendStream/creating=] a {{SendStream}} with
