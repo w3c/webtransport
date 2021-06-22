@@ -254,7 +254,7 @@ or <dfn for=stream>bidirectional</dfn>.
 A <dfn interface>DatagramDuplexStream</dfn> is a generic duplex stream.
 
 <pre class="idl">
-[Exposed=(Window,Worker)]
+[Exposed=(Window,Worker), SecureContext]
 interface DatagramDuplexStream {
   readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
@@ -487,7 +487,7 @@ progress.
 defined in [[!WEB-TRANSPORT-HTTP3]].
 
 <pre class="idl">
-[Exposed=(Window,Worker)]
+[Exposed=(Window,Worker), SecureContext]
 interface WebTransport {
   constructor(USVString url, optional WebTransportOptions options = {});
 
@@ -1046,7 +1046,7 @@ A <dfn interface>SendStream</dfn> is a {{WritableStream}} of {{Uint8Array}}
 that can be written to, to transmit data to the server.
 
 <pre class="idl">
-[ Exposed=(Window,Worker) ]
+[Exposed=(Window,Worker), SecureContext]
 interface SendStream : WritableStream /* of Uint8Array */ {
   readonly attribute Promise&lt;StreamAbortInfo&gt; remoteCanceled;
   undefined reset(optional StreamAbortInfo abortInfo = {});
@@ -1160,7 +1160,7 @@ A <dfn interface>ReceiveStream</dfn> is a {{ReadableStream}} of {{Uint8Array}}
 that can be read from, to consume data received from the server.
 
 <pre class="idl">
-[ Exposed=(Window,Worker) ]
+[Exposed=(Window,Worker), SecureContext]
 interface ReceiveStream : ReadableStream /* of Uint8Array */ {
   readonly attribute Promise&lt;StreamAbortInfo&gt; remoteReset;
 };
@@ -1235,7 +1235,7 @@ The {{ReceiveStream}}'s <dfn>cancelAlgorithm</dfn> is:
 # Interface `BidirectionalStream` #  {#bidirectional-stream}
 
 <pre class="idl">
-[ Exposed=(Window,Worker) ]
+[Exposed=(Window,Worker), SecureContext]
 interface BidirectionalStream {
   readonly attribute ReceiveStream readable;
   readonly attribute SendStream writable;
