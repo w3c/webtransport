@@ -815,22 +815,24 @@ these steps.
    following steps:
 
    1. Let |transport| be [=this=].
-   1. If |transport|'s {{WebTransport/state}} is `"closed"` or `"failed"`,
-      immediately return a new [=rejected=] promise with a newly created
-      {{InvalidStateError}} and abort these steps.
+   1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
+      return a new [=rejected=] promise with an {{InvalidStateError}}.
    1. Let |p| be a new promise.
-   1. Return |p| and continue the remaining steps [=in parallel=].
-   1. [=BidirectionalStream/create=] a {{BidirectionalStream}} with |transport|
-      and |p| when all of the following conditions are met:
-       1. The |transport|'s {{WebTransport/state}} is `"connected"`.
-       1. Stream creation flow control is not being violated by exceeding the
-          max stream limit set by the remote endpoint, as specified in
-          [[!QUIC]].
-       1. |p| has not been [=settled=].
-   1. Queue a task to [=reject=] |p| with a newly created {{InvalidStateError}}
-      when all of the following conditions are met:
-       1. The |transport|'s state is `"closed"` or `"failed"`.
-       1. |p| has not been [=settled=].
+   1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
+      [=WebTransport/[[State]]=] becomes `"closed"` or `"failed"`, and instead
+      [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}.
+      1. Wait for |transport|'s [=WebTransport/[[State]]=] to be `"connected"`.
+      1. Let |internalStream| be the result of [=creating a bidirectional stream=] with
+         |transport|'s [=[[Session]]=].
+
+        Note: This operation may take time, for example when the stream ID is exhausted. [[!QUIC]]
+      1. [=Queue a network task=] with |transport| to run the following steps:
+        1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
+           [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
+        1. Let |stream| be the result of [=BidirectionalStream/creating=] a {{BidirectionalStream}}
+           with |internalStream| and |transport|.
+        1. [=Resolve=] |p| with |stream|.
+   1. return |p|.
 
 : <dfn for="WebTransport" method>createUnidirectionalStream()</dfn>
 
