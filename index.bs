@@ -569,12 +569,12 @@ A {{WebTransport}} object has the following internal slots.
    <td class="non-normative">A sequence of {{SendStream}} objects.
   </tr>
   <tr>
-   <td><dfn>\[[ReceivedStreams]]</dfn>
-   <td class="non-normative">A {{ReadableStream}} consisting of {{ReceiveStream}} objects.
-  </tr>
-  <tr>
    <td><dfn>\[[IncomingBidirectionalStreams]]</dfn>
    <td class="non-normative">A {{ReadableStream}} consisting of {{BidirectionalStream}} objects.
+  </tr>
+  <tr>
+   <td><dfn>\[[IncomingUnidirectionalStreams]]</dfn>
+   <td class="non-normative">A {{ReadableStream}} consisting of {{ReceiveStream}} objects.
   </tr>
   <tr>
    <td><dfn>\[[State]]</dfn>
@@ -604,6 +604,7 @@ A {{WebTransport}} object has the following internal slots.
 
 ## Constructor ##  {#webtransport-constructor}
 
+<div algorithm="webtransport-contructor">
 When the {{WebTransport/constructor()}} constructor is invoked, the user
 agent MUST run the following steps:
 1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
@@ -630,9 +631,9 @@ agent MUST run the following steps:
     :: an empty [=ordered set=]
     : [=[[OutgoingStreams]]=]
     :: empty
-    : [=[[ReceivedStreams]]=]
-    :: a new {{ReadableStream}}
     : [=[[IncomingBidirectionalStreams]]=]
+    :: a new {{ReadableStream}}
+    : [=[[IncomingUnidirectionalStreams]]=]
     :: a new {{ReadableStream}}
     : [=[[State]]=]
     :: `"connecting"`
@@ -655,6 +656,11 @@ agent MUST run the following steps:
 1. [=ReadableStream/Set up=] |transport|'s [=[[IncomingBidirectionalStreams]]=] with
    [=ReadableStream/set up/pullAlgorithm=] set to |pullBidirectionalStreamAlgorithm|, and
    [=ReadableStream/set up/highWaterMark=] set to 0.
+1. Let |pullUnidirectionalStreamAlgorithm| be an action that runs [=pullUnidirectionalStream=]
+   with |transport|.
+1. [=ReadableStream/Set up=] |transport|'s [=[[IncomingUnidirectionalStreams]]=] with
+   [=ReadableStream/set up/pullAlgorithm=] set to |pullUnidirectionalStreamAlgorithm|, and
+   [=ReadableStream/set up/highWaterMark=] set to 0.
 1. Let |promise| be the result of [=initialize WebTransport over HTTP|initializing WebTransport
    over HTTP=], with |transport|, |parsedURL| and |dedicated|.
 1. [=Upon fulfillment=] of |promise|, run these steps:
@@ -666,6 +672,8 @@ agent MUST run the following steps:
    1. Reject |transport|'s [=[[Ready]]=] with |error|.
    1. Reject |transport|'s [=[[Closed]]=] with |error|.
 1. Return |transport|.
+
+</div>
 
 <div algorithm="initialize WebTransport over HTTP">
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
@@ -716,6 +724,23 @@ these steps.
 
 </div>
 
+<div algorithm>
+To <dfn>pullUnidirectionalStream</dfn>, given a {{WebTransport}} object <var>transport</var>, run
+these steps.
+
+1. Let |session| be |transport|'s [=[[Session]]=].
+1. Let |p| be a new promise.
+1. Return |p| and run the remaining steps [=in parallel=].
+1. Wait until there is an [=session/receive an incoming stream|available incoming stream=].
+1. Let |internalStream| be the result of [=session/receiving an incoming stream=].
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. Let |stream| be the result of [=ReceiveStream/creating=] a {{ReceiveStream}} with
+     |internalStream| and |transport|.
+  1. [=ReadableStream/Enqueue=] |stream| to |transport|'s [=[[IncomingUnidirectionalStreams]]=].
+  1. [=Resolve=] |p| with undefined.
+
+</div>
+
 ## Attributes ##  {#webtransport-attributes}
 
 : <dfn for="WebTransport" attribute>state</dfn>
@@ -746,15 +771,8 @@ these steps.
 : <dfn for="WebTransport" attribute>incomingUnidirectionalStreams</dfn>
 :: A {{ReadableStream}} of unidirectional streams, each represented by a
    {{ReceiveStream}} object, that have been received from the server.
-
    The getter steps for `incomingUnidirectionalStreams` are:
-     1. Let |transport| be [=this=].
-     1. Return this's [=[[ReceivedStreams]]=].
-     1. For each unidirectional stream received, create a corresponding
-        {{ReceiveStream}} and insert it into [=[[ReceivedStreams]]=]. As data
-        is received over the unidirectional stream, insert that data into the
-        corresponding `ReceiveStream` object.  When the remote side closes or
-        aborts the stream, close or abort the corresponding `ReceiveStream`.
+     1. Return [=this=]'s [=[[IncomingUnidirectionalStreams]]=].
 
 ## Methods ##  {#webtransport-methods}
 
@@ -851,6 +869,8 @@ To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |re
 1. Let |receiveStreams| be a copy of |transport|'s [=[[ReceiveStreams]]=].
 1. Let |ready| be |transport|'s [=[[Ready]]=].
 1. Let |closed| be |transport|'s [=[[Closed]]=].
+1. Let |incomingBidirectionalStreams| be |transport|'s [=[[IncomingBidirectionalStreams]]=].
+1. Let |incomingUnidirectionalStreams| be |transport|'s [=[[IncomingUnidirectionalStreams]]=].
 1. Set |transport|'s [=[[SendStreams]]=] to an empty [=set=].
 1. Set |transport|'s [=[[ReceiveStreams]]=] to an empty [=set=].
 1. If |abruptly| is true, then set |transport|'s [=[[State]]=] to `"failed"`.
@@ -865,10 +885,14 @@ To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |re
 
 1. If |abruptly| is true, then:
   1. [=Reject=] |closed| with |error|.
-  1. If |ready| is not [=settled=], then [=reject=] |ready| with |error|.
+  1. [=Reject=] |ready| with |error|.
+  1. [=ReadableStream/Error=] |incomingBidirectionalStreams| with |error|.
+  1. [=ReadableStream/Error=] |incomingUnidirectionalStreams| with |error|.
 1. Otherwise:
   1. [=Resolve=] |closed| with |reason|.
   1. Assert: |ready| is [=settled=].
+  1. [=ReadableStream/Close=] |incomingBidirectionalStreams|.
+  1. [=ReadableStream/Close=] |incomingUnidirectionalStreams|.
 
 </div>
 
@@ -972,33 +996,9 @@ enum WebTransportState {
 :: The transport has completed negotiation of a secure connection. Outgoing
    data and media can now flow through.
 : <dfn for="WebTransportState" enum-value>"closed"</dfn>
-:: The transport has been closed intentionally via a call to
-   {{WebTransport/close()}} or receipt of a closing message from the remote
-   side.  When the {{WebTransport}}'s [=[[State]]=]
-   transitions to `closed` the user agent MUST run the following steps:
-
-   1. Let |transport| be the {{WebTransport}}.
-   1. Close the {{ReadableStream}} in |transport|'s [=[[ReceivedStreams]]=].
-   1. Close the {{ReadableStream}} in |transport|'s
-      [=[[ReceivedBidirectionalStreams]]=].
-   1. For each {{SendStream}} in |transport|'s [=[[OutgoingStreams]]=]
-      run the following:
-
-     1. Let |stream| be the {{SendStream}}.
-     1. Remove the |stream| from the |transport|'s [=[[OutgoingStreams]]=].
-
+:: The transport has been closed cleanly. This is a terminal state.
 : <dfn for="WebTransportState" enum-value>"failed"</dfn>
-:: The transport has been closed as the result of an error (such as receipt of
-   an error alert). When the WebTransport's [=[[State]]=] transitions to
-   `failed` the user agent MUST run the following steps:
-
-   1. Close the {{ReadableStream}} in |transport|'s [=[[ReceivedStreams]]=].
-   1. Close the {{ReadableStream}} in |transport|'s
-      [=[[ReceivedBidirectionalStreams]]=].
-   1. For each {{SendStream}} in |transport|'s [=[[OutgoingStreams]]=]
-      run the following:
-
-     1. Remove the |stream| from the |transport|'s [=[[OutgoingStreams]]=].
+:: The transport has been closed abruptly. This is a terminal state.
 
 ## `WebTransportCloseInfo` Dictionary ##  {#web-transport-close-info}
 
