@@ -1114,7 +1114,6 @@ that can be written to, to transmit data to the server.
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
 interface SendStream : WritableStream /* of Uint8Array */ {
-  undefined reset(optional StreamAbortInfo abortInfo = {});
 };
 </pre>
 
@@ -1213,23 +1212,6 @@ To <dfn for="SendStream">abort</dfn> a {{SendStream}} |stream| with |reason|, ru
 1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
 
 </div>
-
-## Methods ##  {#send-stream-methods}
-
-: <dfn method for="SendStream">reset(abortInfo)</dfn>
-:: A hard shutdown of the {{SendStream}}. It may be called regardless of
-   whether the {{SendStream}} was created by the local or remote peer. When
-   the `reset` method is called, the user agent MUST run the following
-   steps:
-     1. Let |transport| be the {{WebTransport}}, which [=this=] stream was created
-        from.
-     1. Remove [=this=] from the transport's [=[[OutgoingStreams]]=].
-     1. Let |reason| be |abortInfo|.errorCode.
-     1. Let |p| be the result of [=WritableStream/abort|aborting=] [=this=], with |reason|.
-     1. Set |p|.[=[[PromiseIsHandled]]=] to true.
-     1. If it hasn't been done already, [=in parallel=], [=reset=] [=this=]
-        [=WebTransport stream=] with |reason| as the Application Protocol Error
-         Code.
 
 ## STOP_SENDING signal coming from the server ##  {#send-stream-STOP_SENDING}
 
@@ -1408,10 +1390,6 @@ in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>{{BidirectionalStream/writable}}.{{SendStream/reset}}({errorCode})</td>
-        <td>send RESET_STREAM with errorCode</td>
-      </tr>
       <tr>
         <td>{{BidirectionalStream/writable}}.{{WritableStream/abort}}(errorCode)</td>
         <td>send RESET_STREAM with errorCode</td>
