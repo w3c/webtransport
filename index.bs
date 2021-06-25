@@ -166,7 +166,7 @@ There may be multiple [=WebTransport session=]s on one [=connection=], when pool
    [section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
   </tr>
   <tr>
-   <td><dfn>create an [=stream/outgoing=] stream</dfn>
+   <td><dfn>create an [=stream/outgoing unidirectional=] stream</dfn>
    <td>[[!WEB-TRANSPORT-HTTP3]]
    [section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
   </tr>
@@ -176,7 +176,7 @@ There may be multiple [=WebTransport session=]s on one [=connection=], when pool
    [section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2)
   </tr>
   <tr>
-   <td><dfn>receive an [=stream/incoming=] stream</dfn>
+   <td><dfn>receive an [=stream/incoming unidirectional=] stream</dfn>
    <td>[[!WEB-TRANSPORT-HTTP3]]
    [section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
   </tr>
@@ -197,8 +197,8 @@ follow [[!WEB-TRANSPORT-HTTP3]]
 
 <dfn>WebTransport stream</dfn> is a concept for HTTP/3 stream on a [=WebTransport session=].
 
-A [=WebTransport stream=] is one of <dfn for=stream>incoming</dfn>, <dfn for=stream>outgoing</dfn>
-or <dfn for=stream>bidirectional</dfn>.
+A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn>,
+<dfn for=stream>outgoing unidirectional</dfn> or <dfn for=stream>bidirectional</dfn>.
 
 [=WebTransport stream=] has the following capabilities:
 
@@ -207,9 +207,9 @@ or <dfn for=stream>bidirectional</dfn>.
   <tr>
    <th>capability
    <th>definition
-   <th>incoming
-   <th>outgoing
-   <th>bidirectional
+   <th>[=stream/incoming unidirectional=]
+   <th>[=stream/outgoing unidirectional=]
+   <th>[=stream/bidirectional=]
   </tr>
  </thead>
  <tbody>
@@ -255,9 +255,9 @@ or <dfn for=stream>bidirectional</dfn>.
   <tr>
    <th>event
    <th>definition
-   <th>incoming
-   <th>outgoing
-   <th>bidirectional
+   <th>[=stream/incoming unidirectional=]
+   <th>[=stream/outgoing unidirectional=]
+   <th>[=stream/bidirectional=]
   </tr>
  </thead>
  <tbody>
@@ -731,8 +731,9 @@ these steps.
 1. Let |session| be |transport|'s [=[[Session]]=].
 1. Let |p| be a new promise.
 1. Return |p| and run the remaining steps [=in parallel=].
-1. Wait until there is an [=session/receive an incoming stream|available incoming stream=].
-1. Let |internalStream| be the result of [=session/receiving an incoming stream=].
+1. Wait until there is an
+   [=session/receive an incoming unidirectional stream|available incoming unidirectional stream=].
+1. Let |internalStream| be the result of [=session/receiving an incoming unidirectional stream=].
 1. [=Queue a network task=] with |transport| to run these steps:
   1. Let |stream| be the result of [=ReceiveStream/creating=] a {{ReceiveStream}} with
      |internalStream| and |transport|.
@@ -850,7 +851,7 @@ these steps.
         [=WebTransport/[[State]]=] becomes `"closed"` or `"failed"`, and instead
         [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}.
         1. Wait for |transport|'s [=WebTransport/[[State]]=] to be `"connected"`.
-        1. Let |internalStream| be the result of [=creating an outgoing stream=] with
+        1. Let |internalStream| be the result of [=creating an outgoing unidirectional stream=] with
            |transport|'s [=[[Session]]=].
 
           Note: This operation may take time, for example when the stream ID is exhausted. [[!QUIC]]
@@ -1099,7 +1100,8 @@ A {{SendStream}} has the following internal slots.
  <tbody>
   <tr>
    <td><dfn>\[[InternalStream]]</dfn>
-   <td class="non-normative">An [=outgoing=] or [=bidirectional=] [=WebTransport stream=].
+   <td class="non-normative">An [=outgoing unidirectional=] or [=bidirectional=]
+   [=WebTransport stream=].
   </tr>
   <tr>
    <td><dfn>\[[Transport]]</dfn>
@@ -1113,7 +1115,7 @@ A {{SendStream}} has the following internal slots.
 <div algorithm="create a SendStream">
 
 To <dfn export for="SendStream" lt="create|creating">create</dfn> a
-{{SendStream}}, with an [=outgoing=] or [=bidirectional=] [=WebTransport stream=]
+{{SendStream}}, with an [=outgoing unidirectional=] or [=bidirectional=] [=WebTransport stream=]
 |internalStream| and a {{WebTransport}} |transport|, run these steps:
 
 1. Let |stream| be a [=new=] {{SendStream}}, with:
@@ -1257,7 +1259,8 @@ A {{ReceiveStream}} has the following internal slots.
  <tbody>
   <tr>
    <td><dfn>\[[InternalStream]]</dfn>
-   <td class="non-normative">An [=incoming=] or [=bidirectional=] [=WebTransport stream=].
+   <td class="non-normative">An [=incoming unidirectional=] or [=bidirectional=]
+   [=WebTransport stream=].
   </tr>
 </table>
 
@@ -1266,7 +1269,7 @@ A {{ReceiveStream}} has the following internal slots.
 <div algorithm="create a ReceiveStream">
 
 To <dfn export for="ReceiveStream" lt="create|creating">create</dfn> a
-{{ReceiveStream}}, with an [=incoming=] or [=bidirectional=] [=WebTransport stream=]
+{{ReceiveStream}}, with an [=incoming unidirectional=] or [=bidirectional=] [=WebTransport stream=]
 |internalStream| and a {{WebTransport}} |transport|, run these steps:
 
 1. Let |stream| be a [=new=] {{ReceiveStream}}, with:
