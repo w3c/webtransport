@@ -1135,6 +1135,10 @@ A {{SendStream}} has the following internal slots.
    [=WebTransport stream=].
   </tr>
   <tr>
+   <td><dfn>\[[PendingOperation]]</dfn>
+   <td class="non-normative">A promise representing a pending write or close operation, or null.
+  </tr>
+  <tr>
    <td><dfn>\[[Transport]]</dfn>
    <td class="non-normative">A {{WebTransport}} which owns this {{SendStream}}.
   </tr>
@@ -1152,6 +1156,8 @@ To <dfn export for="SendStream" lt="create|creating">create</dfn> a
 1. Let |stream| be a [=new=] {{SendStream}}, with:
     : [=[[InternalStream]]=]
     :: |internalStream|
+    : [=[[PendingOperation]]=]
+    :: null
     : [=[[Transport]]=]
     :: |transport|
 1. Let |writeAlgorithm| be an action that [=writes=] |chunk| to |stream|, given |chunk|.
@@ -1160,6 +1166,12 @@ To <dfn export for="SendStream" lt="create|creating">create</dfn> a
 1. [=WritableStream/Set up=] |stream| with [=WritableStream/set up/writeAlgorithm=] set to
    |writeAlgorithm|, [=WritableStream/set up/closeAlgorithm=] set to |closeAlgorithm|,
    [=WritableStream/set up/abortAlgorithm=] set to |abortAlgorithm|.
+1. [=AbortSignal/Add=] the following steps to |stream|'s \[[controller]]'s \[[signal]].
+  1. If |stream|'s [=[[PendingOperation]]=] is null, then abort these steps.
+  1. Let |reason| be |stream|'s \[[controller]]'s \[[abortReason]].
+  1. [=Abort=] stream with |reason|.
+  1. [=Reject=] |stream|'s [=[[PendingOperation]]=] with |reason|.
+  1. Set |stream|'s [=[[PendingOperation]]=] to null.
 1. [=set/Append=] |stream| to |transport|'s [=[[SendStreams]]=].
 1. Return |stream|.
 
@@ -1172,10 +1184,13 @@ To <dfn for="SendStream">write</dfn> |chunk| to a {{SendStream}} |stream|, run t
 1. If |chunk| is not a {{Uint8Array}}, return [=a promise rejected with=] a {{TypeError}}.
 1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of the [=byte sequence=] which |chunk| represents.
+1. Set |stream|'s [=[[PendingOperation]]=] to |promise|.
 1. Return |promise| and run the remaining steps [=in parallel=].
 1. [=stream/Send=] |bytes| on |stream|'s [=[[InternalStream]]=] and wait for the operation to
    complete.
-1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. Set |stream|'s [=[[PendingOperation]]=] to null.
+  1. [=Resolve=] |promise| with undefined.
 
 Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
 SHOULD have a fixed size, to carry the backpressure information to the user of {{SendStream}}. This
@@ -1192,11 +1207,14 @@ To <dfn for="SendStream">close</dfn> a {{SendStream}} |stream|, run these steps:
 1. Let |transport| be |stream|'s [=[[Transport]]=].
 1. Let |promise| be a new promise.
 1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
+1. Set |stream|'s [=[[PendingOperation]]=] to |promise|.
 1. Return |promise| and run the remaining steps [=in parallel=].
 1. [=stream/Send=] FIN on |stream|'s [=[[InternalStream]]=] and wait for the operation to
    complete.
 1. Wait for |stream|'s [=[[InternalStream]]=] to enter the "Data Recvd" state. [[!QUIC]]
-1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. Set |stream|'s [=[[PendingOperation]]=] to null.
+  1. [=Resolve=] |promise| with undefined.
 
 </div>
 
