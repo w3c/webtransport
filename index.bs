@@ -255,7 +255,7 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
 
 [=WebTransport stream=] has the following signals:
 
-<table class="data" dfn-for="stream-event">
+<table class="data" dfn-for="stream-signal">
  <thead>
   <tr>
    <th>event
@@ -1235,7 +1235,7 @@ To <dfn for="SendStream">abort</dfn> a {{SendStream}} |stream| with |reason|, ru
 
 <div algorithm="STOP_SENDING signal">
 Whenever a [=WebTransport stream=] associated with a {{SendStream}} |stream| gets a
-[=stream-event/STOP_SENDING=] signal from the server, run these steps:
+[=stream-signal/STOP_SENDING=] signal from the server, run these steps:
 
 1. Let |transport| be |stream|'s [=[[Transport]]=].
 1. Let |code| be the application protocol error code attached to the STOP_SENDING frame. [[!QUIC]]
@@ -1294,44 +1294,97 @@ A {{ReceiveStream}} has the following internal slots.
    <td class="non-normative">An [=incoming unidirectional=] or [=bidirectional=]
    [=WebTransport stream=].
   </tr>
+  <tr>
+   <td><dfn>\[[Transport]]</dfn>
+   <td class="non-normative">The {{WebTransport}} object owning this {{ReceiveStream}}.
+  </tr>
 </table>
 
 ## Procedures ##  {#receive-stream-procedures}
 
-<div algorithm="create a ReceiveStream">
+<div algorithm>
 
 To <dfn export for="ReceiveStream" lt="create|creating">create</dfn> a
 {{ReceiveStream}}, with an [=incoming unidirectional=] or [=bidirectional=] [=WebTransport stream=]
 |internalStream| and a {{WebTransport}} |transport|, run these steps:
 
 1. Let |stream| be a [=new=] {{ReceiveStream}}, with:
-    : [=[[InternalStream]]=]
+    : [=ReceiveStream/[[InternalStream]]=]
     :: |internalStream|
-1. [=ReadableStream/Set up=] |stream| with TBD.
+    : [=ReceiveStream/[[Transport]]=]
+    :: |transport|
+1. Let |pullAlgorithm| be an action that [=pulls bytes=] from |stream|.
+1. Let |cancelAlgorithm| be an action that [=ReceiveStream/cancels=] |stream|.
+1. [=ReadableByteStream/Set up=] |stream| with
+   [=ReadableByteStream/set up/pullAlgorithm=] set to |pullAlgorithm|,
+   [=ReadableByteStream/set up/cancelAlgorithm=] set to |cancelAlgorithm|, and
+   [=ReadableByteStream/set up/highWaterMark=] set to 0.
 1. [=set/Add=] |stream| to |transport|'s [=[[ReceiveStreams]]=].
 1. Return |stream|.
 
 </div>
 
-When a {{ReceiveStream}} receives a message from the remote side aborting the
-stream (for QUIC, that message is an RESET_STREAM frame), the user agent MUST
-queue a task to run the following:
-      1. Let |stream| be the {{ReceiveStream}} object for which the reset
-         message was received.
-      1. Let |transport| be the {{WebTransport}}, which the |stream| was created
-         from.
-      1. Let |reason| be the value from the message from the remote side.
-      1. [=ReadableStream/Error=] |stream| with |reason|.
+<div algorithm>
 
-The {{ReceiveStream}}'s <dfn>cancelAlgorithm</dfn> is:
-     1. Let |stream| be the {{ReceiveStream}} object.
-     1. Let |transport| be the {{WebTransport}}, which the |stream| was created
-        from.
-     1. Let |reason| be the first argument, if it is numeric, or 0.
-     1. If |stream| has received a RESET_STREAM frame, abort these steps.
-     1. [=In parallel=], [=send STOP_SENDING=] over |stream|'s
-        [=WebTransport stream=] with |reason| as the Application Protocol Error
-         Code.
+To <dfn for="ReceiveStream">pull bytes</dfn> from a {{ReceiveStream}} |stream|, run these steps.
+
+1. Let |controller| be |stream|'s [=ReadableStream/[[controller]]=].
+1. Assert: |controller| is a {{ReadableByteStreamController}}.
+1. Let |transport| be |stream|'s [=ReceiveStream/[[Transport]]=].
+1. Let |internalStream| be |stream|'s [=ReceiveStream/[[InternalStream]]=].
+1. Let |promise| be a new promise.
+1. Let |request| be the result of running [=ReadableByteStreamControllerGetBYOBRequest=] with
+   |controller|.
+1. Let |view| be |request|'s [=ReadableStreamBYOBRequest/view=].
+1. Assert: |view| is not null.
+1. Let |bytes| be the byte sequence |view| represents.
+1. Return |promise| and run the remaining steps [=in parallel=].
+1. [=stream/receive|Read bytes=] into |bytes|, from |internalStream|. Let |read| be the number of
+   read bytes, and let |hasReceivedFIN| be whether FIN was accompanied.
+
+  Note: This operation may return before filling up all of |bytes|.
+
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. If |read| > 0, then perform [=ReadableByteStreamControllerRespond=] with |controller| and
+     |read|.
+  1. If |hasReceivedFIN| is true:
+    1. [=set/Remove=] |stream| from |transport|'s [=[[ReceiveStreams]]=].
+    1. [=ReadableStream/Close=] |stream|.
+  1. [=Resolve=] promise with undefined.
+
+</div>
+
+<div algorithm>
+
+To <dfn for="ReceiveStream">cancel</dfn> a {{ReceiveStream}} |stream|, run these steps.
+
+1. Let |transport| be |stream|'s [=ReceiveStream/[[Transport]]=].
+1. Let |internalStream| be |stream|'s [=ReceiveStream/[[InternalStream]]=].
+1. Let |promise| be a new promise.
+1. Return |promise| and run the remaining steps [=in parallel=].
+1. [=Send STOP_SENDING=] with |internalStream|.
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
+  1. [=set/Remove=] |stream| from |transport|'s [=[[ReceiveStreams]]=].
+  1. [=Resolve=] |promise| with undefined.
+
+</div>
+
+## Reset signal coming from the server ##  {#receive-stream-RESET_STREAM}
+
+<div algorithm="reset signal">
+Whenever a [=WebTransport stream=] associated with a {{ReceiveStream}} |stream| gets a
+[=stream-signal/reset=] signal from the server, run these steps:
+
+1. Let |transport| be |stream|'s [=ReceiveStream/[[Transport]]=].
+1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
+1. [=Queue a network task=] with |transport| to run these steps:
+  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
+  1. [=set/Remove=] |stream| from |transport|'s [=[[ReceiveStreams]]=].
+  1. Let |error| be TBD.
+  1. [=ReadableStream/Error=] |stream| with |error|.
+
+</div>
 
 # Interface `BidirectionalStream` #  {#bidirectional-stream}
 
