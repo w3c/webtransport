@@ -1315,10 +1315,11 @@ To <dfn export for="ReceiveStream" lt="create|creating">create</dfn> a
     :: |transport|
 1. Let |pullAlgorithm| be an action that [=pulls bytes=] from |stream|.
 1. Let |cancelAlgorithm| be an action that [=ReceiveStream/cancels=] |stream|.
-1. [=ReadableByteStream/Set up=] |stream| with
-   [=ReadableByteStream/set up/pullAlgorithm=] set to |pullAlgorithm|,
-   [=ReadableByteStream/set up/cancelAlgorithm=] set to |cancelAlgorithm|, and
-   [=ReadableByteStream/set up/highWaterMark=] set to 0.
+1. [=ReadableStream/Set up with byte reading support=] |stream| with
+   [=ReadableStream/set up with byte reading support/pullAlgorithm=] set to |pullAlgorithm| and
+   [=ReadableStream/set up with byte reading support/cancelAlgorithm=] set to |cancelAlgorithm|.
+1. Set |stream|'s [=ReadableByteStream/[[controller]]=]'s
+   [=ReadableStreamController/autoAllocateChunkSize=] to an [=implementation-defined=] integer.
 1. [=set/Add=] |stream| to |transport|'s [=[[ReceiveStreams]]=].
 1. Return |stream|.
 
@@ -1335,6 +1336,9 @@ To <dfn for="ReceiveStream">pull bytes</dfn> from a {{ReceiveStream}} |stream|, 
 1. Let |promise| be a new promise.
 1. Let |request| be the result of running [=ReadableByteStreamControllerGetBYOBRequest=] with
    |controller|.
+
+  Note: |request| is not null, because of [=ReadableStreamController/autoAllocateChunkSize=] set in
+  the [=ReceiveStream/create=] procedure.
 1. Let |view| be |request|'s [=ReadableStreamBYOBRequest/view=].
 1. Assert: |view| is not null.
 1. Let |bytes| be the byte sequence |view| represents.
