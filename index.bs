@@ -1318,8 +1318,6 @@ To <dfn export for="ReceiveStream" lt="create|creating">create</dfn> a
 1. [=ReadableStream/Set up with byte reading support=] |stream| with
    [=ReadableStream/set up with byte reading support/pullAlgorithm=] set to |pullAlgorithm| and
    [=ReadableStream/set up with byte reading support/cancelAlgorithm=] set to |cancelAlgorithm|.
-1. Set |stream|'s [=ReadableByteStream/[[controller]]=]'s
-   [=ReadableStreamController/autoAllocateChunkSize=] to an [=implementation-defined=] integer.
 1. [=set/Add=] |stream| to |transport|'s [=[[ReceiveStreams]]=].
 1. Return |stream|.
 
@@ -1334,21 +1332,30 @@ To <dfn for="ReceiveStream">pull bytes</dfn> from a {{ReceiveStream}} |stream|, 
 1. Let |transport| be |stream|'s [=ReceiveStream/[[Transport]]=].
 1. Let |internalStream| be |stream|'s [=ReceiveStream/[[InternalStream]]=].
 1. Let |promise| be a new promise.
-1. Let |request| be the result of running [=ReadableByteStreamControllerGetBYOBRequest=] with
-   |controller|.
-
-  Note: |request| is not null, because of [=ReadableStreamController/autoAllocateChunkSize=] set in
-  the [=ReceiveStream/create=] procedure.
-1. Let |view| be |request|'s [=ReadableStreamBYOBRequest/view=].
+1. **TBD, fix here this before merging**
 1. Assert: |view| is not null.
 1. Let |bytes| be the byte sequence |view| represents.
 1. Return |promise| and run the remaining steps [=in parallel=].
-1. [=stream/receive|Read bytes=] into |bytes|, from |internalStream|. Let |read| be the number of
-   read bytes, and let |hasReceivedFIN| be whether FIN was accompanied.
+1. [=stream/receive|Read bytes=] into |bytes|, from |internalStream|. Wait until either at least one
+   byte is read or FIN is received. Let |read| be the number of read bytes, and let |hasReceivedFIN|
+   be whether FIN was accompanied.
 
-  Note: This operation may return before filling up all of |bytes|.
+
+   Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
+   SHOULD have a fixed size, to carry the backpressure information to the server.
+
+   Note: This operation may return before filling up all of |bytes|.
+
+1. If the previous step failed, abort the remaining steps.
+
+  Note: We don't reject |promise| here because we handle network errors elsewhere, and those logic
+  error |stream| and reject the result of this read operation.
 
 1. [=Queue a network task=] with |transport| to run these steps:
+
+   Note: If the buffer described above is available in the [=event loop=] where this procedure is
+   running, this block MAY run immediately.
+
   1. If |read| > 0, then perform [=ReadableByteStreamControllerRespond=] with |controller| and
      |read|.
   1. If |hasReceivedFIN| is true:
@@ -1368,7 +1375,6 @@ To <dfn for="ReceiveStream">cancel</dfn> a {{ReceiveStream}} |stream|, run these
 1. Return |promise| and run the remaining steps [=in parallel=].
 1. [=Send STOP_SENDING=] with |internalStream|.
 1. [=Queue a network task=] with |transport| to run these steps:
-  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
   1. [=set/Remove=] |stream| from |transport|'s [=[[ReceiveStreams]]=].
   1. [=Resolve=] |promise| with undefined.
 
