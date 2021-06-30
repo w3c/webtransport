@@ -515,7 +515,7 @@ To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 1. While |queue| is not empty:
   1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
   1. If it is not possible to send |bytes| to the network immediately, then break this loop.
-  1. [=session/Send a datagram=], |transport|'s [=[[Session]]=] and |bytes|.
+  1. [=session/Send a datagram=], with |transport|'s [=[[Session]]=] and |bytes|.
   1. Remove the first element from |queue|.
   1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
 
