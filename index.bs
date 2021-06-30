@@ -477,6 +477,8 @@ The user agent SHOULD run [=receiveDatagrams=] for any {{WebTransport}} object w
 [=[[State]]=] is `"connected"` as soon as reasonably possible whenever the algorithm can make
 progress.
 
+<div algorithm>
+
 The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
 |data| as input. It is defined by running the following steps:
 1. Let |session| be |transport|'s [=[[Session]]=].
@@ -496,6 +498,10 @@ have been returned by [=writeDatagrams=] have been resolved. Hence the timestamp
 duration work well only when the web developer pays attention to
 {{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
 
+</div>
+
+<div algorithm>
+
 To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
 1. Let |queue| be |datagrams|'s [=[[OutgoingDatagramsQueue]]=].
 1. Let |duration| be |datagrams|'s [=[[OutgoingDatagramsExpirationDuration]]=].
@@ -506,16 +512,24 @@ To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
      1. Remove the first element from |queue|.
      1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with |undefined|.
   1. Otherwise, break this loop.
+1. If |transport|'s [=[[State]]=] is not `"connected"`, then return.
 1. While |queue| is not empty:
   1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
   1. If it is not possible to send |bytes| to the network immediately, then break this loop.
-  1. [=session/Send a datagram=], with |session| and |bytes|.
+  1. [=session/Send a datagram=], |transport|'s [=[[Session]]=] and |bytes|.
   1. Remove the first element from |queue|.
-  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with |undefined|.
+  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+
+</div>
 
 The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whose
-[=[[State]]=] is `"connected"` as soon as reasonably possible whenever the algorithm can make
-progress.
+[=[[State]]=] is `"connecting"` or `"connected"` as soon as reasonably possible whenever the
+algorithm can make progress.
+
+Note: Writing datagrams while the transport's [=[[State]]=] is `"connecting"` is allowed. The
+datagrams are stored in [=[[OutgoingDatagramsExpirationDuration]]=], and they can be discarded
+in the same manner as the `"connected"` case. Once the transport's [=[[State]]=] becomes
+`"connected"`, it will start sending stored datagrams.
 
 # `WebTransport` Interface #  {#web-transport}
 
