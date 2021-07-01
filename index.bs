@@ -1269,7 +1269,9 @@ The dictionary SHALL have the following fields:
 # Interface `ReceiveStream` #  {#receive-stream}
 
 A <dfn interface>ReceiveStream</dfn> is a {{ReadableStream}} of {{Uint8Array}}
-that can be read from, to consume data received from the server.
+that can be read from, to consume data received from the server. {{ReceiveStream}} is a
+[=readable byte stream=], and hence it allows its consumers to use a [=BYOB reader=]
+as well as a [=default reader=].
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
