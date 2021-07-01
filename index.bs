@@ -660,48 +660,49 @@ agent MUST run the following steps:
 1. [=ReadableStream/Set up=] |transport|'s [=[[IncomingUnidirectionalStreams]]=] with
    [=ReadableStream/set up/pullAlgorithm=] set to |pullUnidirectionalStreamAlgorithm|, and
    [=ReadableStream/set up/highWaterMark=] set to 0.
-1. Let |promise| be the result of [=initialize WebTransport over HTTP|initializing WebTransport
-   over HTTP=], with |transport|, |parsedURL| and |dedicated|.
-1. [=Upon fulfillment=] of |promise|, run these steps:
-   1. If |transport|'s [=[[State]]=] is not `"connecting"`, then abort these steps.
-   1. Set |transport|'s [=[[State]]=] to `"connected"`.
-   1. Resolve |transport|'s [=[[Ready]]=] with {{undefined}}.
-1. [=Upon rejection=] of |promise| with |error|, run these steps:
-   1. Set |transport|'s [=[[State]]=] to `"failed"`.
-   1. Reject |transport|'s [=[[Ready]]=] with |error|.
-   1. Reject |transport|'s [=[[Closed]]=] with |error|.
+1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL| and |dedicated|.
 1. Return |transport|.
 
 </div>
 
-<div algorithm="initialize WebTransport over HTTP">
+<div algorithm>
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 <var>transport</var>, a [=URL record=] |url|, and a boolean |dedicated|, run these steps.
 
-1. Let |promise| be a new promise.
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
-1. Return |promise| and run the following steps [=in parallel=].
+1. Run the remaining steps [=in parallel=], but abort them whenever |transport|'s
+   [=[[State]]=] becomes `"closed"` or `"failed"`.
 1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
    |networkPartitionKey|, |url|'s [=url/origin=], false, [=obtain a connection/http3Only=] set to
    true, and [=obtain a connection/dedicated=] set to |dedicated|.
-1. If |connection| is failure:
-  1. [=Queue a network task=] with |transport| to [=reject=] |promise| with a {{TypeError}}.
-  1. Abort these steps.
+1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
+   |transport| to run these steps:
+  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
+  1. Let |error| be a {{TypeError}}.
+  1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
    represents the SETTINGS frame.
 1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
-   contain H3_DATAGRAM with a value of 1:
-  1. [=Queue a network task=] with |transport| to  [=reject=] |promise| with a {{TypeError}}.
-  1. Abort these steps.
+   contain H3_DATAGRAM with a value of 1, then abort the remaining steps and [=queue a network
+   task=] with |transport| to run these steps:
+  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
+  1. Let |error| be a {{TypeError}}.
+  1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. [=session/Establish=] a [=WebTransport session=] on |connection|.
-1. If the previous step fails:
-  1. [=Queue a network task=] with |transport| to  [=reject=] |promise| with a {{TypeError}}.
-  1. Abort these steps.
+1. If the previous step fails, abort the remaining steps and [=queue a network task=] with
+   |transport| to run these steps:
+  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
+  1. Let |error| be a {{TypeError}}.
+  1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. Let |session| be the established [=WebTransport session=].
 1. [=Queue a network task=] with |transport| to run these steps:
+  1. If |transport|'s [=[[State]]=] is not `"connecting"`:
+    1. [=In parallel=], [=session/terminate=] |session| with TBD.
+    1. Abort these steps.
+  1. Set |transport|'s [=[[State]]=] to `"connected"`.
   1. Set |transport|'s [=[[Session]]=] to |session|.
-  1. [=Resolve=] |promise| with {{undefined}}.
+  1. [=Resolve=] |transport|'s [=[[Ready]]=] with undefined.
 
 </div>
 
@@ -781,8 +782,11 @@ these steps.
 
    When close is called, the user agent MUST run the following steps:
      1. Let |transport| be [=this=].
-     1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`,
-        then abort these steps.
+     1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
+     1. If |transport|'s [=[[State]]=] is `"connecting"`:
+       1. Let |error| be a {{TypeError}}.
+       1. [=Cleanup=] |transport| with |error|, |error| and true.
+       1. Abort these steps.
      1. Let |session| be |transport|'s [=[[Session]]=].
      1. In parallel, [=session/terminate=] |session| with |closeInfo|.{{WebTransportCloseInfo/errorCode}}.
 
