@@ -541,7 +541,7 @@ interface WebTransport {
   /* a ReadableStream of BidirectionalStream objects */
   readonly attribute ReadableStream incomingBidirectionalStreams;
 
-  Promise&lt;SendStream&gt; createUnidirectionalStream(optional SendStreamParameters parameters = {});
+  Promise&lt;SendStream&gt; createUnidirectionalStream();
   /* a ReadableStream of ReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 };
@@ -967,14 +967,6 @@ that determine how WebTransport connection is established and used.
    SHALL use certificate verification procedures it would use for normal
    [=fetch=] operations.
 :: This cannot be used with {{WebTransportOptions/allowPooling}}.
-
-<pre class="idl">
-dictionary SendStreamParameters {
-};
-</pre>
-
-The <dfn dictionary>SendStreamParameters</dfn> dictionary includes information
-relating to stream configuration.
 
 <div algorithm="compute a certificate fingerprint">
 To <dfn>compute a certificate fingerprint</dfn>, do the following:
