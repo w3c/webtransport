@@ -1334,9 +1334,14 @@ To <dfn for="ReceiveStream">pull bytes</dfn> from a {{ReceiveStream}} |stream|, 
 1. Let |transport| be |stream|'s [=ReceiveStream/[[Transport]]=].
 1. Let |internalStream| be |stream|'s [=ReceiveStream/[[InternalStream]]=].
 1. Let |promise| be a new promise.
-1. **TBD, fix here this before merging**
-1. Assert: |view| is not null.
+1. Let |view| be [=ReadableStream/current BYOB request view=] for |stream|.
+1. If |view| is null, set |view| to a [=new=] {{Uint8Array}} with an [=implementation-defined=]
+   size. If allocating the {{Uint8Array}} fails, return a promise [=rejected with=] a
+   {{RangeError}}.
 1. Let |bytes| be the byte sequence |view| represents.
+1. Assert: |bytes|'s length equals to |view|.\[[ByteLength]].
+1. Let |arrayBuffer| be |view|.\[[ViewedArrayBuffer]].
+1. Let |offset| be |view|.\[[ByteOffset]].
 1. Return |promise| and run the remaining steps [=in parallel=].
 1. [=stream/receive|Read bytes=] into |bytes|, from |internalStream|. Wait until either at least one
    byte is read or FIN is received. Let |read| be the number of read bytes, and let |hasReceivedFIN|
@@ -1358,8 +1363,8 @@ To <dfn for="ReceiveStream">pull bytes</dfn> from a {{ReceiveStream}} |stream|, 
    Note: If the buffer described above is available in the [=event loop=] where this procedure is
    running, the following steps MAY run immediately.
 
-  1. If |read| > 0, then perform [=ReadableByteStreamControllerRespond=] with |controller| and
-     |read|.
+  1. Set |view| to a [=new=] {{Uint8Array}} with |arrayBuffer|, |offset| and |read|.
+  1. If |read| > 0, then [=ReadableStream/enqueue bytes=] into |stream| with |view|.
   1. If |hasReceivedFIN| is true:
     1. [=set/Remove=] |stream| from |transport|'s [=[[ReceiveStreams]]=].
     1. [=ReadableStream/Close=] |stream|.
