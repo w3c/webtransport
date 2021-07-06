@@ -528,11 +528,9 @@ interface WebTransport {
   constructor(USVString url, optional WebTransportOptions options = {});
 
   Promise&lt;WebTransportStats&gt; getStats();
-  readonly attribute WebTransportState state;
   readonly attribute Promise&lt;undefined&gt; ready;
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   undefined close(optional WebTransportCloseInfo closeInfo = {});
-  attribute EventHandler onstatechange;
 
   readonly attribute unsigned short maxDatagramSize;
   readonly attribute DatagramDuplexStream datagrams;
@@ -579,7 +577,8 @@ A {{WebTransport}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>\[[State]]</dfn>
-   <td class="non-normative">A {{WebTransportState}}.
+   <td class="non-normative">An enum indicating the state of the transport. One of `"connecting"`,
+   `"connected"`, `"closed"`, and `"failed"`.
   </tr>
   <tr>
    <td><dfn>\[[Ready]]</dfn>
@@ -744,8 +743,6 @@ these steps.
 
 ## Attributes ##  {#webtransport-attributes}
 
-: <dfn for="WebTransport" attribute>state</dfn>
-:: The current state of the transport. On getting, it MUST return [=this=]'s [=[[State]]=].
 : <dfn for="WebTransport" attribute>ready</dfn>
 :: On getting, it MUST return [=this=]'s [=[[Ready]]=].
 : <dfn for="WebTransport" attribute>closed</dfn>
@@ -753,10 +750,6 @@ these steps.
 :: This promise MUST be [=resolved=] when the transport is closed; an
    implementation SHOULD include error information in the `reason` and
    `errorCode` fields of {{WebTransportCloseInfo}}.
-: <dfn for="WebTransport" attribute>onstatechange</dfn>
-:: This event handler, of event handler event type `statechange`, MUST be fired
-   any time the [=[[State]]=] changes, unless the state changes
-   due to calling {{WebTransport/close}}.
 : <dfn for="WebTransport" attribute>maxDatagramSize</dfn>
 :: The maximum size data that may be passed to
    {{DatagramTransport/datagrams}}' {{DatagramDuplexStream/writable}}.
@@ -1008,30 +1001,6 @@ Issue: Reconsider the time period above.  We want it to be sufficiently large
 that applications using this for ephemeral certificates can do so without
 having to fight the clock skew, but small enough to discourage long-term use
 without key rotation.
-
-## `WebTransportState` Enum ##  {#web-transport-state-enum}
-
-<dfn enum>WebTransportState</dfn> indicates the state of the transport.
-
-<pre class="idl">
-enum WebTransportState {
-  "connecting",
-  "connected",
-  "closed",
-  "failed"
-};
-</pre>
-
-: <dfn for="WebTransportState" enum-value>"connecting"</dfn>
-:: The transport is in the process of negotiating a secure connection. Once a
-   secure connection is negotiated, incoming data can flow through.
-: <dfn for="WebTransportState" enum-value>"connected"</dfn>
-:: The transport has completed negotiation of a secure connection. Outgoing
-   data and media can now flow through.
-: <dfn for="WebTransportState" enum-value>"closed"</dfn>
-:: The transport has been closed cleanly. This is a terminal state.
-: <dfn for="WebTransportState" enum-value>"failed"</dfn>
-:: The transport has been closed abruptly. This is a terminal state.
 
 ## `WebTransportCloseInfo` Dictionary ##  {#web-transport-close-info}
 
