@@ -710,6 +710,9 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 To <dfn>pullBidirectionalStream</dfn>, given a {{WebTransport}} object <var>transport</var>, run
 these steps.
 
+1. If |transport|'s [=[[State]]=] is `"connecting"`, then return the result of [=reacting=] to
+   |transport|'s [=[[Ready]]=] with the following step:
+  1. Return the result of [=pullBidirectionalStream=] with |transport|.
 1. Let |session| be |transport|'s [=[[Session]]=].
 1. Let |p| be a new promise.
 1. Return |p| and run the remaining steps [=in parallel=].
@@ -728,6 +731,9 @@ these steps.
 To <dfn>pullUnidirectionalStream</dfn>, given a {{WebTransport}} object <var>transport</var>, run
 these steps.
 
+1. If |transport|'s [=[[State]]=] is `"connecting"`, then return the result of [=reacting=] to
+   |transport|'s [=[[Ready]]=] with the following step:
+  1. Return the result of [=pullBidirectionalStream=] with |transport|.
 1. Let |session| be |transport|'s [=[[Session]]=].
 1. Let |p| be a new promise.
 1. Return |p| and run the remaining steps [=in parallel=].
