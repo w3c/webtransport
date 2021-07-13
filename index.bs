@@ -552,7 +552,7 @@ interface WebTransport {
   /* a ReadableStream of BidirectionalStream objects */
   readonly attribute ReadableStream incomingBidirectionalStreams;
 
-  Promise&lt;SendStream&gt; createUnidirectionalStream();
+  Promise&lt;WritableStream&gt; createUnidirectionalStream();
   /* a ReadableStream of ReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 };
@@ -573,7 +573,7 @@ A {{WebTransport}} object has the following internal slots.
  <tbody>
   <tr>
    <td><dfn>\[[SendStreams]]</dfn>
-   <td class="non-normative">An [=ordered set=] of {{SendStream}} objects owned by this {{WebTransport}}.
+   <td class="non-normative">An [=ordered set=] of {{SendStreams}} owned by this {{WebTransport}}.
   </tr>
   <tr>
    <td><dfn>\[[ReceiveStreams]]</dfn>
@@ -846,7 +846,7 @@ these steps.
 
 : <dfn for="WebTransport" method>createUnidirectionalStream()</dfn>
 
-:: Creates a {{SendStream}} object for an outgoing unidirectional stream.  Note
+:: Creates a {{SendStream}} for an outgoing unidirectional stream.  Note
    that the mere creation of a stream is not immediately visible to the server until it is used
    to send data.
 
@@ -1080,14 +1080,11 @@ The dictionary SHALL have the following attributes:
 
 # Interface `SendStream` #  {#send-stream}
 
-A <dfn interface>SendStream</dfn> is a {{WritableStream}} of {{Uint8Array}}
-that can be written to, to transmit data to the server.
+In this spec, we call a {{WritableStream}} providing outgoing streaming features with an [=outgoing
+unidirectional=] or [=bidirectional=] [=WebTransport stream=] a <dfn>SendStream</dfn>.
 
-<pre class="idl">
-[Exposed=(Window,Worker), SecureContext]
-interface SendStream : WritableStream /* of Uint8Array */ {
-};
-</pre>
+Note: {{SendStream}} is not a Web IDL type. A {{SendStream}} is always created by the
+[=SendStream/create=] procedure.
 
 ## Internal Slots ## {#send-stream-internal-slots}
 
