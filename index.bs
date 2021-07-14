@@ -1081,7 +1081,7 @@ The dictionary SHALL have the following attributes:
 # `SendStream` #  {#send-stream}
 
 In this spec, we call a {{WritableStream}} providing outgoing streaming features with an [=outgoing
-unidirectional=] or [=bidirectional=] [=WebTransport stream=] a <dfn>SendStream</dfn>.
+unidirectional=] or [=bidirectional=] [=WebTransport stream=] a <dfn interface>SendStream</dfn>.
 
 Note: {{SendStream}} is not a Web IDL type. A {{SendStream}} is always created by the
 [=SendStream/create=] procedure.
@@ -1113,6 +1113,11 @@ A {{SendStream}} has the following internal slots.
   </tr>
  <tbody>
 </table>
+
+Note: These internal slots need to be attached to {{SendStream}} (which is a kind of
+{{WritableStream}}s) conceptually, not phisically. For example, implementers MAY have a weak hash
+map whose key is {{SendStream}} and value is the set of these internal slots, to implement the
+internal slots.
 
 ## Procedures ##  {#send-stream-procedures}
 
