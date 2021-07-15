@@ -1224,27 +1224,8 @@ Whenever a [=WebTransport stream=] associated with a {{SendStream}} |stream| get
   1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
   1. Let |error| be TBD.
   1. [=WritableStream/Error=] |stream| with |error|.
-  1. [=Resolve=] {{SendStream}}.{{SendStream/remoteCanceled}} with a new
-     {{StreamAbortInfo}} with the {{StreamAbortInfo/errorCode}} set to |code|.
 
 </div>
-
-## `StreamAbortInfo` Dictionary ##  {#stream-abort-info}
-
-The <dfn dictionary>StreamAbortInfo</dfn> dictionary includes information
-relating to the error code for aborting an incoming or outgoing stream (
-in either a RESET_STREAM frame or a STOP_SENDING frame).
-
-<pre class="idl">
-dictionary StreamAbortInfo {
-  [EnforceRange] octet errorCode = 0;
-};
-</pre>
-
-The dictionary SHALL have the following fields:
-
-: <dfn for="StreamAbortInfo" dict-member>errorCode</dfn>
-:: The error code. The default value of 0 means "CLOSING."
 
 # Interface `ReceiveStream` #  {#receive-stream}
 
