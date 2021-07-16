@@ -1115,9 +1115,9 @@ A {{SendStream}} has the following internal slots.
 </table>
 
 Note: These internal slots need to be attached to {{SendStream}} (which is a kind of
-{{WritableStream}}) conceptually, not physically. For example, implementers may have a weak hash
-map whose key is {{SendStream}} and value is the set of these internal slots, to implement the
-internal slots.
+{{WritableStream}}) conceptually, not physically. For example, an implementation could place them on
+an object which is referenced from |writeAlgorithm|, |closeAlgorithm| and |abortAlgorithm| in the
+[=SendStream/create=] procedure.
 
 ## Procedures ##  {#send-stream-procedures}
 
