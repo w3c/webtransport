@@ -1364,7 +1364,7 @@ To <dfn for="ReceiveStream">pull bytes</dfn> from a {{ReceiveStream}} |stream|, 
    running, the following steps may run immediately.
 
   1. Set |view| to a [=new=] {{Uint8Array}} with |arrayBuffer|, |offset| and |read|.
-  1. If |read| > 0, then [=ReadableStream/enqueue=] into |stream| with |view|.
+  1. If |read| > 0, then [=ReadableStream/enqueue=] |view| into |stream|.
   1. If |hasReceivedFIN| is true:
     1. [=set/Remove=] |stream| from |transport|'s [=[[ReceiveStreams]]=].
     1. [=ReadableStream/Close=] |stream|.
