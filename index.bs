@@ -950,6 +950,22 @@ run these steps:
 
 </div>
 
+## Context cleanup steps ##  {#web-transport-context-cleanup-steps}
+
+This specification defines [=unloading document cleanup steps=] as the following steps, given a
+{{Document}} document:
+
+1. Let |window| be |document|'s [=relevent global object=].
+1. For each {{WebTransport}} |transport| whose [=relevent global object=] is |window|:
+  1. If |transport|'s [=[[State]]=] is `"connected"`, set |transport|'s [=[[State]]=] to `"failed"`
+     and [=session/terminate=] |transport|'s [=[[Session]]=] [=in parallel=].
+  1. If |transport|'s [=[[State]]=] is `"connecting"`, set |transport|'s [=[[State]]=] to
+     `"failed"`.
+
+  Issue: This needs to be done in workers too. See
+  <a href="https://www.github.com/w3c/webtransport/issues/127">#127</a> and
+  <a href="https://www.github.com/whatwg/html/issues/6831">whatwg/html#6731</a>.
+
 ## Configuration ##  {#web-transport-configuration}
 
 <pre class="idl">
