@@ -1370,6 +1370,73 @@ object |transport|, run these steps.
 
 </div>
 
+# `WebTransportError` Interface #  {#web-transport-error-interface}
+
+<dfn interface>WebTransportError</dfn> is a subclass of {{DOMException}} that represents
+
+ - An error coming from the server or the network, or
+ - An reason for a client initiated abort operation.
+
+<pre class="idl">
+[Exposed=(Window,Worker), SecureContext]
+interface WebTransportError : DOMException {
+  constructor(octet applicationProtocolCode, DOMString message);
+
+  readonly attribute octet applicationProtocolCode;
+};
+</pre>
+
+## Internal slots  ## {#web-transport-error-internal-slots}
+
+A {{WebTransportError}} has the following internal slots.
+
+<table class="data" dfn-for="WebTransportError">
+ <thead>
+  <tr>
+   <th>Internal Slot
+   <th>Description (<em>non-normative</em>)
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>\[[ApplicationProtocolCode]]</dfn>
+   <td class="non-normative">The application protocol error code for this error.
+  </tr>
+  <tr>
+ </tbody>
+</table>
+
+## Constructor ##  {#web-transport-error-constructor1}
+
+<div algorithm>
+
+The <dfn constructor for="WebTransportError">new
+WebTransportError(applicationProtocolCode, message)</dfn> constructor steps are:
+
+1. Let |error| be [=this=].
+1. [=WebTransportError/Set up=] |error| with |message|.
+1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |applicationProtocolCode|.
+
+</div>
+
+## Attributes ## {#web-transport-error-methods}
+
+: <dfn for="WebTransportError" attribute>applicationProtocolCode</dfn>
+:: The getter steps are to return [=this=]'s [=[[ApplicationProtocolCode]]=].
+
+## Procedures ## {#web-transport-error-procedures}
+
+<div algorithm>
+
+To <dfn for="WebTransportError">set up</dfn> a {{WebTranspoerError}} |error| with a DOMString
+|message|, run these steps:
+
+1. Run {{new DOMException(message, name)}} constructor steps with |error|, |message| and
+   `"WebTransportError"`.
+
+   Note: This name does not have a mapping to a legacy code, so |error|'s {{DOMException/code}}
+   is 0.
+
 # Protocol Mappings # {#protocol-mapping}
 
 *This section is non-normative.*
