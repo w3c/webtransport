@@ -1343,7 +1343,7 @@ To <dfn for="ReceiveStream">pull bytes</dfn> from a {{ReceiveStream}} |stream|, 
   1. Set |offset| to 0.
   1. Set |maxBytes| to an [=implementation-defined=] size.
   1. Set |buffer| be a [=new=] {{ArrayBuffer}} with |maxBytes| size. If allocating the
-     {{Uint8Array}} fails, return a promise [=rejected with=] a {{RangeError}}.
+     {{ArrayBuffer}} fails, return a promise [=rejected with=] a {{RangeError}}.
 1. Return |promise| and run the remaining steps [=in parallel=].
 1. [=ArrayBuffer/Write=] the bytes that area [=stream/receive|read=] from |internalStream| into
    |buffer| with offset |offset|, up to |maxBytes| bytes. Wait until either at least one byte is
