@@ -553,7 +553,7 @@ interface WebTransport {
   readonly attribute ReadableStream incomingBidirectionalStreams;
 
   Promise&lt;WritableStream&gt; createUnidirectionalStream();
-  /* a ReadableStream of ReceiveStream objects */
+  /* a ReadableStream of ReceiveStreams */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 };
 
@@ -577,7 +577,7 @@ A {{WebTransport}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>\[[ReceiveStreams]]</dfn>
-   <td class="non-normative">An [=ordered set=] of {{ReceiveStream}} objects owned by this
+   <td class="non-normative">An [=ordered set=] of {{ReceiveStreams}} owned by this
    {{WebTransport}}.
   </tr>
   <tr>
@@ -586,7 +586,7 @@ A {{WebTransport}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>\[[IncomingUnidirectionalStreams]]</dfn>
-   <td class="non-normative">A {{ReadableStream}} consisting of {{ReceiveStream}} objects.
+   <td class="non-normative">A {{ReadableStream}} consisting of {{ReceiveStreams}}.
   </tr>
   <tr>
    <td><dfn>\[[State]]</dfn>
@@ -783,7 +783,7 @@ these steps.
      1. Return [=this=]'s [=[[IncomingBidirectionalStreams]]=].
 : <dfn for="WebTransport" attribute>incomingUnidirectionalStreams</dfn>
 :: A {{ReadableStream}} of unidirectional streams, each represented by a
-   {{ReceiveStream}} object, that have been received from the server.
+   {{ReceiveStream}}, that have been received from the server.
    The getter steps for `incomingUnidirectionalStreams` are:
      1. Return [=this=]'s [=[[IncomingUnidirectionalStreams]]=].
 
@@ -1245,18 +1245,17 @@ Whenever a [=WebTransport stream=] associated with a {{SendStream}} |stream| get
 
 </div>
 
-# Interface `ReceiveStream` #  {#receive-stream}
+# `ReceiveStream` #  {#receive-stream}
 
-A <dfn interface>ReceiveStream</dfn> is a {{ReadableStream}} of {{Uint8Array}}
-that can be read from, to consume data received from the server. {{ReceiveStream}} is a
-[=readable byte stream=], and hence it allows its consumers to use a [=BYOB reader=]
-as well as a [=default reader=].
+In this spec, we call a {{ReadableStream}} providing incoming streaming features with an [=incoming
+unidirectional=] or [=bidirectional=] [=WebTransport stream=] a <dfn interface>ReceiveStream</dfn>.
 
-<pre class="idl">
-[Exposed=(Window,Worker), SecureContext]
-interface ReceiveStream : ReadableStream /* of Uint8Array */ {
-};
-</pre>
+A {{ReceiveStream}} is a {{ReadableStream}} of {{Uint8Array}} that can be read from, to consume
+data received from the server. {{ReceiveStream}} is a [=readable byte stream=], and hence it allows
+its consumers to use a [=BYOB reader=] as well as a [=default reader=].
+
+Note: {{ReceiveStream}} is not a Web IDL type. A {{ReceiveStream}} is always created by the
+[=ReceiveStream/create=] procedure.
 
 ## Internal Slots ## {#receive-stream-internal-slots}
 
@@ -1281,6 +1280,11 @@ A {{ReceiveStream}} has the following internal slots.
   </tr>
 </table>
 
+Note: These internal slots need to be attached to {{ReceiveStream}} (which is a kind of
+{{ReadableStream}}) conceptually, not physically. For example, an implementation could place them on
+an object which is referenced from |pullAlgorithm| and |cancelAlgorithm| in the
+[=ReceiveStream/create=] procedure.
+
 ## Procedures ##  {#receive-stream-procedures}
 
 <div algorithm>
@@ -1289,7 +1293,7 @@ To <dfn export for="ReceiveStream" lt="create|creating">create</dfn> a
 {{ReceiveStream}}, with an [=incoming unidirectional=] or [=bidirectional=] [=WebTransport stream=]
 |internalStream| and a {{WebTransport}} |transport|, run these steps:
 
-1. Let |stream| be a [=new=] {{ReceiveStream}}, with:
+1. Let |stream| be a [=new=] {{ReadableStream}}, with:
     : [=ReceiveStream/[[InternalStream]]=]
     :: |internalStream|
     : [=ReceiveStream/[[Transport]]=]
@@ -1393,7 +1397,7 @@ Whenever a [=WebTransport stream=] associated with a {{ReceiveStream}} |stream| 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
 interface BidirectionalStream {
-  readonly attribute ReceiveStream readable;
+  readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
 };
 </pre>
