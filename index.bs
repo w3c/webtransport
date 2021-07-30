@@ -1381,9 +1381,10 @@ object |transport|, run these steps.
  - A reason for a client-initiated abort operation.
 
 <pre class="idl">
+
 [Exposed=(Window,Worker), SecureContext]
 interface WebTransportError : DOMException {
-  constructor(WebTransportErrorInit init, optional DOMString message = "");
+  constructor(optional WebTransportErrorInit init = {});
 
   readonly attribute octet? applicationProtocolCode;
 };
@@ -1403,7 +1404,7 @@ A {{WebTransportError}} has the following internal slots.
  <tbody>
   <tr>
    <td><dfn>\[[ApplicationProtocolCode]]</dfn>
-   <td class="non-normative">The application protocol error code for this error.
+   <td class="non-normative">The application protocol error code for this error, or null.
   </tr>
  </tbody>
 </table>
@@ -1413,12 +1414,15 @@ A {{WebTransportError}} has the following internal slots.
 <div algorithm>
 
 The <dfn constructor for="WebTransportError"
-lt="WebTransportError(applicationProtocolCode, message)">new
-WebTransportError(applicationProtocolCode, message)</dfn> constructor steps are:
+lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps are:
 
 1. Let |error| be [=this=].
+1. Let |message| be `""`.
+1. If |init|'s {{WebTransportErrorInit/message}} exists, set |message| to |init|'s
+   {{WebTransportErrorInit/message}}.
 1. [=WebTransportError/Set up=] |error| with |message|.
-1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |applicationProtocolCode|.
+1. If |init|'s {{WebTransportErrorInit/applicationProtocolCode}} exists, set |error|'s
+   [=[[ApplicationProtocolCode]]=] to |init|'s {{WebTransportErrorInit/applicationProtocolCode}}.
 
 </div>
 
@@ -1439,6 +1443,22 @@ To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| wit
 
    Note: This name does not have a mapping to a legacy code, so |error|'s {{DOMException/code}}
    is 0.
+
+## Configuration ## {#web-transport-error-configuration}
+
+<pre class="idl">
+
+dictionary WebTransportErrorInit {
+  octet applicationProtocolCode;
+  DOMString message;
+};
+
+</pre>
+
+: <dfn for="WebTransportErrorInit" dict-member>applicationProtocolCode</dfn>
+:: Used to set {{WebTransportError/applicationProtocolCode}}.
+: <dfn for="WebTransportErrorInit" dict-member>message</dfn>
+:: Used to set {{DOMException/message}}.
 
 # Protocol Mappings # {#protocol-mapping}
 
