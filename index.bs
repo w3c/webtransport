@@ -1421,12 +1421,14 @@ The <dfn constructor for="WebTransportError"
 lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps are:
 
 1. Let |error| be [=this=].
+1. Set |error|'s internal slots as:
+    : [=[[ApplicationProtocolCode]]=]
+    :: null
 1. Let |message| be `""`.
-1. If |init|'s {{WebTransportErrorInit/message}} exists, set |message| to |init|'s
-   {{WebTransportErrorInit/message}}.
+1. Set |message| to |init|'s {{WebTransportErrorInit/message}} if it exists.
 1. [=WebTransportError/Set up=] |error| with |message|.
-1. If |init|'s {{WebTransportErrorInit/applicationProtocolCode}} exists, set |error|'s
-   [=[[ApplicationProtocolCode]]=] to |init|'s {{WebTransportErrorInit/applicationProtocolCode}}.
+1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |init|'s
+   {{WebTransportErrorInit/applicationProtocolCode}} if it exists.
 
 </div>
 
