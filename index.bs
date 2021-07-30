@@ -1381,12 +1381,16 @@ object |transport|, run these steps.
  - A reason for a client-initiated abort operation.
 
 <pre class="idl">
-
 [Exposed=(Window,Worker), SecureContext]
 interface WebTransportError : DOMException {
   constructor(optional WebTransportErrorInit init = {});
 
   readonly attribute octet? applicationProtocolCode;
+};
+
+dictionary WebTransportErrorInit {
+  octet applicationProtocolCode;
+  DOMString message;
 };
 </pre>
 
@@ -1426,7 +1430,7 @@ lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps
 
 </div>
 
-## Attributes ## {#web-transport-error-methods}
+## Attributes ## {#web-transport-error-attributes}
 
 : <dfn for="WebTransportError" attribute>applicationProtocolCode</dfn>
 :: The getter steps are to return [=this=]'s [=[[ApplicationProtocolCode]]=].
@@ -1445,22 +1449,6 @@ To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| wit
    is 0.
 
 </div>
-
-## Configuration ## {#web-transport-error-configuration}
-
-<pre class="idl">
-
-dictionary WebTransportErrorInit {
-  octet applicationProtocolCode;
-  DOMString message;
-};
-
-</pre>
-
-: <dfn for="WebTransportErrorInit" dict-member>applicationProtocolCode</dfn>
-:: Used to set {{WebTransportError/applicationProtocolCode}}.
-: <dfn for="WebTransportErrorInit" dict-member>message</dfn>
-:: Used to set {{DOMException/message}}.
 
 # Protocol Mappings # {#protocol-mapping}
 
