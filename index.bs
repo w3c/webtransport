@@ -73,7 +73,6 @@ spec:html; type:dfn; for:/; text:origin
 spec:fetch; type:dfn; for:/; text:fetch
 spec:url; type:dfn; text:scheme
 spec:url; type:dfn; text:fragment
-spec:webidl; type:dfn; for:/; text:new DOMException(message, name)
 </pre>
 <pre class="anchors">
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMASCRIPT-6.0
@@ -83,6 +82,9 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMA
     text: pending; url: sec-promise-objects
     text: resolved; url: sec-promise-objects
     text: settled; url: sec-promise-objects
+urlPrefix: https://heycam.github.io/webidl/; spec: WEBIDL
+  type: dfn
+    text: new DOMException(message, name); for:DOMException; url: ref-for-dom-domexception-domexception
 </pre>
 
 # Introduction #    {#introduction}
@@ -1432,8 +1434,8 @@ WebTransportError(applicationProtocolCode, message)</dfn> constructor steps are:
 To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| with a DOMString
 |message|, run these steps:
 
-1. Run {{new DOMException(message, name)}} constructor steps with |error|, |message| and
-   `"WebTransportError"`.
+1. Run [=DOMException/new DOMException(message, name)=] constructor steps with |error|, |message|
+   and `"WebTransportError"`.
 
    Note: This name does not have a mapping to a legacy code, so |error|'s {{DOMException/code}}
    is 0.
