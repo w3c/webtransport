@@ -82,6 +82,9 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMA
     text: pending; url: sec-promise-objects
     text: resolved; url: sec-promise-objects
     text: settled; url: sec-promise-objects
+urlPrefix: https://heycam.github.io/webidl/; spec: WEBIDL
+  type: dfn
+    text: new DOMException(message, name); for:DOMException; url: dom-domexception-domexception
 </pre>
 
 # Introduction #    {#introduction}
@@ -1447,6 +1450,85 @@ object |transport|, run these steps.
     : [=[[Transport]]=]
     :: |transport|
 1. Return |stream|.
+
+</div>
+
+# `WebTransportError` Interface #  {#web-transport-error-interface}
+
+<dfn interface>WebTransportError</dfn> is a subclass of {{DOMException}} that represents
+
+ - An error coming from the server or the network, or
+ - A reason for a client-initiated abort operation.
+
+<pre class="idl">
+[Exposed=(Window,Worker), SecureContext]
+interface WebTransportError : DOMException {
+  constructor(optional WebTransportErrorInit init = {});
+
+  readonly attribute octet? applicationProtocolCode;
+};
+
+dictionary WebTransportErrorInit {
+  octet applicationProtocolCode;
+  DOMString message;
+};
+</pre>
+
+## Internal slots  ## {#web-transport-error-internal-slots}
+
+A {{WebTransportError}} has the following internal slots.
+
+<table class="data" dfn-for="WebTransportError">
+ <thead>
+  <tr>
+   <th>Internal Slot
+   <th>Description (<em>non-normative</em>)
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>\[[ApplicationProtocolCode]]</dfn>
+   <td class="non-normative">The application protocol error code for this error, or null.
+  </tr>
+ </tbody>
+</table>
+
+## Constructor ##  {#web-transport-error-constructor1}
+
+<div algorithm>
+
+The <dfn constructor for="WebTransportError"
+lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps are:
+
+1. Let |error| be [=this=].
+1. Set |error|'s internal slots as:
+    : [=[[ApplicationProtocolCode]]=]
+    :: null
+1. Let |message| be `""`.
+1. Set |message| to |init|'s {{WebTransportErrorInit/message}} if it exists.
+1. [=WebTransportError/Set up=] |error| with |message|.
+1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |init|'s
+   {{WebTransportErrorInit/applicationProtocolCode}} if it exists.
+
+</div>
+
+## Attributes ## {#web-transport-error-attributes}
+
+: <dfn for="WebTransportError" attribute>applicationProtocolCode</dfn>
+:: The getter steps are to return [=this=]'s [=[[ApplicationProtocolCode]]=].
+
+## Procedures ## {#web-transport-error-procedures}
+
+<div algorithm>
+
+To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| with a DOMString
+|message|, run these steps:
+
+1. Run [=DOMException/new DOMException(message, name)=] constructor steps with |error|, |message|
+   and `"WebTransportError"`.
+
+   Note: This name does not have a mapping to a legacy code, so |error|'s {{DOMException/code}}
+   is 0.
 
 </div>
 
