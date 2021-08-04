@@ -485,7 +485,7 @@ progress.
 The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
 |data| as input. It is defined by running the following steps:
 1. Let |timestamp| be a timestamp representing now.
-1. If |data| is not a {{Uint8Array}} object, then return [=a promise rejected with=] a {{TypeError}}.
+1. If |data| is not a {{BufferSource}} object, then return [=a promise rejected with=] a {{TypeError}}.
 1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of bytes which |data| represents.
 1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
@@ -1183,7 +1183,7 @@ To <dfn export for="SendStream" lt="create|creating">create</dfn> a
 To <dfn for="SendStream">write</dfn> |chunk| to a {{SendStream}} |stream|, run these steps:
 
 1. Let |transport| be |stream|'s [=[[Transport]]=].
-1. If |chunk| is not a {{Uint8Array}}, return [=a promise rejected with=] a {{TypeError}}.
+1. If |chunk| is not a {{BufferSource}}, return [=a promise rejected with=] a {{TypeError}}.
 1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of the [=byte sequence=] which |chunk| represents.
 1. Set |stream|'s [=[[PendingOperation]]=] to |promise|.
