@@ -1230,8 +1230,16 @@ To <dfn for="SendStream">abort</dfn> a {{SendStream}} |stream| with |reason|, ru
 
 1. Let |transport| be |stream|'s [=[[Transport]]=].
 1. Let |promise| be a new promise.
-1. Let |code| be TBD.
+1. Let |code| be 0.
 1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
+1. If |reason| is a {{WebTransportError}} and |reasons|'s [=[[ApplicationProtocolCode]]=] is not
+   null, then set |code| to |reason|'s [=[[ApplicationProtocolCode]]=].
+1. If |code| < 0, then set |code| to 0.
+1. If |code| > 255, then set |code| to 255.
+
+Note: |code| ranges in 0 and 255. The code will be encoded to a number in
+      [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+
 1. Return |promise| and run the remaining steps [=in parallel=].
 1. [=stream/Reset=] |stream|'s [=[[InternalStream]]=] with |code|.
 1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
@@ -1246,6 +1254,10 @@ Whenever a [=WebTransport stream=] associated with a {{SendStream}} |stream| get
 
 1. Let |transport| be |stream|'s [=[[Transport]]=].
 1. Let |code| be the application protocol error code attached to the STOP_SENDING frame. [[!QUIC]]
+
+Note: |code| ranges in 0 and 255. The code has been decoded from a number in
+      [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
   1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
@@ -1308,7 +1320,8 @@ To <dfn export for="ReceiveStream" lt="create|creating">create</dfn> a
     : [=ReceiveStream/[[Transport]]=]
     :: |transport|
 1. Let |pullAlgorithm| be an action that [=pulls bytes=] from |stream|.
-1. Let |cancelAlgorithm| be an action that [=ReceiveStream/cancels=] |stream|.
+1. Let |cancelAlgorithm| be an action that [=ReceiveStream/cancels=] |stream| with |reason|, given
+   |reason|.
 1. [=ReadableStream/Set up with byte reading support=] |stream| with
    [=ReadableStream/set up with byte reading support/pullAlgorithm=] set to |pullAlgorithm| and
    [=ReadableStream/set up with byte reading support/cancelAlgorithm=] set to |cancelAlgorithm|.
@@ -1368,13 +1381,24 @@ To <dfn for="ReceiveStream">pull bytes</dfn> from a {{ReceiveStream}} |stream|, 
 
 <div algorithm>
 
-To <dfn for="ReceiveStream">cancel</dfn> a {{ReceiveStream}} |stream|, run these steps.
+To <dfn for="ReceiveStream">cancel</dfn> a {{ReceiveStream}} |stream| with |reason|, run these
+steps.
 
 1. Let |transport| be |stream|'s [=ReceiveStream/[[Transport]]=].
 1. Let |internalStream| be |stream|'s [=ReceiveStream/[[InternalStream]]=].
 1. Let |promise| be a new promise.
+1. Let |code| be 0.
+1. If |reason| is a {{WebTransportError}} and |reasons|'s [=[[ApplicationProtocolCode]]=] is not
+   null, then set |code| to |reason|'s [=[[ApplicationProtocolCode]]=].
+1. If |code| < 0, then set |code| to 0.
+1. If |code| > 255, then set |code| to 255.
+
+Note: |code| ranges in 0 and 255. The code will be encoded to a number in
+      [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+
+1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
 1. Return |promise| and run the remaining steps [=in parallel=].
-1. [=Send STOP_SENDING=] with |internalStream|.
+1. [=Send STOP_SENDING=] with |internalStream| and |code|.
 1. [=Queue a network task=] with |transport| to run these steps:
 
   Note: If the buffer described above is available in the [=event loop=] where this procedure is
@@ -1393,6 +1417,10 @@ Whenever a [=WebTransport stream=] associated with a {{ReceiveStream}} |stream| 
 
 1. Let |transport| be |stream|'s [=ReceiveStream/[[Transport]]=].
 1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
+
+Note: |code| ranges in 0 and 255. The code has been decoded from a number in
+      [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
   1. [=set/Remove=] |stream| from |transport|'s [=[[ReceiveStreams]]=].
