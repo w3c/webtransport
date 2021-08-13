@@ -1472,11 +1472,18 @@ interface WebTransportError : DOMException {
   constructor(optional WebTransportErrorInit init = {});
 
   readonly attribute octet? applicationProtocolCode;
+  readonly attribute WebTransportErrorSource source;
 };
 
 dictionary WebTransportErrorInit {
   octet applicationProtocolCode;
   DOMString message;
+};
+
+enum WebTransportErrorSource {
+  "stream",
+  "session",
+  "connection",
 };
 </pre>
 
@@ -1496,6 +1503,10 @@ A {{WebTransportError}} has the following internal slots.
    <td><dfn>\[[ApplicationProtocolCode]]</dfn>
    <td class="non-normative">The application protocol error code for this error, or null.
   </tr>
+  <tr>
+   <td><dfn>\[[Source]]</dfn>
+   <td class="non-normative">A {{WebTransportErrorSource}} indicating the source of this error.
+  </tr>
  </tbody>
 </table>
 
@@ -1512,7 +1523,7 @@ lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps
     :: null
 1. Let |message| be `""`.
 1. Set |message| to |init|'s {{WebTransportErrorInit/message}} if it exists.
-1. [=WebTransportError/Set up=] |error| with |message|.
+1. [=WebTransportError/Set up=] |error| with |message| and `"stream"`.
 1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |init|'s
    {{WebTransportErrorInit/applicationProtocolCode}} if it exists.
 
@@ -1522,19 +1533,23 @@ lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps
 
 : <dfn for="WebTransportError" attribute>applicationProtocolCode</dfn>
 :: The getter steps are to return [=this=]'s [=[[ApplicationProtocolCode]]=].
+: <dfn for="WebTransportError" attribute>source</dfn>
+:: The getter steps are to return [=this=]'s [=WebTransportError/[[Source]]=].
 
 ## Procedures ## {#web-transport-error-procedures}
 
 <div algorithm>
 
 To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| with a DOMString
-|message|, run these steps:
+|message| and |source|, run these steps:
 
 1. Run [=DOMException/new DOMException(message, name)=] constructor steps with |error|, |message|
    and `"WebTransportError"`.
 
-   Note: This name does not have a mapping to a legacy code, so |error|'s {{DOMException/code}}
+   Note: This name does not have a mapping to a legacy code, so [=this=]'s {{DOMException/code}}
    is 0.
+
+1. Set [=this=]'s [=WebTransportError/[[Source]]=] to |source|.
 
 </div>
 
