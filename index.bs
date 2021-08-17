@@ -298,6 +298,7 @@ interface DatagramDuplexStream {
   readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
 
+  readonly attribute unsigned long maxDatagramSize;
   attribute double? incomingMaxAge;
   attribute double? outgoingMaxAge;
   attribute long incomingHighWaterMark;
@@ -358,8 +359,15 @@ A {{DatagramDuplexStream}} object has the following internal slots.
    <td class="non-normative">A {{double}} value representing the expiration duration for outgoing
    datagrams (in milliseconds), or null.
   </tr>
+  <tr>
+   <td><dfn>\[[OutgoingMaxDatagramSize]]</dfn>
+   <td class="non-normative">An integer representing the maximum size for an outgoing datagram.
+  </tr>
  </tbody>
 </table>
+
+The user agent MAY update [=[[OutgoingMaxDatagramSize]]=] for any {{WebTransport}} object whose
+[=[[State]]=] is either `"connecting"` or `"connected"`.
 
  To <dfn export for="DatagramDuplexStream" lt="create|creating">create</dfn> a
  {{DatagramDuplexStream}} given a
@@ -390,6 +398,8 @@ A {{DatagramDuplexStream}} object has the following internal slots.
        </div>
     : [=[[OutgoingDatagramsExpirationDuration]]=]
     :: null
+    : [=[[OutgoingMaxDatagramSize]]=]
+    :: an [=implementation-defined=] integer.
  1. Return |stream|.
 
 ## Attributes ##  {#datagram-duplex-stream-attributes}
@@ -409,6 +419,10 @@ A {{DatagramDuplexStream}} object has the following internal slots.
      1. Let |value| be the given value.
      1. If |value| is null or |value| > 0:
        1. Set [=this=]'s [=[[IncomingDatagramsExpirationDuration]]=] to |value|.
+
+: <dfn for="DatagramDuplexStream" attribute>maxDatagramSize</dfn>
+:: The maximum size data that may be passed to {{DatagramDuplexStream/writable}}.
+   The getter steps are to return [=this=]'s [=[[Datagrams]]=]'s [=[[OutgoingMaxDatagramSize]]=].
 
 : <dfn for="DatagramDuplexStream" attribute>outgoingMaxAge</dfn>
 :: The getter steps are:
@@ -486,10 +500,12 @@ The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
 |data| as input. It is defined by running the following steps:
 1. Let |timestamp| be a timestamp representing now.
 1. If |data| is not a {{BufferSource}} object, then return [=a promise rejected with=] a {{TypeError}}.
+1. Let |datagrams| be |transport|'s [=[[Datagrams]]=].
+1. If |datagrams|'s [=[[OutgoingMaxDatagramSize]]=] is less than |data|'s \[[ByteLength]], return
+   [=a promise resolved with=] undefined.
 1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of bytes which |data| represents.
 1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
-1. Let |datagrams| be |transport|'s [=[[Datagrams]]=].
 1. Enqueue |chunk| to |datagrams|'s [=[[OutgoingDatagramsQueue]]=].
 1. If the length of |datagrams|'s [=[[OutgoingDatagramsQueue]]=] is less than
    |datagrams|'s [=[[OutgoingDatagramsHighWaterMark]]=], then [=resolve=] |promise| with undefined.
@@ -515,10 +531,12 @@ To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
      1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with |undefined|.
   1. Otherwise, break this loop.
 1. If |transport|'s [=[[State]]=] is not `"connected"`, then return.
+1. Let |maxSize| be |datagrams|'s [=[[OutgoingMaxDatagramSize]]=].
 1. While |queue| is not empty:
   1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-  1. If it is not possible to send |bytes| to the network immediately, then break this loop.
-  1. [=session/Send a datagram=], with |transport|'s [=[[Session]]=] and |bytes|.
+  1. If |bytes|'s length ≤ |maxSize|:
+    1. If it is not possible to send |bytes| to the network immediately, then break this loop.
+    1. [=session/Send a datagram=], with |transport|'s [=[[Session]]=] and |bytes|.
   1. Remove the first element from |queue|.
   1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
 
@@ -548,7 +566,6 @@ interface WebTransport {
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   undefined close(optional WebTransportCloseInfo closeInfo = {});
 
-  readonly attribute unsigned short maxDatagramSize;
   readonly attribute DatagramDuplexStream datagrams;
 
   Promise&lt;BidirectionalStream&gt; createBidirectionalStream();
@@ -705,12 +722,16 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
   1. Let |error| be a {{TypeError}}.
   1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. [=session/Establish=] a [=WebTransport session=] on |connection|.
+
+  Note: This step also contains the transport parameter exchange specified in [[!QUIC-DATAGRAM]].
+
 1. If the previous step fails, abort the remaining steps and [=queue a network task=] with
    |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
   1. Let |error| be a {{TypeError}}.
   1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. Let |session| be the established [=WebTransport session=].
+1. Assert: |maxDatagramSize| is an integer.
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is not `"connecting"`:
     1. [=In parallel=], [=session/terminate=] |session| with TBD.
@@ -772,9 +793,6 @@ these steps.
 :: This promise MUST be [=resolved=] when the transport is closed; an
    implementation SHOULD include error information in the `reason` and
    `errorCode` fields of {{WebTransportCloseInfo}}.
-: <dfn for="WebTransport" attribute>maxDatagramSize</dfn>
-:: The maximum size data that may be passed to
-   {{DatagramTransport/datagrams}}' {{DatagramDuplexStream/writable}}.
 : <dfn for="WebTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this session.
    The getter steps for the `datagrams` attribute SHALL be:
