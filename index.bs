@@ -288,13 +288,13 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
  </tbody>
 </table>
 
-# `DatagramDuplexStream` Interface #  {#duplex-stream}
+# `WebTransportDatagramDuplexStream` Interface #  {#duplex-stream}
 
-A <dfn interface>DatagramDuplexStream</dfn> is a generic duplex stream.
+A <dfn interface>WebTransportDatagramDuplexStream</dfn> is a generic duplex stream.
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
-interface DatagramDuplexStream {
+interface WebTransportDatagramDuplexStream {
   readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
 
@@ -308,7 +308,7 @@ interface DatagramDuplexStream {
 
 ## Internal slots ## {#datagramduplexstream-internal-slots}
 
-A {{DatagramDuplexStream}} object has the following internal slots.
+A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
 
 <table class="data" dfn-for="DatagramDuplexStream">
  <thead>
@@ -370,12 +370,12 @@ The user agent MAY update [=[[OutgoingMaxDatagramSize]]=] for any {{WebTransport
 [=[[State]]=] is either `"connecting"` or `"connected"`.
 
  To <dfn export for="DatagramDuplexStream" lt="create|creating">create</dfn> a
- {{DatagramDuplexStream}} given a
+ {{WebTransportDatagramDuplexStream}} given a
  <dfn export for="DatagramDuplexStream/create"><var>readable</var></dfn>, and
  a <dfn export for="DatagramDuplexStream/create"><var>writable</var></dfn>,
  perform the following steps.
 
- 1. Let |stream| be a [=new=] {{DatagramDuplexStream}}, with:
+ 1. Let |stream| be a [=new=] {{WebTransportDatagramDuplexStream}}, with:
     : [=[[Readable]]=]
     :: |readable|
     : [=[[Writable]]=]
@@ -404,15 +404,15 @@ The user agent MAY update [=[[OutgoingMaxDatagramSize]]=] for any {{WebTransport
 
 ## Attributes ##  {#datagram-duplex-stream-attributes}
 
-: <dfn for="DatagramDuplexStream" attribute>readable</dfn>
+: <dfn for="WebTransportDatagramDuplexStream" attribute>readable</dfn>
 :: The getter steps are:
      1. Return [=this=].`[[Readable]]`.
 
-: <dfn for="DatagramDuplexStream" attribute>writable</dfn>
+: <dfn for="WebTransportDatagramDuplexStream" attribute>writable</dfn>
 :: The getter steps are:
      1. Return [=this=].`[[Writable]]`.
 
-: <dfn for="DatagramDuplexStream" attribute>incomingMaxAge</dfn>
+: <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxAge</dfn>
 :: The getter steps are:
      1. Return [=this=]'s [=[[IncomingDatagramsExpirationDuration]]=].
 :: The setter steps are:
@@ -420,11 +420,11 @@ The user agent MAY update [=[[OutgoingMaxDatagramSize]]=] for any {{WebTransport
      1. If |value| is null or |value| > 0:
        1. Set [=this=]'s [=[[IncomingDatagramsExpirationDuration]]=] to |value|.
 
-: <dfn for="DatagramDuplexStream" attribute>maxDatagramSize</dfn>
-:: The maximum size data that may be passed to {{DatagramDuplexStream/writable}}.
+: <dfn for="WebTransportDatagramDuplexStream" attribute>maxDatagramSize</dfn>
+:: The maximum size data that may be passed to {{WebTransportDatagramDuplexStream/writable}}.
    The getter steps are to return [=this=]'s [=[[Datagrams]]=]'s [=[[OutgoingMaxDatagramSize]]=].
 
-: <dfn for="DatagramDuplexStream" attribute>outgoingMaxAge</dfn>
+: <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingMaxAge</dfn>
 :: The getter steps are:
      1. Return [=this=]'s [=[[OutgoingDatagramsExpirationDuration]]=].
 :: The setter steps are:
@@ -432,7 +432,7 @@ The user agent MAY update [=[[OutgoingMaxDatagramSize]]=] for any {{WebTransport
      1. If |value| is null or |value| > 0:
        1. Set [=this=]'s [=[[OutgoingDatagramsExpirationDuration]]=] to |value|.
 
-: <dfn for="DatagramDuplexStream" attribute>incomingHighWaterMark</dfn>
+: <dfn for="WebTransportDatagramDuplexStream" attribute>incomingHighWaterMark</dfn>
 :: The getter steps are:
      1. Return [=this=]'s [=[[IncomingDatagramsHighWaterMark]]=].
 :: The setter steps are:
@@ -440,7 +440,7 @@ The user agent MAY update [=[[OutgoingMaxDatagramSize]]=] for any {{WebTransport
      1. If |value| ≥ 0:
        1. Set [=this=]'s [=[[IncomingDatagramsHighWaterMark]]=] to |value|.
 
-: <dfn for="DatagramDuplexStream" attribute>outgoingHighWaterMark</dfn>
+: <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingHighWaterMark</dfn>
 :: The getter steps are:
      1. Return [=this=]'s [=[[OutgoingDatagramsHighWaterMark]]=].
 :: The setter steps are:
@@ -566,10 +566,10 @@ interface WebTransport {
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   undefined close(optional WebTransportCloseInfo closeInfo = {});
 
-  readonly attribute DatagramDuplexStream datagrams;
+  readonly attribute WebTransportDatagramDuplexStream datagrams;
 
-  Promise&lt;BidirectionalStream&gt; createBidirectionalStream();
-  /* a ReadableStream of BidirectionalStream objects */
+  Promise&lt;WebTransportBidirectionalStream&gt; createBidirectionalStream();
+  /* a ReadableStream of WebTransportBidirectionalStream objects */
   readonly attribute ReadableStream incomingBidirectionalStreams;
 
   Promise&lt;WritableStream&gt; createUnidirectionalStream();
@@ -602,7 +602,8 @@ A {{WebTransport}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>\[[IncomingBidirectionalStreams]]</dfn>
-   <td class="non-normative">A {{ReadableStream}} consisting of {{BidirectionalStream}} objects.
+   <td class="non-normative">A {{ReadableStream}} consisting of {{WebTransportBidirectionalStream}}
+   objects.
   </tr>
   <tr>
    <td><dfn>\[[IncomingUnidirectionalStreams]]</dfn>
@@ -626,7 +627,7 @@ A {{WebTransport}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>\[[Datagrams]]</dfn>
-   <td class="non-normative">A {{DatagramDuplexStream}}.
+   <td class="non-normative">A {{WebTransportDatagramDuplexStream}}.
   </tr>
   <tr>
   <tr>
@@ -655,7 +656,7 @@ agent MUST run the following steps:
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=DatagramDuplexStream/creating=] a
-   {{DatagramDuplexStream}}, its [=DatagramDuplexStream/create/readable=] set to
+   {{WebTransportDatagramDuplexStream}}, its [=DatagramDuplexStream/create/readable=] set to
    |incomingDatagrams| and its [=DatagramDuplexStream/create/writable=] set to |outgoingDatagrams|.
 1. Let |transport| be a newly constructed {{WebTransport}} object, with:
     : [=[[SendStreams]]=]
@@ -756,8 +757,8 @@ these steps.
    stream=].
 1. Let |internalStream| be the result of [=session/receiving a bidirectional stream=].
 1. [=Queue a network task=] with |transport| to run these steps:
-  1. Let |stream| be the result of [=BidirectionalStream/creating=] a {{BidirectionalStream}} with
-     |internalStream| and |transport|.
+  1. Let |stream| be the result of [=BidirectionalStream/creating=] a
+     {{WebTransportBidirectionalStream}} with |internalStream| and |transport|.
   1. [=ReadableStream/Enqueue=] |stream| to |transport|'s [=[[IncomingBidirectionalStreams]]=].
   1. [=Resolve=] |p| with undefined.
 
@@ -798,7 +799,7 @@ these steps.
    The getter steps for the `datagrams` attribute SHALL be:
      1. Return [=this=]'s [=[[Datagrams]]=].
 : <dfn for="WebTransport" attribute>incomingBidirectionalStreams</dfn>
-:: Returns a {{ReadableStream}} of {{BidirectionalStream}}s that have been
+:: Returns a {{ReadableStream}} of {{WebTransportBidirectionalStream}}s that have been
    received from the server.
    The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
      1. Return [=this=]'s [=[[IncomingBidirectionalStreams]]=].
@@ -844,7 +845,7 @@ these steps.
            1. [=Resolve=] |p| with |stats|.
 
 : <dfn for="WebTransport" method>createBidirectionalStream()</dfn>
-:: Creates a {{BidirectionalStream}} object for an outgoing bidirectional
+:: Creates a {{WebTransportBidirectionalStream}} object for an outgoing bidirectional
    stream.  Note that the mere creation of a stream is not immediately visible to the peer until
    it is used to send data.
 
@@ -866,8 +867,8 @@ these steps.
       1. [=Queue a network task=] with |transport| to run the following steps:
         1. If |transport|'s [=WebTransport/[[State]]=] is `"closed"` or `"failed"`,
            [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
-        1. Let |stream| be the result of [=BidirectionalStream/creating=] a {{BidirectionalStream}}
-           with |internalStream| and |transport|.
+        1. Let |stream| be the result of [=BidirectionalStream/creating=] a
+           {{WebTransportBidirectionalStream}} with |internalStream| and |transport|.
         1. [=Resolve=] |p| with |stream|.
    1. return |p|.
 
@@ -1125,7 +1126,7 @@ The dictionary SHALL have the following attributes:
 :: The minimum RTT observed on the entire connection.
 : <dfn for="WebTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
-   between calls to {{DatagramTransport/datagrams}}' {{DatagramDuplexStream/readable}}.
+   between calls to {{DatagramTransport/datagrams}}' {{WebTransportDatagramDuplexStream/readable}}.
 
 # `SendStream` #  {#send-stream}
 
@@ -1447,11 +1448,11 @@ Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encod
 
 </div>
 
-# Interface `BidirectionalStream` #  {#bidirectional-stream}
+# Interface `WebTransportBidirectionalStream` #  {#bidirectional-stream}
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
-interface BidirectionalStream {
+interface WebTransportBidirectionalStream {
   readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
 };
@@ -1459,7 +1460,7 @@ interface BidirectionalStream {
 
 ## Internal slots ## {#bidirectional-stream-internal-slots}
 
-A {{BidirectionalStream}} has the following internal slots.
+A {{WebTransportBidirectionalStream}} has the following internal slots.
 
 <table class="data" dfn-for="BidirectionalStream">
  <thead>
@@ -1479,14 +1480,15 @@ A {{BidirectionalStream}} has the following internal slots.
   </tr>
   <tr>
    <td><dfn>\[[Transport]]</dfn>
-   <td class="non-normative">The {{WebTransport}} object owning this {{BidirectionalStream}}.
+   <td class="non-normative">The {{WebTransport}} object owning this
+   {{WebTransportBidirectionalStream}}.
   </tr>
 </table>
 
 ## Procedures ## {#bidirectional-stream-procedures}
 
 <div algorithm="create a BidirectionalStream">
-To <dfn for=BidirectionalStream>create</dfn> a {{BidirectionalStream}} with a
+To <dfn for=BidirectionalStream>create</dfn> a {{WebTransportBidirectionalStream}} with a
 [=bidirectional=] [=WebTransport stream=] |internalStream| and a {{WebTransport}}
 object |transport|, run these steps.
 
@@ -1494,7 +1496,7 @@ object |transport|, run these steps.
    |internalStream| and |transport|.
 1. Let |writable| be the result of [=SendStream/creating=] a {{SendStream}} with
    |internalStream| and |transport|.
-1. Let |stream| be a [=new=] {{BidirectionalStream}}, with:
+1. Let |stream| be a [=new=] {{WebTransportBidirectionalStream}}, with:
     : [=[[Readable]]=]
     :: |readable|
     : [=[[Writable]]=]
@@ -1616,35 +1618,35 @@ in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
     </thead>
     <tbody>
       <tr>
-        <td>{{BidirectionalStream/writable}}.{{WritableStream/abort}}(errorCode)</td>
+        <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(errorCode)</td>
         <td>send RESET_STREAM with errorCode</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/writable}}.{{WritableStream/close}}()</td>
+        <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/close}}()</td>
         <td>send STREAM_FINAL</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/write}}()</td>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/write}}()</td>
         <td>send STREAM</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/close}}()</td>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/close}}()</td>
         <td>send STREAM_FINAL</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(errorCode)</td>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(errorCode)</td>
         <td>send RESET_STREAM with errorCode</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/readable}}.{{ReadableStream/cancel}}(errorCode)</td>
+        <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(errorCode)</td>
         <td>send STOP_SENDING with errorCode</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()</td>
+        <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()</td>
         <td>receive STREAM or STREAM_FINAL</td>
       </tr>
       <tr>
-        <td>{{BidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(errorCode)</td>
+        <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(errorCode)</td>
         <td>send STOP_SENDING with errorCode</td>
       </tr>
     </tbody>
@@ -1714,7 +1716,7 @@ willing to accept connections from the Web.
 *This section is non-normative.*
 
 Sending a buffer of datagrams can be achieved by using the
-{{DatagramTransport/datagrams}}' {{DatagramDuplexStream/writable}} attribute. In the
+{{DatagramTransport/datagrams}}' {{WebTransportDatagramDuplexStream/writable}} attribute. In the
 following example datagrams are only sent if the {{DatagramTransport}} is ready to send.
 
 <pre class="example" highlight="js">
@@ -1734,7 +1736,7 @@ async function sendDatagrams(url, datagrams) {
 
 Sending datagrams at a fixed rate regardless if the transport is ready to send
 can be achieved by simply using {{DatagramTransport/datagrams}}'
-{{DatagramDuplexStream/writable}} and not using the `ready` attribute. More complex
+{{WebTransportDatagramDuplexStream/writable}} and not using the `ready` attribute. More complex
 scenarios can utilize the `ready` attribute.
 
 <pre class="example" highlight="js">
@@ -1753,7 +1755,7 @@ async function sendFixedRate(url, createDatagram, ms = 100) {
 *This section is non-normative.*
 
 Datagrams can be received by reading from the
-transport.{{DatagramTransport/datagrams}}.{{DatagramTransport/datagrams}}.{{DatagramDuplexStream/readable}}
+transport.{{DatagramTransport/datagrams}}.{{DatagramTransport/datagrams}}.{{WebTransportDatagramDuplexStream/readable}}
 attribute. Null values may indicate that packets are not being processed quickly
 enough.
 
