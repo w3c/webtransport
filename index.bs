@@ -1214,6 +1214,11 @@ To <dfn for="SendStream">write</dfn> |chunk| to a {{SendStream}} |stream|, run t
 1. Return |promise| and run the remaining steps [=in parallel=].
 1. [=stream/Send=] |bytes| on |stream|'s [=[[InternalStream]]=] and wait for the operation to
    complete.
+1. If the previous step failed, abort the remaining steps.
+
+  Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
+  error |stream| and reject the result of this read operation.
+
 1. [=Queue a network task=] with |transport| to run these steps:
   1. Set |stream|'s [=[[PendingOperation]]=] to null.
   1. [=Resolve=] |promise| with undefined.
