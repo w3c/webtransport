@@ -198,9 +198,10 @@ To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an
 follow [[!WEB-TRANSPORT-HTTP3]]
 [section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
 
-A [=WebTransport session=] |session| is <dfn for=session>terminated</dfn> when
-the HTTP/3 stream associated with the CONNECT request that initiated |session| is closed by
-the server, as described at [[!WEB-TRANSPORT-HTTP3]]
+A [=WebTransport session=] |session| is <dfn for=session>terminated</dfn>, with optionally
+an integer |code| and a [=byte sequence=] |reason|, when the HTTP/3 stream associated with the
+CONNECT request that initiated |session| is closed by the server, as described at
+[[!WEB-TRANSPORT-HTTP3]]
 [section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
 
 <dfn>WebTransport stream</dfn> is a concept for HTTP/3 stream on a [=WebTransport session=].
@@ -949,14 +950,20 @@ series of steps |steps|, run these steps:
 
 <div algorithm="termination-initiated-by-server">
 Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} |transport| is
-[=session/terminated=], run these steps:
+[=session/terminated=] with optionally |code| and |reasonBytes|, run these steps:
 
 1. Let |cleanly| be a boolean representing whether the HTTP/3 stream associated with the CONNECT
    request that initiated |transport|'s [=[[Session]]=] is in the "Data Recvd" state. [[!QUIC]]
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
-  1. Let |reason| be TBD.
-  1. Let |error| be TBD.
+  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
+     `"session"`.
+  1. Let |reason| be |error|.
+  1. If |cleanly| is true:
+     1. Set |reason| to a [=new=] {{WebTransportCloseInfo}}.
+     1. If |code| is given, set |reason|'s {{WebTransportCloseInfo/errorCode}} to |code|.
+     1. If |reasonBytes| is given, set |reason|'s {{WebTransportCloseInfo/reason}} to |reasonBytes|,
+        [=UTF-8 decoded=].
   1. [=Cleanup=] |transport| with |reason|, |error| and the negation of |cleanly|.
 
 </div>
@@ -967,7 +974,8 @@ run these steps:
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
-  1. Let |error| be TBD.
+  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
+     `"session"`.
   1. [=Cleanup=] |transport| with |error|, |error| and true.
 
 </div>
@@ -1282,13 +1290,15 @@ Whenever a [=WebTransport stream=] associated with a {{SendStream}} |stream| get
 1. Let |transport| be |stream|'s [=[[Transport]]=].
 1. Let |code| be the application protocol error code attached to the STOP_SENDING frame. [[!QUIC]]
 
-   Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
+   Note: Valid values of |code| are from 0 to 255 inclusive. The code has been decoded from a number in
          [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
   1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
-  1. Let |error| be TBD.
+  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
+     `"stream"`.
+  1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |code|.
   1. [=WritableStream/Error=] |stream| with |error|.
 
 </div>
@@ -1445,13 +1455,15 @@ Whenever a [=WebTransport stream=] associated with a {{ReceiveStream}} |stream| 
 1. Let |transport| be |stream|'s [=ReceiveStream/[[Transport]]=].
 1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
 
-   Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
+   Note: Valid values of |code| are from 0 to 255 inclusive. The code has been decoded from a number in
          [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
   1. [=set/Remove=] |stream| from |transport|'s [=[[ReceiveStreams]]=].
-  1. Let |error| be TBD.
+  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
+     `"stream"`.
+  1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |code|.
   1. [=ReadableStream/Error=] |stream| with |error|.
 
 </div>
@@ -1573,11 +1585,7 @@ The <dfn constructor for="WebTransportError"
 lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps are:
 
 1. Let |error| be [=this=].
-1. Set |error|'s internal slots as:
-    : [=[[ApplicationProtocolCode]]=]
-    :: null
-1. Let |message| be `""`.
-1. Set |message| to |init|'s {{WebTransportErrorInit/message}} if it exists.
+1. Let |message| be |init|'s {{WebTransportErrorInit/message}} if it exists, and `""` otherwise.
 1. [=WebTransportError/Set up=] |error| with |message| and `"stream"`.
 1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |init|'s
    {{WebTransportErrorInit/applicationProtocolCode}} if it exists.
@@ -1595,16 +1603,30 @@ lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps
 
 <div algorithm>
 
-To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| with a DOMString
-|message| and |source|, run these steps:
+To <dfn for="WebTransportError">create</dfn> a {{WebTransportError}} |error| with a
+{{WebTransportErrorSource}} |source|, run these steps:
 
+1. Let |message| be an [=implementation-defined=] string.
+1. Let |error| be a [=new=] {{WebTransportError}}.
+1. [=Set up=] |error| with |message| and |source|.
+
+</div>
+
+<div algorithm>
+
+To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| with a {{DOMString}}
+|message| and a {{WebTransportErrorSource}} |source|, run these steps:
+
+1. Set |error|'s internal slots as:
+    : [=[[ApplicationProtocolCode]]=]
+    :: null
+    : [=WebTransportError/[[Source]]=]
+    :: |source|
 1. Run [=DOMException/new DOMException(message, name)=] constructor steps with |error|, |message|
    and `"WebTransportError"`.
 
    Note: This name does not have a mapping to a legacy code, so [=this=]'s {{DOMException/code}}
    is 0.
-
-1. Set [=this=]'s [=WebTransportError/[[Source]]=] to |source|.
 
 </div>
 
