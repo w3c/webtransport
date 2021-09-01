@@ -1212,6 +1212,9 @@ To <dfn for="SendStream">write</dfn> |chunk| to a {{SendStream}} |stream|, run t
 1. Let |bytes| be a copy of the [=byte sequence=] which |chunk| represents.
 1. Set |stream|'s [=[[PendingOperation]]=] to |promise|.
 1. Return |promise| and run the remaining steps [=in parallel=].
+1. Wait for |transport|'s [=[[Datagrams]]=]'s [=[[OutgoingDatagramsQueue]]=] to be empty.
+
+   Note: This means outgoing datagrams are prioritized over stream data.
 1. [=stream/Send=] |bytes| on |stream|'s [=[[InternalStream]]=] and wait for the operation to
    complete.
 1. If the previous step failed, abort the remaining steps.
