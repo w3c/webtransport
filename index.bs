@@ -1264,8 +1264,8 @@ To <dfn for="SendStream">abort</dfn> a {{SendStream}} |stream| with |reason|, ru
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 255, then set |code| to 255.
 
-Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
-      [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
+         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
 
 1. Return |promise| and run the remaining steps [=in parallel=].
 1. [=stream/Reset=] |stream|'s [=[[InternalStream]]=] with |code|.
@@ -1282,8 +1282,8 @@ Whenever a [=WebTransport stream=] associated with a {{SendStream}} |stream| get
 1. Let |transport| be |stream|'s [=[[Transport]]=].
 1. Let |code| be the application protocol error code attached to the STOP_SENDING frame. [[!QUIC]]
 
-Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
-      [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
+         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
@@ -1420,8 +1420,8 @@ steps.
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 255, then set |code| to 255.
 
-Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
-      [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
+         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
 
 1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
 1. Return |promise| and run the remaining steps [=in parallel=].
@@ -1445,8 +1445,8 @@ Whenever a [=WebTransport stream=] associated with a {{ReceiveStream}} |stream| 
 1. Let |transport| be |stream|'s [=ReceiveStream/[[Transport]]=].
 1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
 
-Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
-      [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
+         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, abort these steps.
