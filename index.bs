@@ -713,7 +713,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
    |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be a {{TypeError}}.
+  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
+     `"session"`.
   1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
    represents the SETTINGS frame.
@@ -721,7 +722,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
    contain H3_DATAGRAM with a value of 1, then abort the remaining steps and [=queue a network
    task=] with |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be a {{TypeError}}.
+  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
+     `"session"`.
   1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. [=session/Establish=] a [=WebTransport session=] on |connection|.
 
@@ -730,7 +732,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 1. If the previous step fails, abort the remaining steps and [=queue a network task=] with
    |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be a {{TypeError}}.
+  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
+     `"session"`.
   1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. Let |session| be the established [=WebTransport session=].
 1. Assert: |maxDatagramSize| is an integer.
@@ -819,7 +822,8 @@ these steps.
      1. Let |transport| be [=this=].
      1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
      1. If |transport|'s [=[[State]]=] is `"connecting"`:
-       1. Let |error| be a {{TypeError}}.
+       1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
+          `"session"`.
        1. [=Cleanup=] |transport| with |error|, |error| and true.
        1. Abort these steps.
      1. Let |session| be |transport|'s [=[[Session]]=].
