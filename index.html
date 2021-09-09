@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2016/W3C-ED" rel="stylesheet" type="text/css">
   <meta content="Bikeshed version 4f053d00e, updated Tue Aug 10 14:13:32 2021 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="54ea0410044377a669095da68c636b57cee4bfcc" name="document-revision">
+  <meta content="d471288bc6db2a6daed8b2c66558d00a16de6493" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -579,7 +579,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="profile-and-date"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2021-09-07">7 September 2021</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="profile-and-date"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2021-09-09">9 September 2021</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -752,7 +752,7 @@ handlers, and the <code class="idl"><a data-link-type="idl" href="https://html.s
    <p>The concepts <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task">queue a task</a> and <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source">networking task source</a> are defined in <a data-link-type="biblio" href="#biblio-html">[HTML]</a>.</p>
    <p>The terms <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event" id="ref-for-concept-event">event</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handlers" id="ref-for-event-handlers">event handlers</a> and <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-event-type" id="ref-for-event-handler-event-type">event handler event types</a> are
 defined in <a data-link-type="biblio" href="#biblio-html">[HTML]</a>.</p>
-   <p>When referring to exceptions, the terms <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw">throw</a> and <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create">create</a> are defined in <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>.</p>
+   <p>When referring to exceptions, the terms <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw">throw</a> and <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create">create</a> are defined in <a data-link-type="biblio" href="#biblio-webidl">[WEBIDL]</a>.</p>
    <p>The terms <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects">fulfilled</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①">rejected</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②">resolved</a>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③">pending</a> and <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects④">settled</a> used in the context of Promises are defined in <a data-link-type="biblio" href="#biblio-ecmascript-60">[ECMASCRIPT-6.0]</a>.</p>
    <p>The terms <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream">ReadableStream</a></code> and <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream">WritableStream</a></code> are defined in <a data-link-type="biblio" href="#biblio-whatwg-streams">[WHATWG-STREAMS]</a>.</p>
    <h2 class="heading settled" data-level="4" id="protocol-concepts"><span class="secno">4. </span><span class="content">Protocol concepts</span><a class="self-link" href="#protocol-concepts"></a></h2>
@@ -916,7 +916,7 @@ CONNECT request that initiated <var>session</var> is closed by the server, as de
     <li data-md>
      <p>Let <var>stream</var> be a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#new" id="ref-for-new">new</a> <code class="idl"><a data-link-type="idl" href="#webtransportdatagramduplexstream" id="ref-for-webtransportdatagramduplexstream③">WebTransportDatagramDuplexStream</a></code>, with:</p>
      <dl>
-      <dt data-md><a data-link-type="dfn" href="#datagramduplexstream-readable" id="ref-for-datagramduplexstream-readable">[[Readable]]</a>
+      <dt data-md><a data-link-type="dfn" href="#bidirectionalstream-readable" id="ref-for-bidirectionalstream-readable">[[Readable]]</a>
       <dd data-md>
        <p><var>readable</var></p>
       <dt data-md><a data-link-type="dfn" href="#datagramduplexstream-writable" id="ref-for-datagramduplexstream-writable">[[Writable]]</a>
@@ -1073,7 +1073,7 @@ CONNECT request that initiated <var>session</var> is closed by the server, as de
     <li data-md>
      <p>Let <var>chunk</var> be a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-Uint8Array" id="ref-for-idl-Uint8Array">Uint8Array</a></code> object representing <var>bytes</var>.</p>
     <li data-md>
-     <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-enqueue" id="ref-for-readablestream-enqueue">Enqueue</a> <var>chunk</var> to <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-datagrams" id="ref-for-webtransport-datagrams②">[[Datagrams]]</a>' s <a data-link-type="dfn" href="#datagramduplexstream-readable" id="ref-for-datagramduplexstream-readable①">[[Readable]]</a>.</p>
+     <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-enqueue" id="ref-for-readablestream-enqueue">Enqueue</a> <var>chunk</var> to <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-datagrams" id="ref-for-webtransport-datagrams②">[[Datagrams]]</a>' s <a data-link-type="dfn" href="#datagramduplexstream-readable" id="ref-for-datagramduplexstream-readable">[[Readable]]</a>.</p>
     <li data-md>
      <p>Return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#a-promise-resolved-with" id="ref-for-a-promise-resolved-with">a promise resolved with</a> undefined.</p>
    </ol>
@@ -1130,7 +1130,7 @@ CONNECT request that initiated <var>session</var> is closed by the server, as de
         <li data-md>
          <p>Let <var>chunk</var> be a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-Uint8Array" id="ref-for-idl-Uint8Array①">Uint8Array</a></code> object representing <var>bytes</var>.</p>
         <li data-md>
-         <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-enqueue" id="ref-for-readablestream-enqueue①">Enqueue</a> <var>chunk</var> to <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-readable" id="ref-for-datagramduplexstream-readable②">[[Readable]]</a>.</p>
+         <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-enqueue" id="ref-for-readablestream-enqueue①">Enqueue</a> <var>chunk</var> to <var>datagrams</var>’s <a data-link-type="dfn" href="#datagramduplexstream-readable" id="ref-for-datagramduplexstream-readable①">[[Readable]]</a>.</p>
         <li data-md>
          <p><a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑤">Resolve</a> <var>promise</var> with undefined.</p>
        </ol>
@@ -1378,7 +1378,7 @@ agent MUST run the following steps:
        <li data-md>
         <p>If <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state⑧">[[State]]</a> is <code>"closed"</code> or <code>"failed"</code>, then abort these steps.</p>
        <li data-md>
-        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror">WebTransportError</a></code> with <code>"session"</code>.</p>
+        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create①">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror">WebTransportError</a></code> with <code>"session"</code>.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="#webtransport-cleanup" id="ref-for-webtransport-cleanup">Cleanup</a> <var>transport</var> with <var>error</var>, <var>error</var> and true.</p>
       </ol>
@@ -1393,7 +1393,7 @@ agent MUST run the following steps:
        <li data-md>
         <p>If <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state⑨">[[State]]</a> is <code>"closed"</code> or <code>"failed"</code>, then abort these steps.</p>
        <li data-md>
-        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create①">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror①">WebTransportError</a></code> with <code>"session"</code>.</p>
+        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create②">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror①">WebTransportError</a></code> with <code>"session"</code>.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="#webtransport-cleanup" id="ref-for-webtransport-cleanup①">Cleanup</a> <var>transport</var> with <var>error</var>, <var>error</var> and true.</p>
       </ol>
@@ -1406,7 +1406,7 @@ agent MUST run the following steps:
        <li data-md>
         <p>If <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state①⓪">[[State]]</a> is <code>"closed"</code> or <code>"failed"</code>, then abort these steps.</p>
        <li data-md>
-        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create②">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror②">WebTransportError</a></code> with <code>"session"</code>.</p>
+        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create③">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror②">WebTransportError</a></code> with <code>"session"</code>.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="#webtransport-cleanup" id="ref-for-webtransport-cleanup②">Cleanup</a> <var>transport</var> with <var>error</var>, <var>error</var> and true.</p>
       </ol>
@@ -1553,7 +1553,7 @@ these steps.
        <p>If <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state①⑥">[[State]]</a> is <code>"connecting"</code>:</p>
        <ol>
         <li data-md>
-         <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create③">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror③">WebTransportError</a></code> with <code>"session"</code>.</p>
+         <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create④">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror③">WebTransportError</a></code> with <code>"session"</code>.</p>
         <li data-md>
          <p><a data-link-type="dfn" href="#webtransport-cleanup" id="ref-for-webtransport-cleanup③">Cleanup</a> <var>transport</var> with <var>error</var>, <var>error</var> and true.</p>
         <li data-md>
@@ -1663,7 +1663,7 @@ these steps.
           <li data-md>
            <p>If <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state②④">[[State]]</a> is <code>"closed"</code> or <code>"failed"</code>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②①">reject</a> <var>p</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror⑤">InvalidStateError</a></code> and abort these steps.</p>
           <li data-md>
-           <p>Let <var>stream</var> be the result of <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create①">creating</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②">SendStream</a></code> with <var>internalStream</var> and <var>transport</var>.</p>
+           <p>Let <var>stream</var> be the result of <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create">creating</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream②">SendStream</a></code> with <var>internalStream</var> and <var>transport</var>.</p>
           <li data-md>
            <p><a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②②">Resolve</a> <var>p</var> with <var>stream</var>.</p>
          </ol>
@@ -1750,7 +1750,7 @@ series of steps <var>steps</var>, run these steps:</p>
        <li data-md>
         <p>If <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state②⑦">[[State]]</a> is <code>"closed"</code> or <code>"failed"</code>, abort these steps.</p>
        <li data-md>
-        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create④">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror④">WebTransportError</a></code> with <code>"session"</code>.</p>
+        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create⑤">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror④">WebTransportError</a></code> with <code>"session"</code>.</p>
        <li data-md>
         <p>Let <var>reason</var> be <var>error</var>.</p>
        <li data-md>
@@ -1778,7 +1778,7 @@ run these steps:
        <li data-md>
         <p>If <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-state" id="ref-for-webtransport-state②⑧">[[State]]</a> is <code>"closed"</code> or <code>"failed"</code>, abort these steps.</p>
        <li data-md>
-        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create⑤">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑤">WebTransportError</a></code> with <code>"session"</code>.</p>
+        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create⑥">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑤">WebTransportError</a></code> with <code>"session"</code>.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="#webtransport-cleanup" id="ref-for-webtransport-cleanup⑥">Cleanup</a> <var>transport</var> with <var>error</var>, <var>error</var> and true.</p>
       </ol>
@@ -1944,7 +1944,7 @@ or are impossible to define for pooled connections.</p>
    <h2 class="heading settled" data-level="7" id="send-stream"><span class="secno">7. </span><span class="content"><code>SendStream</code></span><a class="self-link" href="#send-stream"></a></h2>
    <p>In this spec, we call a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑦">WritableStream</a></code> providing outgoing streaming features with an <a data-link-type="dfn" href="#stream-outgoing-unidirectional" id="ref-for-stream-outgoing-unidirectional③">outgoing
 unidirectional</a> or <a data-link-type="dfn" href="#stream-bidirectional" id="ref-for-stream-bidirectional④">bidirectional</a> <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream⑤">WebTransport stream</a> a <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="sendstream"><code>SendStream</code></dfn>.</p>
-   <p class="note" role="note"><span>Note:</span> <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream③">SendStream</a></code> is not a Web IDL type. A <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream④">SendStream</a></code> is always created by the <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create②">create</a> procedure.</p>
+   <p class="note" role="note"><span>Note:</span> <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream③">SendStream</a></code> is not a Web IDL type. A <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream④">SendStream</a></code> is always created by the <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create①">create</a> procedure.</p>
    <h3 class="heading settled" data-level="7.1" id="send-stream-internal-slots"><span class="secno">7.1. </span><span class="content">Internal Slots</span><a class="self-link" href="#send-stream-internal-slots"></a></h3>
    <p>A <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream⑤">SendStream</a></code> has the following internal slots.</p>
    <table class="data">
@@ -1965,7 +1965,7 @@ unidirectional</a> or <a data-link-type="dfn" href="#stream-bidirectional" id="r
     <tbody>
    </table>
    <p class="note" role="note"><span>Note:</span> These internal slots need to be attached to <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream⑦">SendStream</a></code> (which is a kind of <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑧">WritableStream</a></code>) conceptually, not physically. For example, an implementation could place them on
-an object which is referenced from <var>writeAlgorithm</var>, <var>closeAlgorithm</var> and <var>abortAlgorithm</var> in the <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create③">create</a> procedure.</p>
+an object which is referenced from <var>writeAlgorithm</var>, <var>closeAlgorithm</var> and <var>abortAlgorithm</var> in the <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create②">create</a> procedure.</p>
    <h3 class="heading settled" data-level="7.2" id="send-stream-procedures"><span class="secno">7.2. </span><span class="content">Procedures</span><a class="self-link" href="#send-stream-procedures"></a></h3>
    <div class="algorithm" data-algorithm="create a SendStream">
     <p>To <dfn class="dfn-paneled" data-dfn-for="SendStream" data-dfn-type="dfn" data-export data-lt="create|creating" id="sendstream-create">create</dfn> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream⑧">SendStream</a></code>, with an <a data-link-type="dfn" href="#stream-outgoing-unidirectional" id="ref-for-stream-outgoing-unidirectional⑤">outgoing unidirectional</a> or <a data-link-type="dfn" href="#stream-bidirectional" id="ref-for-stream-bidirectional⑥">bidirectional</a> <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream⑦">WebTransport stream</a> <var>internalStream</var> and a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②⑤">WebTransport</a></code> <var>transport</var>, run these steps:</p>
@@ -1979,7 +1979,7 @@ an object which is referenced from <var>writeAlgorithm</var>, <var>closeAlgorith
        <dt data-md><a data-link-type="dfn" href="#sendstream-pendingoperation" id="ref-for-sendstream-pendingoperation">[[PendingOperation]]</a>
        <dd data-md>
         <p>null</p>
-       <dt data-md><a data-link-type="dfn" href="#bidirectionalstream-transport" id="ref-for-bidirectionalstream-transport">[[Transport]]</a>
+       <dt data-md><a data-link-type="dfn" href="#sendstream-transport" id="ref-for-sendstream-transport">[[Transport]]</a>
        <dd data-md>
         <p><var>transport</var></p>
       </dl>
@@ -2019,7 +2019,7 @@ an object which is referenced from <var>writeAlgorithm</var>, <var>closeAlgorith
      To <dfn class="dfn-paneled" data-dfn-for="SendStream" data-dfn-type="dfn" data-noexport id="sendstream-write">write</dfn> <var>chunk</var> to a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream⑨">SendStream</a></code> <var>stream</var>, run these steps: 
     <ol>
      <li data-md>
-      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#bidirectionalstream-transport" id="ref-for-bidirectionalstream-transport①">[[Transport]]</a>.</p>
+      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#bidirectionalstream-transport" id="ref-for-bidirectionalstream-transport">[[Transport]]</a>.</p>
      <li data-md>
       <p>If <var>chunk</var> is not a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource①">BufferSource</a></code>, return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror②">TypeError</a></code>.</p>
      <li data-md>
@@ -2068,10 +2068,10 @@ the chunk arrives at the server, use an application-level protocol.</p>
      <li data-md>
       <p>Return <var>promise</var> and run the remaining steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑨">in parallel</a>.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send①">Send</a> FIN on <var>stream</var>’s <a data-link-type="dfn" href="#sendstream-internalstream" id="ref-for-sendstream-internalstream②">[[InternalStream]]</a> and wait for the operation to
+      <p><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send①">Send</a> FIN on <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-internalstream" id="ref-for-receivestream-internalstream">[[InternalStream]]</a> and wait for the operation to
  complete.</p>
      <li data-md>
-      <p>Wait for <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-internalstream" id="ref-for-receivestream-internalstream">[[InternalStream]]</a> to enter the "Data Recvd" state. <a data-link-type="biblio" href="#biblio-quic">[QUIC]</a></p>
+      <p>Wait for <var>stream</var>’s <a data-link-type="dfn" href="#sendstream-internalstream" id="ref-for-sendstream-internalstream②">[[InternalStream]]</a> to enter the "Data Recvd" state. <a data-link-type="biblio" href="#biblio-quic">[QUIC]</a></p>
      <li data-md>
       <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①⑦">Queue a network task</a> with <var>transport</var> to run these steps:</p>
       <ol>
@@ -2086,7 +2086,7 @@ the chunk arrives at the server, use an application-level protocol.</p>
      To <dfn class="dfn-paneled" data-dfn-for="SendStream" data-dfn-type="dfn" data-noexport id="sendstream-abort">abort</dfn> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream①②">SendStream</a></code> <var>stream</var> with <var>reason</var>, run these steps: 
     <ol>
      <li data-md>
-      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#sendstream-transport" id="ref-for-sendstream-transport">[[Transport]]</a>.</p>
+      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport①">[[Transport]]</a>.</p>
      <li data-md>
       <p>Let <var>promise</var> be a new promise.</p>
      <li data-md>
@@ -2094,8 +2094,8 @@ the chunk arrives at the server, use an application-level protocol.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-remove" id="ref-for-list-remove①">Remove</a> <var>stream</var> from <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-sendstreams" id="ref-for-webtransport-sendstreams⑥">[[SendStreams]]</a>.</p>
      <li data-md>
-      <p>If <var>reason</var> is a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑥">WebTransportError</a></code> and <var>reasons</var>’s <a data-link-type="dfn" href="#webtransporterror-applicationprotocolcode" id="ref-for-webtransporterror-applicationprotocolcode">[[ApplicationProtocolCode]]</a> is not
- null, then set <var>code</var> to <var>reason</var>’s <a data-link-type="dfn" href="#webtransporterror-applicationprotocolcode" id="ref-for-webtransporterror-applicationprotocolcode①">[[ApplicationProtocolCode]]</a>.</p>
+      <p>If <var>reason</var> is a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑥">WebTransportError</a></code> and <var>reasons</var>’s <a data-link-type="dfn" href="#webtransporterror-streamerrorcode" id="ref-for-webtransporterror-streamerrorcode">[[StreamErrorCode]]</a> is not
+ null, then set <var>code</var> to <var>reason</var>’s <a data-link-type="dfn" href="#webtransporterror-streamerrorcode" id="ref-for-webtransporterror-streamerrorcode①">[[StreamErrorCode]]</a>.</p>
      <li data-md>
       <p>If <var>code</var> &lt; 0, then set <var>code</var> to 0.</p>
      <li data-md>
@@ -2105,7 +2105,7 @@ the chunk arrives at the server, use an application-level protocol.</p>
      <li data-md>
       <p>Return <var>promise</var> and run the remaining steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⓪">in parallel</a>.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset">Reset</a> <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-internalstream" id="ref-for-receivestream-internalstream①">[[InternalStream]]</a> with <var>code</var>.</p>
+      <p><a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset">Reset</a> <var>stream</var>’s <a data-link-type="dfn" href="#sendstream-internalstream" id="ref-for-sendstream-internalstream③">[[InternalStream]]</a> with <var>code</var>.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①⑧">Queue a network task</a> with <var>transport</var> to <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③①">resolve</a> <var>promise</var> with undefined.</p>
     </ol>
@@ -2115,7 +2115,7 @@ the chunk arrives at the server, use an application-level protocol.</p>
      Whenever a <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream⑧">WebTransport stream</a> associated with a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream①③">SendStream</a></code> <var>stream</var> gets a <a data-link-type="dfn" href="#stream-signal-stop_sending" id="ref-for-stream-signal-stop_sending">STOP_SENDING</a> signal from the server, run these steps: 
     <ol>
      <li data-md>
-      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#bidirectionalstream-transport" id="ref-for-bidirectionalstream-transport②">[[Transport]]</a>.</p>
+      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport②">[[Transport]]</a>.</p>
      <li data-md>
       <p>Let <var>code</var> be the application protocol error code attached to the STOP_SENDING frame. <a data-link-type="biblio" href="#biblio-quic">[QUIC]</a></p>
       <p class="note" role="note"><span>Note:</span> Valid values of <var>code</var> are from 0 to 255 inclusive. The code has been decoded from a number in
@@ -2128,9 +2128,9 @@ the chunk arrives at the server, use an application-level protocol.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-remove" id="ref-for-list-remove②">Remove</a> <var>stream</var> from <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-sendstreams" id="ref-for-webtransport-sendstreams⑦">[[SendStreams]]</a>.</p>
        <li data-md>
-        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create⑥">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑦">WebTransportError</a></code> with <code>"stream"</code>.</p>
+        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create⑦">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑦">WebTransportError</a></code> with <code>"stream"</code>.</p>
        <li data-md>
-        <p>Set <var>error</var>’s <a data-link-type="dfn" href="#webtransporterror-applicationprotocolcode" id="ref-for-webtransporterror-applicationprotocolcode②">[[ApplicationProtocolCode]]</a> to <var>code</var>.</p>
+        <p>Set <var>error</var>’s <a data-link-type="dfn" href="#webtransporterror-streamerrorcode" id="ref-for-webtransporterror-streamerrorcode②">[[StreamErrorCode]]</a> to <var>code</var>.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-error" id="ref-for-writablestream-error①">Error</a> <var>stream</var> with <var>error</var>.</p>
       </ol>
@@ -2167,10 +2167,10 @@ an object which is referenced from <var>pullAlgorithm</var> and <var>cancelAlgor
      <li data-md>
       <p>Let <var>stream</var> be a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#new" id="ref-for-new⑥">new</a> <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑧">ReadableStream</a></code>, with:</p>
       <dl>
-       <dt data-md><a data-link-type="dfn" href="#receivestream-internalstream" id="ref-for-receivestream-internalstream②">[[InternalStream]]</a>
+       <dt data-md><a data-link-type="dfn" href="#receivestream-internalstream" id="ref-for-receivestream-internalstream①">[[InternalStream]]</a>
        <dd data-md>
         <p><var>internalStream</var></p>
-       <dt data-md><a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport①">[[Transport]]</a>
+       <dt data-md><a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport③">[[Transport]]</a>
        <dd data-md>
         <p><var>transport</var></p>
       </dl>
@@ -2190,9 +2190,9 @@ an object which is referenced from <var>pullAlgorithm</var> and <var>cancelAlgor
     <p>To <dfn class="dfn-paneled" data-dfn-for="ReceiveStream" data-dfn-type="dfn" data-noexport id="receivestream-pull-bytes">pull bytes</dfn> from a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream①②">ReceiveStream</a></code> <var>stream</var>, run these steps.</p>
     <ol>
      <li data-md>
-      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport②">[[Transport]]</a>.</p>
+      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport④">[[Transport]]</a>.</p>
      <li data-md>
-      <p>Let <var>internalStream</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-internalstream" id="ref-for-receivestream-internalstream③">[[InternalStream]]</a>.</p>
+      <p>Let <var>internalStream</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-internalstream" id="ref-for-receivestream-internalstream②">[[InternalStream]]</a>.</p>
      <li data-md>
       <p>Let <var>promise</var> be a new promise.</p>
      <li data-md>
@@ -2261,16 +2261,16 @@ error <var>stream</var> and reject the result of this read operation.</p>
 steps.</p>
     <ol>
      <li data-md>
-      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport③">[[Transport]]</a>.</p>
+      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport⑤">[[Transport]]</a>.</p>
      <li data-md>
-      <p>Let <var>internalStream</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-internalstream" id="ref-for-receivestream-internalstream④">[[InternalStream]]</a>.</p>
+      <p>Let <var>internalStream</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-internalstream" id="ref-for-receivestream-internalstream③">[[InternalStream]]</a>.</p>
      <li data-md>
       <p>Let <var>promise</var> be a new promise.</p>
      <li data-md>
       <p>Let <var>code</var> be 0.</p>
      <li data-md>
-      <p>If <var>reason</var> is a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑧">WebTransportError</a></code> and <var>reasons</var>’s <a data-link-type="dfn" href="#webtransporterror-applicationprotocolcode" id="ref-for-webtransporterror-applicationprotocolcode③">[[ApplicationProtocolCode]]</a> is not
- null, then set <var>code</var> to <var>reason</var>’s <a data-link-type="dfn" href="#webtransporterror-applicationprotocolcode" id="ref-for-webtransporterror-applicationprotocolcode④">[[ApplicationProtocolCode]]</a>.</p>
+      <p>If <var>reason</var> is a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑧">WebTransportError</a></code> and <var>reasons</var>’s <a data-link-type="dfn" href="#webtransporterror-streamerrorcode" id="ref-for-webtransporterror-streamerrorcode③">[[StreamErrorCode]]</a> is not
+ null, then set <var>code</var> to <var>reason</var>’s <a data-link-type="dfn" href="#webtransporterror-streamerrorcode" id="ref-for-webtransporterror-streamerrorcode④">[[StreamErrorCode]]</a>.</p>
      <li data-md>
       <p>If <var>code</var> &lt; 0, then set <var>code</var> to 0.</p>
      <li data-md>
@@ -2300,7 +2300,7 @@ running, the following steps may run immediately.</p>
      Whenever a <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream①②">WebTransport stream</a> associated with a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream①④">ReceiveStream</a></code> <var>stream</var> gets a <a data-link-type="dfn" href="#stream-signal-reset" id="ref-for-stream-signal-reset①">reset</a> signal from the server, run these steps: 
     <ol>
      <li data-md>
-      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport④">[[Transport]]</a>.</p>
+      <p>Let <var>transport</var> be <var>stream</var>’s <a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport⑥">[[Transport]]</a>.</p>
      <li data-md>
       <p>Let <var>code</var> be the application protocol error code attached to the RESET_STREAM frame. <a data-link-type="biblio" href="#biblio-quic">[QUIC]</a></p>
       <p class="note" role="note"><span>Note:</span> Valid values of <var>code</var> are from 0 to 255 inclusive. The code has been decoded from a number in
@@ -2313,9 +2313,9 @@ running, the following steps may run immediately.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-remove" id="ref-for-list-remove⑥">Remove</a> <var>stream</var> from <var>transport</var>’s <a data-link-type="dfn" href="#webtransport-receivestreams" id="ref-for-webtransport-receivestreams⑦">[[ReceiveStreams]]</a>.</p>
        <li data-md>
-        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create⑦">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑨">WebTransportError</a></code> with <code>"stream"</code>.</p>
+        <p>Let <var>error</var> be the result of <a data-link-type="dfn" href="#webtransporterror-create" id="ref-for-webtransporterror-create⑧">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑨">WebTransportError</a></code> with <code>"stream"</code>.</p>
        <li data-md>
-        <p>Set <var>error</var>’s <a data-link-type="dfn" href="#webtransporterror-applicationprotocolcode" id="ref-for-webtransporterror-applicationprotocolcode⑤">[[ApplicationProtocolCode]]</a> to <var>code</var>.</p>
+        <p>Set <var>error</var>’s <a data-link-type="dfn" href="#webtransporterror-streamerrorcode" id="ref-for-webtransporterror-streamerrorcode⑤">[[StreamErrorCode]]</a> to <var>code</var>.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error③">Error</a> <var>stream</var> with <var>error</var>.</p>
       </ol>
@@ -2337,7 +2337,7 @@ running, the following steps may run immediately.</p>
       <th>Description (<em>non-normative</em>) 
     <tbody>
      <tr>
-      <td><dfn data-dfn-for="BidirectionalStream" data-dfn-type="dfn" data-noexport id="bidirectionalstream-readable">[[Readable]]<a class="self-link" href="#bidirectionalstream-readable"></a></dfn> 
+      <td><dfn class="dfn-paneled" data-dfn-for="BidirectionalStream" data-dfn-type="dfn" data-noexport id="bidirectionalstream-readable">[[Readable]]</dfn> 
       <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream①⑤">ReceiveStream</a></code>. 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="BidirectionalStream" data-dfn-type="dfn" data-noexport id="bidirectionalstream-writable">[[Writable]]</dfn> 
@@ -2353,17 +2353,17 @@ running, the following steps may run immediately.</p>
      <li data-md>
       <p>Let <var>readable</var> be the result of <a data-link-type="dfn" href="#receivestream-create" id="ref-for-receivestream-create③">creating</a> a <code class="idl"><a data-link-type="idl" href="#receivestream" id="ref-for-receivestream①⑥">ReceiveStream</a></code> with <var>internalStream</var> and <var>transport</var>.</p>
      <li data-md>
-      <p>Let <var>writable</var> be the result of <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create④">creating</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream①⑤">SendStream</a></code> with <var>internalStream</var> and <var>transport</var>.</p>
+      <p>Let <var>writable</var> be the result of <a data-link-type="dfn" href="#sendstream-create" id="ref-for-sendstream-create③">creating</a> a <code class="idl"><a data-link-type="idl" href="#sendstream" id="ref-for-sendstream①⑤">SendStream</a></code> with <var>internalStream</var> and <var>transport</var>.</p>
      <li data-md>
       <p>Let <var>stream</var> be a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#new" id="ref-for-new⑧">new</a> <code class="idl"><a data-link-type="idl" href="#webtransportbidirectionalstream" id="ref-for-webtransportbidirectionalstream⑨">WebTransportBidirectionalStream</a></code>, with:</p>
       <dl>
-       <dt data-md><a data-link-type="dfn" href="#datagramduplexstream-readable" id="ref-for-datagramduplexstream-readable③">[[Readable]]</a>
+       <dt data-md><a data-link-type="dfn" href="#datagramduplexstream-readable" id="ref-for-datagramduplexstream-readable②">[[Readable]]</a>
        <dd data-md>
         <p><var>readable</var></p>
        <dt data-md><a data-link-type="dfn" href="#bidirectionalstream-writable" id="ref-for-bidirectionalstream-writable">[[Writable]]</a>
        <dd data-md>
         <p><var>writable</var></p>
-       <dt data-md><a data-link-type="dfn" href="#sendstream-transport" id="ref-for-sendstream-transport①">[[Transport]]</a>
+       <dt data-md><a data-link-type="dfn" href="#receivestream-transport" id="ref-for-receivestream-transport⑦">[[Transport]]</a>
        <dd data-md>
         <p><var>transport</var></p>
       </dl>
@@ -2383,12 +2383,12 @@ running, the following steps may run immediately.</p>
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#webtransporterror" id="ref-for-webtransporterror①⓪"><c- g>WebTransportError</c-></a> : <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-DOMException" id="ref-for-idl-DOMException①"><c- n>DOMException</c-></a> {
   <a class="idl-code" data-link-type="constructor" href="#dom-webtransporterror-webtransporterror" id="ref-for-dom-webtransporterror-webtransporterror"><c- g>constructor</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransporterrorinit" id="ref-for-dictdef-webtransporterrorinit"><c- n>WebTransportErrorInit</c-></a> <dfn class="idl-code" data-dfn-for="WebTransportError/WebTransportError(init), WebTransportError/constructor(init), WebTransportError/WebTransportError(), WebTransportError/constructor()" data-dfn-type="argument" data-export id="dom-webtransporterror-webtransporterror-init-init"><code><c- g>init</c-></code><a class="self-link" href="#dom-webtransporterror-webtransporterror-init-init"></a></dfn> = {});
 
-  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-octet" id="ref-for-idl-octet"><c- b>octet</c-></a>? <a class="idl-code" data-link-type="attribute" data-readonly data-type="octet?" href="#dom-webtransporterror-applicationprotocolcode" id="ref-for-dom-webtransporterror-applicationprotocolcode"><c- g>applicationProtocolCode</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransporterrorsource" id="ref-for-enumdef-webtransporterrorsource"><c- n>WebTransportErrorSource</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportErrorSource" href="#dom-webtransporterror-source" id="ref-for-dom-webtransporterror-source"><c- g>source</c-></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-octet" id="ref-for-idl-octet"><c- b>octet</c-></a>? <a class="idl-code" data-link-type="attribute" data-readonly data-type="octet?" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode"><c- g>streamErrorCode</c-></a>;
 };
 
 <c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-webtransporterrorinit"><code><c- g>WebTransportErrorInit</c-></code></dfn> {
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Clamp" id="ref-for-Clamp"><c- g>Clamp</c-></a>] <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-octet" id="ref-for-idl-octet①"><c- b>octet</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportErrorInit" data-dfn-type="dict-member" data-export data-type="octet " id="dom-webtransporterrorinit-applicationprotocolcode"><code><c- g>applicationProtocolCode</c-></code></dfn>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Clamp" id="ref-for-Clamp"><c- g>Clamp</c-></a>] <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-octet" id="ref-for-idl-octet①"><c- b>octet</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportErrorInit" data-dfn-type="dict-member" data-export data-type="octet " id="dom-webtransporterrorinit-streamerrorcode"><code><c- g>streamErrorCode</c-></code></dfn>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString②"><c- b>DOMString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportErrorInit" data-dfn-type="dict-member" data-export data-type="DOMString " id="dom-webtransporterrorinit-message"><code><c- g>message</c-></code></dfn>;
 };
 
@@ -2406,11 +2406,11 @@ running, the following steps may run immediately.</p>
       <th>Description (<em>non-normative</em>) 
     <tbody>
      <tr>
-      <td><dfn class="dfn-paneled" data-dfn-for="WebTransportError" data-dfn-type="dfn" data-noexport id="webtransporterror-applicationprotocolcode">[[ApplicationProtocolCode]]</dfn> 
-      <td class="non-normative">The application protocol error code for this error, or null. 
-     <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="WebTransportError" data-dfn-type="dfn" data-noexport id="webtransporterror-source">[[Source]]</dfn> 
       <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="#enumdef-webtransporterrorsource" id="ref-for-enumdef-webtransporterrorsource①">WebTransportErrorSource</a></code> indicating the source of this error. 
+     <tr>
+      <td><dfn class="dfn-paneled" data-dfn-for="WebTransportError" data-dfn-type="dfn" data-noexport id="webtransporterror-streamerrorcode">[[StreamErrorCode]]</dfn> 
+      <td class="non-normative">The application protocol error code for this error, or null. 
    </table>
    <h3 class="heading settled" data-level="10.2" id="web-transport-error-constructor1"><span class="secno">10.2. </span><span class="content">Constructor</span><a class="self-link" href="#web-transport-error-constructor1"></a></h3>
    <div class="algorithm" data-algorithm="WebTransportError(init)" data-algorithm-for="WebTransportError">
@@ -2423,17 +2423,17 @@ running, the following steps may run immediately.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="#webtransporterror-set-up" id="ref-for-webtransporterror-set-up">Set up</a> <var>error</var> with <var>message</var> and <code>"stream"</code>.</p>
      <li data-md>
-      <p>Set <var>error</var>’s <a data-link-type="dfn" href="#webtransporterror-applicationprotocolcode" id="ref-for-webtransporterror-applicationprotocolcode⑥">[[ApplicationProtocolCode]]</a> to <var>init</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterrorinit-applicationprotocolcode" id="ref-for-dom-webtransporterrorinit-applicationprotocolcode">applicationProtocolCode</a></code> if it exists.</p>
+      <p>Set <var>error</var>’s <a data-link-type="dfn" href="#webtransporterror-streamerrorcode" id="ref-for-webtransporterror-streamerrorcode⑥">[[StreamErrorCode]]</a> to <var>init</var>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterrorinit-streamerrorcode" id="ref-for-dom-webtransporterrorinit-streamerrorcode">streamErrorCode</a></code> if it exists.</p>
     </ol>
    </div>
    <h3 class="heading settled" data-level="10.3" id="web-transport-error-attributes"><span class="secno">10.3. </span><span class="content">Attributes</span><a class="self-link" href="#web-transport-error-attributes"></a></h3>
    <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportError" data-dfn-type="attribute" data-export id="dom-webtransporterror-applicationprotocolcode"><code>applicationProtocolCode</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-octet" id="ref-for-idl-octet②">octet</a>, readonly, nullable</span>
-    <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this②①">this</a>'s <a data-link-type="dfn" href="#webtransporterror-applicationprotocolcode" id="ref-for-webtransporterror-applicationprotocolcode⑦">[[ApplicationProtocolCode]]</a>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportError" data-dfn-type="attribute" data-export id="dom-webtransporterror-source"><code>source</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransporterrorsource" id="ref-for-enumdef-webtransporterrorsource②">WebTransportErrorSource</a>, readonly</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this②②">this</a>'s <a data-link-type="dfn" href="#webtransporterror-source" id="ref-for-webtransporterror-source">[[Source]]</a>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this②①">this</a>'s <a data-link-type="dfn" href="#webtransporterror-source" id="ref-for-webtransporterror-source">[[Source]]</a>.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportError" data-dfn-type="attribute" data-export id="dom-webtransporterror-streamerrorcode"><code>streamErrorCode</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-octet" id="ref-for-idl-octet②">octet</a>, readonly, nullable</span>
+    <dd data-md>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#this" id="ref-for-this②②">this</a>'s <a data-link-type="dfn" href="#webtransporterror-streamerrorcode" id="ref-for-webtransporterror-streamerrorcode⑦">[[StreamErrorCode]]</a>.</p>
    </dl>
    <h3 class="heading settled" data-level="10.4" id="web-transport-error-procedures"><span class="secno">10.4. </span><span class="content">Procedures</span><a class="self-link" href="#web-transport-error-procedures"></a></h3>
    <div class="algorithm" data-algorithm="create" data-algorithm-for="WebTransportError">
@@ -2453,7 +2453,7 @@ running, the following steps may run immediately.</p>
      <li data-md>
       <p>Set <var>error</var>’s internal slots as:</p>
       <dl>
-       <dt data-md><a data-link-type="dfn" href="#webtransporterror-applicationprotocolcode" id="ref-for-webtransporterror-applicationprotocolcode⑧">[[ApplicationProtocolCode]]</a>
+       <dt data-md><a data-link-type="dfn" href="#webtransporterror-streamerrorcode" id="ref-for-webtransporterror-streamerrorcode⑧">[[StreamErrorCode]]</a>
        <dd data-md>
         <p>null</p>
        <dt data-md><a data-link-type="dfn" href="#webtransporterror-source" id="ref-for-webtransporterror-source①">[[Source]]</a>
@@ -2783,13 +2783,6 @@ and has been adapted for use in this specification.</p>
   <ul class="index">
    <li><a href="#sendstream-abort">abort</a><span>, in § 7.2</span>
    <li><a href="#dom-webtransportoptions-allowpooling">allowPooling</a><span>, in § 6.9</span>
-   <li><a href="#webtransporterror-applicationprotocolcode">[[ApplicationProtocolCode]]</a><span>, in § 10.1</span>
-   <li>
-    applicationProtocolCode
-    <ul>
-     <li><a href="#dom-webtransporterror-applicationprotocolcode">attribute for WebTransportError</a><span>, in § 10.3</span>
-     <li><a href="#dom-webtransporterrorinit-applicationprotocolcode">dict-member for WebTransportErrorInit</a><span>, in § 10</span>
-    </ul>
    <li><a href="#stream-bidirectional">bidirectional</a><span>, in § 4</span>
    <li><a href="#dom-webtransportstats-bytesreceived">bytesReceived</a><span>, in § 6.11</span>
    <li><a href="#dom-webtransportstats-bytessent">bytesSent</a><span>, in § 6.11</span>
@@ -2914,6 +2907,13 @@ and has been adapted for use in this specification.</p>
    <li><a href="#webtransport-state">[[State]]</a><span>, in § 6.1</span>
    <li><a href="#stream-signal-stop_sending">STOP_SENDING</a><span>, in § 4</span>
    <li><a href="#dom-webtransporterrorsource-stream">"stream"</a><span>, in § 10</span>
+   <li><a href="#webtransporterror-streamerrorcode">[[StreamErrorCode]]</a><span>, in § 10.1</span>
+   <li>
+    streamErrorCode
+    <ul>
+     <li><a href="#dom-webtransporterror-streamerrorcode">attribute for WebTransportError</a><span>, in § 10.3</span>
+     <li><a href="#dom-webtransporterrorinit-streamerrorcode">dict-member for WebTransportErrorInit</a><span>, in § 10</span>
+    </ul>
    <li><a href="#session-terminate">terminate</a><span>, in § 4</span>
    <li><a href="#session-terminated">terminated</a><span>, in § 4</span>
    <li><a href="#dom-webtransportstats-timestamp">timestamp</a><span>, in § 6.11</span>
@@ -3987,12 +3987,12 @@ and has been adapted for use in this specification.</p>
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#webtransporterror"><c- g>WebTransportError</c-></a> : <a data-link-type="idl-name" href="https://heycam.github.io/webidl/#idl-DOMException"><c- n>DOMException</c-></a> {
   <a class="idl-code" data-link-type="constructor" href="#dom-webtransporterror-webtransporterror"><c- g>constructor</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransporterrorinit"><c- n>WebTransportErrorInit</c-></a> <a href="#dom-webtransporterror-webtransporterror-init-init"><code><c- g>init</c-></code></a> = {});
 
-  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-octet"><c- b>octet</c-></a>? <a class="idl-code" data-link-type="attribute" data-readonly data-type="octet?" href="#dom-webtransporterror-applicationprotocolcode"><c- g>applicationProtocolCode</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransporterrorsource"><c- n>WebTransportErrorSource</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportErrorSource" href="#dom-webtransporterror-source"><c- g>source</c-></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-octet"><c- b>octet</c-></a>? <a class="idl-code" data-link-type="attribute" data-readonly data-type="octet?" href="#dom-webtransporterror-streamerrorcode"><c- g>streamErrorCode</c-></a>;
 };
 
 <c- b>dictionary</c-> <a href="#dictdef-webtransporterrorinit"><code><c- g>WebTransportErrorInit</c-></code></a> {
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Clamp"><c- g>Clamp</c-></a>] <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-octet"><c- b>octet</c-></a> <a data-type="octet " href="#dom-webtransporterrorinit-applicationprotocolcode"><code><c- g>applicationProtocolCode</c-></code></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Clamp"><c- g>Clamp</c-></a>] <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-octet"><c- b>octet</c-></a> <a data-type="octet " href="#dom-webtransporterrorinit-streamerrorcode"><code><c- g>streamErrorCode</c-></code></a>;
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><c- b>DOMString</c-></a> <a data-type="DOMString " href="#dom-webtransporterrorinit-message"><code><c- g>message</c-></code></a>;
 };
 
@@ -4180,9 +4180,8 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="datagramduplexstream-readable">
    <b><a href="#datagramduplexstream-readable">#datagramduplexstream-readable</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-datagramduplexstream-readable">5.1. Internal slots</a>
-    <li><a href="#ref-for-datagramduplexstream-readable①">5.3. Procedures</a> <a href="#ref-for-datagramduplexstream-readable②">(2)</a>
-    <li><a href="#ref-for-datagramduplexstream-readable③">9.2. Procedures</a>
+    <li><a href="#ref-for-datagramduplexstream-readable">5.3. Procedures</a> <a href="#ref-for-datagramduplexstream-readable①">(2)</a>
+    <li><a href="#ref-for-datagramduplexstream-readable②">9.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="datagramduplexstream-writable">
@@ -4708,7 +4707,7 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="sendstream-internalstream">
    <b><a href="#sendstream-internalstream">#sendstream-internalstream</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-sendstream-internalstream">7.2. Procedures</a> <a href="#ref-for-sendstream-internalstream①">(2)</a> <a href="#ref-for-sendstream-internalstream②">(3)</a>
+    <li><a href="#ref-for-sendstream-internalstream">7.2. Procedures</a> <a href="#ref-for-sendstream-internalstream①">(2)</a> <a href="#ref-for-sendstream-internalstream②">(3)</a> <a href="#ref-for-sendstream-internalstream③">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="sendstream-pendingoperation">
@@ -4721,17 +4720,15 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
    <b><a href="#sendstream-transport">#sendstream-transport</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-sendstream-transport">7.2. Procedures</a>
-    <li><a href="#ref-for-sendstream-transport①">9.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="sendstream-create">
    <b><a href="#sendstream-create">#sendstream-create</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-sendstream-create">3. Terminology</a>
-    <li><a href="#ref-for-sendstream-create①">6.4. Methods</a>
-    <li><a href="#ref-for-sendstream-create②">7. SendStream</a>
-    <li><a href="#ref-for-sendstream-create③">7.1. Internal Slots</a>
-    <li><a href="#ref-for-sendstream-create④">9.2. Procedures</a>
+    <li><a href="#ref-for-sendstream-create">6.4. Methods</a>
+    <li><a href="#ref-for-sendstream-create①">7. SendStream</a>
+    <li><a href="#ref-for-sendstream-create②">7.1. Internal Slots</a>
+    <li><a href="#ref-for-sendstream-create③">9.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="sendstream-write">
@@ -4770,16 +4767,18 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="receivestream-internalstream">
    <b><a href="#receivestream-internalstream">#receivestream-internalstream</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-receivestream-internalstream">7.2. Procedures</a> <a href="#ref-for-receivestream-internalstream①">(2)</a>
-    <li><a href="#ref-for-receivestream-internalstream②">8.2. Procedures</a> <a href="#ref-for-receivestream-internalstream③">(2)</a> <a href="#ref-for-receivestream-internalstream④">(3)</a>
+    <li><a href="#ref-for-receivestream-internalstream">7.2. Procedures</a>
+    <li><a href="#ref-for-receivestream-internalstream①">8.2. Procedures</a> <a href="#ref-for-receivestream-internalstream②">(2)</a> <a href="#ref-for-receivestream-internalstream③">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="receivestream-transport">
    <b><a href="#receivestream-transport">#receivestream-transport</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-receivestream-transport">7.2. Procedures</a>
-    <li><a href="#ref-for-receivestream-transport①">8.2. Procedures</a> <a href="#ref-for-receivestream-transport②">(2)</a> <a href="#ref-for-receivestream-transport③">(3)</a>
-    <li><a href="#ref-for-receivestream-transport④">8.3. Reset signal coming from the server</a>
+    <li><a href="#ref-for-receivestream-transport">7.2. Procedures</a> <a href="#ref-for-receivestream-transport①">(2)</a>
+    <li><a href="#ref-for-receivestream-transport②">7.3. STOP_SENDING signal coming from the server</a>
+    <li><a href="#ref-for-receivestream-transport③">8.2. Procedures</a> <a href="#ref-for-receivestream-transport④">(2)</a> <a href="#ref-for-receivestream-transport⑤">(3)</a>
+    <li><a href="#ref-for-receivestream-transport⑥">8.3. Reset signal coming from the server</a>
+    <li><a href="#ref-for-receivestream-transport⑦">9.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="receivestream-create">
@@ -4827,6 +4826,12 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
     <li><a href="#ref-for-dom-webtransportbidirectionalstream-writable">11. Protocol Mappings</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable①">(2)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable②">(3)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable③">(4)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable④">(5)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="bidirectionalstream-readable">
+   <b><a href="#bidirectionalstream-readable">#bidirectionalstream-readable</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bidirectionalstream-readable">5.1. Internal slots</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="bidirectionalstream-writable">
    <b><a href="#bidirectionalstream-writable">#bidirectionalstream-writable</a></b><b>Referenced in:</b>
    <ul>
@@ -4836,8 +4841,7 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
   <aside class="dfn-panel" data-for="bidirectionalstream-transport">
    <b><a href="#bidirectionalstream-transport">#bidirectionalstream-transport</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-bidirectionalstream-transport">7.2. Procedures</a> <a href="#ref-for-bidirectionalstream-transport①">(2)</a>
-    <li><a href="#ref-for-bidirectionalstream-transport②">7.3. STOP_SENDING signal coming from the server</a>
+    <li><a href="#ref-for-bidirectionalstream-transport">7.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bidirectionalstream-create">
@@ -4868,10 +4872,10 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
     <li><a href="#ref-for-dictdef-webtransporterrorinit">10. WebTransportError Interface</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-webtransporterrorinit-applicationprotocolcode">
-   <b><a href="#dom-webtransporterrorinit-applicationprotocolcode">#dom-webtransporterrorinit-applicationprotocolcode</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="dom-webtransporterrorinit-streamerrorcode">
+   <b><a href="#dom-webtransporterrorinit-streamerrorcode">#dom-webtransporterrorinit-streamerrorcode</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-webtransporterrorinit-applicationprotocolcode">10.2. Constructor</a>
+    <li><a href="#ref-for-dom-webtransporterrorinit-streamerrorcode">10.2. Constructor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransporterrorinit-message">
@@ -4889,23 +4893,23 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
     <li><a href="#ref-for-enumdef-webtransporterrorsource③">10.4. Procedures</a> <a href="#ref-for-enumdef-webtransporterrorsource④">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="webtransporterror-applicationprotocolcode">
-   <b><a href="#webtransporterror-applicationprotocolcode">#webtransporterror-applicationprotocolcode</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-webtransporterror-applicationprotocolcode">7.2. Procedures</a> <a href="#ref-for-webtransporterror-applicationprotocolcode①">(2)</a>
-    <li><a href="#ref-for-webtransporterror-applicationprotocolcode②">7.3. STOP_SENDING signal coming from the server</a>
-    <li><a href="#ref-for-webtransporterror-applicationprotocolcode③">8.2. Procedures</a> <a href="#ref-for-webtransporterror-applicationprotocolcode④">(2)</a>
-    <li><a href="#ref-for-webtransporterror-applicationprotocolcode⑤">8.3. Reset signal coming from the server</a>
-    <li><a href="#ref-for-webtransporterror-applicationprotocolcode⑥">10.2. Constructor</a>
-    <li><a href="#ref-for-webtransporterror-applicationprotocolcode⑦">10.3. Attributes</a>
-    <li><a href="#ref-for-webtransporterror-applicationprotocolcode⑧">10.4. Procedures</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="webtransporterror-source">
    <b><a href="#webtransporterror-source">#webtransporterror-source</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-webtransporterror-source">10.3. Attributes</a>
     <li><a href="#ref-for-webtransporterror-source①">10.4. Procedures</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="webtransporterror-streamerrorcode">
+   <b><a href="#webtransporterror-streamerrorcode">#webtransporterror-streamerrorcode</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-webtransporterror-streamerrorcode">7.2. Procedures</a> <a href="#ref-for-webtransporterror-streamerrorcode①">(2)</a>
+    <li><a href="#ref-for-webtransporterror-streamerrorcode②">7.3. STOP_SENDING signal coming from the server</a>
+    <li><a href="#ref-for-webtransporterror-streamerrorcode③">8.2. Procedures</a> <a href="#ref-for-webtransporterror-streamerrorcode④">(2)</a>
+    <li><a href="#ref-for-webtransporterror-streamerrorcode⑤">8.3. Reset signal coming from the server</a>
+    <li><a href="#ref-for-webtransporterror-streamerrorcode⑥">10.2. Constructor</a>
+    <li><a href="#ref-for-webtransporterror-streamerrorcode⑦">10.3. Attributes</a>
+    <li><a href="#ref-for-webtransporterror-streamerrorcode⑧">10.4. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransporterror-webtransporterror">
@@ -4914,26 +4918,27 @@ or are impossible to define for pooled connections.<a href="#issue-29939a8a"> �
     <li><a href="#ref-for-dom-webtransporterror-webtransporterror">10. WebTransportError Interface</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-webtransporterror-applicationprotocolcode">
-   <b><a href="#dom-webtransporterror-applicationprotocolcode">#dom-webtransporterror-applicationprotocolcode</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-webtransporterror-applicationprotocolcode">10. WebTransportError Interface</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="dom-webtransporterror-source">
    <b><a href="#dom-webtransporterror-source">#dom-webtransporterror-source</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-webtransporterror-source">10. WebTransportError Interface</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="dom-webtransporterror-streamerrorcode">
+   <b><a href="#dom-webtransporterror-streamerrorcode">#dom-webtransporterror-streamerrorcode</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-webtransporterror-streamerrorcode">10. WebTransportError Interface</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="webtransporterror-create">
    <b><a href="#webtransporterror-create">#webtransporterror-create</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-webtransporterror-create">6.2. Constructor</a> <a href="#ref-for-webtransporterror-create①">(2)</a> <a href="#ref-for-webtransporterror-create②">(3)</a>
-    <li><a href="#ref-for-webtransporterror-create③">6.4. Methods</a>
-    <li><a href="#ref-for-webtransporterror-create④">6.6. Session termination not initiated by the client</a> <a href="#ref-for-webtransporterror-create⑤">(2)</a>
-    <li><a href="#ref-for-webtransporterror-create⑥">7.3. STOP_SENDING signal coming from the server</a>
-    <li><a href="#ref-for-webtransporterror-create⑦">8.3. Reset signal coming from the server</a>
+    <li><a href="#ref-for-webtransporterror-create">3. Terminology</a>
+    <li><a href="#ref-for-webtransporterror-create①">6.2. Constructor</a> <a href="#ref-for-webtransporterror-create②">(2)</a> <a href="#ref-for-webtransporterror-create③">(3)</a>
+    <li><a href="#ref-for-webtransporterror-create④">6.4. Methods</a>
+    <li><a href="#ref-for-webtransporterror-create⑤">6.6. Session termination not initiated by the client</a> <a href="#ref-for-webtransporterror-create⑥">(2)</a>
+    <li><a href="#ref-for-webtransporterror-create⑦">7.3. STOP_SENDING signal coming from the server</a>
+    <li><a href="#ref-for-webtransporterror-create⑧">8.3. Reset signal coming from the server</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="webtransporterror-set-up">
