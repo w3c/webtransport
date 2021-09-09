@@ -1271,8 +1271,8 @@ To <dfn for="SendStream">abort</dfn> a {{SendStream}} |stream| with |reason|, ru
 1. Let |promise| be a new promise.
 1. Let |code| be 0.
 1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
-1. If |reason| is a {{WebTransportError}} and |reasons|'s [=[[ApplicationProtocolCode]]=] is not
-   null, then set |code| to |reason|'s [=[[ApplicationProtocolCode]]=].
+1. If |reason| is a {{WebTransportError}} and |reasons|'s [=[[StreamErrorCode]]=] is not
+   null, then set |code| to |reason|'s [=[[StreamErrorCode]]=].
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 255, then set |code| to 255.
 
@@ -1302,7 +1302,7 @@ Whenever a [=WebTransport stream=] associated with a {{SendStream}} |stream| get
   1. [=set/Remove=] |stream| from |transport|'s [=[[SendStreams]]=].
   1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
      `"stream"`.
-  1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |code|.
+  1. Set |error|'s [=[[StreamErrorCode]]=] to |code|.
   1. [=WritableStream/Error=] |stream| with |error|.
 
 </div>
@@ -1429,8 +1429,8 @@ steps.
 1. Let |internalStream| be |stream|'s [=ReceiveStream/[[InternalStream]]=].
 1. Let |promise| be a new promise.
 1. Let |code| be 0.
-1. If |reason| is a {{WebTransportError}} and |reasons|'s [=[[ApplicationProtocolCode]]=] is not
-   null, then set |code| to |reason|'s [=[[ApplicationProtocolCode]]=].
+1. If |reason| is a {{WebTransportError}} and |reasons|'s [=[[StreamErrorCode]]=] is not
+   null, then set |code| to |reason|'s [=[[StreamErrorCode]]=].
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 255, then set |code| to 255.
 
@@ -1467,7 +1467,7 @@ Whenever a [=WebTransport stream=] associated with a {{ReceiveStream}} |stream| 
   1. [=set/Remove=] |stream| from |transport|'s [=[[ReceiveStreams]]=].
   1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
      `"stream"`.
-  1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |code|.
+  1. Set |error|'s [=[[StreamErrorCode]]=] to |code|.
   1. [=ReadableStream/Error=] |stream| with |error|.
 
 </div>
@@ -1543,12 +1543,12 @@ object |transport|, run these steps.
 interface WebTransportError : DOMException {
   constructor(optional WebTransportErrorInit init = {});
 
-  readonly attribute octet? applicationProtocolCode;
   readonly attribute WebTransportErrorSource source;
+  readonly attribute octet? streamErrorCode;
 };
 
 dictionary WebTransportErrorInit {
-  [Clamp] octet applicationProtocolCode;
+  [Clamp] octet streamErrorCode;
   DOMString message;
 };
 
@@ -1571,12 +1571,12 @@ A {{WebTransportError}} has the following internal slots.
  </thead>
  <tbody>
   <tr>
-   <td><dfn>\[[ApplicationProtocolCode]]</dfn>
-   <td class="non-normative">The application protocol error code for this error, or null.
-  </tr>
-  <tr>
    <td><dfn>\[[Source]]</dfn>
    <td class="non-normative">A {{WebTransportErrorSource}} indicating the source of this error.
+  </tr>
+  <tr>
+   <td><dfn>\[[StreamErrorCode]]</dfn>
+   <td class="non-normative">The application protocol error code for this error, or null.
   </tr>
  </tbody>
 </table>
@@ -1591,17 +1591,17 @@ lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps
 1. Let |error| be [=this=].
 1. Let |message| be |init|'s {{WebTransportErrorInit/message}} if it exists, and `""` otherwise.
 1. [=WebTransportError/Set up=] |error| with |message| and `"stream"`.
-1. Set |error|'s [=[[ApplicationProtocolCode]]=] to |init|'s
-   {{WebTransportErrorInit/applicationProtocolCode}} if it exists.
+1. Set |error|'s [=[[StreamErrorCode]]=] to |init|'s
+   {{WebTransportErrorInit/streamErrorCode}} if it exists.
 
 </div>
 
 ## Attributes ## {#web-transport-error-attributes}
 
-: <dfn for="WebTransportError" attribute>applicationProtocolCode</dfn>
-:: The getter steps are to return [=this=]'s [=[[ApplicationProtocolCode]]=].
 : <dfn for="WebTransportError" attribute>source</dfn>
 :: The getter steps are to return [=this=]'s [=WebTransportError/[[Source]]=].
+: <dfn for="WebTransportError" attribute>streamErrorCode</dfn>
+:: The getter steps are to return [=this=]'s [=[[StreamErrorCode]]=].
 
 ## Procedures ## {#web-transport-error-procedures}
 
@@ -1622,7 +1622,7 @@ To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| wit
 |message| and a {{WebTransportErrorSource}} |source|, run these steps:
 
 1. Set |error|'s internal slots as:
-    : [=[[ApplicationProtocolCode]]=]
+    : [=[[StreamErrorCode]]=]
     :: null
     : [=WebTransportError/[[Source]]=]
     :: |source|
