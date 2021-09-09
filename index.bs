@@ -707,9 +707,10 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
    |transport|'s [=relevant settings object=].
 1. Run the remaining steps [=in parallel=], but abort them whenever |transport|'s
    [=[[State]]=] becomes `"closed"` or `"failed"`.
+1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
 1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
-   |networkPartitionKey|, |url|'s [=url/origin=], false, [=obtain a connection/http3Only=] set to
-   true, and [=obtain a connection/dedicated=] set to |dedicated|.
+   |networkPartitionKey|, |url|, false, |newConnection|, and with [=obtain a connection/http3Only=]
+   set to true.
 1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
    |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
