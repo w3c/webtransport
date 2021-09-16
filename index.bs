@@ -650,9 +650,9 @@ agent MUST run the following steps:
 1. Let |allowPooling| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/allowPooling}} if it exists, and false otherwise.
 1. Let |dedicated| be the negation of |allowPooling|.
-1. Let |serverCertificateFingerprints| be {{WebTransport/constructor(url, options)/options}}'s
-   {{WebTransportOptions/serverCertificateFingerprints}} if it exists, and null otherwise.
-1. If |dedicated| is false and |serverCertificateFingerprints| is non-null, then [=throw=] a
+1. Let |serverCertificateHashes| be {{WebTransport/constructor(url, options)/options}}'s
+   {{WebTransportOptions/serverCertificateHashes}} if it exists, and null otherwise.
+1. If |dedicated| is false and |serverCertificateHashes| is non-null, then [=throw=] a
    {{TypeError}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
@@ -1024,7 +1024,7 @@ The user agent MUST NOT garbage collect a {{WebTransport}} object whose [=[[Stat
 <pre class="idl">
 dictionary WebTransportOptions {
   boolean allowPooling;
-  sequence&lt;RTCDtlsFingerprint&gt; serverCertificateFingerprints;
+  sequence&lt;RTCDtlsFingerprint&gt; serverCertificateHashes;
 };
 </pre>
 
@@ -1035,22 +1035,22 @@ that determine how WebTransport connection is established and used.
 :: When set to true, the WebTransport connection can be pooled, that is, the network connection for
    the WebTransport session can be shared with other HTTP/3 sessions.
 
-: <dfn for="WebTransportOptions" dict-member>serverCertificateFingerprints</dfn>
+: <dfn for="WebTransportOptions" dict-member>serverCertificateHashes</dfn>
 :: This option is only supported for transports using dedicated connections.
    For transport protocols that do not support this feature, having this
    field non-empty SHALL result in a {{NotSupportedError}} exception being thrown.
 :: If supported and non-empty, the user agent SHALL deem a server certificate
-   trusted if and only if it can successfully [=verify a certificate
-   fingerprint=] against {{WebTransportOptions/serverCertificateFingerprints}}
+   trusted if and only if it can successfully [=verify a certificate hash=] against
+   {{WebTransportOptions/serverCertificateHashes}}
    and satisfies [=custom certificate requirements=].  The user agent SHALL
-   ignore any fingerprint that uses an unknown {{RTCDtlsFingerprint/algorithm}}
+   ignore any hash that uses an unknown {{RTCDtlsFingerprint/algorithm}}
    or has a malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent
    SHALL use certificate verification procedures it would use for normal
    [=fetch=] operations.
 :: This cannot be used with {{WebTransportOptions/allowPooling}}.
 
-<div algorithm="compute a certificate fingerprint">
-To <dfn>compute a certificate fingerprint</dfn>, do the following:
+<div algorithm>
+To <dfn>compute a certificate hash</dfn>, do the following:
 1. Let |cert| be the input certificate, represented as a DER encoding of
    Certificate message defined in [[!RFC5280]].
 1. Compute the SHA-256 hash of |cert|.  Format it as `fingerprint` BNF
@@ -1058,15 +1058,14 @@ To <dfn>compute a certificate fingerprint</dfn>, do the following:
 
 </div>
 
-<div algorithm="verify a certificate fingerprint">
-To <dfn>verify a certificate fingerprint</dfn>, do the following:
-1. Let |fingerprints| be the input array of fingerprints.
-1. Let |referenceFingerprint| be the [=compute a certificate fingerprint|computed
-   fingerprint=] of the input certificate.
-1. For every fingerprint |fingerprint| in |fingerprints|:
-   1. If {{RTCDtlsFingerprint/algorithm}} of |fingerprint| is equal to
-      "sha-256", and {{RTCDtlsFingerprint/value}} of |fingerprint| is
-      [=ASCII case-insensitive=] equal to |referenceFingerprint|, the
+<div algorithm>
+To <dfn>verify a certificate hash</dfn>, do the following:
+1. Let |hashes| be the input array of hashes.
+1. Let |referenceHash| be the [=compute a certificate hash|computed hash=] of the input certificate.
+1. For every hash |hash| in |hashes|:
+   1. If {{RTCDtlsFingerprint/algorithm}} of |hash| is equal to
+      "sha-256", and {{RTCDtlsFingerprint/value}} of |hash| is
+      [=ASCII case-insensitive=] equal to |referenceHash|, the
       certificate is valid.  Return true.
 1. Return false.
 
