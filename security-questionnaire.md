@@ -23,7 +23,8 @@
 05.  Do the features in your specification introduce new state for an origin
      that persists across browsing sessions?
 
-    - No.
+    - No. Also WebTransport doesn't interact with cookies and other persistent
+      state.
 06.  Do the features in your specification expose information about the
      underlying platform to origins?
 
@@ -67,7 +68,9 @@
 14.  How does this specification distinguish between behavior in first-party and
      third-party contexts?
 
-    - The feature behaves in first-party and third-party contexts in the same way.
+    - The feature behaves in first-party and third-party contexts in the same way. WebTransport
+      notifies the server of origin of the context when a session is established, and we use
+      network partision keys when creating or pooling connections.
 15.  How do the features in this specification work in the context of a browser’s
      Private Browsing or Incognito mode?
 
