@@ -798,7 +798,7 @@ these steps.
 :: On getting, it MUST return [=this=]'s [=[[Closed]]=].
 :: This promise MUST be [=resolved=] when the transport is closed; an
    implementation SHOULD include error information in the `reason` and
-   `errorCode` fields of {{WebTransportCloseInfo}}.
+   `closeCode` fields of {{WebTransportCloseInfo}}.
 : <dfn for="WebTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this session.
    The getter steps for the `datagrams` attribute SHALL be:
@@ -835,9 +835,9 @@ these steps.
         |closeInfo|.{{WebTransportCloseInfo/reason}}, [=UTF-8 encoded=].
      1. If |reason|'s [=byte sequence/length=] exceeds 1024, then set |reason| to a
         [=byte sequence/prefix=] of |reason| whose length is 1024.
-     1. If |closeInfo|.{{WebTransportCloseInfo/errorCode}} exists:
+     1. If |closeInfo|.{{WebTransportCloseInfo/closeCode}} exists:
        1. [=In parallel=], [=session/terminate=] |session| with
-          |closeInfo|.{{WebTransportCloseInfo/errorCode}} and |reason|.
+          |closeInfo|.{{WebTransportCloseInfo/closeCode}} and |reason|.
      1. Otherwise:
        1. [=In parallel=], [=session/terminate=] |session|.
 
@@ -979,7 +979,7 @@ Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} 
   1. Let |reason| be |error|.
   1. If |cleanly| is true:
      1. Set |reason| to a [=new=] {{WebTransportCloseInfo}}.
-     1. If |code| is given, set |reason|'s {{WebTransportCloseInfo/errorCode}} to |code|.
+     1. If |code| is given, set |reason|'s {{WebTransportCloseInfo/closeCode}} to |code|.
      1. If |reasonBytes| is given, set |reason|'s {{WebTransportCloseInfo/reason}} to |reasonBytes|,
         [=UTF-8 decoded=].
   1. [=Cleanup=] |transport| with |reason|, |error| and the negation of |cleanly|.
@@ -1092,14 +1092,14 @@ frame.
 
 <pre class="idl">
 dictionary WebTransportCloseInfo {
-  unsigned long errorCode;
+  unsigned long closeCode;
   DOMString reason;
 };
 </pre>
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportCloseInfo" dict-member>errorCode</dfn>
+: <dfn for="WebTransportCloseInfo" dict-member>closeCode</dfn>
 :: The error code communicated to the peer.
 : <dfn for="WebTransportCloseInfo" dict-member>reason</dfn>
 :: The reason for closing the {{WebTransport}}.
