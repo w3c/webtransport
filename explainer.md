@@ -135,15 +135,15 @@ function deserializeNotification(serializedNotification) { ... }
 function serializeClickedMessage(notification) { ... }
 
 const wt = new WebTransport('https://example.com:10001/path');
-for await (const stream of wt.incomingBidirectionalStreams) {
+for await (const {readable, writable} of wt.incomingBidirectionalStreams) {
   const buffers = []
-  for await (const buffer of stream) {
+  for await (const buffer of readable) {
     buffers.push(buffer)
   }
   const notification = new Notification(deserializeNotification(buffers));
   notification.addEventListener('onclick', () => {
     const clickMessage = encodeClickMessage(notification);
-    const writer = stream.writable.getWriter();
+    const writer = writable.getWriter();
     writer.write(clickMessage);
     writer.close();
   });
