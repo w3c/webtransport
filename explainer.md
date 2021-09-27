@@ -68,31 +68,31 @@ encrypted and congestion-controlled communication.
    [an HTTP/3 based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-http3)
    that allows web developers to reuse HTTP/3 connections (sharing a congestion control context).
 
-## Example of sending unreliable game state to server using QUIC datagrams
+## Example of sending unreliable game state to server using datagrams
 
 ```javascript
 // The app provides a way to get a serialized state to send to the server
 function getSerializedGameState() { ... }
 
-const transport = new WebTransport('quic-transport://example.com:10001/path');
-const datagramWriter = transport.datagramWritable.getWriter();
+const wt = new WebTransport('https://example.com:10001/path');
+const writer = wt.datagrams.writable.getWriter();
 setInterval(() => {
   const message = getSerializedGameState();
-  datagramWriter.write(message);
+  writer.write(message);
 }, 100);
 ```
 
-## Example of sending reliable game state to server using a QUIC unidirectional send stream
+## Example of sending reliable game state to server using a unidirectional send stream
 
 ```javascript
 // The app provides a way to get a serialized state to send to the server.
 function getSerializedGameState() { ... }
 
-const transport = new WebTransport('quic-transport://example.com:10001/path');
+const wt = new WebTransport('https://example.com:10001/path');
 setInterval(async () => {
   const message = getSerializedGameState();
-  const stream = await transport.createUnidirectionalStream();
-  const writer = stream.writable.getWriter();
+  const stream = await wt.createUnidirectionalStream();
+  const writer = stream.getWriter();
   writer.write(message);
   writer.close();
 }, 100);
@@ -104,7 +104,7 @@ setInterval(async () => {
 // The app provides a way to get a serialized media request to send to the server
 function getSerializedMediaRequest() { ... }
 
-const transport = new WebTransport('quic-transport://example.com:10001/path');
+const wt = new WebTransport('https://example.com:10001/path');
 
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve, {once: true}));
@@ -112,14 +112,14 @@ const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09
 
 // App-specific request
 const mediaRequest = getSerializedMediaRequest();
-const requestStream = await transport.createUnidirectionalStream();
-const requestWriter = requestStream.writable.getWriter();
+const requestStream = await wt.createUnidirectionalStream();
+const requestWriter = requestStream.getWriter();
 requestWriter.write(mediaRequest);
 requestWriter.close();
 
 // Receive the responses.
-for await (const receiveStream of transport.incomingUnidirectionalStreams) {
-  for await (const buffer of receiveStream.readable) {
+for await (const receiveStream of wt.incomingUnidirectionalStreams) {
+  for await (const buffer of receiveStream) {
     sourceBuffer.appendBuffer(buffer);
   }
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
@@ -134,10 +134,10 @@ function deserializeNotification(serializedNotification) { ... }
 // The app also provides a way to serialize a "clicked" message to send to the server.
 function serializeClickedMessage(notification) { ... }
 
-const transport = new WebTransport('quic-transport://example.com:10001/path');
-for await (const stream of transport.incomingBidirectionalStreams) {
+const wt = new WebTransport('https://example.com:10001/path');
+for await (const stream of wt.incomingBidirectionalStreams) {
   const buffers = []
-  for await (const buffer of stream.readable) {
+  for await (const buffer of stream) {
     buffers.push(buffer)
   }
   const notification = new Notification(deserializeNotification(buffers));
@@ -156,9 +156,9 @@ for await (const stream of transport.incomingBidirectionalStreams) {
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve, {once: true}));
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
-const transport = new WebTransport('/video');
+const wt = new WebTransport('/video');
 await fetch('https://example.com/babyshark');
-for await (const datagram of transport.datagramReadable) {
+for await (const datagram of wt.datagrams.readable) {
   sourceBuffer.appendBuffer(datagram);
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
 }
@@ -170,9 +170,9 @@ for await (const datagram of transport.datagramReadable) {
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
-const transport = new WebTransport('https://example.com/video');
+const wt = new WebTransport('https://example.com/video');
 for await (const receiveStream of transport.incomingUnidirectionalStreams) {
-  for await (const buffer of receiveStream.readable) {
+  for await (const buffer of receiveStream) {
     sourceBuffer.appendBuffer(buffer);
   }
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
