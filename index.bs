@@ -1022,9 +1022,14 @@ The user agent MUST NOT garbage collect a {{WebTransport}} object whose [=[[Stat
 ## Configuration ##  {#web-transport-configuration}
 
 <pre class="idl">
+dictionary WebTransportHash {
+  DOMString algorithm;
+  BufferSource value;
+};
+
 dictionary WebTransportOptions {
   boolean allowPooling;
-  sequence&lt;RTCDtlsFingerprint&gt; serverCertificateHashes;
+  sequence&lt;WebTransportHash&gt; serverCertificateHashes;
 };
 </pre>
 
@@ -1043,18 +1048,16 @@ that determine how WebTransport connection is established and used.
    trusted if and only if it can successfully [=verify a certificate hash=] against
    {{WebTransportOptions/serverCertificateHashes}}
    and satisfies [=custom certificate requirements=].  The user agent SHALL
-   ignore any hash that uses an unknown {{RTCDtlsFingerprint/algorithm}}
-   or has a malformed {{RTCDtlsFingerprint/value}}.  If empty, the user agent
-   SHALL use certificate verification procedures it would use for normal
-   [=fetch=] operations.
+   ignore any hash that uses an unknown {{WebTransportHash/algorithm}}.
+   If empty, the user agent SHALL use certificate verification procedures it would
+   use for normal [=fetch=] operations.
 :: This cannot be used with {{WebTransportOptions/allowPooling}}.
 
 <div algorithm>
 To <dfn>compute a certificate hash</dfn>, do the following:
 1. Let |cert| be the input certificate, represented as a DER encoding of
    Certificate message defined in [[!RFC5280]].
-1. Compute the SHA-256 hash of |cert|.  Format it as `fingerprint` BNF
-   rule described in Section 5 of [[!RFC8122]].
+1. Compute the SHA-256 hash of |cert| and return the computed value.
 
 </div>
 
@@ -1063,10 +1066,10 @@ To <dfn>verify a certificate hash</dfn>, do the following:
 1. Let |hashes| be the input array of hashes.
 1. Let |referenceHash| be the [=compute a certificate hash|computed hash=] of the input certificate.
 1. For every hash |hash| in |hashes|:
-   1. If {{RTCDtlsFingerprint/algorithm}} of |hash| is equal to
-      "sha-256", and {{RTCDtlsFingerprint/value}} of |hash| is
-      [=ASCII case-insensitive=] equal to |referenceHash|, the
-      certificate is valid.  Return true.
+   1. If |hash|'s {{WebTransportHash/value}} is not null:
+     1. Let |hashValue| be the byte sequence which |hash|'s {{WebTransportHash/value}} represents.
+     1. If {{WebTransportHash/algorithm}} of |hash| is equal to "sha-256", and |hashValue| is equal
+        to |referenceHash|, the certificate is valid. Return true.
 1. Return false.
 
 </div>
