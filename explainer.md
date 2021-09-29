@@ -116,7 +116,7 @@ const requestStream = await wt.createUnidirectionalStream();
 const requestWriter = requestStream.getWriter();
 requestWriter.write(mediaRequest);
 requestWriter.close();
-
+b
 // Receive the responses.
 for await (const receiveStream of wt.incomingUnidirectionalStreams) {
   for await (const buffer of receiveStream) {
@@ -156,7 +156,7 @@ for await (const {readable, writable} of wt.incomingBidirectionalStreams) {
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve, {once: true}));
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
-const wt = new WebTransport('/video');
+const wt = new WebTransport('/video', {allowPooling: true});
 await fetch('https://example.com/babyshark');
 for await (const datagram of wt.datagrams.readable) {
   sourceBuffer.appendBuffer(datagram);
