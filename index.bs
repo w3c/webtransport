@@ -191,8 +191,11 @@ There may be multiple [=WebTransport sessions=] on one [=connection=], when pool
  </tbody>
 </table>
 
-To <dfn for=session>establish</dfn> a [=WebTransport session=], follow [[!WEB-TRANSPORT-HTTP3]]
-[section 3.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.3).
+To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=origin=] |origin|,
+follow [[!WEB-TRANSPORT-HTTP3]]
+[section 3.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.3),
+with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomorphic encoded=],
+as the "Origin" header of the request.
 
 To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an optional integer
 |code| and an optional [=byte sequence=] |reason|, follow [[!WEB-TRANSPORT-HTTP3]]
@@ -703,6 +706,8 @@ agent MUST run the following steps:
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 <var>transport</var>, a [=URL record=] |url|, and a boolean |dedicated|, run these steps.
 
+1. Let |client| be |transport|'s [=relevant settings object=].
+1. Let |origin| be |client|'s [=environment settings object/origin=].
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
 1. Run the remaining steps [=in parallel=], but abort them whenever |transport|'s
@@ -726,7 +731,7 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
   1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
      `"session"`.
   1. [=Cleanup=] |transport| with |error|, |error| and true.
-1. [=session/Establish=] a [=WebTransport session=] on |connection|.
+1. [=session/Establish=] a [=WebTransport session=] with |origin| on |connection|.
 
   Note: This step also contains the transport parameter exchange specified in [[!QUIC-DATAGRAM]].
 
