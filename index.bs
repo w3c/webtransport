@@ -70,6 +70,7 @@ Boilerplate: omit conformance
 <pre class="link-defaults">
 spec:streams; type:interface; text:ReadableStream
 spec:html; type:dfn; for:/; text:origin
+spec:fetch; type:dfn; for:/; text:origin header
 spec:fetch; type:dfn; for:/; text:fetch
 spec:url; type:dfn; text:scheme
 spec:url; type:dfn; text:fragment
@@ -1737,15 +1738,16 @@ specification.
 ## Protocol Security ##  {#protocol-security}
 
 WebTransport imposes a set of requirements as described in
-[[!WEB-TRANSPORT-OVERVIEW]], including: 
+[[!WEB-TRANSPORT-OVERVIEW]], including:
 
-1. Ensuring that the remote server is aware that the
-   connection in question originates from a Web application; this is required
-   to prevent cross-protocol attacks. [[WEB-TRANSPORT-HTTP3]] uses a
-   combination of ALPN [[RFC7301]], an HTTP/3 setting and a `:protocol`
-   pseudo-header for this purpose.
-1. Allowing the server to filter connections based on the
-   origin of the resource originating the transport session.
+1. Ensuring that the remote server is aware that the WebTransport protocol is in
+   use and confirming that the remote server is willing to use the WebTransport
+   protocol. [[WEB-TRANSPORT-HTTP3]] uses a combination of ALPN [[RFC7301]], an
+   HTTP/3 setting, and a `:protocol` pseudo-header to identify the WebTransport
+   protocol.
+1. Allowing the server to filter connections based on the origin of the resource
+   originating the transport session.  The [[fetch#origin-header|Origin]] header
+   field on the session establishment request carries this information.
 
 Protocol security considerations related are described in the
 *Security Considerations* sections of [[!WEB-TRANSPORT-HTTP3]].
