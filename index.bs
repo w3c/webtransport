@@ -708,6 +708,17 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 
 1. Let |client| be |transport|'s [=relevant settings object=].
 1. Let |origin| be |client|'s [=environment settings object/origin=].
+1. Let |request| be a new [=request=] whose [=request/URL=] is |url|, [=request/client=] is
+   |client|, [=request/policy container=] is |client|'s
+   [=environment settings object/policy container=], [=request/destination=] is an empty string,
+   and [=request/origin=] is |origin|.
+1. Run <a>report Content Security Policy violations for |request|</a>.
+1. If [=should request be blocked by Content Security Policy?=] with |request| returns
+   <b>blocked</b>, then abort the remaining steps and [=queue a network task=] with |transport|
+   to run these steps:
+  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
+  1. Let |error| be a {{SecurityError}}.
+  1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
 1. Run the remaining steps [=in parallel=], but abort them whenever |transport|'s
