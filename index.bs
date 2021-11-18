@@ -1092,15 +1092,19 @@ To <dfn>verify a certificate hash</dfn>, do the following:
 </div>
 
 The <dfn>custom certificate requirements</dfn> are as follows: the certificate
-MUST be an X.509v3 certificate as defined in [[!RFC5280]], the current time
-MUST be within the validity period of the certificate as defined in Section
-4.1.2.5 of [[!RFC5280]] and the total length of the validity period MUST NOT
-exceed two weeks.
+MUST be an X.509v3 certificate as defined in [[!RFC5280]], the key used in the
+Subject Public Key field MUST be one of the [=allowed public key algorithms=],
+the current time MUST be within the validity period of the certificate as
+defined in Section 4.1.2.5 of [[!RFC5280]] and the total length of the validity
+period MUST NOT exceed two weeks.  The user agent MAY impose additional
+[=implementation-defined=] requirements on the certificate.
 
-Issue: Reconsider the time period above.  We want it to be sufficiently large
-that applications using this for ephemeral certificates can do so without
-having to fight the clock skew, but small enough to discourage long-term use
-without key rotation.
+The exact list of <dfn>allowed public key algorithms</dfn> used in the Subject
+Public Key Info field (and, as a consequence, in the TLS CertificateVerify
+message) is [=implementation-defined=]; however, it SHOULD include ECDSA with
+secp256r1 (NIST P-256) named group ([[!RFC3279]], Section 2.3.5; [[!RFC8422]])
+to provide an interoperable default.  It MUST NOT contain RSA keys
+([[!RFC3279]], Section 2.3.1).
 
 ## `WebTransportCloseInfo` Dictionary ##  {#web-transport-close-info}
 
@@ -1783,6 +1787,57 @@ to this problem: the specific connection error is not returned until an
 endpoint is verified to be a WebTransport endpoint; thus, the Web application
 cannot distinguish between a non-existing endpoint and the endpoint that is not
 willing to accept connections from the Web.
+
+## Authentication using Certificate Hashes {#certificate-hashes}
+
+In the vast majority of cases, a user agent authenticates a TLS connection
+between itself and a remote endpoint by verifying the validity of the TLS
+server certificate provided against the server name in the URL; this approach
+will be further referred to as Web PKI.  The full details of how the Web PKI
+functions are implementation-defined, and go far beyond the scope of this
+docuement; in practice, those tend to be fairly complex, and involve
+procedures for maintaining roots of trust, handling revocations of previously
+issued certificates, as well as defending against key compromise, certificate
+mis-issuance, and numerous other security risks.
+
+This API provides web applications with a capability to connect to a remote
+network endpoint authenticated by the hash of its server certificate, rather
+than its server name.  This enables connections to the endpoints that are not
+capable of getting long-term certificates, including hosts that are ephemeral
+in nature (e.g. short-lived virtual machines), or that are not publicly
+routable.  Since this mechanism substitutes Web PKI-based authentication for an
+individual connection, we need to compare the security properties of both.
+
+Validating against a specific hash has certain desirable security properties
+that Web PKI normally does not provide.  For instance, the hashes used for
+verification are scoped to the context of a single connection, which can limit
+the consequences of any individual certificate being compromised.  In addition,
+hash-based verification has a single unambiguous root of trust (the hash
+provided by the Web application), while the Web PKI allows names to be
+authenticated by multiple certificate authorities;  the latter fact arises from
+a variety of operational and ecosystem concerns that are not usually
+relevant for the use cases where hash-based verification is used.
+
+It is, however, important to note that Web PKI provides additional security
+mechanisms in addition to simply establishing a chain of trust for a server
+name.  One of them is handling certificate revocation.  In cases where the
+certificate used is ephemeral, such mechanism is not necessary.  In other
+cases, the Web application has to consider the mechanism by which the
+certificate hashes are provisioned; for instance, if the hash is provided as a
+cached HTTP resource, the cache needs to be invalidated if the corresponding
+certificate has been rotated due to compromise.
+
+Web PKI enforces an expiry period requirement on the certificates.  This
+requirement limits the scope of potential key compromise; it also forces server
+operators to design systems that support and actively perform key rotation.
+For this reason, WebTransport imposes a similar expiry requirement; as the
+certificates are expected to be ephemeral or short-lived, the expiry period is
+limited to two weeks.  This also improves the cryptographic agility of the
+system, as the keys in the Subject Public Key Info field can be upgraded to a
+different algorithm as a part of the key rotation process.  WebTransport API
+lets the application to specify multiple certificate hashes at once, allowing
+the client to accept multiple certificates for a perioid in which a new
+certificate is being rolled out.
 
 # Examples #  {#examples}
 
