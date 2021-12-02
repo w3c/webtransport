@@ -1237,7 +1237,7 @@ To <dfn export for="SendStream" lt="create|creating">create</dfn> a
    [=WritableStream/set up/abortAlgorithm=] set to |abortAlgorithm|.
 1. [=AbortSignal/Add=] the following steps to |stream|'s \[[controller]]'s \[[signal]].
   1. If |stream|'s [=[[PendingOperation]]=] is null, then abort these steps.
-  1. Let |reason| be |stream|'s \[[controller]]'s \[[signal]]'s \[[reason]].
+  1. Let |reason| be |stream|'s \[[controller]]'s \[[signal]]'s [=AbortSignal/abort reason=].
   1. Let |abortPromise| be the result of [=aborting=] stream with |reason|.
   1. [=Upon fulfillment=] of |abortPromise|, [=reject=] |promise| with |reason|.
   1. Let |pendingOperation| be |stream|'s [=[[PendingOperation]]=].
