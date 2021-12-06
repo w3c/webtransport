@@ -715,7 +715,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
    and [=request/origin=] is |origin|.
 1. Run <a>report Content Security Policy violations for |request|</a>.
 1. If [=should request be blocked by Content Security Policy?=] with |request| returns
-   <b>blocked</b>, then abort the remaining steps and [=queue a network task=] with |transport|
+   <b>"Blocked"</b>, or |request| [=block bad port|should be blocked due to a bad port=]
+   returns <b>blocked</b>, then abort the remaining steps and [=queue a network task=] with |transport|
    to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
   1. Let |error| be a {{SecurityError}}.
