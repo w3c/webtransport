@@ -847,16 +847,12 @@ these steps.
        1. [=Cleanup=] |transport| with |error|, |error| and true.
        1. Abort these steps.
      1. Let |session| be |transport|'s [=[[Session]]=].
+     1. Let |code| be |closeInfo|.{{WebTransportCloseInfo/closeCode}}.
      1. Let |reason| be an empty [=byte sequence=].
-     1. If |closeInfo|.{{WebTransportCloseInfo/reason}} exists, set |reason| be
-        |closeInfo|.{{WebTransportCloseInfo/reason}}, [=UTF-8 encoded=].
+     1. Set |reason| to |closeInfo|.{{WebTransportCloseInfo/reason}}, [=UTF-8 encoded=].
      1. If |reason|'s [=byte sequence/length=] exceeds 1024, then set |reason| to a
         [=byte sequence/prefix=] of |reason| whose length is 1024.
-     1. If |closeInfo|.{{WebTransportCloseInfo/closeCode}} exists:
-       1. [=In parallel=], [=session/terminate=] |session| with
-          |closeInfo|.{{WebTransportCloseInfo/closeCode}} and |reason|.
-     1. Otherwise:
-       1. [=In parallel=], [=session/terminate=] |session|.
+     1. [=In parallel=], [=session/terminate=] |session| with |code| and |reason|.
 
        Note: This also [=resets=] or [=sends STOP_SENDING=] [=WebTransport streams=] contained in
        |transport|'s [=[[SendStreams]]=] and [=[[ReceiveStreams]]=].
@@ -1111,8 +1107,8 @@ frame.
 
 <pre class="idl">
 dictionary WebTransportCloseInfo {
-  unsigned long closeCode;
-  DOMString reason;
+  unsigned long closeCode = 0;
+  DOMString reason = "";
 };
 </pre>
 
