@@ -719,7 +719,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
    returns <b>blocked</b>, then abort the remaining steps and [=queue a network task=] with |transport|
    to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be a {{SecurityError}}.
+  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
+     `"session"`.
   1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
