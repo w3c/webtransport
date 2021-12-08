@@ -1101,7 +1101,7 @@ period MUST NOT exceed two weeks.  The user agent MAY impose additional
 
 The exact list of <dfn>allowed public key algorithms</dfn> used in the Subject
 Public Key Info field (and, as a consequence, in the TLS CertificateVerify
-message) is [=implementation-defined=]; however, it SHOULD include ECDSA with
+message) is [=implementation-defined=]; however, it MUST include ECDSA with the
 secp256r1 (NIST P-256) named group ([[!RFC3279]], Section 2.3.5; [[!RFC8422]])
 to provide an interoperable default.  It MUST NOT contain RSA keys
 ([[!RFC3279]], Section 2.3.1).
@@ -1828,15 +1828,15 @@ requirement limits the scope of potential key compromise; it also forces server
 operators to design systems that support and actively perform key rotation.
 For this reason, WebTransport imposes a similar expiry requirement; as the
 certificates are expected to be ephemeral or short-lived, the expiry period is
-limited to two weeks.  This also improves the cryptographic agility of the
-system, as the keys in the Subject Public Key Info field can be upgraded to a
-different algorithm as a part of the key rotation process.  WebTransport API
+limited to two weeks.
+
+The WebTransport API
 lets the application to specify multiple certificate hashes at once, allowing
-the client to accept multiple certificates for a perioid in which a new
+the client to accept multiple certificates for a period in which a new
 certificate is being rolled out.
 
 Unlike a similar mechanism in WebRTC, the server certificate hash API in
-WebTransport does not provide any form of authenticating the client; the fact
+WebTransport does not provide any means of authenticating the client; the fact
 that the client knows what the server certificate is or how to contact it is
 not sufficient.  The application has to establish the identity of the client
 in-band if necessary.
