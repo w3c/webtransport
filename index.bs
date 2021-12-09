@@ -1790,21 +1790,21 @@ willing to accept connections from the Web.
 
 ## Authentication using Certificate Hashes {#certificate-hashes}
 
-In the vast majority of cases, a user agent authenticates a TLS connection
-between itself and a remote endpoint by verifying the validity of the TLS
-server certificate provided against the server name in the URL.  This is
-accomplished by chaining server certificates to one of the trust anchors
-maintained by the browser; the trust anchors in question are responisble for
-authenticating the server names in the certificates.  We will refer to this
-system as Web PKI.
+Normally, a user agent authenticates a TLS connection between itself and a
+remote endpoint by verifying the validity of the TLS server certificate
+provided against the server name in the URL.  This is accomplished by chaining
+server certificates to one of the trust anchors maintained by the browser; the
+trust anchors in question are responisble for authenticating the server names
+in the certificates.  We will refer to this system as Web PKI.
 
 This API provides web applications with a capability to connect to a remote
 network endpoint authenticated by a specific server certificate, rather than
-its server name.  This mechanism enables connections to endpoints that are not
-capable of getting long-term certificates, including hosts that are ephemeral
-in nature (e.g. short-lived virtual machines), or that are not publicly
-routable.  Since this mechanism substitutes Web PKI-based authentication for an
-individual connection, we need to compare the security properties of both.
+its server name.  This mechanism enables connections to endpoints for which
+getting long-term certificates can be challenging, including hosts that are
+ephemeral in nature (e.g. short-lived virtual machines), or that are not
+publicly routable.  Since this mechanism substitutes Web PKI-based
+authentication for an individual connection, we need to compare the security
+properties of both.
 
 A remote server will be able to successfully perform a TLS handshake only if it
 posesses the private key corresponding to the public key of the certificate
