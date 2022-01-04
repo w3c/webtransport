@@ -1794,7 +1794,7 @@ Normally, a user agent authenticates a TLS connection between itself and a
 remote endpoint by verifying the validity of the TLS server certificate
 provided against the server name in the URL.  This is accomplished by chaining
 server certificates to one of the trust anchors maintained by the browser; the
-trust anchors in question are responisble for authenticating the server names
+trust anchors in question are responsible for authenticating the server names
 in the certificates.  We will refer to this system as Web PKI.
 
 This API provides web applications with a capability to connect to a remote
@@ -1821,19 +1821,25 @@ certificate used is ephemeral, such a mechanism is not necessary.  In other
 cases, the Web application has to consider the mechanism by which the
 certificate hashes are provisioned; for instance, if the hash is provided as a
 cached HTTP resource, the cache needs to be invalidated if the corresponding
-certificate has been rotated due to compromise.
+certificate has been rotated due to compromise.  Another security feature
+provided by the Web PKI are safeguards against certain issues with key
+generation, such as rejecting certificates with well-known weak keys; while
+this specification does not provide any specific guidance, browsers MAY reject
+those as a part of implementation-defined behavior.
 
 Web PKI enforces an expiry period requirement on the certificates.  This
 requirement limits the scope of potential key compromise; it also forces server
 operators to design systems that support and actively perform key rotation.
 For this reason, WebTransport imposes a similar expiry requirement; as the
 certificates are expected to be ephemeral or short-lived, the expiry period is
-limited to two weeks.
+limited to two weeks.  The two weeks limit is a balance between setting the
+expiry limit as low as possible to minimize consequences of a key compromise,
+and maintaining it sufficiently high to lower the operational costs of
+provisioning certificates.
 
-The WebTransport API
-lets the application specify multiple certificate hashes at once, allowing
-the client to accept multiple certificates for a period in which a new
-certificate is being rolled out.
+The WebTransport API lets the application specify multiple certificate
+hashes at once, allowing the client to accept multiple certificates for a
+period in which a new certificate is being rolled out.
 
 Unlike a similar mechanism in WebRTC, the server certificate hash API in
 WebTransport does not provide any means of authenticating the client; the fact
