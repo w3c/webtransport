@@ -302,12 +302,19 @@ A <dfn interface>WebTransportDatagramDuplexStream</dfn> is a generic duplex stre
 interface WebTransportDatagramDuplexStream {
   readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
+  readonly attribute WebTransportDatagramMode mode;
 
   readonly attribute unsigned long maxDatagramSize;
   attribute double? incomingMaxAge;
   attribute double? outgoingMaxAge;
   attribute long incomingHighWaterMark;
   attribute long outgoingHighWaterMark;
+};
+
+enum WebTransportDatagramMode {
+  "new",
+  "reliable",
+  "unreliable",
 };
 </pre>
 
@@ -330,6 +337,12 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>\[[Writable]]</dfn>
    <td class="non-normative">A {{WritableStream}} for outgoing datagrams.
+  </tr>
+  <tr>
+   <td><dfn>\[[Mode]]</dfn>
+   <td class="non-normative">A {{WebTransportDatagramMode}} indicating whether
+   unreliable (UDP) transport or reliable (TCP fallback) transport is used.
+   Returns `"new"` until a connection has been established.
   </tr>
   <tr>
    <td><dfn>\[[IncomingDatagramsQueue]]</dfn>
@@ -385,6 +398,8 @@ The user agent MAY update [=[[OutgoingMaxDatagramSize]]=] for any {{WebTransport
     :: |readable|
     : [=[[Writable]]=]
     :: |writable|
+    : [=[[Mode]]=]
+    :: "new"
     : [=[[IncomingDatagramsQueue]]=]
     :: an empty queue
     : [=[[IncomingDatagramsPullPromise]]=]
@@ -424,6 +439,10 @@ The user agent MAY update [=[[OutgoingMaxDatagramSize]]=] for any {{WebTransport
      1. Let |value| be the given value.
      1. If |value| is null or |value| > 0:
        1. Set [=this=]'s [=[[IncomingDatagramsExpirationDuration]]=] to |value|.
+
+: <dfn for="WebTransportDatagramDuplexStream" attribute>mode</dfn>
+:: Whether {{WebTransportDatagramDuplexStream/writable}}.
+   The getter steps are to return [=this=]'s [=[[Datagrams]]=]'s [=[[Mode]]=].
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>maxDatagramSize</dfn>
 :: The maximum size data that may be passed to {{WebTransportDatagramDuplexStream/writable}}.
@@ -763,6 +782,7 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
     1. Abort these steps.
   1. Set |transport|'s [=[[State]]=] to `"connected"`.
   1. Set |transport|'s [=[[Session]]=] to |session|.
+  1. Set |transport|'s [=[[Datagrams]]=]'s [=[[Mode]]=] to `"unreliable"`.
   1. [=Resolve=] |transport|'s [=[[Ready]]=] with undefined.
 
 </div>
@@ -1938,8 +1958,7 @@ connect.onclick = async () => {
     wt = new WebTransport(url);
     addToEventLog('Initiating connection...');
     await wt.ready;
-    addToEventLog('Connection ready.');
-
+    addToEventLog(\`HTTP/${(wt.datagrams.mode == "reliable")? 2 : 3} connection ready.\`);
     wt.closed
       .then(() => addToEventLog('Connection closed normally.'))
       .catch(() => addToEventLog('Connection closed abruptly.', 'error'));
