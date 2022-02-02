@@ -1139,6 +1139,8 @@ dictionary WebTransportStats {
   unsigned long numIncomingStreamsCreated;
   unsigned long long bytesReceived;
   unsigned long long packetsReceived;
+  DOMHighResTimeStamp smoothedRtt;
+  DOMHighResTimeStamp rttVariation;
   DOMHighResTimeStamp minRtt;
   unsigned long numReceivedDatagramsDropped;
 };
@@ -1164,8 +1166,15 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportStats" dict-member>packetsReceived</dfn>
 :: The number of total packets received on the QUIC connection, including
    packets that were not processable.
+: <dfn for="WebTransportStats" dict-member>smoothedRtt</dfn>
+:: The smoothed round-trip time (RTT) currently observed on the connection, as defined
+   in [[!RFC9002]] [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
+: <dfn for="WebTransportStats" dict-member>rttVariation</dfn>
+:: The mean variation in round-trip time samples currently observed on the
+   connection, as defined in [[!RFC9002]]
+   [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
 : <dfn for="WebTransportStats" dict-member>minRtt</dfn>
-:: The minimum RTT observed on the entire connection.
+:: The minimum round-trip time observed on the entire connection.
 : <dfn for="WebTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
    between calls to {{DatagramTransport/datagrams}}' {{WebTransportDatagramDuplexStream/readable}}.
