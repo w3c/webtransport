@@ -1792,10 +1792,10 @@ willing to accept connections from the Web.
 
 Normally, a user agent authenticates a TLS connection between itself and a
 remote endpoint by verifying the validity of the TLS server certificate
-provided against the server name in the URL.  This is accomplished by chaining
-server certificates to one of the trust anchors maintained by the user agent; the
-trust anchors in question are responsible for authenticating the server names
-in the certificates.  We will refer to this system as Web PKI.
+provided against the server name in the URL [[!RFC6125]].  This is accomplished
+by chaining server certificates to one of the trust anchors maintained by the
+user agent; the trust anchors in question are responsible for authenticating
+the server names in the certificates.  We will refer to this system as Web PKI.
 
 This API provides web applications with a capability to connect to a remote
 network endpoint authenticated by a specific server certificate, rather than
@@ -1834,8 +1834,9 @@ For this reason, WebTransport imposes a similar expiry requirement; as the
 certificates are expected to be ephemeral or short-lived, the expiry period is
 limited to two weeks.  The two weeks limit is a balance between setting the
 expiry limit as low as possible to minimize consequences of a key compromise,
-and maintaining it sufficiently high to lower the operational costs of
-provisioning certificates.
+and maintaining it sufficiently high to accomodate for clock skew across
+devices, and to lower the costs of synchronizing certificates between the
+client and the server side.
 
 The WebTransport API lets the application specify multiple certificate
 hashes at once, allowing the client to accept multiple certificates for a
