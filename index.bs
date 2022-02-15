@@ -1135,6 +1135,7 @@ dictionary WebTransportStats {
   DOMHighResTimeStamp timestamp;
   unsigned long long bytesSent;
   unsigned long long packetsSent;
+  unsigned long long packetsLost;
   unsigned long numOutgoingStreamsCreated;
   unsigned long numIncomingStreamsCreated;
   unsigned long long bytesReceived;
@@ -1155,7 +1156,9 @@ The dictionary SHALL have the following attributes:
 :: The number of bytes sent on the QUIC connection, including retransmissions.
    Does not include UDP or any other outer framing.
 : <dfn for="WebTransportStats" dict-member>packetsSent</dfn>
-:: The number of packets sent on the QUIC connection, including retransmissions.
+:: The number of packets sent on the QUIC connection, including those that are determined to have been lost.
+: <dfn for="WebTransportStats" dict-member>packetsLost</dfn>
+:: The number of packets lost on the QUIC connection (does not monotonically increase, because packets that are declared lost can subsequently be received).
 : <dfn for="WebTransportStats" dict-member>numOutgoingStreamsCreated</dfn>
 :: The number of outgoing QUIC streams created on the QUIC connection.
 : <dfn for="WebTransportStats" dict-member>numIncomingStreamsCreated</dfn>
