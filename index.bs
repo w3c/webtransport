@@ -670,6 +670,9 @@ agent MUST run the following steps:
    {{WebTransportOptions/serverCertificateHashes}} if it exists, and null otherwise.
 1. If |dedicated| is false and |serverCertificateHashes| is non-null, then [=throw=] a
    {{TypeError}}.
+1. Let |disallowFallback| be {{WebTransport/constructor(url, options)/options}}'s
+   {{WebTransportOptions/disallowFallback}} if it exists, and false otherwise.
+1. Let |fallback| be the negation of |disallowFallback|.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=DatagramDuplexStream/creating=] a
@@ -712,14 +715,14 @@ agent MUST run the following steps:
 1. [=ReadableStream/Set up=] |transport|'s [=[[IncomingUnidirectionalStreams]]=] with
    [=ReadableStream/set up/pullAlgorithm=] set to |pullUnidirectionalStreamAlgorithm|, and
    [=ReadableStream/set up/highWaterMark=] set to 0.
-1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL| and |dedicated|.
+1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL|, |dedicated| and |fallback|.
 1. Return |transport|.
 
 </div>
 
 <div algorithm>
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
-<var>transport</var>, a [=URL record=] |url|, and a boolean |dedicated|, run these steps.
+<var>transport</var>, a [=URL record=] |url|, a boolean |dedicated| and a boolean |fallback|, run these steps.
 
 1. Let |client| be |transport|'s [=relevant settings object=].
 1. Let |origin| be |client|'s [=environment settings object/origin=].
@@ -743,7 +746,7 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
 1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
    |networkPartitionKey|, |url|, false, |newConnection|, and with [=obtain a connection/http3Only=]
-   set to true.
+   set to the negation of |fallback|.
 1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
    |transport| to run these steps:
   1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
@@ -1064,6 +1067,7 @@ dictionary WebTransportHash {
 
 dictionary WebTransportOptions {
   boolean allowPooling;
+  boolean disallowFallback;
   sequence&lt;WebTransportHash&gt; serverCertificateHashes;
 };
 </pre>
@@ -1074,6 +1078,10 @@ that determine how WebTransport connection is established and used.
 : <dfn for="WebTransportOptions" dict-member>allowPooling</dfn>
 :: When set to true, the WebTransport connection can be pooled, that is, the network connection for
    the WebTransport session can be shared with other HTTP/3 sessions.
+
+: <dfn for="WebTransportOptions" dict-member>disallowFallback</dfn>
+:: When set to true, the WebTransport connection cannot be established over HTTP/2 if
+   an HTTP/3 connection is not possible.
 
 : <dfn for="WebTransportOptions" dict-member>serverCertificateHashes</dfn>
 :: This option is only supported for transports using dedicated connections.
