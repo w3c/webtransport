@@ -68,13 +68,14 @@ Boilerplate: omit conformance
 }
 </pre>
 <pre class="link-defaults">
+spec:infra; type:dfn; for:/; text:set
 spec:streams; type:interface; text:ReadableStream
-spec:html; type:dfn; for:/; text:origin
 spec:fetch; type:dfn; for:/; text:fetch
 spec:url; type:dfn; text:scheme
 spec:url; type:dfn; text:fragment
 </pre>
 <pre class="anchors">
+url: https://html.spec.whatwg.org/multipage/origin.html#concept-origin; type: dfn; text: origin; for:/
 url: https://streams.spec.whatwg.org/#high-water-mark; type: dfn; text: high water mark
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMASCRIPT-6.0
   type: dfn
@@ -172,11 +173,11 @@ There may be multiple [=WebTransport sessions=] on one [=connection=], when pool
  </tbody>
 </table>
 
-To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=origin=] |origin|,
+To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=/origin=] |origin|,
 follow [[!WEB-TRANSPORT-HTTP3]]
 [section 3.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.3),
 with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomorphic encoded=],
-as the "Origin" header of the request.
+as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 
 To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an optional integer
@@ -689,7 +690,7 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 
 1. Let |client| be |transport|'s [=relevant settings object=].
 1. Let |origin| be |client|'s [=environment settings object/origin=].
-1. Let |request| be a new [=request=] whose [=request/URL=] is |url|, [=request/client=] is
+1. Let |request| be a new [=/request=] whose [=request/URL=] is |url|, [=request/client=] is
    |client|, [=request/policy container=] is |client|'s
    [=environment settings object/policy container=], [=request/destination=] is an empty string,
    and [=request/origin=] is |origin|.
@@ -834,7 +835,7 @@ these steps.
         [=byte sequence/prefix=] of |reason| whose length is 1024.
      1. [=In parallel=], [=session/terminate=] |session| with |code| and |reason|.
 
-       Note: This also [=resets=] or [=sends STOP_SENDING=] [=WebTransport streams=] contained in
+       Note: This also [=stream/resets=] or [=sends STOP_SENDING=] [=WebTransport streams=] contained in
        |transport|.{{[[SendStreams]]}} and {{[[ReceiveStreams]]}}.
      1. [=Cleanup=] |transport| with |closeInfo|, an {{AbortError}} and false.
 
@@ -927,8 +928,8 @@ To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |re
 1. Set |transport|.{{[[ReceiveStreams]]}} to an empty [=set=].
 1. If |abruptly| is true, then set |transport|.{{[[State]]}} to `"failed"`.
 1. Otherwise, set |transport|.{{[[State]]}} to `"closed"`.
-1. [=For each=] |sendStream| in |sendStreams|, [=WritableStream/error=] |sendStream| with |error|.
-1. [=For each=] |receiveStream| in |receiveStreams|, [=ReadableStream/error=] |receiveStream|
+1. [=set/For each=] |sendStream| in |sendStreams|, [=WritableStream/error=] |sendStream| with |error|.
+1. [=set/For each=] |receiveStream| in |receiveStreams|, [=ReadableStream/error=] |receiveStream|
    with |error|.
 
   Note: Script authors can inject code which runs in Promise resolution synchronously. Hence
@@ -1432,7 +1433,7 @@ To <dfn for="ReceiveStream">pull bytes</dfn> from a {{ReceiveStream}} |stream|, 
 
 1. [=Queue a network task=] with |transport| to run these steps:
 
-   Note: If the buffer described above is available in the [=event loop=] where this procedure is
+   Note: If the buffer described above is available in the [=agent/event loop=] where this procedure is
    running, the following steps may run immediately.
 
   1. If |read| > 0:
@@ -1467,7 +1468,7 @@ steps.
 1. [=Send STOP_SENDING=] with |internalStream| and |code|.
 1. [=Queue a network task=] with |transport| to run these steps:
 
-  Note: If the buffer described above is available in the [=event loop=] where this procedure is
+  Note: If the buffer described above is available in the [=agent/event loop=] where this procedure is
   running, the following steps may run immediately.
 
   1. [=set/Remove=] |stream| from |transport|.{{[[ReceiveStreams]]}}.
