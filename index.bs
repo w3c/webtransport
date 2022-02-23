@@ -315,7 +315,7 @@ interface WebTransportDatagramDuplexStream {
 
 A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
 
-<table class="data" dfn-for="DatagramDuplexStream">
+<table class="data" dfn-for="WebTransportDatagramDuplexStream">
  <thead>
   <tr>
    <th>Internal Slot
@@ -374,10 +374,10 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
 The user agent MAY update [=[[OutgoingMaxDatagramSize]]=] for any {{WebTransport}} object whose
 [=[[State]]=] is either `"connecting"` or `"connected"`.
 
- To <dfn export for="DatagramDuplexStream" lt="create|creating">create</dfn> a
+ To <dfn export for="WebTransportDatagramDuplexStream" lt="create|creating">create</dfn> a
  {{WebTransportDatagramDuplexStream}} given a
- <dfn export for="DatagramDuplexStream/create"><var>readable</var></dfn>, and
- a <dfn export for="DatagramDuplexStream/create"><var>writable</var></dfn>,
+ <dfn export for="WebTransportDatagramDuplexStream/create"><var>readable</var></dfn>, and
+ a <dfn export for="WebTransportDatagramDuplexStream/create"><var>writable</var></dfn>,
  perform the following steps.
 
  1. Let |stream| be a [=new=] {{WebTransportDatagramDuplexStream}}, with:
@@ -465,7 +465,7 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
 1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
 1. [=ReadableStream/Enqueue=] |chunk| to |transport|'s [=[[Datagrams]]=]' s
-   [=DatagramDuplexStream/[[Readable]]=].
+   [=WebTransportDatagramDuplexStream/[[Readable]]=].
 1. Return [=a promise resolved with=] undefined.
 
 To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
@@ -492,7 +492,7 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
   1. Set |datagrams|'s [=[[IncomingDatagramsPullPromise]]=] to null.
   1. [=Queue a network task=] with |transport| to run the following steps:
     1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
-    1. [=ReadableStream/Enqueue=] |chunk| to |datagrams|'s [=DatagramDuplexStream/[[Readable]]=].
+    1. [=ReadableStream/Enqueue=] |chunk| to |datagrams|'s [=WebTransportDatagramDuplexStream/[[Readable]]=].
     1. [=Resolve=] |promise| with undefined.
 
 The user agent SHOULD run [=receiveDatagrams=] for any {{WebTransport}} object whose
@@ -660,9 +660,9 @@ agent MUST run the following steps:
    {{TypeError}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
-1. Let |datagrams| be the result of [=DatagramDuplexStream/creating=] a
-   {{WebTransportDatagramDuplexStream}}, its [=DatagramDuplexStream/create/readable=] set to
-   |incomingDatagrams| and its [=DatagramDuplexStream/create/writable=] set to |outgoingDatagrams|.
+1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
+   {{WebTransportDatagramDuplexStream}}, its [=WebTransportDatagramDuplexStream/create/readable=] set to
+   |incomingDatagrams| and its [=WebTransportDatagramDuplexStream/create/writable=] set to |outgoingDatagrams|.
 1. Let |transport| be a newly constructed {{WebTransport}} object, with:
     : [=[[SendStreams]]=]
     :: an empty [=ordered set=]
@@ -1184,7 +1184,7 @@ The dictionary SHALL have the following attributes:
 :: The minimum round-trip time observed on the entire connection.
 : <dfn for="WebTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
-   between calls to {{DatagramTransport/datagrams}}' {{WebTransportDatagramDuplexStream/readable}}.
+   between calls to {{WebTransport/datagrams}}' {{WebTransportDatagramDuplexStream/readable}}.
 
 # `SendStream` #  {#send-stream}
 
@@ -1865,8 +1865,8 @@ in-band if necessary.
 *This section is non-normative.*
 
 Sending a buffer of datagrams can be achieved by using the
-{{DatagramTransport/datagrams}}' {{WebTransportDatagramDuplexStream/writable}} attribute. In the
-following example datagrams are only sent if the {{DatagramTransport}} is ready to send.
+{{WebTransport/datagrams}}' {{WebTransportDatagramDuplexStream/writable}} attribute. In the
+following example datagrams are only sent if the transport is ready to send.
 
 <pre class="example" highlight="js">
 async function sendDatagrams(url, datagrams) {
@@ -1884,7 +1884,7 @@ async function sendDatagrams(url, datagrams) {
 *This section is non-normative.*
 
 Sending datagrams at a fixed rate regardless if the transport is ready to send
-can be achieved by simply using {{DatagramTransport/datagrams}}'
+can be achieved by simply using {{WebTransport/datagrams}}'
 {{WebTransportDatagramDuplexStream/writable}} and not using the `ready` attribute. More complex
 scenarios can utilize the `ready` attribute.
 
@@ -1904,7 +1904,7 @@ async function sendFixedRate(url, createDatagram, ms = 100) {
 *This section is non-normative.*
 
 Datagrams can be received by reading from the
-transport.{{DatagramTransport/datagrams}}.{{DatagramTransport/datagrams}}.{{WebTransportDatagramDuplexStream/readable}}
+transport.{{WebTransport/datagrams}}.{{WebTransportDatagramDuplexStream/readable}}
 attribute. Null values may indicate that packets are not being processed quickly
 enough.
 
