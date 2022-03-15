@@ -1269,11 +1269,11 @@ To <dfn for="SendStream">write</dfn> |chunk| to a {{SendStream}} |stream|, run t
 1. Let |bytes| be a copy of the [=byte sequence=] which |chunk| represents.
 1. Set |stream|'s [=[[PendingOperation]]=] to |promise|.
 1. Return |promise| and run the remaining steps [=in parallel=].
-1. Wait for |transport|'s [=[[Datagrams]]=]'s [=[[OutgoingDatagramsQueue]]=] to be empty.
-
-   Note: This means outgoing datagrams are prioritized over stream data.
 1. [=stream/Send=] |bytes| on |stream|'s [=[[InternalStream]]=] and wait for the operation to
    complete.
+   This sending MAY happen in parallel with sending of previously queued streams and datagrams,
+   as well as streams and datagrams yet to be queued to be sent over this transport.
+   When determining prioritization, the user agent SHOULD make sure datagrams get out quickly.
 1. If the previous step failed, abort the remaining steps.
 
   Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
