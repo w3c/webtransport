@@ -308,7 +308,6 @@ interface WebTransportDatagramDuplexStream {
   attribute double? outgoingMaxAge;
   attribute long incomingHighWaterMark;
   attribute long outgoingHighWaterMark;
-  Promise&lt;WebTransportDatagramStats&gt; getStats();
 };
 </pre>
 
@@ -453,22 +452,6 @@ The user agent MAY update [=[[OutgoingMaxDatagramSize]]=] for any {{WebTransport
      1. Let |value| be the given value.
      1. If |value| ≥ 0:
        1. Set [=this=]'s [=[[OutgoingDatagramsHighWaterMark]]=] to |value|.
-
-: <dfn for="WebTransportDatagramDuplexStream" method>getStats()</dfn>
-:: Gathers stats for this {{WebTransportDatagramDuplexStream}} and reports the
-   result asynchronously.</p>
-
-   When getStats is called, the user agent MUST run the following steps:
-     1. Let |datagrams| be [=this=].
-     1. Let |transport| be the {{WebTransport}} associated with |datagrams|.
-     1. Let |p| be a new promise.
-     1. Return |p| and continue the following steps [=in parallel=].
-         1. Gather the datagram stats from the underlying QUIC connection.
-         1. Wait for the stats to be ready.
-         1. [=Queue a network task=] to run the following steps:
-           1. Let |stats| be a [=new=] {{WebTransportDatagramStats}} object
-              representing the gathered stats.
-           1. [=Resolve=] |p| with |stats|.
 
 ## Procedures ## {#datagram-duplex-stream-procedures}
 
@@ -886,7 +869,7 @@ these steps.
      1. Let |transport| be [=this=].
      1. Let |p| be a new promise.
      1. Return |p| and continue the following steps [=in parallel=].
-         1. Gather the stats from the underlying QUIC connection.
+         1. Gather the stats from the underlying QUIC connection, including stats on datagrams.
          1. Wait for the stats to be ready.
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportStats}} object representing the gathered stats.
@@ -1162,6 +1145,7 @@ dictionary WebTransportStats {
   DOMHighResTimeStamp smoothedRtt;
   DOMHighResTimeStamp rttVariation;
   DOMHighResTimeStamp minRtt;
+  WebTransportDatagramStats datagrams;
 };
 </pre>
 
