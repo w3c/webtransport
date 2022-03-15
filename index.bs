@@ -635,7 +635,6 @@ A {{WebTransport}} object has the following internal slots.
    <td class="non-normative">A {{WebTransportDatagramDuplexStream}}.
   </tr>
   <tr>
-  <tr>
    <td><dfn>\[[Session]]</dfn>
    <td class="non-normative">A [=WebTransport session=] for this {{WebTransport}} object, or null.
   </tr>
@@ -715,11 +714,13 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
    and [=request/origin=] is |origin|.
 1. Run <a>report Content Security Policy violations for |request|</a>.
 1. If [=should request be blocked by Content Security Policy?=] with |request| returns
-   <b>blocked</b>, then abort the remaining steps and [=queue a network task=] with |transport|
+   <b>"Blocked"</b>, or if |request| [=block bad port|should be blocked due to a bad port=]
+   returns <b>blocked</b>, then abort the remaining steps and [=queue a network task=] with |transport|
    to run these steps:
-  1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be a {{SecurityError}}.
-  1. [=Cleanup=] |transport| with |error|.
+1. If |transport|'s [=[[State]]=] is `"closed"` or `"failed"`, then abort these steps.
+1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
+   `"session"`.
+1. [=Cleanup=] |transport| with |error|, |error| and true.
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
 1. Run the remaining steps [=in parallel=], but abort them whenever |transport|'s
@@ -844,16 +845,11 @@ these steps.
        1. [=Cleanup=] |transport| with |error|.
        1. Abort these steps.
      1. Let |session| be |transport|'s [=[[Session]]=].
-     1. Let |reason| be an empty [=byte sequence=].
-     1. If |closeInfo|.{{WebTransportCloseInfo/reason}} exists, set |reason| be
-        |closeInfo|.{{WebTransportCloseInfo/reason}}, [=UTF-8 encoded=].
+     1. Let |code| be |closeInfo|.{{WebTransportCloseInfo/closeCode}}.
+     1. Let |reason| be |closeInfo|.{{WebTransportCloseInfo/reason}}, [=UTF-8 encoded=].
      1. If |reason|'s [=byte sequence/length=] exceeds 1024, then set |reason| to a
         [=byte sequence/prefix=] of |reason| whose length is 1024.
-     1. If |closeInfo|.{{WebTransportCloseInfo/closeCode}} exists:
-       1. [=In parallel=], [=session/terminate=] |session| with
-          |closeInfo|.{{WebTransportCloseInfo/closeCode}} and |reason|.
-     1. Otherwise:
-       1. [=In parallel=], [=session/terminate=] |session|.
+     1. [=In parallel=], [=session/terminate=] |session| with |code| and |reason|.
 
        Note: This also [=resets=] or [=sends STOP_SENDING=] [=WebTransport streams=] contained in
        |transport|'s [=[[SendStreams]]=] and [=[[ReceiveStreams]]=].
@@ -1088,15 +1084,19 @@ To <dfn>verify a certificate hash</dfn>, do the following:
 </div>
 
 The <dfn>custom certificate requirements</dfn> are as follows: the certificate
-MUST be an X.509v3 certificate as defined in [[!RFC5280]], the current time
-MUST be within the validity period of the certificate as defined in Section
-4.1.2.5 of [[!RFC5280]] and the total length of the validity period MUST NOT
-exceed two weeks.
+MUST be an X.509v3 certificate as defined in [[!RFC5280]], the key used in the
+Subject Public Key field MUST be one of the [=allowed public key algorithms=],
+the current time MUST be within the validity period of the certificate as
+defined in Section 4.1.2.5 of [[!RFC5280]] and the total length of the validity
+period MUST NOT exceed two weeks.  The user agent MAY impose additional
+[=implementation-defined=] requirements on the certificate.
 
-Issue: Reconsider the time period above.  We want it to be sufficiently large
-that applications using this for ephemeral certificates can do so without
-having to fight the clock skew, but small enough to discourage long-term use
-without key rotation.
+The exact list of <dfn>allowed public key algorithms</dfn> used in the Subject
+Public Key Info field (and, as a consequence, in the TLS CertificateVerify
+message) is [=implementation-defined=]; however, it MUST include ECDSA with the
+secp256r1 (NIST P-256) named group ([[!RFC3279]], Section 2.3.5; [[!RFC8422]])
+to provide an interoperable default.  It MUST NOT contain RSA keys
+([[!RFC3279]], Section 2.3.1).
 
 ## `WebTransportCloseInfo` Dictionary ##  {#web-transport-close-info}
 
@@ -1107,8 +1107,8 @@ frame.
 
 <pre class="idl">
 dictionary WebTransportCloseInfo {
-  unsigned long closeCode;
-  DOMString reason;
+  unsigned long closeCode = 0;
+  DOMString reason = "";
 };
 </pre>
 
@@ -1134,10 +1134,13 @@ dictionary WebTransportStats {
   DOMHighResTimeStamp timestamp;
   unsigned long long bytesSent;
   unsigned long long packetsSent;
+  unsigned long long packetsLost;
   unsigned long numOutgoingStreamsCreated;
   unsigned long numIncomingStreamsCreated;
   unsigned long long bytesReceived;
   unsigned long long packetsReceived;
+  DOMHighResTimeStamp smoothedRtt;
+  DOMHighResTimeStamp rttVariation;
   DOMHighResTimeStamp minRtt;
   unsigned long numReceivedDatagramsDropped;
 };
@@ -1152,7 +1155,9 @@ The dictionary SHALL have the following attributes:
 :: The number of bytes sent on the QUIC connection, including retransmissions.
    Does not include UDP or any other outer framing.
 : <dfn for="WebTransportStats" dict-member>packetsSent</dfn>
-:: The number of packets sent on the QUIC connection, including retransmissions.
+:: The number of packets sent on the QUIC connection, including those that are determined to have been lost.
+: <dfn for="WebTransportStats" dict-member>packetsLost</dfn>
+:: The number of packets lost on the QUIC connection (does not monotonically increase, because packets that are declared lost can subsequently be received).
 : <dfn for="WebTransportStats" dict-member>numOutgoingStreamsCreated</dfn>
 :: The number of outgoing QUIC streams created on the QUIC connection.
 : <dfn for="WebTransportStats" dict-member>numIncomingStreamsCreated</dfn>
@@ -1163,8 +1168,15 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportStats" dict-member>packetsReceived</dfn>
 :: The number of total packets received on the QUIC connection, including
    packets that were not processable.
+: <dfn for="WebTransportStats" dict-member>smoothedRtt</dfn>
+:: The smoothed round-trip time (RTT) currently observed on the connection, as defined
+   in [[!RFC9002]] [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
+: <dfn for="WebTransportStats" dict-member>rttVariation</dfn>
+:: The mean variation in round-trip time samples currently observed on the
+   connection, as defined in [[!RFC9002]]
+   [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
 : <dfn for="WebTransportStats" dict-member>minRtt</dfn>
-:: The minimum RTT observed on the entire connection.
+:: The minimum round-trip time observed on the entire connection.
 : <dfn for="WebTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
 :: The number of datagrams that were dropped, due to too many datagrams buffered
    between calls to {{DatagramTransport/datagrams}}' {{WebTransportDatagramDuplexStream/readable}}.
@@ -1780,6 +1792,66 @@ to this problem: the specific connection error is not returned until an
 endpoint is verified to be a WebTransport endpoint; thus, the Web application
 cannot distinguish between a non-existing endpoint and the endpoint that is not
 willing to accept connections from the Web.
+
+## Authentication using Certificate Hashes {#certificate-hashes}
+
+Normally, a user agent authenticates a TLS connection between itself and a
+remote endpoint by verifying the validity of the TLS server certificate
+provided against the server name in the URL [[!RFC6125]].  This is accomplished
+by chaining server certificates to one of the trust anchors maintained by the
+user agent; the trust anchors in question are responsible for authenticating
+the server names in the certificates.  We will refer to this system as Web PKI.
+
+This API provides web applications with a capability to connect to a remote
+network endpoint authenticated by a specific server certificate, rather than
+its server name.  This mechanism enables connections to endpoints for which
+getting long-term certificates can be challenging, including hosts that are
+ephemeral in nature (e.g. short-lived virtual machines), or that are not
+publicly routable.  Since this mechanism substitutes Web PKI-based
+authentication for an individual connection, we need to compare the security
+properties of both.
+
+A remote server will be able to successfully perform a TLS handshake only if it
+posesses the private key corresponding to the public key of the certificate
+specified.  The API identifies the certificates using their hashes.  That is
+only secure as long as the cryptographic hash function used has second-preimage
+resistance.  The only function defined in this document is SHA-256; the API
+provides a way to introduce new hash functions through allowing multiple
+algorithm-hash pairs to be specified.
+
+It is important to note that Web PKI provides additional security
+mechanisms in addition to simply establishing a chain of trust for a server
+name.  One of them is handling certificate revocation.  In cases where the
+certificate used is ephemeral, such a mechanism is not necessary.  In other
+cases, the Web application has to consider the mechanism by which the
+certificate hashes are provisioned; for instance, if the hash is provided as a
+cached HTTP resource, the cache needs to be invalidated if the corresponding
+certificate has been rotated due to compromise.  Another security feature
+provided by the Web PKI are safeguards against certain issues with key
+generation, such as rejecting certificates with known weak keys; while
+this specification does not provide any specific guidance, browsers MAY reject
+those as a part of implementation-defined behavior.
+
+Web PKI enforces an expiry period requirement on the certificates.  This
+requirement limits the scope of potential key compromise; it also forces server
+operators to design systems that support and actively perform key rotation.
+For this reason, WebTransport imposes a similar expiry requirement; as the
+certificates are expected to be ephemeral or short-lived, the expiry period is
+limited to two weeks.  The two weeks limit is a balance between setting the
+expiry limit as low as possible to minimize consequences of a key compromise,
+and maintaining it sufficiently high to accomodate for clock skew across
+devices, and to lower the costs of synchronizing certificates between the
+client and the server side.
+
+The WebTransport API lets the application specify multiple certificate
+hashes at once, allowing the client to accept multiple certificates for a
+period in which a new certificate is being rolled out.
+
+Unlike a similar mechanism in WebRTC, the server certificate hash API in
+WebTransport does not provide any means of authenticating the client; the fact
+that the client knows what the server certificate is or how to contact it is
+not sufficient.  The application has to establish the identity of the client
+in-band if necessary.
 
 # Examples #  {#examples}
 

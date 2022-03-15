@@ -116,7 +116,7 @@ const requestStream = await wt.createUnidirectionalStream();
 const requestWriter = requestStream.getWriter();
 requestWriter.write(mediaRequest);
 requestWriter.close();
-b
+
 // Receive the responses.
 for await (const receiveStream of wt.incomingUnidirectionalStreams) {
   for await (const buffer of receiveStream) {
