@@ -1273,7 +1273,8 @@ To <dfn for="SendStream">write</dfn> |chunk| to a {{SendStream}} |stream|, run t
    complete.
    This sending MAY be interleaved with sending of previously queued streams and datagrams,
    as well as streams and datagrams yet to be queued to be sent over this transport.
-   When determining prioritization, the user agent SHOULD make sure datagrams get out quickly.
+
+   Note: Solving prioritization is an outstanding issue.
 1. If the previous step failed, abort the remaining steps.
 
   Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
