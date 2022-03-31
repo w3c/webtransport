@@ -857,10 +857,8 @@ these steps.
    When getStats is called, the user agent MUST run the following steps:
      1. Let |transport| be [=this=].
      1. Let |p| be a new promise.
-     1. If the URL scheme associated with |transport| is not `https`,
-        [=reject=] |p| with {{NotSupportedError}} and return |p|.
      1. Return |p| and continue the following steps [=in parallel=].
-         1. Gather the stats from the underlying QUIC connection.
+         1. Gather the stats from the underlying QUIC connection, including stats on datagrams.
          1. Wait for the stats to be ready.
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportStats}} object representing the gathered stats.
@@ -1140,7 +1138,7 @@ dictionary WebTransportStats {
   DOMHighResTimeStamp smoothedRtt;
   DOMHighResTimeStamp rttVariation;
   DOMHighResTimeStamp minRtt;
-  unsigned long numReceivedDatagramsDropped;
+  WebTransportDatagramStats datagrams;
 };
 </pre>
 
@@ -1175,9 +1173,36 @@ The dictionary SHALL have the following attributes:
    [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
 : <dfn for="WebTransportStats" dict-member>minRtt</dfn>
 :: The minimum round-trip time observed on the entire connection.
-: <dfn for="WebTransportStats" dict-member>numReceivedDatagramsDropped</dfn>
-:: The number of datagrams that were dropped, due to too many datagrams buffered
-   between calls to {{WebTransport/datagrams}}' {{WebTransportDatagramDuplexStream/readable}}.
+
+## `WebTransportDatagramStats` Dictionary ##  {#web-transport-stats}
+
+The <dfn dictionary>WebTransportDatagramStats</dfn> dictionary includes statistics
+on datagram transmission over the HTTP/3 connection.
+
+<pre class="idl">
+dictionary WebTransportDatagramStats {
+  DOMHighResTimeStamp timestamp;
+  unsigned long long expiredOutgoing;
+  unsigned long long droppedIncoming;
+  unsigned long long lostOutgoing;
+};
+</pre>
+
+The dictionary SHALL have the following attributes:
+
+: <dfn for="WebTransportDatagramStats" dict-member>timestamp</dfn>
+:: The `timestamp` for when the stats are gathered, relative to the
+   UNIX epoch (Jan 1, 1970, UTC).
+: <dfn for="WebTransportDatagramStats" dict-member>expiredOutgoing</dfn>
+:: The number of datagrams queued for sending that were dropped, due to being
+   older than {{outgoingMaxAge}} before they were able to be sent.
+: <dfn for="WebTransportDatagramStats" dict-member>droppedIncoming</dfn>
+:: The number of incoming datagrams that were dropped, due to the application not reading
+  from {{WebTransport/datagrams}}' {{WebTransportDatagramDuplexStream/readable}}
+  before new datagrams overflow the receive queue.
+: <dfn for="WebTransportDatagramStats" dict-member>lostOutgoing</dfn>
+:: The number of sent datagrams that were declared lost, as defined in
+   [[!RFC9002]] [Section 6.1](https://www.rfc-editor.org/rfc/rfc9002#section-6.1).
 
 # `SendStream` #  {#send-stream}
 
