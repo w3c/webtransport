@@ -2006,7 +2006,7 @@ connect.onclick = async () => {
     wt = new WebTransport(url);
     addToEventLog('Initiating connection...');
     await wt.ready;
-    addToEventLog(\`HTTP/${(wt.reliability == "reliable-only")? 2 : 3} connection ready.\`);
+    addToEventLog(\`${(wt.reliability == "reliable-only")? "TCP" : "UDP"} connection ready.\`);
     wt.closed
       .then(() => addToEventLog('Connection closed normally.'))
       .catch(() => addToEventLog('Connection closed abruptly.', 'error'));
