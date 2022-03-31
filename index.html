@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version fb1e763a4, updated Tue Mar 1 13:13:50 2022 -0800" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="49e2e1a9295e5450cf08dac9c30c0e6e36a33293" name="document-revision">
+  <meta content="23a4ef42896aa61d91fe576e1a166ac6ddd5583d" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -2141,11 +2141,11 @@ an object which is referenced from <var>writeAlgorithm</var>, <var>closeAlgorith
      <li data-md>
       <p>Return <var>promise</var> and run the remaining steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑨">in parallel</a>.</p>
      <li data-md>
-      <p>Wait for <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot⑤">[[Datagrams]]</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot④">[[OutgoingDatagramsQueue]]</a></code> to be empty.</p>
-      <p class="note" role="note"><span>Note:</span> This means outgoing datagrams are prioritized over stream data.</p>
-     <li data-md>
-      <p><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send">Send</a> <var>bytes</var> on <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-sendstream-internalstream-slot" id="ref-for-dom-sendstream-internalstream-slot①">[[InternalStream]]</a></code> and wait for the operation to
- complete.</p>
+      <p><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send">Send</a> <var>bytes</var> on <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-sendstream-internalstream-slot" id="ref-for-dom-sendstream-internalstream-slot①">[[InternalStream]]</a></code> and wait for the
+ operation to complete.
+ This sending MAY be interleaved with sending of previously queued streams and datagrams,
+ as well as streams and datagrams yet to be queued to be sent over this transport.</p>
+      <p class="note" role="note"><span>Note:</span> Solving prioritization is an outstanding issue.</p>
      <li data-md>
       <p>If the previous step failed, abort the remaining steps.</p>
       <p class="note" role="note"><span>Note:</span> We don’t reject <var>promise</var> here because we handle network errors elsewhere, and those steps
@@ -4477,7 +4477,6 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <ul>
     <li><a href="#ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot">4.1. Internal slots</a>
     <li><a href="#ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot①">4.3. Procedures</a> <a href="#ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot②">(2)</a> <a href="#ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot③">(3)</a>
-    <li><a href="#ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot④">6.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransportdatagramduplexstream-outgoingdatagramshighwatermark-slot">
@@ -4725,7 +4724,6 @@ or are impossible to define for pooled connections. <a class="issue-return" href
     <li><a href="#ref-for-dom-webtransport-datagrams-slot">4.3. Procedures</a> <a href="#ref-for-dom-webtransport-datagrams-slot①">(2)</a> <a href="#ref-for-dom-webtransport-datagrams-slot②">(3)</a>
     <li><a href="#ref-for-dom-webtransport-datagrams-slot③">5.2. Constructor</a>
     <li><a href="#ref-for-dom-webtransport-datagrams-slot④">5.3. Attributes</a>
-    <li><a href="#ref-for-dom-webtransport-datagrams-slot⑤">6.2. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-session-slot">
