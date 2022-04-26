@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version fb1e763a4, updated Tue Mar 1 13:13:50 2022 -0800" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="23a4ef42896aa61d91fe576e1a166ac6ddd5583d" name="document-revision">
+  <meta content="b40dcc967ad47301fcdfddd5cd89600c587d0052" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -590,7 +590,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2022-03-31">31 March 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2022-04-26">26 April 2022</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -1618,9 +1618,9 @@ these steps.
        <li data-md>
         <p>Let <var>code</var> be <var>closeInfo</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportcloseinfo-closecode" id="ref-for-dom-webtransportcloseinfo-closecode">closeCode</a></code>.</p>
        <li data-md>
-        <p>Let <var>reason</var> be <var>closeInfo</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportcloseinfo-reason" id="ref-for-dom-webtransportcloseinfo-reason">reason</a></code>, <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-encode" id="ref-for-utf-8-encode">UTF-8 encoded</a>.</p>
+        <p>Let <var>reasonString</var> be the maximal <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#code-unit-prefix" id="ref-for-code-unit-prefix">code unit prefix</a> of <var>closeInfo</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportcloseinfo-reason" id="ref-for-dom-webtransportcloseinfo-reason">reason</a></code> where the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence-length" id="ref-for-byte-sequence-length">length</a> of the <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-encode" id="ref-for-utf-8-encode">UTF-8 encoded</a> prefix doesn’t exceed 1024.</p>
        <li data-md>
-        <p>If <var>reason</var>’s <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence-length" id="ref-for-byte-sequence-length">length</a> exceeds 1024, then set <var>reason</var> to a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence-prefix" id="ref-for-byte-sequence-prefix">prefix</a> of <var>reason</var> whose length is 1024.</p>
+        <p>Let <var>reason</var> be <var>reasonString</var>, <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-encode" id="ref-for-utf-8-encode①">UTF-8 encoded</a>.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel④">In parallel</a>, <a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate①">terminate</a> <var>session</var> with <var>code</var> and <var>reason</var>.</p>
         <p class="note" role="note"><span>Note:</span> This also <a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset">resets</a> or <a data-link-type="dfn" href="#stream-send-stop_sending" id="ref-for-stream-send-stop_sending">sends STOP_SENDING</a> <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream④">WebTransport streams</a> contained in <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-sendstreams-slot" id="ref-for-dom-webtransport-sendstreams-slot①">[[SendStreams]]</a></code> and <code class="idl"><a data-link-type="idl" href="#dom-webtransport-receivestreams-slot" id="ref-for-dom-webtransport-receivestreams-slot①">[[ReceiveStreams]]</a></code>.</p>
@@ -3255,7 +3255,7 @@ and has been adapted for use in this specification.</p>
   <aside class="dfn-panel" data-for="term-for-utf-8-encode">
    <a href="https://encoding.spec.whatwg.org/#utf-8-encode">https://encoding.spec.whatwg.org/#utf-8-encode</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-utf-8-encode">5.4. Methods</a>
+    <li><a href="#ref-for-utf-8-encode">5.4. Methods</a> <a href="#ref-for-utf-8-encode①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-block-bad-port">
@@ -3423,6 +3423,12 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-byte-sequence②">6.2. Procedures</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-code-unit-prefix">
+   <a href="https://infra.spec.whatwg.org/#code-unit-prefix">https://infra.spec.whatwg.org/#code-unit-prefix</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-code-unit-prefix">5.4. Methods</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-queue-dequeue">
    <a href="https://infra.spec.whatwg.org/#queue-dequeue">https://infra.spec.whatwg.org/#queue-dequeue</a><b>Referenced in:</b>
    <ul>
@@ -3469,12 +3475,6 @@ and has been adapted for use in this specification.</p>
     <li><a href="#ref-for-ordered-set">5.1. Internal slots</a> <a href="#ref-for-ordered-set①">(2)</a>
     <li><a href="#ref-for-ordered-set②">5.2. Constructor</a> <a href="#ref-for-ordered-set③">(2)</a>
     <li><a href="#ref-for-ordered-set④">5.5. Procedures</a> <a href="#ref-for-ordered-set⑤">(2)</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="term-for-byte-sequence-prefix">
-   <a href="https://infra.spec.whatwg.org/#byte-sequence-prefix">https://infra.spec.whatwg.org/#byte-sequence-prefix</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-byte-sequence-prefix">5.4. Methods</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-list-remove">
@@ -4013,6 +4013,7 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="term-for-set-append">append</span>
      <li><span class="dfn-paneled" id="term-for-iteration-break">break</span>
      <li><span class="dfn-paneled" id="term-for-byte-sequence">byte sequence</span>
+     <li><span class="dfn-paneled" id="term-for-code-unit-prefix">code unit prefix</span>
      <li><span class="dfn-paneled" id="term-for-queue-dequeue">dequeue</span>
      <li><span class="dfn-paneled" id="term-for-queue-enqueue">enqueue</span>
      <li><span class="dfn-paneled" id="term-for-list-iterate">for each</span>
@@ -4020,7 +4021,6 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="term-for-isomorphic-encode">isomorphic encode</span>
      <li><span class="dfn-paneled" id="term-for-byte-sequence-length">length</span>
      <li><span class="dfn-paneled" id="term-for-ordered-set">ordered set</span>
-     <li><span class="dfn-paneled" id="term-for-byte-sequence-prefix">prefix</span>
      <li><span class="dfn-paneled" id="term-for-list-remove">remove</span>
      <li><span class="dfn-paneled" id="term-for-ordered-set①">set</span>
     </ul>
