@@ -1223,11 +1223,11 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
 |internalStream| and a {{WebTransport}} |transport|, run these steps:
 
 1. Let |stream| be a [=new=] {{WebTransportSendStream}}, with:
-    : {{SendStream/[[InternalStream]]}}
+    : {{WebTransportSendStream/[[InternalStream]]}}
     :: |internalStream|
     : {{[[PendingOperation]]}}
     :: null
-    : {{SendStream/[[Transport]]}}
+    : {{WebTransportSendStream/[[Transport]]}}
     :: |transport|
 1. Let |writeAlgorithm| be an action that [=writes=] |chunk| to |stream|, given |chunk|.
 1. Let |closeAlgorithm| be an action that [=closes=] |stream|.
@@ -1251,7 +1251,7 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
 <div algorithm>
 To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSendStream}} |stream|, run these steps:
 
-1. Let |transport| be |stream|.{{SendStream/[[Transport]]}}.
+1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
 1. If |chunk| is not a {{BufferSource}}, return [=a promise rejected with=] a {{TypeError}}.
 1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of the [=byte sequence=] which |chunk| represents.
@@ -1260,7 +1260,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 1. Wait for |transport|.{{[[Datagrams]]}}'s {{[[OutgoingDatagramsQueue]]}} to be empty.
 
    Note: This means outgoing datagrams are prioritized over stream data.
-1. [=stream/Send=] |bytes| on |stream|.{{SendStream/[[InternalStream]]}} and wait for the operation to
+1. [=stream/Send=] |bytes| on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the operation to
    complete.
 1. If the previous step failed, abort the remaining steps.
 
@@ -1283,14 +1283,14 @@ the chunk arrives at the server, use an application-level protocol.
 <div algorithm>
 To <dfn for="WebTransportSendStream">close</dfn> a {{WebTransportSendStream}} |stream|, run these steps:
 
-1. Let |transport| be |stream|.{{SendStream/[[Transport]]}}.
+1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
 1. Let |promise| be a new promise.
 1. [=set/Remove=] |stream| from |transport|.{{[[SendStreams]]}}.
 1. Set |stream|.{{[[PendingOperation]]}} to |promise|.
 1. Return |promise| and run the remaining steps [=in parallel=].
-1. [=stream/Send=] FIN on |stream|.{{SendStream/[[InternalStream]]}} and wait for the operation to
+1. [=stream/Send=] FIN on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the operation to
    complete.
-1. Wait for |stream|.{{SendStream/[[InternalStream]]}} to enter the "Data Recvd" state. [[!QUIC]]
+1. Wait for |stream|.{{WebTransportSendStream/[[InternalStream]]}} to enter the "Data Recvd" state. [[!QUIC]]
 1. [=Queue a network task=] with |transport| to run these steps:
   1. Set |stream|.{{[[PendingOperation]]}} to null.
   1. [=Resolve=] |promise| with undefined.
@@ -1300,7 +1300,7 @@ To <dfn for="WebTransportSendStream">close</dfn> a {{WebTransportSendStream}} |s
 <div algorithm>
 To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |stream| with |reason|, run these steps:
 
-1. Let |transport| be |stream|.{{SendStream/[[Transport]]}}.
+1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
 1. Let |promise| be a new promise.
 1. Let |code| be 0.
 1. [=set/Remove=] |stream| from |transport|.{{[[SendStreams]]}}.
@@ -1313,7 +1313,7 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
          [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
 
 1. Return |promise| and run the remaining steps [=in parallel=].
-1. [=stream/Reset=] |stream|.{{SendStream/[[InternalStream]]}} with |code|.
+1. [=stream/Reset=] |stream|.{{WebTransportSendStream/[[InternalStream]]}} with |code|.
 1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
 
 </div>
@@ -1324,7 +1324,7 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
 Whenever a [=WebTransport stream=] associated with a {{WebTransportSendStream}} |stream| gets a
 [=stream-signal/STOP_SENDING=] signal from the server, run these steps:
 
-1. Let |transport| be |stream|.{{SendStream/[[Transport]]}}.
+1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
 1. Let |code| be the application protocol error code attached to the STOP_SENDING frame. [[!QUIC]]
 
    Note: Valid values of |code| are from 0 to 255 inclusive. The code has been decoded from a number in
@@ -1367,7 +1367,7 @@ The dictionary SHALL have the following attributes:
    {{WebTransportSendStream}} has been sent at least once. This
    number can only increase, and is always less than or equal to {{amountWrittenTo}}.
 : <dfn for="WebTransportSendStreamStats" dict-member>acknowledgedProgress</dfn>
-<!-- for HTTP/2 fallback, acknowledgedProgress may be == sentProgress --!>
+<!-- for HTTP/2 fallback, acknowledgedProgress may be == sentProgress -->
 :: An indicator of progress on how many of the application bytes written to this
    {{WebTransportSendStream}} have been sent and acknowledged as received by
    the server using QUIC's ACK mechanism. Only sequential bytes up to, but not
@@ -1446,9 +1446,9 @@ To <dfn export for="WebTransportReceiveStream" lt="create|creating">create</dfn>
 |internalStream| and a {{WebTransport}} |transport|, run these steps:
 
 1. Let |stream| be a [=new=] {{WebTransportReceiveStream}}, with:
-    : {{ReceiveStream/[[InternalStream]]}}
+    : {{WebTransportReceiveStream/[[InternalStream]]}}
     :: |internalStream|
-    : {{ReceiveStream/[[Transport]]}}
+    : {{WebTransportReceiveStream/[[Transport]]}}
     :: |transport|
 1. Let |pullAlgorithm| be an action that [=pulls bytes=] from |stream|.
 1. Let |cancelAlgorithm| be an action that [=WebTransportReceiveStream/cancels=] |stream| with |reason|, given
@@ -1465,8 +1465,8 @@ To <dfn export for="WebTransportReceiveStream" lt="create|creating">create</dfn>
 
 To <dfn for="WebTransportReceiveStream">pull bytes</dfn> from a {{WebTransportReceiveStream}} |stream|, run these steps.
 
-1. Let |transport| be |stream|.{{ReceiveStream/[[Transport]]}}.
-1. Let |internalStream| be |stream|.{{ReceiveStream/[[InternalStream]]}}.
+1. Let |transport| be |stream|.{{WebTransportReceiveStream/[[Transport]]}}.
+1. Let |internalStream| be |stream|.{{WebTransportReceiveStream/[[InternalStream]]}}.
 1. Let |promise| be a new promise.
 1. Let |buffer|, |offset|, and |maxBytes| be null.
 1. If |stream|'s [=ReadableStream/current BYOB request view=] for |stream| is not null:
@@ -1515,8 +1515,8 @@ To <dfn for="WebTransportReceiveStream">pull bytes</dfn> from a {{WebTransportRe
 To <dfn for="WebTransportReceiveStream">cancel</dfn> a {{WebTransportReceiveStream}} |stream| with |reason|, run these
 steps.
 
-1. Let |transport| be |stream|.{{ReceiveStream/[[Transport]]}}.
-1. Let |internalStream| be |stream|.{{ReceiveStream/[[InternalStream]]}}.
+1. Let |transport| be |stream|.{{WebTransportReceiveStream/[[Transport]]}}.
+1. Let |internalStream| be |stream|.{{WebTransportReceiveStream/[[InternalStream]]}}.
 1. Let |promise| be a new promise.
 1. Let |code| be 0.
 1. If |reason| is a {{WebTransportError}} and |reasons|.{{WebTransportError/[[StreamErrorCode]]}} is not
@@ -1546,7 +1546,7 @@ steps.
 Whenever a [=WebTransport stream=] associated with a {{WebTransportReceiveStream}} |stream| gets a
 [=stream-signal/reset=] signal from the server, run these steps:
 
-1. Let |transport| be |stream|.{{ReceiveStream/[[Transport]]}}.
+1. Let |transport| be |stream|.{{WebTransportReceiveStream/[[Transport]]}}.
 1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
 
    Note: Valid values of |code| are from 0 to 255 inclusive. The code has been decoded from a number in
