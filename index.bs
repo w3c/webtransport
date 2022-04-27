@@ -1402,9 +1402,9 @@ on stats specific to one {{WebTransportSendStream}}.
 <pre class="idl">
 dictionary WebTransportSendStreamStats {
   DOMHighResTimeStamp timestamp;
-  unsigned long long amountWrittenTo;
-  unsigned long long sentProgress;
-  unsigned long long acknowledgedProgress;
+  unsigned long long bytesWritten;
+  unsigned long long bytesSent;
+  unsigned long long bytesAcknowledged;
 };
 </pre>
 
@@ -1413,21 +1413,26 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportSendStreamStats" dict-member>timestamp</dfn>
 :: The `timestamp` for when the stats are gathered, relative to the
    UNIX epoch (Jan 1, 1970, UTC).
-: <dfn for="WebTransportSendStreamStats" dict-member>amountWrittenTo</dfn>
+: <dfn for="WebTransportSendStreamStats" dict-member>bytesWritten</dfn>
 :: The total number of bytes the application has successfully written to this
    {{WebTransportSendStream}}. This number can only increase.
-: <dfn for="WebTransportSendStreamStats" dict-member>sentProgress</dfn>
+: <dfn for="WebTransportSendStreamStats" dict-member>bytesSent</dfn>
 :: An indicator of progress on how many of the application bytes written to this
    {{WebTransportSendStream}} has been sent at least once. This
-   number can only increase, and is always less than or equal to {{amountWrittenTo}}.
-: <dfn for="WebTransportSendStreamStats" dict-member>acknowledgedProgress</dfn>
-<!-- for HTTP/2 fallback, acknowledgedProgress may be == sentProgress -->
+   number can only increase, and is always less than or equal to
+   {{WebTransportSendStreamStats/bytesWritten}}.
+   
+   Note: this is progress of app data sent on a single stream only, and does not
+   include any network overhead.
+: <dfn for="WebTransportSendStreamStats" dict-member>bytesAcknowledged</dfn>
 :: An indicator of progress on how many of the application bytes written to this
    {{WebTransportSendStream}} have been sent and acknowledged as received by
    the server using QUIC's ACK mechanism. Only sequential bytes up to, but not
    including, the first non-acknowledged byte, are counted. This number can only
-   increase and is always less than or equal to {{sentProgress}}.
+   increase and is always less than or equal to {{WebTransportSendStreamStats/bytesSent}}.
 
+   Note: This value will match {{WebTransportSendStreamStats/bytesSent}} when
+   the connection is over HTTP/2.
 # Interface `WebTransportReceiveStream` #  {#receive-stream}
 
 A {{WebTransportReceiveStream}} is a {{ReadableStream}} providing incoming streaming
@@ -1624,8 +1629,8 @@ information on stats specific to one {{WebTransportReceiveStream}}.
 <pre class="idl">
 dictionary WebTransportReceiveStreamStats {
   DOMHighResTimeStamp timestamp;
-  unsigned long long amountReadFrom;
-  unsigned long long receivedProgress;
+  unsigned long long bytesReceived;
+  unsigned long long bytesRead;
 };
 </pre>
 
@@ -1634,15 +1639,18 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportReceiveStreamStats" dict-member>timestamp</dfn>
 :: The `timestamp` for when the stats are gathered, relative to the
    UNIX epoch (Jan 1, 1970, UTC).
-: <dfn for="WebTransportReceiveStreamStats" dict-member>amountReadFrom</dfn>
-:: The total number of bytes the application has successfully read from this
-   {{WebTransportReceiveStream}}. This number can only increase, and is always
-   less than or equal to {{receivedProgress}}.
-: <dfn for="WebTransportReceiveStreamStats" dict-member>receivedProgress</dfn>
+: <dfn for="WebTransportReceiveStreamStats" dict-member>bytesReceived</dfn>
 :: An indicator of progress on how many of the server application's bytes
    intended for this {{WebTransportReceiveStream}} have been received so far.
    Only sequential bytes up to, but not including, the first missing byte, are
    counted. This number can only increase.
+
+   Note: this is progress of app data received on a single stream only, and does
+   not include any network overhead.
+: <dfn for="WebTransportReceiveStreamStats" dict-member>bytesRead</dfn>
+:: The total number of bytes the application has successfully read from this
+   {{WebTransportReceiveStream}}. This number can only increase, and is always
+   less than or equal to {{bytesReceived}}.
 
 # Interface `WebTransportBidirectionalStream` #  {#bidirectional-stream}
 
