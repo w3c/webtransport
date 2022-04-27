@@ -1031,6 +1031,12 @@ dictionary WebTransportOptions {
   boolean allowPooling = false;
   boolean requireUnreliable = false;
   sequence&lt;WebTransportHash&gt; serverCertificateHashes;
+  WebTransportCongestionControl congestionControl = "throughput";
+};
+
+enum WebTransportCongestionControl {
+  "throughput",
+  "low-latency",
 };
 </pre>
 
@@ -1057,6 +1063,10 @@ that determine how WebTransport connection is established and used.
    If empty, the user agent SHALL use certificate verification procedures it would
    use for normal [=fetch=] operations.
 :: This cannot be used with {{WebTransportOptions/allowPooling}}.
+
+: <dfn for="WebTransportOptions" dict-member>congestionControl</dfn>
+:: When set, influences the congestion control algorithm used by the user agent
+   when sending data over this connection.
 
 <div algorithm>
 To <dfn>compute a certificate hash</dfn>, do the following:
