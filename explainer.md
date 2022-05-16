@@ -3,7 +3,7 @@
 ## Problem and Motivation
 
 Many applications, such as games and live streaming, need a mechanism to send
-many messages as quickly as possibly, possibly out of order, and possibly
+many messages as quickly as possible, possibly out of order, and possibly
 unreliably from client to server or server to client.  The web platform is
 missing the capability to do this easily.
 
@@ -23,7 +23,7 @@ reliability and stream independence for performance.
 We think there is a room for a simple, client-server, unordered/unreliable API
 with minimal latency.  The WebTransport protocol provides this with a single
 transport object that abstracts away the specific underlying protocol with
-a flexibile set of possible capabilities including reliable
+a flexible set of possible capabilities including reliable
 unidirectional and bidirectional streams, and unreliable datagrams
 (much like the capabilities of QUIC).
 
@@ -61,10 +61,10 @@ encrypted and congestion-controlled communication.
 1. A generic transport interface that can be provided by any transport,
    but match closely with QUIC's capabilities.
 
-2. The transport interface can talk
+2. The transport interface can talk to
    [a QUIC based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-quic).
 
-3. The transport interface can talk
+3. The transport interface can talk to
    [an HTTP/3 based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-http3)
    that allows web developers to reuse HTTP/3 connections (sharing a congestion control context).
 
