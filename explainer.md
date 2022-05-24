@@ -61,12 +61,19 @@ encrypted and congestion-controlled communication.
 1. A generic transport interface that can be provided by any transport,
    but match closely with QUIC's capabilities.
 
-2. The transport interface can talk to
-   [a QUIC based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-quic).
+2. The transport interface that can use
+   [an HTTP/3 extension](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
+   to enable transport capabilities provided by QUIC.
 
-3. The transport interface can talk to
-   [an HTTP/3 based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-http3)
-   that allows web developers to reuse HTTP/3 connections (sharing a congestion control context).
+3. The transport interface that can use
+   [an HTTP/2 extension](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http2/),
+   which provides the same functionality over TCP for situations where QUIC is
+   unavailable.
+
+Using TCP provides reliable, in-order delivery, which can mean that the HTTP/2
+version might lack some of the performance advantages provided by QUIC.
+Both HTTP/3 and HTTP/2 extensions provide the same capabilities, allowing
+applications to build to the same interface under most conditions.
 
 ## Example of sending unreliable game state to server using datagrams
 
