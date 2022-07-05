@@ -536,6 +536,7 @@ interface WebTransport {
   Promise&lt;WebTransportStats&gt; getStats();
   readonly attribute Promise&lt;undefined&gt; ready;
   readonly attribute WebTransportReliabilityMode reliability;
+  readonly attribute WebTransportCongestionControl congestionControl;
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   undefined close(optional WebTransportCloseInfo closeInfo = {});
 
@@ -605,6 +606,12 @@ A {{WebTransport}} object has the following internal slots.
    transport is used. Returns `"pending"` until a connection has been established.
   </tr>
   <tr>
+   <td><dfn>`[[CongestionControl]]`</dfn>
+   <td class="non-normative">A {{WebTransportCongestionControl}} indicating
+   whether the congestion control algorithm for sending on this connection is
+   optimized for throughput or low latency.
+  </tr>
+  <tr>
    <td><dfn>`[[Closed]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated {{WebTransport}} object is
    closed gracefully, or rejected when it is closed abruptly or failed on initialization.
@@ -638,6 +645,11 @@ agent MUST run the following steps:
    {{TypeError}}.
 1. Let |requireUnreliable| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/requireUnreliable}}.
+1. Let |congestionControl| be {{WebTransport/constructor(url, options)/options}}'s
+   {{WebTransportOptions/congestionControl}}.
+1. If the user agent only implements the default congestion control algorithm in
+   [[!RFC9002]] [section 7](https://datatracker.ietf.org/doc/html/rfc9002#section-7),
+   set |congestionControl| to `"throughput"`.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
@@ -658,6 +670,8 @@ agent MUST run the following steps:
     :: a new promise
     : {{[[Reliability]]}}
     :: "pending"
+    : {{[[CongestionControl]]}}
+    :: |congestionControl|
     : {{[[Closed]]}}
     :: a new promise
     : {{[[Datagrams]]}}
@@ -680,14 +694,16 @@ agent MUST run the following steps:
 1. [=ReadableStream/Set up=] |transport|.{{[[IncomingUnidirectionalStreams]]}} with
    [=ReadableStream/set up/pullAlgorithm=] set to |pullUnidirectionalStreamAlgorithm|, and
    [=ReadableStream/set up/highWaterMark=] set to 0.
-1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL|, |dedicated|, and |requireUnreliable|.
+1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL|, |dedicated|,
+   |requireUnreliable|, and |congestionControl|.
 1. Return |transport|.
 
 </div>
 
 <div algorithm>
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
-<var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, and a boolean |http3Only|, run these steps.
+<var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, a boolean
+|http3Only|, and a boolean |congestionControl|, run these steps.
 
 1. Let |client| be |transport|'s [=relevant settings object=].
 1. Let |origin| be |client|'s [=environment settings object/origin=].
@@ -709,7 +725,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 1. Run the remaining steps [=in parallel=], but abort them whenever |transport|.{{[[State]]}} becomes `"closed"` or `"failed"`.
 1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
 1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
-   |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|.
+   |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|. Use a congestion
+   control algorithm appropriate for |congestionControl|.
 1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
    |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
@@ -820,6 +837,10 @@ these steps.
    Returns `"pending"` until a connection has been established.
    The getter steps are to return [=this=]'s {{[[Reliability]]}}.
 
+: <dfn for="WebTransport" attribute>congestionControl</dfn>
+:: Whether the congestion control algorithm used for sending on this connection
+   is optimized for throughput or low latency.
+   The getter steps are to return [=this=]'s {{[[CongestionControl]]}}.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -1067,6 +1088,14 @@ that determine how WebTransport connection is established and used.
 : <dfn for="WebTransportOptions" dict-member>congestionControl</dfn>
 :: When set, influences the congestion control algorithm used by the user agent
    when sending data over this connection.
+   <div class="issue atrisk">
+     <p>
+       This configuration option is considered at risk due to the lack of
+       implementation and specification of any congestion control algorithm
+       other than [[!RFC9002]] [section 7](https://datatracker.ietf.org/doc/html/rfc9002#section-7)
+       at the time of writing.
+     </p>
+   </div>
 
 <div algorithm>
 To <dfn>compute a certificate hash</dfn>, do the following:
