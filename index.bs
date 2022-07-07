@@ -533,6 +533,7 @@ defined in [[!WEB-TRANSPORT-HTTP3]].
 interface WebTransport {
   constructor(USVString url, optional WebTransportOptions options = {});
 
+  static sequence&lt;WebTransportCongestionControlAlgorithm&gt; getCongestionControlAlgorithms();
   Promise&lt;WebTransportStats&gt; getStats();
   readonly attribute Promise&lt;undefined&gt; ready;
   readonly attribute WebTransportReliabilityMode reliability;
@@ -607,9 +608,8 @@ A {{WebTransport}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[CongestionControl]]`</dfn>
-   <td class="non-normative">A {{WebTransportCongestionControl}} indicating
-   whether the congestion control algorithm for sending on this connection is
-   optimized for throughput or low latency.
+   <td class="non-normative">A {{WebTransportCongestionControl}} describing
+   the congestion control algorithm used for sending on this connection.
   </tr>
   <tr>
    <td><dfn>`[[Closed]]`</dfn>
@@ -645,12 +645,20 @@ agent MUST run the following steps:
    {{TypeError}}.
 1. Let |requireUnreliable| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/requireUnreliable}}.
-1. Let |congestionControl| be {{WebTransport/constructor(url, options)/options}}'s
+1. Let |ccInput| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/congestionControl}}.
-1. If the user agent does not support any congestion control algorithms that
-   optimize for low latency, as allowed by
-   [[!RFC9002]] [section 7](https://datatracker.ietf.org/doc/html/rfc9002#section-7),
-   then set |congestionControl| to `"throughput"`.
+1. If |ccInput|.{{WebTransportCongestionControlAlgorithm/name}} is the empty
+   string and |ccInput|.{{WebTransportCongestionControlAlgorithm/aim}} does not [=exist=],
+   then let |ccFound| be the first entry returned from {{getCongestionControlAlgorithms}}.
+   Otherwise, let |ccFound| be the first entry returned from {{getCongestionControlAlgorithms}}
+   that matches |ccInput|.{{WebTransportCongestionControlAlgorithm/name}} if not an
+   empty string, and |ccInput|.{{WebTransportCongestionControlAlgorithm/aim}} if it
+   [=exists=]. If there is no such entry, [=throw=] a {{NotSupportedError}} exception.
+1. Let |congestionControl| be the result of [=WebTransportCongestionControl/creating=] a
+   {{WebTransportCongestionControl}}, its [=WebTransportCongestionControl/create/name=] set to
+   |ccFound|.{{WebTransportCongestionControlAlgorithm/name}} and its
+   [=WebTransportCongestionControl/create/aim=] set to
+   |ccFound|.{{WebTransportCongestionControlAlgorithm/aim}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
@@ -839,9 +847,8 @@ these steps.
    The getter steps are to return [=this=]'s {{[[Reliability]]}}.
 
 : <dfn for="WebTransport" attribute>congestionControl</dfn>
-:: Whether the congestion control algorithm used for sending on this connection
-   is optimized for throughput or low latency.
-   The getter steps are to return [=this=]'s {{[[CongestionControl]]}}.
+:: Information about the congestion control algorithm used for sending on this
+   connection. The getter steps are to return [=this=]'s {{[[CongestionControl]]}}.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -871,6 +878,22 @@ these steps.
      1. [=Cleanup=] |transport| with {{AbortError}} and |closeInfo|.
 
 </div>
+
+: <dfn for="WebTransport" method>getCongestionControlAlgorithms()</dfn>
+:: Returns a sequence of {{WebTransportCongestionControlAlgorithm}} dictionaries
+   describing the congestion control algorithms the user agent supports for sending.
+   The user agent MUST return at least one dictionary.</p>
+
+   When {{getCongestionControlAlgorithms}} is called, the user agent MUST run the following steps:
+     1. Let |list| be an empty list.
+     1. [=For each=] congestion control algorithm the user agent supports for sending, in order
+        of its preference, run the following steps:
+         1. Let |algorithm| be a new {{WebTransportCongestionControlAlgorithm}} dictionary.
+         1. Set |algorithm|.`name` to the name of the algorithm.
+         1. Set |algorithm|.`aim` to either `"throughput"` or `"low-latency"`, whichever
+            best describes the aim of the algorithm.
+         1. Add |algorithm| to |list|.
+     1. Return |list|.
 
 : <dfn for="WebTransport" method>getStats()</dfn>
 :: Gathers stats for this {{WebTransport}}'s HTTP/3
@@ -1049,16 +1072,16 @@ dictionary WebTransportHash {
   BufferSource value;
 };
 
+dictionary WebTransportCongestionControlAlgorithm {
+  DOMString name = "";
+  WebTransportCongestionControlAim aim;
+};
+
 dictionary WebTransportOptions {
   boolean allowPooling = false;
   boolean requireUnreliable = false;
   sequence&lt;WebTransportHash&gt; serverCertificateHashes;
-  WebTransportCongestionControl congestionControl = "throughput";
-};
-
-enum WebTransportCongestionControl {
-  "throughput",
-  "low-latency",
+  WebTransportCongestionControlAlgorithm congestionControl;
 };
 </pre>
 
@@ -1212,6 +1235,68 @@ The dictionary SHALL have the following attributes:
    [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
 : <dfn for="WebTransportStats" dict-member>minRtt</dfn>
 :: The minimum round-trip time observed on the entire connection.
+
+# `WebTransportCongestionControl` Interface #  {#congestion-control}
+
+A <dfn interface>WebTransportCongestionControl</dfn> is a readonly description
+of the current congestion control algorithm.
+
+<pre class="idl">
+[Exposed=(Window,Worker), SecureContext]
+interface WebTransportCongestionControl {
+  readonly attribute DOMString name;
+  readonly attribute WebTransportCongestionControlAim aim;
+};
+
+enum WebTransportCongestionControlAim {
+  "throughput",
+  "low-latency",
+};
+</pre>
+
+## Internal slots ## {#congestion-control-internal-slots}
+
+A {{WebTransportCongestionControl}} object has the following internal slots.
+
+<table class="data" dfn-for="WebTransportCongestionControl" dfn-type="attribute">
+ <thead>
+  <tr>
+   <th>Internal Slot
+   <th>Description (<em>non-normative</em>)
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>`[[Name]]`</dfn>
+   <td class="non-normative">The name of the congestion control algorithm.
+  </tr>
+  <tr>
+   <td><dfn>`[[Aim]]`</dfn>
+   <td class="non-normative">A {{WebTransportCongestionControlAim}} describing the algorithm's aim.
+  </tr>
+ </tbody>
+</table>
+
+ To <dfn export for="WebTransportCongestionControl" lt="create|creating">create</dfn> a
+ {{WebTransportCongestionControl}} given a
+ <dfn export for="WebTransportCongestionControl/create"><var>name</var></dfn>, and
+ an <dfn export for="WebTransportCongestionControl/create"><var>aim</var></dfn>,
+ perform the following steps.
+
+ 1. Let |congestionControl| be a [=new=] {{WebTransportCongestionControl}}, with:
+    : {{WebTransportCongestionControl/[[Name]]}}
+    :: |name|
+    : {{WebTransportCongestionControl/[[Aim]]}}
+    :: |aim|
+ 1. Return |congestionControl|.
+
+## Attributes ##  {#congestion-control-attributes}
+
+: <dfn for="WebTransportCongestionControl" attribute>name</dfn>
+:: The getter steps are to return [=this=].{{[[Name]]}}.
+
+: <dfn for="WebTransportDatagramDuplexStream" attribute>aim</dfn>
+:: The getter steps are to return [=this=].{{[[Aim]]}}.
 
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-stats}
 
