@@ -203,6 +203,14 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
    <td>Yes
   </tr>
   <tr>
+   <td><dfn>receive STOP_SENDING</dfn>
+   <td>[[!QUIC]]
+   [section 3.2](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-3.2)
+   <td>No
+   <td>Yes
+   <td>Yes
+  </tr>
+  <tr>
    <td><dfn>receive</dfn> bytes (potentially with FIN)
    <td>[[!QUIC]]
    [section 2.2](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-2.2)
@@ -1886,7 +1894,7 @@ not be immediate due to buffering.
     </thead>
     <tbody>
       <tr>
-        <td>[=stream/Receive|received=] STOP_SENDING with errorCode</td>
+        <td>[=stream/receive STOP_SENDING|received STOP_SENDING=] with errorCode</td>
         <td>[=WritableStream/Error|errors=] {{WebTransportBidirectionalStream/writable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
@@ -1907,13 +1915,13 @@ not be immediate due to buffering.
       </tr>
       <tr>
         <td>Connection cleanly [=session/terminated|terminated=] with closeInfo<br>
-        <td>(await wt.{{WebTransport/closed}}).closeInfo, and open streams
-          [=ReadableStream/error=]</td>
+        <td>(await wt.{{WebTransport/closed}}).closeInfo, and
+         [=ReadableStream/error|errors=] open streams</td>
       </tr>
       <tr>
         <td>Network error<br>
-        <td>(await wt.{{WebTransport/closed}}) rejects, and open streams
-          [=ReadableStream/error|error=]</td>
+        <td>(await wt.{{WebTransport/closed}}) rejects, and
+          [=ReadableStream/error|errors=] open streams</td>
       </tr>
     </tbody>
   </table>
