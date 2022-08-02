@@ -203,14 +203,6 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
    <td>Yes
   </tr>
   <tr>
-   <td><dfn>receive STOP_SENDING</dfn>
-   <td>[[!QUIC]]
-   [section 3.2](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-3.2)
-   <td>No
-   <td>Yes
-   <td>Yes
-  </tr>
-  <tr>
    <td><dfn>receive</dfn> bytes (potentially with FIN)
    <td>[[!QUIC]]
    [section 2.2](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-2.2)
@@ -259,7 +251,7 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
    <td>Yes
   </tr>
   <tr>
-   <td><dfn>reset</dfn>
+   <td><dfn>RESET_STREAM</dfn>
    <td>[[!QUIC]]
    [section 19.4](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-19.4)
    <td>Yes
@@ -1612,7 +1604,7 @@ steps.
 
 <div algorithm="reset signal">
 Whenever a [=WebTransport stream=] associated with a {{WebTransportReceiveStream}} |stream| gets a
-[=stream-signal/reset=] signal from the server, run these steps:
+[=stream-signal/RESET_STREAM=] signal from the server, run these steps:
 
 1. Let |transport| be |stream|.{{WebTransportReceiveStream/[[Transport]]}}.
 1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
@@ -1894,7 +1886,7 @@ not be immediate due to buffering.
     </thead>
     <tbody>
       <tr>
-        <td>[=stream/receive STOP_SENDING|received STOP_SENDING=] with errorCode</td>
+        <td>received [=stream-signal/STOP_SENDING=] with errorCode</td>
         <td>[=WritableStream/Error|errors=] {{WebTransportBidirectionalStream/writable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
@@ -1909,7 +1901,7 @@ not be immediate due to buffering.
           {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).done</td>
       </tr>
       <tr>
-        <td>[=stream/Receive|received=] RESET_STREAM with errorCode</td>
+        <td>received [=stream-signal/RESET_STREAM=] with errorCode</td>
         <td>[=ReadableStream/Error|errors=] {{WebTransportBidirectionalStream/readable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
