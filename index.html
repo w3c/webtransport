@@ -6,9 +6,9 @@
   <meta content="w3c/ED" name="w3c-status">
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
-  <meta content="Bikeshed version 37b7e7e68, updated Fri May 27 15:08:11 2022 -0700" name="generator">
+  <meta content="Bikeshed version 44af0bf3e, updated Fri Jul 29 17:05:16 2022 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="71ee0946f1ad4de9dbf3b81e8808106353f0876d" name="document-revision">
+  <meta content="bbf64b6298c9522346ed5bfd7cf635c8a8c08cf5" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -590,7 +590,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2022-06-24">24 June 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2022-08-02">2 August 2022</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -857,7 +857,7 @@ CONNECT request that initiated <var>session</var> is closed by the server, as de
       <td>Yes 
       <td>Yes 
      <tr>
-      <td><dfn class="dfn-paneled" data-dfn-for="stream-signal" data-dfn-type="dfn" data-noexport id="stream-signal-reset">reset</dfn> 
+      <td><dfn class="dfn-paneled" data-dfn-for="stream-signal" data-dfn-type="dfn" data-noexport id="stream-signal-reset_stream">RESET_STREAM</dfn> 
       <td><a data-link-type="biblio" href="#biblio-quic">[QUIC]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-19.4">section 19.4</a> 
       <td>Yes 
       <td>No 
@@ -2514,7 +2514,7 @@ running, the following steps may run immediately.</p>
    </div>
    <h3 class="heading settled" data-level="7.4" id="receive-stream-RESET_STREAM"><span class="secno">7.4. </span><span class="content">Reset signal coming from the server</span><a class="self-link" href="#receive-stream-RESET_STREAM"></a></h3>
    <div class="algorithm" data-algorithm="reset signal">
-     Whenever a <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream①②">WebTransport stream</a> associated with a <code class="idl"><a data-link-type="idl" href="#webtransportreceivestream" id="ref-for-webtransportreceivestream①⑥">WebTransportReceiveStream</a></code> <var>stream</var> gets a <a data-link-type="dfn" href="#stream-signal-reset" id="ref-for-stream-signal-reset">reset</a> signal from the server, run these steps: 
+     Whenever a <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream①②">WebTransport stream</a> associated with a <code class="idl"><a data-link-type="idl" href="#webtransportreceivestream" id="ref-for-webtransportreceivestream①⑥">WebTransportReceiveStream</a></code> <var>stream</var> gets a <a data-link-type="dfn" href="#stream-signal-reset_stream" id="ref-for-stream-signal-reset_stream">RESET_STREAM</a> signal from the server, run these steps: 
     <ol>
      <li data-md>
       <p>Let <var>transport</var> be <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportreceivestream-transport-slot" id="ref-for-dom-webtransportreceivestream-transport-slot③">[[Transport]]</a></code>.</p>
@@ -2722,7 +2722,8 @@ information on stats specific to one <code class="idl"><a data-link-type="idl" h
    <h2 class="heading settled" data-level="10" id="protocol-mapping"><span class="secno">10. </span><span class="content">Protocol Mappings</span><a class="self-link" href="#protocol-mapping"></a></h2>
    <p><em>This section is non-normative.</em></p>
    <p>This section describes the <a data-link-type="biblio" href="#biblio-quic">[QUIC]</a> protocol behavior of methods defined
-in this specification, utilizing <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>.</p>
+in this specification, utilizing <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]</a>. Cause and effect may
+not be immediate due to buffering.</p>
    <table class="data">
     <colgroup class="header">
      <col>
@@ -2730,33 +2731,62 @@ in this specification, utilizing <a data-link-type="biblio" href="#biblio-web-tr
      <col>
     <thead>
      <tr>
-      <th>Method
+      <th>API Method
       <th>QUIC Protocol Action
     <tbody>
      <tr>
       <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable①">writable</a></code>.<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#ws-abort" id="ref-for-ws-abort">abort</a></code>(errorCode)
-      <td>send RESET_STREAM with errorCode
+      <td><a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset②">sends RESET_STREAM</a> with errorCode
      <tr>
       <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable②">writable</a></code>.<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#ws-close" id="ref-for-ws-close">close</a></code>()
-      <td>send STREAM_FINAL
+      <td><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send②">sends</a> STREAM_FINAL
      <tr>
       <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable③">writable</a></code>.getWriter().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-writer-write" id="ref-for-default-writer-write①">write</a></code>()
-      <td>send STREAM
+      <td><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send③">sends</a> STREAM
      <tr>
       <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable④">writable</a></code>.getWriter().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-writer-close" id="ref-for-default-writer-close">close</a></code>()
-      <td>send STREAM_FINAL
+      <td><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send④">sends</a> STREAM_FINAL
      <tr>
       <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable⑤">writable</a></code>.getWriter().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-writer-abort" id="ref-for-default-writer-abort">abort</a></code>(errorCode)
-      <td>send RESET_STREAM with errorCode
+      <td><a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset③">sends RESET_STREAM</a> with errorCode
      <tr>
       <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable①">readable</a></code>.<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#rs-cancel" id="ref-for-rs-cancel">cancel</a></code>(errorCode)
-      <td>send STOP_SENDING with errorCode
+      <td><a data-link-type="dfn" href="#stream-send-stop_sending" id="ref-for-stream-send-stop_sending②">sends STOP_SENDING</a> with errorCode
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable②">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-reader-read" id="ref-for-default-reader-read">read</a></code>()
-      <td>receive STREAM or STREAM_FINAL
+      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable②">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#generic-reader-cancel" id="ref-for-generic-reader-cancel">cancel</a></code>(errorCode)
+      <td><a data-link-type="dfn" href="#stream-send-stop_sending" id="ref-for-stream-send-stop_sending③">sends STOP_SENDING</a> with errorCode
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable③">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#generic-reader-cancel" id="ref-for-generic-reader-cancel">cancel</a></code>(errorCode)
-      <td>send STOP_SENDING with errorCode
+      <td>wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-close" id="ref-for-dom-webtransport-close①">close</a></code>(closeInfo)
+      <td><a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate③">terminates</a> session with closeInfo<br> 
+   </table>
+   <table class="data">
+    <colgroup class="header">
+     <col>
+    <colgroup>
+     <col>
+    <thead>
+     <tr>
+      <th>QUIC Protocol Action
+      <th>API Effect
+    <tbody>
+     <tr>
+      <td>received <a data-link-type="dfn" href="#stream-signal-stop_sending" id="ref-for-stream-signal-stop_sending①">STOP_SENDING</a> with errorCode
+      <td><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-error" id="ref-for-writablestream-error②">errors</a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable⑥">writable</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode①">streamErrorCode</a></code>
+     <tr>
+      <td><a data-link-type="dfn" href="#stream-receive" id="ref-for-stream-receive①">received</a> STREAM
+      <td>(await <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable③">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-reader-read" id="ref-for-default-reader-read">read</a></code>()).value
+     <tr>
+      <td><a data-link-type="dfn" href="#stream-receive" id="ref-for-stream-receive②">received</a> STREAM_FINAL
+      <td>(await <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable④">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-reader-read" id="ref-for-default-reader-read①">read</a></code>()).done
+     <tr>
+      <td>received <a data-link-type="dfn" href="#stream-signal-reset_stream" id="ref-for-stream-signal-reset_stream①">RESET_STREAM</a> with errorCode
+      <td><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error④">errors</a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable⑤">readable</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode②">streamErrorCode</a></code>
+     <tr>
+      <td>Session cleanly <a data-link-type="dfn" href="#session-terminated" id="ref-for-session-terminated①">terminated</a> with closeInfo<br> 
+      <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed①">closed</a></code>).closeInfo, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑤">errors</a> open streams
+     <tr>
+      <td>Network error<br> 
+      <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed②">closed</a></code>) rejects, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑥">errors</a> open streams
    </table>
    <h2 class="heading settled" data-level="11" id="privacy-security"><span class="secno">11. </span><span class="content">Privacy and Security Considerations</span><a class="self-link" href="#privacy-security"></a></h2>
    <p>This section is non-normative; it specifies no new behaviour, but instead
@@ -3227,12 +3257,8 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-webtransport-reliability">reliability</a><span>, in § 5.3</span>
    <li><a href="#dom-webtransportreliabilitymode-reliable-only">"reliable-only"</a><span>, in § 5</span>
    <li><a href="#dom-webtransportoptions-requireunreliable">requireUnreliable</a><span>, in § 5.9</span>
-   <li>
-    reset
-    <ul>
-     <li><a href="#stream-reset">dfn for stream</a><span>, in § 3</span>
-     <li><a href="#stream-signal-reset">dfn for stream-signal</a><span>, in § 3</span>
-    </ul>
+   <li><a href="#stream-reset">reset</a><span>, in § 3</span>
+   <li><a href="#stream-signal-reset_stream">RESET_STREAM</a><span>, in § 3</span>
    <li><a href="#dom-webtransportstats-rttvariation">rttVariation</a><span>, in § 5.11</span>
    <li><a href="#stream-send">send</a><span>, in § 3</span>
    <li><a href="#session-send-a-datagram">send a datagram</a><span>, in § 3</span>
@@ -3767,6 +3793,7 @@ and has been adapted for use in this specification.</p>
    <ul>
     <li><a href="#ref-for-writablestream-error">5.5. Procedures</a>
     <li><a href="#ref-for-writablestream-error①">6.4. STOP_SENDING signal coming from the server</a>
+    <li><a href="#ref-for-writablestream-error②">10. Protocol Mappings</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-high-water-mark">
@@ -3790,7 +3817,7 @@ and has been adapted for use in this specification.</p>
   <aside class="dfn-panel" data-for="term-for-default-reader-read">
    <a href="https://streams.spec.whatwg.org/#default-reader-read">https://streams.spec.whatwg.org/#default-reader-read</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-default-reader-read">10. Protocol Mappings</a>
+    <li><a href="#ref-for-default-reader-read">10. Protocol Mappings</a> <a href="#ref-for-default-reader-read①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-readable-byte-stream">
@@ -4165,7 +4192,7 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="term-for-concept-request-url">url</span>
     </ul>
    <li>
-    <a data-link-type="biblio">[hr-time-2]</a> defines the following terms:
+    <a data-link-type="biblio">[HR-TIME-2]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-dom-domhighrestimestamp">DOMHighResTimeStamp</span>
     </ul>
@@ -4280,17 +4307,17 @@ and has been adapted for use in this specification.</p>
   <h3 class="no-num no-ref heading settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
   <dl>
    <dt id="biblio-csp3">[CSP3]
-   <dd>Mike West. <a href="https://www.w3.org/TR/CSP3/"><cite>Content Security Policy Level 3</cite></a>. 29 June 2021. WD. URL: <a href="https://www.w3.org/TR/CSP3/">https://www.w3.org/TR/CSP3/</a>
+   <dd>Mike West. <a href="https://w3c.github.io/webappsec-csp/"><cite>Content Security Policy Level 3</cite></a>. URL: <a href="https://w3c.github.io/webappsec-csp/">https://w3c.github.io/webappsec-csp/</a>
    <dt id="biblio-dom">[DOM]
    <dd>Anne van Kesteren. <a href="https://dom.spec.whatwg.org/"><cite>DOM Standard</cite></a>. Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
    <dt id="biblio-ecmascript-60">[ECMASCRIPT-6.0]
-   <dd>Allen Wirfs-Brock. <a href="http://www.ecma-international.org/ecma-262/6.0/index.html"><cite>ECMA-262 6th Edition, The ECMAScript 2015 Language Specification</cite></a>. June 2015. Standard. URL: <a href="http://www.ecma-international.org/ecma-262/6.0/index.html">http://www.ecma-international.org/ecma-262/6.0/index.html</a>
+   <dd>Allen Wirfs-Brock. <a href="http://www.ecma-international.org/ecma-262/6.0/index.html"><cite>ECMA-262 6th Edition, The ECMAScript 2015 Language Specification</cite></a>. URL: <a href="http://www.ecma-international.org/ecma-262/6.0/index.html">http://www.ecma-international.org/ecma-262/6.0/index.html</a>
    <dt id="biblio-encoding">[ENCODING]
    <dd>Anne van Kesteren. <a href="https://encoding.spec.whatwg.org/"><cite>Encoding Standard</cite></a>. Living Standard. URL: <a href="https://encoding.spec.whatwg.org/">https://encoding.spec.whatwg.org/</a>
    <dt id="biblio-fetch">[FETCH]
    <dd>Anne van Kesteren. <a href="https://fetch.spec.whatwg.org/"><cite>Fetch Standard</cite></a>. Living Standard. URL: <a href="https://fetch.spec.whatwg.org/">https://fetch.spec.whatwg.org/</a>
    <dt id="biblio-hr-time-2">[HR-TIME-2]
-   <dd>Ilya Grigorik. <a href="https://www.w3.org/TR/hr-time-2/"><cite>High Resolution Time Level 2</cite></a>. 21 November 2019. REC. URL: <a href="https://www.w3.org/TR/hr-time-2/">https://www.w3.org/TR/hr-time-2/</a>
+   <dd>Ilya Grigorik. <a href="https://w3c.github.io/hr-time/"><cite>High Resolution Time Level 2</cite></a>. URL: <a href="https://w3c.github.io/hr-time/">https://w3c.github.io/hr-time/</a>
    <dt id="biblio-html">[HTML]
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/"><cite>HTML Standard</cite></a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-infra">[INFRA]
@@ -4522,12 +4549,14 @@ or are impossible to define for pooled connections. <a class="issue-return" href
     <li><a href="#ref-for-session-terminate">5.2. Constructor</a>
     <li><a href="#ref-for-session-terminate①">5.4. Methods</a>
     <li><a href="#ref-for-session-terminate②">5.7. Context cleanup steps</a>
+    <li><a href="#ref-for-session-terminate③">10. Protocol Mappings</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="session-terminated">
    <b><a href="#session-terminated">#session-terminated</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-session-terminated">5.6. Session termination not initiated by the client</a>
+    <li><a href="#ref-for-session-terminated①">10. Protocol Mappings</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="webtransport-stream">
@@ -4581,12 +4610,14 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <b><a href="#stream-send">#stream-send</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-stream-send">6.3. Procedures</a> <a href="#ref-for-stream-send①">(2)</a>
+    <li><a href="#ref-for-stream-send②">10. Protocol Mappings</a> <a href="#ref-for-stream-send③">(2)</a> <a href="#ref-for-stream-send④">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="stream-receive">
    <b><a href="#stream-receive">#stream-receive</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-stream-receive">7.3. Procedures</a>
+    <li><a href="#ref-for-stream-receive①">10. Protocol Mappings</a> <a href="#ref-for-stream-receive②">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="stream-send-stop_sending">
@@ -4594,6 +4625,7 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <ul>
     <li><a href="#ref-for-stream-send-stop_sending">5.4. Methods</a>
     <li><a href="#ref-for-stream-send-stop_sending①">7.3. Procedures</a>
+    <li><a href="#ref-for-stream-send-stop_sending②">10. Protocol Mappings</a> <a href="#ref-for-stream-send-stop_sending③">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="stream-reset">
@@ -4601,18 +4633,21 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <ul>
     <li><a href="#ref-for-stream-reset">5.4. Methods</a>
     <li><a href="#ref-for-stream-reset①">6.3. Procedures</a>
+    <li><a href="#ref-for-stream-reset②">10. Protocol Mappings</a> <a href="#ref-for-stream-reset③">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="stream-signal-stop_sending">
    <b><a href="#stream-signal-stop_sending">#stream-signal-stop_sending</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-stream-signal-stop_sending">6.4. STOP_SENDING signal coming from the server</a>
+    <li><a href="#ref-for-stream-signal-stop_sending①">10. Protocol Mappings</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="stream-signal-reset">
-   <b><a href="#stream-signal-reset">#stream-signal-reset</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="stream-signal-reset_stream">
+   <b><a href="#stream-signal-reset_stream">#stream-signal-reset_stream</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-stream-signal-reset">7.4. Reset signal coming from the server</a>
+    <li><a href="#ref-for-stream-signal-reset_stream">7.4. Reset signal coming from the server</a>
+    <li><a href="#ref-for-stream-signal-reset_stream①">10. Protocol Mappings</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="webtransportdatagramduplexstream">
@@ -4963,6 +4998,7 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <b><a href="#dom-webtransport-closed">#dom-webtransport-closed</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-webtransport-closed">5. WebTransport Interface</a>
+    <li><a href="#ref-for-dom-webtransport-closed①">10. Protocol Mappings</a> <a href="#ref-for-dom-webtransport-closed②">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-datagrams">
@@ -4998,6 +5034,7 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <b><a href="#dom-webtransport-close">#dom-webtransport-close</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-webtransport-close">5. WebTransport Interface</a>
+    <li><a href="#ref-for-dom-webtransport-close①">10. Protocol Mappings</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-getstats">
@@ -5459,14 +5496,14 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <b><a href="#dom-webtransportbidirectionalstream-readable">#dom-webtransportbidirectionalstream-readable</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-webtransportbidirectionalstream-readable">8. Interface WebTransportBidirectionalStream</a>
-    <li><a href="#ref-for-dom-webtransportbidirectionalstream-readable①">10. Protocol Mappings</a> <a href="#ref-for-dom-webtransportbidirectionalstream-readable②">(2)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-readable③">(3)</a>
+    <li><a href="#ref-for-dom-webtransportbidirectionalstream-readable①">10. Protocol Mappings</a> <a href="#ref-for-dom-webtransportbidirectionalstream-readable②">(2)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-readable③">(3)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-readable④">(4)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-readable⑤">(5)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransportbidirectionalstream-writable">
    <b><a href="#dom-webtransportbidirectionalstream-writable">#dom-webtransportbidirectionalstream-writable</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-webtransportbidirectionalstream-writable">8. Interface WebTransportBidirectionalStream</a>
-    <li><a href="#ref-for-dom-webtransportbidirectionalstream-writable①">10. Protocol Mappings</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable②">(2)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable③">(3)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable④">(4)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable⑤">(5)</a>
+    <li><a href="#ref-for-dom-webtransportbidirectionalstream-writable①">10. Protocol Mappings</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable②">(2)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable③">(3)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable④">(4)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable⑤">(5)</a> <a href="#ref-for-dom-webtransportbidirectionalstream-writable⑥">(6)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bidirectionalstream-create">
@@ -5553,6 +5590,7 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <b><a href="#dom-webtransporterror-streamerrorcode">#dom-webtransporterror-streamerrorcode</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-webtransporterror-streamerrorcode">9. WebTransportError Interface</a>
+    <li><a href="#ref-for-dom-webtransporterror-streamerrorcode①">10. Protocol Mappings</a> <a href="#ref-for-dom-webtransporterror-streamerrorcode②">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="webtransporterror-create">
