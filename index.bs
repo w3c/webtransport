@@ -251,7 +251,7 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
    <td>Yes
   </tr>
   <tr>
-   <td><dfn>reset</dfn>
+   <td><dfn>RESET_STREAM</dfn>
    <td>[[!QUIC]]
    [section 19.4](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-19.4)
    <td>Yes
@@ -1604,7 +1604,7 @@ steps.
 
 <div algorithm="reset signal">
 Whenever a [=WebTransport stream=] associated with a {{WebTransportReceiveStream}} |stream| gets a
-[=stream-signal/reset=] signal from the server, run these steps:
+[=stream-signal/RESET_STREAM=] signal from the server, run these steps:
 
 1. Let |transport| be |stream|.{{WebTransportReceiveStream/[[Transport]]}}.
 1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
@@ -1827,49 +1827,93 @@ To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| wit
 *This section is non-normative.*
 
 This section describes the [[QUIC]] protocol behavior of methods defined
-in this specification, utilizing [[WEB-TRANSPORT-HTTP3]].
+in this specification, utilizing [[WEB-TRANSPORT-HTTP3]]. Cause and effect may
+not be immediate due to buffering.
 
   <table class="data">
     <colgroup class="header"><col></colgroup>
     <colgroup><col></colgroup>
     <thead>
       <tr>
-        <th>Method</th>
+        <th>API Method</th>
         <th>QUIC Protocol Action</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(errorCode)</td>
-        <td>send RESET_STREAM with errorCode</td>
+        <td>[=stream/Reset|sends RESET_STREAM=] with errorCode</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/close}}()</td>
-        <td>send STREAM_FINAL</td>
+        <td>[=stream/Send|sends=] STREAM_FINAL</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/write}}()</td>
-        <td>send STREAM</td>
+        <td>[=stream/Send|sends=] STREAM</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/close}}()</td>
-        <td>send STREAM_FINAL</td>
+        <td>[=stream/Send|sends=] STREAM_FINAL</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(errorCode)</td>
-        <td>send RESET_STREAM with errorCode</td>
+        <td>[=stream/Reset|sends RESET_STREAM=] with errorCode</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(errorCode)</td>
-        <td>send STOP_SENDING with errorCode</td>
-      </tr>
-      <tr>
-        <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()</td>
-        <td>receive STREAM or STREAM_FINAL</td>
+        <td>[=send STOP_SENDING|sends STOP_SENDING=] with errorCode</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(errorCode)</td>
-        <td>send STOP_SENDING with errorCode</td>
+        <td>[=send STOP_SENDING|sends STOP_SENDING=] with errorCode</td>
+      </tr>
+      <tr>
+        <td>wt.{{WebTransport/close}}(closeInfo)</td>
+        <td>[=session/terminate|terminates=] session with closeInfo<br>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>QUIC Protocol Action</th>
+        <th>API Effect</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>received [=stream-signal/STOP_SENDING=] with errorCode</td>
+        <td>[=WritableStream/Error|errors=] {{WebTransportBidirectionalStream/writable}}
+        with {{WebTransportError/streamErrorCode}}</td>
+      </tr>
+      <tr>
+        <td>[=stream/Receive|received=] STREAM</td>
+        <td>(await
+          {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).value</td>
+      </tr>
+      <tr>
+        <td>[=stream/Receive|received=] STREAM_FINAL</td>
+        <td>(await
+          {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).done</td>
+      </tr>
+      <tr>
+        <td>received [=stream-signal/RESET_STREAM=] with errorCode</td>
+        <td>[=ReadableStream/Error|errors=] {{WebTransportBidirectionalStream/readable}}
+        with {{WebTransportError/streamErrorCode}}</td>
+      </tr>
+      <tr>
+        <td>Session cleanly [=session/terminated|terminated=] with closeInfo<br>
+        <td>(await wt.{{WebTransport/closed}}).closeInfo, and
+         [=ReadableStream/error|errors=] open streams</td>
+      </tr>
+      <tr>
+        <td>Network error<br>
+        <td>(await wt.{{WebTransport/closed}}) rejects, and
+          [=ReadableStream/error|errors=] open streams</td>
       </tr>
     </tbody>
   </table>
