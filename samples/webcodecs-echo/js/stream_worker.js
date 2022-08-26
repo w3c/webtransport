@@ -1,6 +1,18 @@
 'use strict';
 
 let encoder, decoder, pl, started = false, stopped = false;
+
+let rtt_aggregate = {
+  all: [],
+  fquart: 0,
+  median: 0,
+  tquart: 0,
+  min: Number.MAX_VALUE,
+  max: 0,
+  avg: 0,
+  sum: 0,
+};
+
 let enc_aggregate = {
   all: [],
   min: Number.MAX_VALUE,
@@ -33,12 +45,12 @@ let decqueue_aggregate = {
   sum: 0,
 };
 
-function appendBuffer(buffer1, buffer2) {
-  let tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
-  tmp.set(new Uint8Array(buffer1), 0);
-  tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
-  return tmp.buffer;
-};
+function rtt_update(rtt) {
+  rtt_aggregate.all.push(rtt);
+  rtt_aggregate.min = Math.min(rtt_aggregate.min, rtt);
+  rtt_aggregate.max = Math.max(rtt_aggregate.max, rtt);
+  rtt_aggregate.sum += rtt;
+}
 
 function enc_update(duration) {
   enc_aggregate.all.push(duration);
@@ -52,6 +64,28 @@ function encqueue_update(duration) {
   encqueue_aggregate.min = Math.min(encqueue_aggregate.min, duration);
   encqueue_aggregate.max = Math.max(encqueue_aggregate.max, duration);
   encqueue_aggregate.sum += duration;
+}
+
+function rtt_report() {
+  rtt_aggregate.all.sort();
+  const len = rtt_aggregate.all.length;
+  const half = len >> 1;
+  const f = (len + 1) >> 2;
+  const t = (3 * (len + 1)) >> 2;
+  const alpha1 = (len + 1)/4 - Math.trunc((len + 1)/4);
+  const alpha3 = (3 * (len + 1)/4) - Math.trunc(3 * (len + 1)/4);
+  const fquart = rtt_aggregate.all[f] + alpha1 * (rtt_aggregate.all[f + 1] - rtt_aggregate.all[f]);
+  const tquart = rtt_aggregate.all[t] + alpha3 * (rtt_aggregate.all[t + 1] - rtt_aggregate.all[t]);
+  const median = len % 2 === 1 ? rtt_aggregate.all[len >> 1] : (rtt_aggregate.all[half - 1] + rtt_aggregate.all[half]) / 2;
+  return {
+     count: len,
+     min: rtt_aggregate.min,
+     fquart: fquart,
+     avg: rtt_aggregate.sum / len,
+     median: median,
+     tquart: tquart,
+     max: rtt_aggregate.max,
+  };
 }
 
 function enc_report() {
@@ -101,6 +135,45 @@ function dec_report() {
      avg: dec_aggregate.sum / len,
      median,
   };
+}
+
+async function get_frame(read_stream, number) {
+  let i=0, packlen, totalen = 0, frame, sendTime, first = true;
+  try {
+    while (true) {
+      const { value, done } = await read_stream.read();
+      if (done) {
+         if (packlen == totalen) {
+            return frame.buffer; //complete frame has been received
+         } else {
+           self.postMessage({severity: 'fatal', text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
+         }
+      }
+      if (first) {
+         packlen = (value[4] << 24) | (value[5] << 16) | (value[6] << 8) | (value[7] << 0);
+         if ((packlen < 1) || (packlen > 200000)) {
+           self.postMessage({severity: 'fatal', text: 'Frame length problem: ' + packlen});
+         }
+         // Retrieve sendTime from value
+         sendTime = (value[8] << 24) | (value[9] << 16) | (value[10] << 8) | (value[11] << 0);
+         let rtt = ((0xffffffff & Math.trunc(1000 * performance.now())) - sendTime)/1000.;
+         //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' rtt: ' + rtt});
+         rtt_update(rtt);
+         frame = new Uint8Array(packlen);
+         frame.set(new Uint8Array(value), 0);
+         //self.postMessage({text: 'Fragment: ' + i + ' Length: ' + value.byteLength + ' Total: ' + packlen});
+         first = false;
+         totalen += value.byteLength;
+      } else {
+        i++;
+        //self.postMessage({text: 'Fragment: ' + i + ' Length: ' + value.byteLength + ' Total: ' + packlen});
+        frame.set(new Uint8Array(value), totalen);
+        totalen += value.byteLength;
+      }
+    }
+  } catch (e) {
+    self.postMessage({severity: 'fatal', text: `Error while reading from stream # ${number} : ${e.message}`});
+  }
 }
 
 function decqueue_update(duration) {
@@ -200,6 +273,8 @@ Header format:
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                      length                                   |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                   send time (performance.now)                 |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                      sequence number                          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                      keyframe index                           |
@@ -227,6 +302,7 @@ S, E, I, D, B, TID, LID defined in draft-ietf-avtext-framemarking
    TID = chunk.temporalLayerId
    LID = 0 (no support for spatial scalability)
 length = length of the frame, including the header
+send time = time at which the packet was sent, in ms * 1000
 sequence number = counter incrementing with each frame
 keyframe index = how many keyframes have been sent
 deltaframe index = how many delta frames since the last keyframe
@@ -262,7 +338,7 @@ SSRC = this.config.ssrc
            pt = config.pt;
          }
          //Serialize the chunk
-         let hdr = new ArrayBuffer( 4 + 4 + 4 + 4 + 8 + 4 + 4);
+         let hdr = new ArrayBuffer( 4 + 4 + 4 + 4 + 8 + 4 + 4 + 4);
          let i = (chunk.type == 'key' ? 1 : 0);
          let lid = 0;
          let d = (tid == 0 ? 0 : 1);
@@ -274,25 +350,27 @@ SSRC = this.config.ssrc
          //self.postMessage({text: 'i : ' + i + ' d: ' + d + ' b: ' + b + ' type: ' + chunk.type + ' pt: ' +  config.pt + ' len: ' + len});
          //self.postMessage({text: 'Serial B0: ' + B0 + ' B1: ' + B1 + ' B2: ' + B2 + ' B3: ' + B3}); 
          let first4 = (B3 & 0xff) | ((B2 & 0xff) << 8) | ((B1 & 0xff) << 16) | ((B0 & 0xff) << 24);
+         let sendTime = (0xffffffff & Math.trunc(1000 * performance.now()));
          writeUInt32(hdr, 0, first4);
-         writeUInt32(hdr, 8, chunk.seqNo);
-         writeUInt32(hdr, 12, chunk.keyframeIndex);
-         writeUInt32(hdr, 16, chunk.deltaframeIndex);
-         writeUInt64(hdr, 20, BigInt(timestamp));
-         writeUInt32(hdr, 28, config.ssrc);
+         writeUInt32(hdr, 8, sendTime);
+         writeUInt32(hdr, 12, chunk.seqNo);
+         writeUInt32(hdr, 16, chunk.keyframeIndex);
+         writeUInt32(hdr, 20, chunk.deltaframeIndex);
+         writeUInt64(hdr, 24, BigInt(timestamp));
+         writeUInt32(hdr, 32, config.ssrc);
          if (chunk.type == "config") {
            let enc = new TextEncoder();
            const cfg = enc.encode(chunk.config);
            // self.postMessage({text: 'Serial Config: ' + chunk.config + ' Length: ' + cfg.length});
            let result = new Uint8Array( hdr.byteLength + cfg.length);
-           let len = (cfg.length + 32) & 0xFFFFFFFF; 
+           let len = (cfg.length + 36) & 0xFFFFFFFF; 
            writeUInt32(hdr, 4, len); 
            result.set(new Uint8Array(hdr), 0);
            result.set(new Uint8Array(cfg), hdr.byteLength);
-           //self.postMessage({text: 'Serialize seqNo: ' + chunk.seqNo + ' lid: ' + lid + ' tid: ' + tid + ' pt: 0 i: ' + i + ' d: ' + d + ' b: ' + b + ' kfi: ' + chunk.keyframeIndex + ' dfi: ' + chunk.deltaframeIndex +  ' ts: ' + timestamp + ' ssrc: ' + config.ssrc + ' actual len: ' + result.byteLength + ' pack len: ' + len});
+           //self.postMessage({text: 'Serialize now: ' + sendTime/1000. + ' seqNo: ' + chunk.seqNo + ' lid: ' + lid + ' tid: ' + tid + ' pt: 0 i: ' + i + ' d: ' + d + ' b: ' + b + ' kfi: ' + chunk.keyframeIndex + ' dfi: ' + chunk.deltaframeIndex +  ' ts: ' + timestamp + ' ssrc: ' + config.ssrc + ' actual len: ' + result.byteLength + ' pack len: ' + len});
            controller.enqueue(result.buffer);
          } else {
-           let len = (chunk.byteLength + 32) & 0xFFFFFFFF;
+           let len = (chunk.byteLength + 36) & 0xFFFFFFFF;
            writeUInt32(hdr, 4, len);
            let result = new Uint8Array( hdr.byteLength + chunk.byteLength);
            result.set(new Uint8Array(hdr), 0);
@@ -300,7 +378,7 @@ SSRC = this.config.ssrc
            chunk.copyTo(data);
            result.set(new Uint8Array(data), hdr.byteLength);
            // self.postMessage({text: 'Serial hdr: ' + hdr.byteLength + ' chunk length: ' + chunk.byteLength + ' result length: ' + result.byteLength});
-           //self.postMessage({text: 'Serialize seqNo: ' + chunk.seqNo + ' lid: ' + lid + ' tid: ' + tid + ' pt: ' + config.pt +  ' i: ' + i + ' d: ' + d + ' b: ' + b + ' kfi: ' + chunk.keyframeIndex + ' dfi: ' + chunk.deltaframeIndex +  ' ts: ' + timestamp + ' ssrc: ' + config.ssrc + ' actual len: ' + result.byteLength + ' pack len: ' + len});
+           //self.postMessage({text: 'Serialize now: ' + sendTime + ' seqNo: ' + chunk.seqNo + ' lid: ' + lid + ' tid: ' + tid + ' pt: ' + config.pt +  ' i: ' + i + ' d: ' + d + ' b: ' + b + ' kfi: ' + chunk.keyframeIndex + ' dfi: ' + chunk.deltaframeIndex +  ' ts: ' + timestamp + ' ssrc: ' + config.ssrc + ' actual len: ' + result.byteLength + ' pack len: ' + len});
            controller.enqueue(result.buffer);
          }
       }
@@ -326,13 +404,14 @@ SSRC = this.config.ssrc
          const d =   (B1 & 0x10)/16;
          const b =   (B1 & 0x08)/8
          const len = readUInt32(chunk, 4)
-         const seqNo = readUInt32(chunk, 8);
-         const keyframeIndex   = readUInt32(chunk, 12);
-         const deltaframeIndex = readUInt32(chunk, 16);
-         const timestamp = readUInt64(chunk, 20);
-         const ssrc = readUInt32(chunk, 28);
+         const sendTime = readUInt32(chunk, 8);
+         const seqNo = readUInt32(chunk, 14);
+         const keyframeIndex   = readUInt32(chunk, 16);
+         const deltaframeIndex = readUInt32(chunk, 20);
+         const timestamp = readUInt64(chunk, 24);
+         const ssrc = readUInt32(chunk, 32);
          const duration = 0;
-         //self.postMessage({text: 'Dserializ seqNo: ' + seqNo + ' lid: ' + lid + ' tid: ' + tid + ' pt: ' + pt +  ' i: ' + i + ' d: ' + d + ' b: ' + b + ' kfi: ' + keyframeIndex + ' dfi: ' + deltaframeIndex + ' ts: ' + timestamp + ' ssrc: ' + ssrc + ' length: ' + chunk.byteLength});
+         //self.postMessage({text: 'Dserializ sendTime: ' + sendTime/1000. + ' seqNo: ' + seqNo + ' lid: ' + lid + ' tid: ' + tid + ' pt: ' + pt +  ' i: ' + i + ' d: ' + d + ' b: ' + b + ' kfi: ' + keyframeIndex + ' dfi: ' + deltaframeIndex + ' ts: ' + timestamp + ' ssrc: ' + ssrc + ' length: ' + chunk.byteLength});
          let hydChunk;
          if (pt == 0) {
            hydChunk = {
@@ -340,24 +419,25 @@ SSRC = this.config.ssrc
              timestamp: timestamp,
            };
            let dec = new TextDecoder();
-           hydChunk.config = dec.decode(new Uint8Array(chunk, 32));
+           hydChunk.config = dec.decode(new Uint8Array(chunk, 36));
            // self.postMessage({text: 'Deserial Config: ' + hydChunk.config});
          } else {
-           let data = new Uint8Array(chunk.byteLength - 32); //create Uint8Array for data
-           data.set(new Uint8Array(chunk, 32));
+           let data = new Uint8Array(chunk.byteLength - 36); //create Uint8Array for data
+           data.set(new Uint8Array(chunk, 36));
            hydChunk = new EncodedVideoChunk ({
               type: (i == 1 ? 'key' : 'delta'),
               timestamp: timestamp,
               data: data.buffer
            });
          }
+         hydChunk.sendTime = sendTime;
          hydChunk.temporalLayerId = tid;
          hydChunk.ssrc = ssrc;
          hydChunk.pt = pt;
          hydChunk.seqNo = seqNo;
          hydChunk.keyframeIndex = keyframeIndex;
          hydChunk.deltaframeIndex = deltaframeIndex;
-         //self.postMessage({text: 'Deserial hdr: 32 ' + 'chunk length: ' + chunk.byteLength });
+         //self.postMessage({text: 'Deserial hdr: 36 ' + 'chunk length: ' + chunk.byteLength });
          controller.enqueue(hydChunk);
        }
      });
@@ -501,6 +581,8 @@ SSRC = this.config.ssrc
      const encqueue_stats = encqueue_report();
      const dec_stats = dec_report();
      const decqueue_stats = decqueue_report();
+     const rtt_stats = rtt_report();
+     self.postMessage({severity: 'info', text: 'RTT report: ' + JSON.stringify(rtt_stats)});  
      self.postMessage({severity: 'info', text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});
      self.postMessage({severity: 'info', text: 'Encoder Queue report: ' + JSON.stringify(encqueue_stats)});
      self.postMessage({security: 'info', text: 'Decoder Time report: ' + JSON.stringify(dec_stats)});
@@ -558,6 +640,7 @@ SSRC = this.config.ssrc
          try {
            const { value, done } = await this.reader.read();
            if (done) {
+             controller.close();
              self.postMessage({severity: 'fatal', text: 'Done accepting unidirectional streams'});
              return;
            }
@@ -567,38 +650,11 @@ SSRC = this.config.ssrc
          } catch (e) {
            self.postMessage({severity: 'fatal', text: `Error in obtaining stream.getReader(), stream # ${number} : ${e.message}`});
          }
-         try {
-           let i=0, packlen, totalen = 0, frame, first = true;
-           while (true) {
-             const { value, done } = await stream_reader.read();
-             if (done) {
-                controller.enqueue(frame.buffer); //complete frame has been received
-                //self.postMessage({text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
-                return;
-             }
-             if (first) {
-                packlen = (value[4] << 24) | (value[5] << 16) | (value[6] << 8) | (value[7] << 0);
-                if ((packlen < 1) || (packlen > 200000)) {
-                  self.postMessage({severity: 'fatal', text: 'Frame length problem: ' + packlen});
-                }
-                frame = new Uint8Array(packlen);
-                frame.set(new Uint8Array(value), 0);
-                //self.postMessage({text: 'Fragment: ' + i + ' Length: ' + value.byteLength + ' Total: ' + packlen});
-                first = false;
-                totalen += value.byteLength;
-             } else {
-               i++;
-               //self.postMessage({text: 'Fragment: ' + i + ' Length: ' + value.byteLength + ' Total: ' + packlen});
-               frame.set(new Uint8Array(value), totalen);
-               totalen += value.byteLength; 
-             }
-           }
-         } catch (e) {
-           self.postMessage({severity: 'fatal', text: `Error while reading from stream # ${number} : ${e.message}`});
-         }
+         controller.enqueue(await get_frame(stream_reader, number));
        },
        async cancel(reason){
          // called when cancel(reason) is called
+         controller.close();
          self.postMessage({severity: 'fatal', text: `Readable Stream Cancelled: ${reason}`});
        }
      });
