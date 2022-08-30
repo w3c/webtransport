@@ -1,6 +1,6 @@
 'use strict';
 
-let encoder, decoder, pl, started = false, stopped = false;
+let encoder, decoder, pl, started = false, stopped = false, first = true, rtt=40.;
 
 let rtt_aggregate = {
   all: [],
@@ -45,11 +45,11 @@ let decqueue_aggregate = {
   sum: 0,
 };
 
-function rtt_update(rtt) {
-  rtt_aggregate.all.push(rtt);
-  rtt_aggregate.min = Math.min(rtt_aggregate.min, rtt);
-  rtt_aggregate.max = Math.max(rtt_aggregate.max, rtt);
-  rtt_aggregate.sum += rtt;
+function rtt_update(rtt_new) {
+  rtt_aggregate.all.push(rtt_new);
+  rtt_aggregate.min = Math.min(rtt_aggregate.min, rtt_new);
+  rtt_aggregate.max = Math.max(rtt_aggregate.max, rtt_new);
+  rtt_aggregate.sum += rtt_new;
 }
 
 function enc_update(duration) {
@@ -139,40 +139,41 @@ function dec_report() {
 
 async function get_frame(read_stream, number) {
   let i=0, packlen, totalen = 0, frame, sendTime, first = true;
-  try {
-    while (true) {
+  while (true) {
+    try {
       const { value, done } = await read_stream.read();
       if (done) {
-         if (packlen == totalen) {
-            return frame.buffer; //complete frame has been received
-         } else {
-           self.postMessage({severity: 'fatal', text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
-         }
+        if (packlen == totalen) {
+           return frame.buffer; //complete frame has been received
+        } else {
+          self.postMessage({severity: 'fatal', text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
+       }
       }
       if (first) {
-         packlen = (value[4] << 24) | (value[5] << 16) | (value[6] << 8) | (value[7] << 0);
-         if ((packlen < 1) || (packlen > 200000)) {
-           self.postMessage({severity: 'fatal', text: 'Frame length problem: ' + packlen});
-         }
-         // Retrieve sendTime from value
-         sendTime = (value[8] << 24) | (value[9] << 16) | (value[10] << 8) | (value[11] << 0);
-         let rtt = ((0xffffffff & Math.trunc(1000 * performance.now())) - sendTime)/1000.;
-         //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' rtt: ' + rtt});
-         rtt_update(rtt);
-         frame = new Uint8Array(packlen);
-         frame.set(new Uint8Array(value), 0);
-         //self.postMessage({text: 'Fragment: ' + i + ' Length: ' + value.byteLength + ' Total: ' + packlen});
-         first = false;
-         totalen += value.byteLength;
+        packlen = (value[4] << 24) | (value[5] << 16) | (value[6] << 8) | (value[7] << 0);
+        if ((packlen < 1) || (packlen > 200000)) {
+          self.postMessage({severity: 'fatal', text: 'Frame length problem: ' + packlen});
+        }
+        // Retrieve sendTime from value
+        sendTime = (value[8] << 24) | (value[9] << 16) | (value[10] << 8) | (value[11] << 0);
+        let rtt = ((0xffffffff & Math.trunc(1000 * performance.now())) - sendTime)/1000.;
+        //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' rtt: ' + rtt});
+        rtt_update(rtt);
+        frame = new Uint8Array(packlen);
+        frame.set(new Uint8Array(value), 0);
+        //self.postMessage({text: 'Fragment: ' + i + ' Length: ' + value.byteLength + ' Total: ' + packlen});
+        first = false;
+        totalen += value.byteLength;
       } else {
         i++;
         //self.postMessage({text: 'Fragment: ' + i + ' Length: ' + value.byteLength + ' Total: ' + packlen});
         frame.set(new Uint8Array(value), totalen);
         totalen += value.byteLength;
       }
+    } catch (e) {
+      self.postMessage({text: `Error while reading from stream # ${number}: ${e.message}`});
+      return ;
     }
-  } catch (e) {
-    self.postMessage({severity: 'fatal', text: `Error while reading from stream # ${number} : ${e.message}`});
   }
 }
 
@@ -298,7 +299,10 @@ PT = payload type:
   x04 = VP9
   x05 = AV1
 S, E, I, D, B, TID, LID defined in draft-ietf-avtext-framemarking
+   S, E always = 1 in frame/stream encoding
    I = 1 means chunk.type == 'key', 0 means chunk.type == 'delta'
+   D = Not a keyframe, configuration or base layer frame 
+   B = Base layer frame
    TID = chunk.temporalLayerId
    LID = 0 (no support for spatial scalability)
 length = length of the frame, including the header
@@ -341,8 +345,14 @@ SSRC = this.config.ssrc
          let hdr = new ArrayBuffer( 4 + 4 + 4 + 4 + 8 + 4 + 4 + 4);
          let i = (chunk.type == 'key' ? 1 : 0);
          let lid = 0;
-         let d = (tid == 0 ? 0 : 1);
-         let b = (tid == 0 ? 1 : 0);
+         let d;
+         let b = (((lid == 0) && (tid == 0)) ? 1 : 0);
+         // If it's a keyframe, configuration or a base layer frame, mark non-discardable
+         if ((i == 1) || (b == 1) || (pt == 0)) {
+           d = 0; 
+         } else {
+           d = 1;
+         }
          let B3 = 0;
          let B2 = 192 + (i * 32) + (d * 16) + (b * 8) + tid;
          let B1 = (chunk.type == "config" ? 0 : config.pt);
@@ -516,8 +526,8 @@ SSRC = this.config.ssrc
                controller.enqueue(configChunk); 
              } 
              chunk.temporalLayerId = 0;
-             if (cfg.temporalLayerId) {
-               chunk.temporalLayerId = cfg.temporalLayerId;
+             if (cfg.svc.temporalLayerId) {
+               chunk.temporalLayerId = cfg.svc.temporalLayerId;
              }
              this.seqNo++;
              if (chunk.type == 'key') {
@@ -606,13 +616,53 @@ SSRC = this.config.ssrc
          // test to see if transport is still usable?
        },
        async write(chunk, controller) {
+         let writable, timeoutId, rto, writer;
          try {
-           let stream = await transport.createUnidirectionalStream();
-           let writer = stream.getWriter();
+           writable = await transport.createUnidirectionalStream();
+           writer = writable.getWriter();
+         } catch (e) {
+           self.postMessage({severity: 'fatal', text: `Failure to create writable stream ${e.message}`});
+         }
+         if (first) {
+           first = false;
+         } else {
+           let rtt_stats = rtt_report();
+           rtt = (.75 * rtt + .25 * rtt_stats.median);
+         }
+         //self.postMessage({text: 'RTT: ' + rtt});
+         //check what kind of frame it is
+         const first4 = readUInt32(chunk, 0);
+         const B0 = (first4 & 0x000000FF);
+         const B1 = (first4 & 0x0000FF00) >> 8;
+         const B2 = (first4 & 0x00FF0000) >> 16;
+         const B3 = (first4 & 0xFF000000) >> 24;
+         const lid = (B0 & 0xff);
+         const pt =  (B2 & 0xff);
+         const tid = (B1 & 0x07);
+         const i =   (B1 & 0x20)/32;
+         const d =   (B1 & 0x10)/16;
+         const b =   (B1 & 0x08)/8
+         if (d == 1) {
+           // if the frame is discardable, stop trying to deliver after 3 RTT
+           rto = 3 * rtt; 
+         } else {
+           //If the frame is non-discardable (keyframe, configuration or base layer) don't give up as easily. 
+           rto = 10 * rtt; 
+         }
+         timeoutId = setTimeout(function() {
+            self.postMessage({text: `Aborting send, i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
+            writer.abort(' Send taking too long').then(() => {
+              self.postMessage({text: 'Abort succeeded'});
+            }).catch((e) => {
+              self.postMessage({text: 'Abort failed'});
+            });
+         }, rto);
+         try {
            await writer.write(chunk);
            await writer.close();
-         } catch (e) {
-           self.postMessage({severity: 'fatal', text: 'Failiure to write chunk'});
+           clearTimeout(timeoutId);
+         } catch(e) {
+           self.postMessage({text: 'Failure to write frame'});
          }
        }, 
        async close(controller) {
@@ -650,7 +700,10 @@ SSRC = this.config.ssrc
          } catch (e) {
            self.postMessage({severity: 'fatal', text: `Error in obtaining stream.getReader(), stream # ${number} : ${e.message}`});
          }
-         controller.enqueue(await get_frame(stream_reader, number));
+         let frame = await get_frame(stream_reader, number);
+         if (frame) {
+           controller.enqueue(frame);
+         }
        },
        async cancel(reason){
          // called when cancel(reason) is called
