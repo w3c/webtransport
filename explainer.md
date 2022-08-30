@@ -3,7 +3,7 @@
 ## Problem and Motivation
 
 Many applications, such as games and live streaming, need a mechanism to send
-many messages as quickly as possibly, possibly out of order, and possibly
+many messages as quickly as possible, possibly out of order, and possibly
 unreliably from client to server or server to client.  The web platform is
 missing the capability to do this easily.
 
@@ -23,7 +23,7 @@ reliability and stream independence for performance.
 We think there is a room for a simple, client-server, unordered/unreliable API
 with minimal latency.  The WebTransport protocol provides this with a single
 transport object that abstracts away the specific underlying protocol with
-a flexibile set of possible capabilities including reliable
+a flexible set of possible capabilities including reliable
 unidirectional and bidirectional streams, and unreliable datagrams
 (much like the capabilities of QUIC).
 
@@ -61,38 +61,45 @@ encrypted and congestion-controlled communication.
 1. A generic transport interface that can be provided by any transport,
    but match closely with QUIC's capabilities.
 
-2. The transport interface can talk
-   [a QUIC based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-quic).
+2. The transport interface that can use
+   [an HTTP/3 extension](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
+   to enable transport capabilities provided by QUIC.
 
-3. The transport interface can talk
-   [an HTTP/3 based protocol](https://tools.ietf.org/html/draft-vvv-webtransport-http3)
-   that allows web developers to reuse HTTP/3 connections (sharing a congestion control context).
+3. The transport interface that can use
+   [an HTTP/2 extension](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http2/),
+   which provides the same functionality over TCP for situations where QUIC is
+   unavailable.
 
-## Example of sending unreliable game state to server using QUIC datagrams
+Using TCP provides reliable, in-order delivery, which can mean that the HTTP/2
+version might lack some of the performance advantages provided by QUIC.
+Both HTTP/3 and HTTP/2 extensions provide the same capabilities, allowing
+applications to build to the same interface under most conditions.
+
+## Example of sending unreliable game state to server using datagrams
 
 ```javascript
 // The app provides a way to get a serialized state to send to the server
 function getSerializedGameState() { ... }
 
-const transport = new WebTransport('quic-transport://example.com:10001/path');
-const datagramWriter = transport.datagramWritable.getWriter();
+const wt = new WebTransport('https://example.com:10001/path');
+const writer = wt.datagrams.writable.getWriter();
 setInterval(() => {
   const message = getSerializedGameState();
-  datagramWriter.write(message);
+  writer.write(message);
 }, 100);
 ```
 
-## Example of sending reliable game state to server using a QUIC unidirectional send stream
+## Example of sending reliable game state to server using a unidirectional send stream
 
 ```javascript
 // The app provides a way to get a serialized state to send to the server.
 function getSerializedGameState() { ... }
 
-const transport = new WebTransport('quic-transport://example.com:10001/path');
+const wt = new WebTransport('https://example.com:10001/path');
 setInterval(async () => {
   const message = getSerializedGameState();
-  const stream = await transport.createUnidirectionalStream();
-  const writer = stream.writable.getWriter();
+  const stream = await wt.createUnidirectionalStream();
+  const writer = stream.getWriter();
   writer.write(message);
   writer.close();
 }, 100);
@@ -104,7 +111,7 @@ setInterval(async () => {
 // The app provides a way to get a serialized media request to send to the server
 function getSerializedMediaRequest() { ... }
 
-const transport = new WebTransport('quic-transport://example.com:10001/path');
+const wt = new WebTransport('https://example.com:10001/path');
 
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve, {once: true}));
@@ -112,14 +119,14 @@ const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09
 
 // App-specific request
 const mediaRequest = getSerializedMediaRequest();
-const requestStream = await transport.createUnidirectionalStream();
-const requestWriter = requestStream.writable.getWriter();
+const requestStream = await wt.createUnidirectionalStream();
+const requestWriter = requestStream.getWriter();
 requestWriter.write(mediaRequest);
 requestWriter.close();
 
 // Receive the responses.
-for await (const receiveStream of transport.incomingUnidirectionalStreams) {
-  for await (const buffer of receiveStream.readable) {
+for await (const receiveStream of wt.incomingUnidirectionalStreams) {
+  for await (const buffer of receiveStream) {
     sourceBuffer.appendBuffer(buffer);
   }
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
@@ -134,16 +141,16 @@ function deserializeNotification(serializedNotification) { ... }
 // The app also provides a way to serialize a "clicked" message to send to the server.
 function serializeClickedMessage(notification) { ... }
 
-const transport = new WebTransport('quic-transport://example.com:10001/path');
-for await (const stream of transport.incomingBidirectionalStreams) {
+const wt = new WebTransport('https://example.com:10001/path');
+for await (const {readable, writable} of wt.incomingBidirectionalStreams) {
   const buffers = []
-  for await (const buffer of stream.readable) {
+  for await (const buffer of readable) {
     buffers.push(buffer)
   }
   const notification = new Notification(deserializeNotification(buffers));
   notification.addEventListener('onclick', () => {
     const clickMessage = encodeClickMessage(notification);
-    const writer = stream.writable.getWriter();
+    const writer = writable.getWriter();
     writer.write(clickMessage);
     writer.close();
   });
@@ -156,9 +163,9 @@ for await (const stream of transport.incomingBidirectionalStreams) {
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve, {once: true}));
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
-const transport = new WebTransport('/video');
+const wt = new WebTransport('/video', {allowPooling: true});
 await fetch('https://example.com/babyshark');
-for await (const datagram of transport.datagramReadable) {
+for await (const datagram of wt.datagrams.readable) {
   sourceBuffer.appendBuffer(datagram);
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
 }
@@ -170,9 +177,9 @@ for await (const datagram of transport.datagramReadable) {
 const mediaSource = new MediaSource();
 await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
 const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
-const transport = new WebTransport('https://example.com/video');
+const wt = new WebTransport('https://example.com/video');
 for await (const receiveStream of transport.incomingUnidirectionalStreams) {
-  for await (const buffer of receiveStream.readable) {
+  for await (const buffer of receiveStream) {
     sourceBuffer.appendBuffer(buffer);
   }
   await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
@@ -181,7 +188,7 @@ for await (const receiveStream of transport.incomingUnidirectionalStreams) {
 
 ## Detailed design discussion
 
-WebTransport supports multiple protocols, each of which provide some of the
+WebTransport can support multiple protocols, each of which provide some of the
 following capabilities.
 
 - Unidirectional streams are indefinitely long streams of bytes in one direction
@@ -199,17 +206,11 @@ following capabilities.
   sending messages with less API complexity
   and less network overhead than streams.
 
-[QuicTransport](https://tools.ietf.org/html/draft-vvv-webtransport-quic)
-is a WebTransport protocol that maps directly to QUIC streams and datagrams,
-which makes it easy to connect to servers that speak QUIC with minimal overhead.
-It supports all of these capabilities.
-
-[Http3Transport](https://tools.ietf.org/html/draft-vvv-webtransport-http3) is a
-WebTransport protocol that provides QUIC streams and datagrams with slightly
-more overhead vs. a QuicTransport.  It has the advantage that HTTP and non-HTTP
-traffic can share the same network port and congestion control context, and it
-may be pooled with other transports such that the transport may be connected
-more quickly (by reusing an existing HTTP/3 connection).
+[WebTransport over
+HTTP/3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3)
+is a WebTransport protocol built on top of HTTP/3. It is the only protocol supported
+by WebTransport as of now. More protocols such as WebTransport over HTTP/2 may be
+supported in the future.
 
 ## Alternative designs considered
 
