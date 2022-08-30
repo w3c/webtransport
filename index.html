@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version 44af0bf3e, updated Fri Jul 29 17:05:16 2022 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="bbf64b6298c9522346ed5bfd7cf635c8a8c08cf5" name="document-revision">
+  <meta content="bc732e3301bdbe3e532e299ec0b59588f8b19f90" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -590,7 +590,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2022-08-02">2 August 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2022-08-30">30 August 2022</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -1243,6 +1243,7 @@ defined in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TR
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportstats" id="ref-for-dictdef-webtransportstats"><c- n>WebTransportStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransport-getstats" id="ref-for-dom-webtransport-getstats"><c- g>getStats</c-></a>();
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise①"><c- b>Promise</c-></a>&lt;<a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined"><c- b>undefined</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<undefined>" href="#dom-webtransport-ready" id="ref-for-dom-webtransport-ready"><c- g>ready</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransportreliabilitymode" id="ref-for-enumdef-webtransportreliabilitymode"><c- n>WebTransportReliabilityMode</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportReliabilityMode" href="#dom-webtransport-reliability" id="ref-for-dom-webtransport-reliability"><c- g>reliability</c-></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol"><c- n>WebTransportCongestionControl</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportCongestionControl" href="#dom-webtransport-congestioncontrol" id="ref-for-dom-webtransport-congestioncontrol"><c- g>congestionControl</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise②"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo"><c- n>WebTransportCloseInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<WebTransportCloseInfo>" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed"><c- g>closed</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined①"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-webtransport-close" id="ref-for-dom-webtransport-close"><c- g>close</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo①"><c- n>WebTransportCloseInfo</c-></a> <dfn class="idl-code" data-dfn-for="WebTransport/close(closeInfo), WebTransport/close()" data-dfn-type="argument" data-export id="dom-webtransport-close-closeinfo-closeinfo"><code><c- g>closeInfo</c-></code><a class="self-link" href="#dom-webtransport-close-closeinfo-closeinfo"></a></dfn> = {});
 
@@ -1295,6 +1296,12 @@ defined in <a data-link-type="biblio" href="#biblio-web-transport-http3">[WEB-TR
    unreliable (UDP) transport is supported or whether only reliable (TCP fallback)
    transport is used. Returns <code>"pending"</code> until a connection has been established. 
      <tr>
+      <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-congestioncontrol-slot"><code>[[CongestionControl]]</code></dfn> 
+      <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol①">WebTransportCongestionControl</a></code> indicating
+   whether a preference for a congestion control algorithm optimized for
+   throughput or low latency was requested by the application and satisfied
+   by the user agent, or <code>"default"</code>. 
+     <tr>
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-closed-slot"><code>[[Closed]]</code></dfn> 
       <td class="non-normative">A promise fulfilled when the associated <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑨">WebTransport</a></code> object is
    closed gracefully, or rejected when it is closed abruptly or failed on initialization. 
@@ -1329,6 +1336,12 @@ agent MUST run the following steps:
      <li data-md>
       <p>Let <var>requireUnreliable</var> be <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransport-url-options-options" id="ref-for-dom-webtransport-webtransport-url-options-options②">options</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportoptions-requireunreliable" id="ref-for-dom-webtransportoptions-requireunreliable">requireUnreliable</a></code>.</p>
      <li data-md>
+      <p>Let <var>congestionControl</var> be <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransport-url-options-options" id="ref-for-dom-webtransport-webtransport-url-options-options③">options</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportoptions-congestioncontrol" id="ref-for-dom-webtransportoptions-congestioncontrol">congestionControl</a></code>.</p>
+     <li data-md>
+      <p>If <var>congestionControl</var> is not <code>"default"</code>, and the user agent does not support any
+ congestion control algorithms that optimize for <var>congestionControl</var>, as allowed by <a data-link-type="biblio" href="#biblio-rfc9002">[RFC9002]</a> <a href="https://datatracker.ietf.org/doc/html/rfc9002#section-7">section 7</a>,
+ then set <var>congestionControl</var> to <code>"default"</code>.</p>
+     <li data-md>
       <p>Let <var>incomingDatagrams</var> be a <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#new" id="ref-for-new①">new</a> <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream⑦">ReadableStream</a></code>.</p>
      <li data-md>
       <p>Let <var>outgoingDatagrams</var> be a <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#new" id="ref-for-new②">new</a> <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream④">WritableStream</a></code>.</p>
@@ -1358,6 +1371,9 @@ agent MUST run the following steps:
        <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransport-reliability-slot" id="ref-for-dom-webtransport-reliability-slot">[[Reliability]]</a></code>
        <dd data-md>
         <p>"pending"</p>
+       <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransport-congestioncontrol-slot" id="ref-for-dom-webtransport-congestioncontrol-slot">[[CongestionControl]]</a></code>
+       <dd data-md>
+        <p><var>congestionControl</var></p>
        <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed-slot" id="ref-for-dom-webtransport-closed-slot">[[Closed]]</a></code>
        <dd data-md>
         <p>a new promise</p>
@@ -1385,13 +1401,13 @@ agent MUST run the following steps:
      <li data-md>
       <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-set-up" id="ref-for-readablestream-set-up②">Set up</a> <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingunidirectionalstreams-slot" id="ref-for-dom-webtransport-incomingunidirectionalstreams-slot①">[[IncomingUnidirectionalStreams]]</a></code> with <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-set-up-pullalgorithm" id="ref-for-readablestream-set-up-pullalgorithm②">pullAlgorithm</a> set to <var>pullUnidirectionalStreamAlgorithm</var>, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-set-up-highwatermark" id="ref-for-readablestream-set-up-highwatermark②">highWaterMark</a> set to 0.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="#initialize-webtransport-over-http" id="ref-for-initialize-webtransport-over-http">Initialize WebTransport over HTTP</a> with <var>transport</var>, <var>parsedURL</var>, <var>dedicated</var>, and <var>requireUnreliable</var>.</p>
+      <p><a data-link-type="dfn" href="#initialize-webtransport-over-http" id="ref-for-initialize-webtransport-over-http">Initialize WebTransport over HTTP</a> with <var>transport</var>, <var>parsedURL</var>, <var>dedicated</var>, <var>requireUnreliable</var>, and <var>congestionControl</var>.</p>
      <li data-md>
       <p>Return <var>transport</var>.</p>
     </ol>
    </div>
    <div class="algorithm" data-algorithm="initialize WebTransport over HTTP">
-     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="initialize-webtransport-over-http">initialize WebTransport over HTTP</dfn>, given a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①②">WebTransport</a></code> object <var>transport</var>, a <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url①">URL record</a> <var>url</var>, a boolean <var>dedicated</var>, and a boolean <var>http3Only</var>, run these steps. 
+     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="initialize-webtransport-over-http">initialize WebTransport over HTTP</dfn>, given a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①②">WebTransport</a></code> object <var>transport</var>, a <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url①">URL record</a> <var>url</var>, a boolean <var>dedicated</var>, a boolean <var>http3Only</var>, and a <code class="idl"><a data-link-type="idl" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol②">WebTransportCongestionControl</a></code> <var>congestionControl</var>, run these steps. 
     <ol>
      <li data-md>
       <p>Let <var>client</var> be <var>transport</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object">relevant settings object</a>.</p>
@@ -1419,7 +1435,8 @@ agent MUST run the following steps:
      <li data-md>
       <p>Let <var>newConnection</var> be "<code>no</code>" if <var>dedicated</var> is false; otherwise "<code>yes-and-dedicated</code>".</p>
      <li data-md>
-      <p>Let <var>connection</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-connection-obtain" id="ref-for-concept-connection-obtain">obtaining a connection</a> with <var>networkPartitionKey</var>, <var>url</var>, false, <var>newConnection</var>, and <var>http3Only</var>.</p>
+      <p>Let <var>connection</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-connection-obtain" id="ref-for-concept-connection-obtain">obtaining a connection</a> with <var>networkPartitionKey</var>, <var>url</var>, false, <var>newConnection</var>, and <var>http3Only</var>. If the user agent
+ supports more than one congestion control algorithm, choose one appropriate for <var>congestionControl</var> for sending of data on this <var>connection</var>.</p>
      <li data-md>
       <p>If <var>connection</var> is failure, then abort the remaining steps and <a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task④">queue a network task</a> with <var>transport</var> to run these steps:</p>
       <ol>
@@ -1593,6 +1610,12 @@ these steps.
  (over TCP fallback) transport.
  Returns <code>"pending"</code> until a connection has been established.
  The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑥">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-reliability-slot" id="ref-for-dom-webtransport-reliability-slot②">[[Reliability]]</a></code>.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-congestioncontrol"><code>congestionControl</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol③">WebTransportCongestionControl</a>, readonly</span>
+    <dd data-md>
+     <p>The application’s preference, if requested in the constructor, and satisfied
+ by the user agent, for a congestion control algorithm optimized for either
+ throughput or low latency for sending on this connection. If a preference was
+ requested but not satisfied, then the value is <code>"default"</code> The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑦">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-congestioncontrol-slot" id="ref-for-dom-webtransport-congestioncontrol-slot①">[[CongestionControl]]</a></code>.</p>
    </dl>
    <h3 class="heading settled" data-level="5.4" id="webtransport-methods"><span class="secno">5.4. </span><span class="content">Methods</span><a class="self-link" href="#webtransport-methods"></a></h3>
    <div class="algorithm" data-algorithm="close(closeInfo)" data-algorithm-for="WebTransport">
@@ -1603,7 +1626,7 @@ these steps.
       <p>When close is called, the user agent MUST run the following steps:</p>
       <ol>
        <li data-md>
-        <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑦">this</a>.</p>
+        <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑧">this</a>.</p>
        <li data-md>
         <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⑥">[[State]]</a></code> is <code>"closed"</code> or <code>"failed"</code>, then abort these steps.</p>
        <li data-md>
@@ -1641,7 +1664,7 @@ these steps.
      <p>When getStats is called, the user agent MUST run the following steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑧">this</a>.</p>
+       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑨">this</a>.</p>
       <li data-md>
        <p>Let <var>p</var> be a new promise.</p>
       <li data-md>
@@ -1670,7 +1693,7 @@ these steps.
  following steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑨">this</a>.</p>
+       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⓪">this</a>.</p>
       <li data-md>
        <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⑧">[[State]]</a></code> is <code>"closed"</code> or <code>"failed"</code>,
   return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑨">rejected</a> promise with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror">InvalidStateError</a></code>.</p>
@@ -1707,7 +1730,7 @@ these steps.
  run the following steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⓪">this</a>.</p>
+       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②①">this</a>.</p>
       <li data-md>
        <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②②">[[State]]</a></code> is <code>"closed"</code> or <code>"failed"</code>,
   return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①③">rejected</a> promise with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror③">InvalidStateError</a></code>.</p>
@@ -1870,6 +1893,13 @@ run these steps:
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-boolean" id="ref-for-idl-boolean"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-webtransportoptions-allowpooling" id="ref-for-dom-webtransportoptions-allowpooling①"><c- g>allowPooling</c-></a> = <c- b>false</c->;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-boolean" id="ref-for-idl-boolean①"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-webtransportoptions-requireunreliable" id="ref-for-dom-webtransportoptions-requireunreliable①"><c- g>requireUnreliable</c-></a> = <c- b>false</c->;
   <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#idl-sequence" id="ref-for-idl-sequence"><c- b>sequence</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransporthash" id="ref-for-dictdef-webtransporthash"><c- n>WebTransportHash</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<WebTransportHash> " href="#dom-webtransportoptions-servercertificatehashes" id="ref-for-dom-webtransportoptions-servercertificatehashes①"><c- g>serverCertificateHashes</c-></a>;
+  <a data-link-type="idl-name" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol④"><c- n>WebTransportCongestionControl</c-></a> <a class="idl-code" data-default="&quot;default&quot;" data-link-type="dict-member" data-type="WebTransportCongestionControl " href="#dom-webtransportoptions-congestioncontrol" id="ref-for-dom-webtransportoptions-congestioncontrol①"><c- g>congestionControl</c-></a> = "default";
+};
+
+<c- b>enum</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="enum" data-export id="enumdef-webtransportcongestioncontrol"><code><c- g>WebTransportCongestionControl</c-></code></dfn> {
+  <dfn class="idl-code" data-dfn-for="WebTransportCongestionControl" data-dfn-type="enum-value" data-export id="dom-webtransportcongestioncontrol-default"><code><c- s>"default"</c-></code><a class="self-link" href="#dom-webtransportcongestioncontrol-default"></a></dfn>,
+  <dfn class="idl-code" data-dfn-for="WebTransportCongestionControl" data-dfn-type="enum-value" data-export id="dom-webtransportcongestioncontrol-throughput"><code><c- s>"throughput"</c-></code><a class="self-link" href="#dom-webtransportcongestioncontrol-throughput"></a></dfn>,
+  <dfn class="idl-code" data-dfn-for="WebTransportCongestionControl" data-dfn-type="enum-value" data-export id="dom-webtransportcongestioncontrol-low-latency"><code><c- s>"low-latency"</c-></code><a class="self-link" href="#dom-webtransportcongestioncontrol-low-latency"></a></dfn>,
 };
 </pre>
    <p><dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-webtransportoptions"><code>WebTransportOptions</code></dfn> is a dictionary of parameters
@@ -1896,6 +1926,17 @@ that determine how WebTransport connection is established and used.</p>
  use for normal <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch">fetch</a> operations.</p>
     <dd data-md>
      <p>This cannot be used with <code class="idl"><a data-link-type="idl" href="#dom-webtransportoptions-allowpooling" id="ref-for-dom-webtransportoptions-allowpooling②">allowPooling</a></code>.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportOptions" data-dfn-type="dict-member" data-export id="dom-webtransportoptions-congestioncontrol"><code>congestionControl</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol⑤">WebTransportCongestionControl</a>, defaulting to <code>"default"</code></span>
+    <dd data-md>
+     <p>Optionally specifies an application’s preference for a congestion control
+ algorithm tuned for either throughput or low-latency to be used when sending
+ data over this connection. This is a hint to the user agent.</p>
+     <div class="issue atrisk" id="issue-398c2337">
+      <a class="self-link" href="#issue-398c2337"></a> 
+      <p> This configuration option is considered a feature at risk due to the lack
+     of implementation in browsers of a congestion control algorithm,
+     at the time of writing, that optimizes for low latency. </p>
+     </div>
    </dl>
    <div class="algorithm" data-algorithm="compute a certificate hash">
      To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="compute-a-certificate-hash">compute a certificate hash</dfn>, do the following: 
@@ -2595,10 +2636,10 @@ information on stats specific to one <code class="idl"><a data-link-type="idl" h
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportBidirectionalStream" data-dfn-type="attribute" data-export id="dom-webtransportbidirectionalstream-readable"><code>readable</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑧">ReadableStream</a>, readonly</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②①">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable-slot" id="ref-for-dom-webtransportbidirectionalstream-readable-slot">[[Readable]]</a></code>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②②">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable-slot" id="ref-for-dom-webtransportbidirectionalstream-readable-slot">[[Readable]]</a></code>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportBidirectionalStream" data-dfn-type="attribute" data-export id="dom-webtransportbidirectionalstream-writable"><code>writable</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑨">WritableStream</a>, readonly</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②②">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable-slot" id="ref-for-dom-webtransportbidirectionalstream-writable-slot">[[Writable]]</a></code>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②③">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable-slot" id="ref-for-dom-webtransportbidirectionalstream-writable-slot">[[Writable]]</a></code>.</p>
    </dl>
    <h3 class="heading settled" data-level="8.3" id="bidirectional-stream-procedures"><span class="secno">8.3. </span><span class="content">Procedures</span><a class="self-link" href="#bidirectional-stream-procedures"></a></h3>
    <div class="algorithm" data-algorithm="create a BidirectionalStream">
@@ -2671,7 +2712,7 @@ information on stats specific to one <code class="idl"><a data-link-type="idl" h
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportError" data-dfn-type="constructor" data-export data-lt="WebTransportError(init)|constructor(init)|WebTransportError()|constructor()" id="dom-webtransporterror-webtransporterror"><code>new WebTransportError(init)</code></dfn> constructor steps are:</p>
     <ol>
      <li data-md>
-      <p>Let <var>error</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②③">this</a>.</p>
+      <p>Let <var>error</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②④">this</a>.</p>
      <li data-md>
       <p>Let <var>message</var> be <var>init</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterrorinit-message" id="ref-for-dom-webtransporterrorinit-message">message</a></code> if it exists, and <code>""</code> otherwise.</p>
      <li data-md>
@@ -2684,10 +2725,10 @@ information on stats specific to one <code class="idl"><a data-link-type="idl" h
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportError" data-dfn-type="attribute" data-export id="dom-webtransporterror-source"><code>source</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransporterrorsource" id="ref-for-enumdef-webtransporterrorsource②">WebTransportErrorSource</a>, readonly</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②④">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot">[[Source]]</a></code>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⑤">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot">[[Source]]</a></code>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportError" data-dfn-type="attribute" data-export id="dom-webtransporterror-streamerrorcode"><code>streamErrorCode</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-octet" id="ref-for-idl-octet②">octet</a>, readonly, nullable</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⑤">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode-slot" id="ref-for-dom-webtransporterror-streamerrorcode-slot⑦">[[StreamErrorCode]]</a></code>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⑥">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode-slot" id="ref-for-dom-webtransporterror-streamerrorcode-slot⑦">[[StreamErrorCode]]</a></code>.</p>
    </dl>
    <h3 class="heading settled" data-level="9.4" id="web-transport-error-procedures"><span class="secno">9.4. </span><span class="content">Procedures</span><a class="self-link" href="#web-transport-error-procedures"></a></h3>
    <div class="algorithm" data-algorithm="create" data-algorithm-for="WebTransportError">
@@ -2716,7 +2757,7 @@ information on stats specific to one <code class="idl"><a data-link-type="idl" h
       </dl>
      <li data-md>
       <p>Run <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dom-domexception-domexception" id="ref-for-dom-domexception-domexception">new DOMException(message, name)</a> constructor steps with <var>error</var>, <var>message</var> and <code>"WebTransportError"</code>.</p>
-      <p class="note" role="note"><span>Note:</span> This name does not have a mapping to a legacy code, so <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⑥">this</a>'s <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#dom-domexception-code" id="ref-for-dom-domexception-code">code</a></code> is 0.</p>
+      <p class="note" role="note"><span>Note:</span> This name does not have a mapping to a legacy code, so <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⑦">this</a>'s <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#dom-domexception-code" id="ref-for-dom-domexception-code">code</a></code> is 0.</p>
     </ol>
    </div>
    <h2 class="heading settled" data-level="10" id="protocol-mapping"><span class="secno">10. </span><span class="content">Protocol Mappings</span><a class="self-link" href="#protocol-mapping"></a></h2>
@@ -3148,6 +3189,13 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-webtransport-closed-slot">[[Closed]]</a><span>, in § 5.1</span>
    <li><a href="#dom-webtransport-closed">closed</a><span>, in § 5.3</span>
    <li><a href="#compute-a-certificate-hash">compute a certificate hash</a><span>, in § 5.9</span>
+   <li><a href="#dom-webtransport-congestioncontrol-slot">[[CongestionControl]]</a><span>, in § 5.1</span>
+   <li>
+    congestionControl
+    <ul>
+     <li><a href="#dom-webtransport-congestioncontrol">attribute for WebTransport</a><span>, in § 5.3</span>
+     <li><a href="#dom-webtransportoptions-congestioncontrol">dict-member for WebTransportOptions</a><span>, in § 5.9</span>
+    </ul>
    <li><a href="#dom-webtransporterror-webtransporterror">constructor()</a><span>, in § 9.2</span>
    <li><a href="#dom-webtransporterror-webtransporterror">constructor(init)</a><span>, in § 9.2</span>
    <li><a href="#dom-webtransport-webtransport">constructor(url)</a><span>, in § 5</span>
@@ -3180,6 +3228,7 @@ and has been adapted for use in this specification.</p>
      <li><a href="#dom-webtransport-datagrams">attribute for WebTransport</a><span>, in § 5.3</span>
      <li><a href="#dom-webtransportstats-datagrams">dict-member for WebTransportStats</a><span>, in § 5.11</span>
     </ul>
+   <li><a href="#dom-webtransportcongestioncontrol-default">"default"</a><span>, in § 5.9</span>
    <li><a href="#dom-webtransportdatagramstats-droppedincoming">droppedIncoming</a><span>, in § 5.12</span>
    <li><a href="#session-establish">establish</a><span>, in § 3</span>
    <li><a href="#dom-webtransportdatagramstats-expiredoutgoing">expiredOutgoing</a><span>, in § 5.12</span>
@@ -3209,6 +3258,7 @@ and has been adapted for use in this specification.</p>
      <li><a href="#dom-webtransportsendstream-internalstream-slot">attribute for WebTransportSendStream</a><span>, in § 6.2</span>
     </ul>
    <li><a href="#dom-webtransportdatagramstats-lostoutgoing">lostOutgoing</a><span>, in § 5.12</span>
+   <li><a href="#dom-webtransportcongestioncontrol-low-latency">"low-latency"</a><span>, in § 5.9</span>
    <li><a href="#dom-webtransportdatagramduplexstream-maxdatagramsize">maxDatagramSize</a><span>, in § 4.2</span>
    <li><a href="#dom-webtransporterrorinit-message">message</a><span>, in § 9</span>
    <li><a href="#dom-webtransportstats-minrtt">minRtt</a><span>, in § 5.11</span>
@@ -3285,6 +3335,7 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-webtransportreliabilitymode-supports-unreliable">"supports-unreliable"</a><span>, in § 5</span>
    <li><a href="#session-terminate">terminate</a><span>, in § 3</span>
    <li><a href="#session-terminated">terminated</a><span>, in § 3</span>
+   <li><a href="#dom-webtransportcongestioncontrol-throughput">"throughput"</a><span>, in § 5.9</span>
    <li>
     timestamp
     <ul>
@@ -3305,6 +3356,7 @@ and has been adapted for use in this specification.</p>
    <li><a href="#webtransport">WebTransport</a><span>, in § 5</span>
    <li><a href="#webtransportbidirectionalstream">WebTransportBidirectionalStream</a><span>, in § 8</span>
    <li><a href="#dictdef-webtransportcloseinfo">WebTransportCloseInfo</a><span>, in § 5.10</span>
+   <li><a href="#enumdef-webtransportcongestioncontrol">WebTransportCongestionControl</a><span>, in § 5.9</span>
    <li><a href="#webtransportdatagramduplexstream">WebTransportDatagramDuplexStream</a><span>, in § 4</span>
    <li><a href="#dictdef-webtransportdatagramstats">WebTransportDatagramStats</a><span>, in § 5.12</span>
    <li><a href="#webtransporterror">WebTransportError</a><span>, in § 9</span>
@@ -4086,12 +4138,12 @@ and has been adapted for use in this specification.</p>
    <a href="https://webidl.spec.whatwg.org/#this">https://webidl.spec.whatwg.org/#this</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-this">4.2. Attributes</a> <a href="#ref-for-this①">(2)</a> <a href="#ref-for-this②">(3)</a> <a href="#ref-for-this③">(4)</a> <a href="#ref-for-this④">(5)</a> <a href="#ref-for-this⑤">(6)</a> <a href="#ref-for-this⑥">(7)</a> <a href="#ref-for-this⑦">(8)</a> <a href="#ref-for-this⑧">(9)</a> <a href="#ref-for-this⑨">(10)</a> <a href="#ref-for-this①⓪">(11)</a>
-    <li><a href="#ref-for-this①①">5.3. Attributes</a> <a href="#ref-for-this①②">(2)</a> <a href="#ref-for-this①③">(3)</a> <a href="#ref-for-this①④">(4)</a> <a href="#ref-for-this①⑤">(5)</a> <a href="#ref-for-this①⑥">(6)</a>
-    <li><a href="#ref-for-this①⑦">5.4. Methods</a> <a href="#ref-for-this①⑧">(2)</a> <a href="#ref-for-this①⑨">(3)</a> <a href="#ref-for-this②⓪">(4)</a>
-    <li><a href="#ref-for-this②①">8.2. Attributes</a> <a href="#ref-for-this②②">(2)</a>
-    <li><a href="#ref-for-this②③">9.2. Constructor</a>
-    <li><a href="#ref-for-this②④">9.3. Attributes</a> <a href="#ref-for-this②⑤">(2)</a>
-    <li><a href="#ref-for-this②⑥">9.4. Procedures</a>
+    <li><a href="#ref-for-this①①">5.3. Attributes</a> <a href="#ref-for-this①②">(2)</a> <a href="#ref-for-this①③">(3)</a> <a href="#ref-for-this①④">(4)</a> <a href="#ref-for-this①⑤">(5)</a> <a href="#ref-for-this①⑥">(6)</a> <a href="#ref-for-this①⑦">(7)</a>
+    <li><a href="#ref-for-this①⑧">5.4. Methods</a> <a href="#ref-for-this①⑨">(2)</a> <a href="#ref-for-this②⓪">(3)</a> <a href="#ref-for-this②①">(4)</a>
+    <li><a href="#ref-for-this②②">8.2. Attributes</a> <a href="#ref-for-this②③">(2)</a>
+    <li><a href="#ref-for-this②④">9.2. Constructor</a>
+    <li><a href="#ref-for-this②⑤">9.3. Attributes</a> <a href="#ref-for-this②⑥">(2)</a>
+    <li><a href="#ref-for-this②⑦">9.4. Procedures</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dfn-throw">
@@ -4376,6 +4428,7 @@ and has been adapted for use in this specification.</p>
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportstats"><c- n>WebTransportStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransport-getstats"><c- g>getStats</c-></a>();
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise"><c- b>Promise</c-></a>&lt;<a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-undefined"><c- b>undefined</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<undefined>" href="#dom-webtransport-ready"><c- g>ready</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransportreliabilitymode"><c- n>WebTransportReliabilityMode</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportReliabilityMode" href="#dom-webtransport-reliability"><c- g>reliability</c-></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransportcongestioncontrol"><c- n>WebTransportCongestionControl</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportCongestionControl" href="#dom-webtransport-congestioncontrol"><c- g>congestionControl</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo"><c- n>WebTransportCloseInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<WebTransportCloseInfo>" href="#dom-webtransport-closed"><c- g>closed</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-undefined"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-webtransport-close"><c- g>close</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo"><c- n>WebTransportCloseInfo</c-></a> <a href="#dom-webtransport-close-closeinfo-closeinfo"><code><c- g>closeInfo</c-></code></a> = {});
 
@@ -4405,6 +4458,13 @@ and has been adapted for use in this specification.</p>
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-boolean"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-webtransportoptions-allowpooling"><c- g>allowPooling</c-></a> = <c- b>false</c->;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-boolean"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-webtransportoptions-requireunreliable"><c- g>requireUnreliable</c-></a> = <c- b>false</c->;
   <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#idl-sequence"><c- b>sequence</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransporthash"><c- n>WebTransportHash</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<WebTransportHash> " href="#dom-webtransportoptions-servercertificatehashes"><c- g>serverCertificateHashes</c-></a>;
+  <a data-link-type="idl-name" href="#enumdef-webtransportcongestioncontrol"><c- n>WebTransportCongestionControl</c-></a> <a class="idl-code" data-default="&quot;default&quot;" data-link-type="dict-member" data-type="WebTransportCongestionControl " href="#dom-webtransportoptions-congestioncontrol"><c- g>congestionControl</c-></a> = "default";
+};
+
+<c- b>enum</c-> <a href="#enumdef-webtransportcongestioncontrol"><code><c- g>WebTransportCongestionControl</c-></code></a> {
+  <a href="#dom-webtransportcongestioncontrol-default"><code><c- s>"default"</c-></code></a>,
+  <a href="#dom-webtransportcongestioncontrol-throughput"><code><c- s>"throughput"</c-></code></a>,
+  <a href="#dom-webtransportcongestioncontrol-low-latency"><code><c- s>"low-latency"</c-></code></a>,
 };
 
 <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-webtransportcloseinfo"><c- g>WebTransportCloseInfo</c-></a> {
@@ -4485,6 +4545,12 @@ and has been adapted for use in this specification.</p>
   <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
    <div class="issue"> This needs to be done in workers too. See <a href="https://www.github.com/w3c/webtransport/issues/127">#127</a> and <a href="https://www.github.com/whatwg/html/issues/6831">whatwg/html#6731</a>. <a class="issue-return" href="#issue-c18b6608" title="Jump to section">↵</a></div>
+   <div class="issue atrisk">
+    <p> This configuration option is considered a feature at risk due to the lack
+     of implementation in browsers of a congestion control algorithm,
+     at the time of writing, that optimizes for low latency. </p>
+     <a class="issue-return" href="#issue-398c2337" title="Jump to section">↵</a>
+   </div>
    <div class="issue"> Now that quic-transport has been removed, this section needs to be
 revised. Some of those are safe to expose for HTTP/2 and HTTP/3 connections
 (like min-RTT), while most would either result in information disclosure
@@ -4866,7 +4932,7 @@ or are impossible to define for pooled connections. <a class="issue-return" href
   <aside class="dfn-panel" data-for="dom-webtransport-webtransport-url-options-options">
    <b><a href="#dom-webtransport-webtransport-url-options-options">#dom-webtransport-webtransport-url-options-options</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-webtransport-webtransport-url-options-options">5.2. Constructor</a> <a href="#ref-for-dom-webtransport-webtransport-url-options-options①">(2)</a> <a href="#ref-for-dom-webtransport-webtransport-url-options-options②">(3)</a>
+    <li><a href="#ref-for-dom-webtransport-webtransport-url-options-options">5.2. Constructor</a> <a href="#ref-for-dom-webtransport-webtransport-url-options-options①">(2)</a> <a href="#ref-for-dom-webtransport-webtransport-url-options-options②">(3)</a> <a href="#ref-for-dom-webtransport-webtransport-url-options-options③">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="enumdef-webtransportreliabilitymode">
@@ -4942,6 +5008,13 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <ul>
     <li><a href="#ref-for-dom-webtransport-reliability-slot">5.2. Constructor</a> <a href="#ref-for-dom-webtransport-reliability-slot①">(2)</a>
     <li><a href="#ref-for-dom-webtransport-reliability-slot②">5.3. Attributes</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-webtransport-congestioncontrol-slot">
+   <b><a href="#dom-webtransport-congestioncontrol-slot">#dom-webtransport-congestioncontrol-slot</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-webtransport-congestioncontrol-slot">5.2. Constructor</a>
+    <li><a href="#ref-for-dom-webtransport-congestioncontrol-slot①">5.3. Attributes</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-closed-slot">
@@ -5030,6 +5103,12 @@ or are impossible to define for pooled connections. <a class="issue-return" href
     <li><a href="#ref-for-dom-webtransport-reliability">5. WebTransport Interface</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="dom-webtransport-congestioncontrol">
+   <b><a href="#dom-webtransport-congestioncontrol">#dom-webtransport-congestioncontrol</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-webtransport-congestioncontrol">5. WebTransport Interface</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="dom-webtransport-close">
    <b><a href="#dom-webtransport-close">#dom-webtransport-close</a></b><b>Referenced in:</b>
    <ul>
@@ -5097,6 +5176,16 @@ or are impossible to define for pooled connections. <a class="issue-return" href
     <li><a href="#ref-for-dom-webtransporthash-value">5.9. Configuration</a> <a href="#ref-for-dom-webtransporthash-value①">(2)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="enumdef-webtransportcongestioncontrol">
+   <b><a href="#enumdef-webtransportcongestioncontrol">#enumdef-webtransportcongestioncontrol</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-enumdef-webtransportcongestioncontrol">5. WebTransport Interface</a>
+    <li><a href="#ref-for-enumdef-webtransportcongestioncontrol①">5.1. Internal slots</a>
+    <li><a href="#ref-for-enumdef-webtransportcongestioncontrol②">5.2. Constructor</a>
+    <li><a href="#ref-for-enumdef-webtransportcongestioncontrol③">5.3. Attributes</a>
+    <li><a href="#ref-for-enumdef-webtransportcongestioncontrol④">5.9. Configuration</a> <a href="#ref-for-enumdef-webtransportcongestioncontrol⑤">(2)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="dictdef-webtransportoptions">
    <b><a href="#dictdef-webtransportoptions">#dictdef-webtransportoptions</a></b><b>Referenced in:</b>
    <ul>
@@ -5123,6 +5212,13 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <ul>
     <li><a href="#ref-for-dom-webtransportoptions-servercertificatehashes">5.2. Constructor</a>
     <li><a href="#ref-for-dom-webtransportoptions-servercertificatehashes①">5.9. Configuration</a> <a href="#ref-for-dom-webtransportoptions-servercertificatehashes②">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-webtransportoptions-congestioncontrol">
+   <b><a href="#dom-webtransportoptions-congestioncontrol">#dom-webtransportoptions-congestioncontrol</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-webtransportoptions-congestioncontrol">5.2. Constructor</a>
+    <li><a href="#ref-for-dom-webtransportoptions-congestioncontrol①">5.9. Configuration</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="compute-a-certificate-hash">
