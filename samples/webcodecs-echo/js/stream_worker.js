@@ -592,11 +592,11 @@ SSRC = this.config.ssrc
      const dec_stats = dec_report();
      const decqueue_stats = decqueue_report();
      const rtt_stats = rtt_report();
-     self.postMessage({severity: 'info', text: 'RTT report: ' + JSON.stringify(rtt_stats)});  
-     self.postMessage({severity: 'info', text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});
-     self.postMessage({severity: 'info', text: 'Encoder Queue report: ' + JSON.stringify(encqueue_stats)});
-     self.postMessage({security: 'info', text: 'Decoder Time report: ' + JSON.stringify(dec_stats)});
-     self.postMessage({severity: 'info', text: 'Decoder Queue report: ' + JSON.stringify(decqueue_stats)});
+     self.postMessage({text: 'RTT report: ' + JSON.stringify(rtt_stats)});  
+     self.postMessage({text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});
+     self.postMessage({text: 'Encoder Queue report: ' + JSON.stringify(encqueue_stats)});
+     self.postMessage({text: 'Decoder Time report: ' + JSON.stringify(dec_stats)});
+     self.postMessage({text: 'Decoder Queue report: ' + JSON.stringify(decqueue_stats)});
      if (stopped) return;
      stopped = true;
      this.stopped = true;
@@ -609,7 +609,7 @@ SSRC = this.config.ssrc
      return;
    }
 
-   SendStream(self, transport) {
+   createSendStream(self, transport) {
      return new WritableStream({
        async start(controller) {
          // called by constructor
@@ -677,7 +677,7 @@ SSRC = this.config.ssrc
      });
    }
 
-   ReceiveStream(self, transport) {
+   createReceiveStream(self, transport) {
      return new ReadableStream({
        async start(controller) {
        // called by constructor
@@ -719,15 +719,15 @@ SSRC = this.config.ssrc
      started = true;
      self.postMessage({text: 'Start method called.'});
      try { 
-       this.inputStream
+       await this.inputStream
            .pipeThrough(this.EncodeVideoStream(self,this.config))
            .pipeThrough(this.Serialize(self,this.config))
-           .pipeTo(this.SendStream(self,this.transport));
+           .pipeTo(this.createSendStream(self,this.transport));
      } catch (e) {
        self.postMessage({severity: 'fatal', text: `input pipeline error: ${e.message}`});
      }
      try {
-       this.ReceiveStream(self,this.transport)
+       await this.createReceiveStream(self,this.transport)
            .pipeThrough(this.Deserialize(self))
            .pipeThrough(this.DecodeVideoStream(self))
            .pipeTo(this.outputStream);
