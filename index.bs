@@ -609,7 +609,8 @@ A {{WebTransport}} object has the following internal slots.
    <td><dfn>`[[CongestionControl]]`</dfn>
    <td class="non-normative">A {{WebTransportCongestionControl}} indicating
    whether a preference for a congestion control algorithm optimized for
-   throughput or low latency was requested by the application.
+   throughput or low latency was requested by the application and satisfied
+   by the user agent, or `"default"`.
   </tr>
   <tr>
    <td><dfn>`[[Closed]]`</dfn>
@@ -840,8 +841,10 @@ these steps.
    The getter steps are to return [=this=]'s {{[[Reliability]]}}.
 
 : <dfn for="WebTransport" attribute>congestionControl</dfn>
-:: The application's preference, if requested in the constructor, for a
-   congestion control algorithm optimized for either throughput or low latency.
+:: The application's preference, if requested in the constructor, and satisfied
+   by the user agent, for a congestion control algorithm optimized for either
+   throughput or low latency for sending on this connection. If a preference was
+   requested but not satisfied, then the value is `"default"`
    The getter steps are to return [=this=]'s {{[[CongestionControl]]}}.
 
 ## Methods ##  {#webtransport-methods}
