@@ -647,6 +647,10 @@ agent MUST run the following steps:
    {{WebTransportOptions/requireUnreliable}}.
 1. Let |congestionControl| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/congestionControl}}.
+1. If |congestionControl| is not `"default"`, and the user agent does not support any
+   congestion control algorithms that optimize for |congestionControl|, as allowed by
+   [[!RFC9002]] [section 7](https://datatracker.ietf.org/doc/html/rfc9002#section-7),
+   then set |congestionControl| to `"default"`.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
