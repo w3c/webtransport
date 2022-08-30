@@ -713,26 +713,27 @@ SSRC = this.config.ssrc
      });
    }
 
-   async start()
+   start()
    {
      if (stopped) return;
      started = true;
      self.postMessage({text: 'Start method called.'});
-     try { 
-       await this.inputStream
+     const promise1 = new Promise ((resolve, reject) => {
+       this.inputStream
            .pipeThrough(this.EncodeVideoStream(self,this.config))
            .pipeThrough(this.Serialize(self,this.config))
            .pipeTo(this.createSendStream(self,this.transport));
-     } catch (e) {
-       self.postMessage({severity: 'fatal', text: `input pipeline error: ${e.message}`});
-     }
-     try {
-       await this.createReceiveStream(self,this.transport)
+     }); 
+     const promise2 = new Promise ((resolve, reject) => {
+       this.createReceiveStream(self,this.transport)
            .pipeThrough(this.Deserialize(self))
            .pipeThrough(this.DecodeVideoStream(self))
            .pipeTo(this.outputStream);
-     } catch (e) {
-       self.postMessage({severity: 'fatal', text: `output pipeline error: ${e.message}`});
-     }
+     });
+     Promise.all([promise1, promise2]).then(() => {
+        self.postMessage({text: 'Pipelines started'});
+     }).catch((e) => {
+        self.postMessage({severity: 'fatal', text: `pipeline error: ${e.message}`});
+     })
    }
 }
