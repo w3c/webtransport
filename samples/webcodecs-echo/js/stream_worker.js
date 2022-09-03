@@ -1,6 +1,17 @@
 'use strict';
 
-let encoder, decoder, pl, started = false, stopped = false, first = true, rtt=40.;
+let encoder, decoder, pl, started = false, stopped = false, first = true, start_time, end_time, rtt=40.;
+
+let bwe_aggregate = {
+   all: [],
+   lenmin: Number.MAX_VALUE,
+   lenmax: 0,
+   seqmin: Number.MAX_VALUE,
+   seqmax: 0,
+   recvsum: 0,
+   bwu: 0,
+   bwe: 0,
+}
 
 let rtt_aggregate = {
   all: [],
@@ -15,6 +26,9 @@ let rtt_aggregate = {
 
 let enc_aggregate = {
   all: [],
+  fquart: 0,
+  median: 0,
+  tquart: 0,
   min: Number.MAX_VALUE,
   max: 0,
   avg: 0,
@@ -23,6 +37,9 @@ let enc_aggregate = {
 
 let dec_aggregate = {
   all: [],
+  fquart: 0,
+  median: 0,
+  tquart: 0,
   min: Number.MAX_VALUE,
   max: 0,
   avg: 0,
@@ -31,6 +48,9 @@ let dec_aggregate = {
 
 let encqueue_aggregate = {
   all: [],
+  fquart: 0,
+  median: 0,
+  tquart: 0,
   min: Number.MAX_VALUE,
   max: 0,
   avg: 0,
@@ -39,11 +59,23 @@ let encqueue_aggregate = {
 
 let decqueue_aggregate = {
   all: [],
+  fquart: 0,
+  median: 0,
+  tquart: 0,
   min: Number.MAX_VALUE,
   max: 0,
   avg: 0,
   sum: 0,
 };
+
+function bwe_update(seqno, len, rtt_new){
+  bwe_aggregate.all.push([seqno, len, rtt_new]);
+  bwe_aggregate.seqmin = Math.min(bwe_aggregate.seqmin, seqno);
+  bwe_aggregate.seqmax = Math.max(bwe_aggregate.seqmax, seqno);
+  bwe_aggregate.lenmin = Math.min(bwe_aggregate.lenmin, len);
+  bwe_aggregate.lenmax = Math.max(bwe_aggregate.lenmax, len);
+  bwe_aggregate.recvsum += len;
+}
 
 function rtt_update(rtt_new) {
   rtt_aggregate.all.push(rtt_new);
@@ -64,6 +96,35 @@ function encqueue_update(duration) {
   encqueue_aggregate.min = Math.min(encqueue_aggregate.min, duration);
   encqueue_aggregate.max = Math.max(encqueue_aggregate.max, duration);
   encqueue_aggregate.sum += duration;
+}
+
+function bwe_report(){
+  const len = bwe_aggregate.all.length;
+  const seqmin = bwe_aggregate.seqmin;
+  const seqmax = bwe_aggregate.seqmax;
+  const lenmin = bwe_aggregate.lenmin;
+  const lenmax = bwe_aggregate.lenmax;
+  const recvsum = bwe_aggregate.recvsum;
+  const reorder =  0; // Calculate reordered frames
+  const time = end_time - start_time;
+  const loss = (bwe_aggregate.seqmax - bwe_aggregate.seqmin + 1) - len ; // Calculate lost frames
+  const bwu = 8 * recvsum/(time/1000); //Calculate bandwidth used in bits/second
+  const bwe = 0.;
+  // Todo: Calculate bwe according to model.
+  // Model: rtt*1000  = (len * 8 + hdr)/bwe + qd
+  // rtt (ms), hdr (link layer + quic headers, bytes), len (app payload, bytes), bwe (bits/second), qd (queueing delay, ms)
+  return {
+    count: len,
+    loss: loss,
+    seqmin: seqmin,
+    seqmax: seqmax,
+    lenmin: lenmin,
+    lenmax: lenmax,
+    reorder: reorder,
+    bwe: bwe,
+    bwu: bwu,
+    recvsum: recvsum,
+  };
 }
 
 function rtt_report() {
@@ -92,13 +153,21 @@ function enc_report() {
   enc_aggregate.all.sort();
   const len = enc_aggregate.all.length;
   const half = len >> 1;
+  const f = (len + 1) >> 2;
+  const t = (3 * (len + 1)) >> 2;
+  const alpha1 = (len + 1)/4 - Math.trunc((len + 1)/4);
+  const alpha3 = (3 * (len + 1)/4) - Math.trunc(3 * (len + 1)/4);
+  const fquart = enc_aggregate.all[f] + alpha1 * (enc_aggregate.all[f + 1] - enc_aggregate.all[f]);
+  const tquart = enc_aggregate.all[t] + alpha3 * (enc_aggregate.all[t + 1] - enc_aggregate.all[t]);
   const median = len % 2 === 1 ? enc_aggregate.all[len >> 1] : (enc_aggregate.all[half - 1] + enc_aggregate.all[half]) / 2;
   return {
      count: len,
      min: enc_aggregate.min,
-     max: enc_aggregate.max,
+     fquart: fquart,
      avg: enc_aggregate.sum / len,
-     median,
+     median: median,
+     tquart: tquart,
+     max: enc_aggregate.max,
   };
 }
 
@@ -106,13 +175,21 @@ function encqueue_report() {
   encqueue_aggregate.all.sort();
   const len = encqueue_aggregate.all.length;
   const half = len >> 1;
+  const f = (len + 1) >> 2;
+  const t = (3 * (len + 1)) >> 2;
+  const alpha1 = (len + 1)/4 - Math.trunc((len + 1)/4);
+  const alpha3 = (3 * (len + 1)/4) - Math.trunc(3 * (len + 1)/4);
+  const fquart = encqueue_aggregate.all[f] + alpha1 * (encqueue_aggregate.all[f + 1] - encqueue_aggregate.all[f]);
+  const tquart = encqueue_aggregate.all[t] + alpha3 * (encqueue_aggregate.all[t + 1] - encqueue_aggregate.all[t]);
   const median = len % 2 === 1 ? encqueue_aggregate.all[len >> 1] : (encqueue_aggregate.all[half - 1] + encqueue_aggregate.all[half]) / 2;
   return {
      count: len,
      min: encqueue_aggregate.min,
-     max: encqueue_aggregate.max,
+     fquart: fquart,
      avg: encqueue_aggregate.sum / len,
-     median,
+     median: median,
+     tquart: tquart,
+     max: encqueue_aggregate.max,
   };
 }
 
@@ -125,25 +202,66 @@ function dec_update(duration) {
 
 function dec_report() {
   dec_aggregate.all.sort();
-  const len  = dec_aggregate.all.length;
+  const len = dec_aggregate.all.length;
   const half = len >> 1;
+  const f = (len + 1) >> 2;
+  const t = (3 * (len + 1)) >> 2;
+  const alpha1 = (len + 1)/4 - Math.trunc((len + 1)/4);
+  const alpha3 = (3 * (len + 1)/4) - Math.trunc(3 * (len + 1)/4);
+  const fquart = dec_aggregate.all[f] + alpha1 * (dec_aggregate.all[f + 1] - dec_aggregate.all[f]);
+  const tquart = dec_aggregate.all[t] + alpha3 * (dec_aggregate.all[t + 1] - dec_aggregate.all[t]);
   const median = len % 2 === 1 ? dec_aggregate.all[len >> 1] : (dec_aggregate.all[half - 1] + dec_aggregate.all[half]) / 2;
   return {
      count: len,
      min: dec_aggregate.min,
-     max: dec_aggregate.max,
+     fquart: fquart,
      avg: dec_aggregate.sum / len,
-     median,
+     median: median,
+     tquart: tquart,
+     max: dec_aggregate.max,
+  };
+}
+
+function decqueue_update(duration) {
+   decqueue_aggregate.all.push(duration);
+   decqueue_aggregate.min = Math.min(decqueue_aggregate.min, duration);
+   decqueue_aggregate.max = Math.max(decqueue_aggregate.max, duration);
+   decqueue_aggregate.sum += duration;
+}
+
+function decqueue_report() {
+  decqueue_aggregate.all.sort();
+  const len = decqueue_aggregate.all.length;
+  const half = len >> 1;
+  const f = (len + 1) >> 2;
+  const t = (3 * (len + 1)) >> 2;
+  const alpha1 = (len + 1)/4 - Math.trunc((len + 1)/4);
+  const alpha3 = (3 * (len + 1)/4) - Math.trunc(3 * (len + 1)/4);
+  const fquart = decqueue_aggregate.all[f] + alpha1 * (decqueue_aggregate.all[f + 1] - decqueue_aggregate.all[f]);
+  const tquart = decqueue_aggregate.all[t] + alpha3 * (decqueue_aggregate.all[t + 1] - decqueue_aggregate.all[t]);
+  const median = len % 2 === 1 ? decqueue_aggregate.all[len >> 1] : (decqueue_aggregate.all[half - 1] + decqueue_aggregate.all[half]) / 2;
+  return {
+     count: len,
+     min: decqueue_aggregate.min,
+     fquart: fquart,
+     avg: decqueue_aggregate.sum / len,
+     median: median,
+     tquart: tquart,
+     max: decqueue_aggregate.max,
   };
 }
 
 async function get_frame(read_stream, number) {
-  let i=0, packlen, totalen = 0, frame, sendTime, first = true;
+  let i=0, packlen, totalen = 0, frame, sendTime, seqno, first = true;
   while (true) {
     try {
       const { value, done } = await read_stream.read();
       if (done) {
         if (packlen == totalen) {
+           let rtt = ((0xffffffff & Math.trunc(1000 * performance.now())) - sendTime)/1000.; 
+           rtt_update(rtt);
+           bwe_update(seqno, packlen, rtt); 
+           //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen + ' rtt: ' + rtt});
            return frame.buffer; //complete frame has been received
         } else {
           self.postMessage({severity: 'fatal', text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
@@ -156,9 +274,7 @@ async function get_frame(read_stream, number) {
         }
         // Retrieve sendTime from value
         sendTime = (value[8] << 24) | (value[9] << 16) | (value[10] << 8) | (value[11] << 0);
-        let rtt = ((0xffffffff & Math.trunc(1000 * performance.now())) - sendTime)/1000.;
-        //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' rtt: ' + rtt});
-        rtt_update(rtt);
+        seqno = (value[12] << 24) | (value[13] << 16) | (value[14] << 8) | (value[15] << 0);
         frame = new Uint8Array(packlen);
         frame.set(new Uint8Array(value), 0);
         //self.postMessage({text: 'Fragment: ' + i + ' Length: ' + value.byteLength + ' Total: ' + packlen});
@@ -175,27 +291,6 @@ async function get_frame(read_stream, number) {
       return ;
     }
   }
-}
-
-function decqueue_update(duration) {
-   decqueue_aggregate.all.push(duration);
-   decqueue_aggregate.min = Math.min(decqueue_aggregate.min, duration);
-   decqueue_aggregate.max = Math.max(decqueue_aggregate.max, duration);
-   decqueue_aggregate.sum += duration;
-}
-
-function decqueue_report() {
-  decqueue_aggregate.all.sort();
-  const len  = decqueue_aggregate.all.length;
-  const half = len >> 1;
-  const median = len % 2 === 1 ? decqueue_aggregate.all[len >> 1] : (decqueue_aggregate.all[half - 1] + decqueue_aggregate.all[half]) / 2;
-  return {
-     count: len,
-     min: decqueue_aggregate.min,
-     max: decqueue_aggregate.max,
-     avg: decqueue_aggregate.sum / len,
-     median,
-  };
 }
 
 function readUInt32(arr, pos) {
@@ -300,11 +395,11 @@ PT = payload type:
   x05 = AV1
 S, E, I, D, B, TID, LID defined in draft-ietf-avtext-framemarking
    S, E always = 1 in frame/stream encoding
-   I = 1 means chunk.type == 'key', 0 means chunk.type == 'delta'
+   I = 1 for chunk.type == 'key', 0 for chunk.type == 'delta'
    D = Not a keyframe, configuration or base layer frame 
    B = Base layer frame
-   TID = chunk.temporalLayerId
-   LID = 0 (no support for spatial scalability)
+   TID = chunk.svc.temporalLayerId
+   LID = 0 (no support for spatial scalability yet)
 length = length of the frame, including the header
 send time = time at which the packet was sent, in ms * 1000
 sequence number = counter incrementing with each frame
@@ -587,11 +682,14 @@ SSRC = this.config.ssrc
    }
 
    stop() {
+     end_time = performance.now();
      const enc_stats = enc_report();
      const encqueue_stats = encqueue_report();
      const dec_stats = dec_report();
      const decqueue_stats = decqueue_report();
      const rtt_stats = rtt_report();
+     const bwe_stats = bwe_report();
+     self.postMessage({text: 'BWE report: ' + JSON.stringify(bwe_stats)});
      self.postMessage({text: 'RTT report: ' + JSON.stringify(rtt_stats)});  
      self.postMessage({text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});
      self.postMessage({text: 'Encoder Queue report: ' + JSON.stringify(encqueue_stats)});
@@ -627,7 +725,7 @@ SSRC = this.config.ssrc
            first = false;
          } else {
            let rtt_stats = rtt_report();
-           rtt = (.75 * rtt + .25 * rtt_stats.median);
+           rtt = rtt_stats.min;
          }
          //self.postMessage({text: 'RTT: ' + rtt});
          //check what kind of frame it is
@@ -642,20 +740,21 @@ SSRC = this.config.ssrc
          const i =   (B1 & 0x20)/32;
          const d =   (B1 & 0x10)/16;
          const b =   (B1 & 0x08)/8
+         const seqno = readUInt32(chunk, 12);
          if (d == 1) {
-           // if the frame is discardable, stop trying to deliver after 3 RTT
-           rto = 3 * rtt; 
+           // if the frame is discardable, stop trying to deliver after 2 RTTmin
+           rto = 2 * rtt; 
          } else {
            //If the frame is non-discardable (keyframe, configuration or base layer) don't give up as easily. 
-           rto = 10 * rtt; 
+           rto = 5 * rtt; 
          }
          timeoutId = setTimeout(function() {
-            self.postMessage({text: `Aborting send, i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
-            writer.abort(' Send taking too long').then(() => {
-              self.postMessage({text: 'Abort succeeded'});
-            }).catch((e) => {
-              self.postMessage({text: 'Abort failed'});
-            });
+           self.postMessage({text: `Aborting send, seqno: ${seqno} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
+           writer.abort(' Send taking too long').then(() => {
+             self.postMessage({text: 'Abort succeeded'});
+           }).catch((e) => {
+             self.postMessage({text: 'Abort failed'});
+           });
          }, rto);
          try {
            await writer.write(chunk);
@@ -718,6 +817,7 @@ SSRC = this.config.ssrc
      if (stopped) return;
      started = true;
      self.postMessage({text: 'Start method called.'});
+     start_time = performance.now();
      const promise1 = new Promise ((resolve, reject) => {
        this.inputStream
            .pipeThrough(this.EncodeVideoStream(self,this.config))

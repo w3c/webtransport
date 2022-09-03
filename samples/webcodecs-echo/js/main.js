@@ -25,13 +25,13 @@ videoSelect.onchange = function () {
   videoSource = videoSelect.value; 
 };
 
-const qvgaConstraints   = {video: {width: 320,  height: 240}};
-const vgaConstraints    = {video: {width: 640,  height: 480}};
-const hdConstraints     = {video: {width: 1280, height: 720}};
-const fullHdConstraints = {video: {width: {min: 1920}, height: {min: 1080}}};
-const tv4KConstraints   = {video: {width: {exact: 3840}, height: {exact: 2160}}};
-const cinema4KConstraints = {video: {width: {exact: 4096}, height: {exact: 2160}}};
-const eightKConstraints = {video: {width: {min: 7680}, height: {min: 4320}}};
+const qvgaConstraints   = { video: {width: {exact: 320},  height: {exact: 240}}};
+const vgaConstraints    = { video: {width: {exact: 640},  height: {exact: 480}}};
+const hdConstraints     = { video: {width: {exact: 1280}, height: {exact: 720}}};
+const fullHdConstraints = { video: {width: {exact: 1920}, height: {exact: 1080}}};
+const tv4KConstraints   = { video: {width: {exact: 3840}, height: {exact: 2160}}};
+const cinema4KConstraints = { video: {width: {exact: 4096}, height: {exact: 2160}}};
+const eightKConstraints = { video: {width: {exact: 7680}, height: {exact: 4320}}};
 let constraints = qvgaConstraints;
 
 function addToEventLog(text, severity = 'info') {
