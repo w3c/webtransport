@@ -28,13 +28,13 @@ videoSelect.onchange = function () {
   videoSource = videoSelect.value; 
 };
 
-const qvgaConstraints   = { video: {width: {exact: 320},  height: {exact: 240}}};
-const vgaConstraints    = { video: {width: {exact: 640},  height: {exact: 480}}};
-const hdConstraints     = { video: {width: {exact: 1280}, height: {exact: 720}}};
-const fullHdConstraints = { video: {width: {exact: 1920}, height: {exact: 1080}}};
-const tv4KConstraints   = { video: {width: {exact: 3840}, height: {exact: 2160}}};
-const cinema4KConstraints = { video: {width: {exact: 4096}, height: {exact: 2160}}};
-const eightKConstraints = { video: {width: {exact: 7680}, height: {exact: 4320}}};
+const qvgaConstraints   = {video: {width: 320,  height: 240}};
+const vgaConstraints    = {video: {width: 640,  height: 480}};
+const hdConstraints     = {video: {width: 1280, height: 720}};
+const fullHdConstraints = {video: {width: {min: 1920}, height: {min: 1080}}};
+const tv4KConstraints   = {video: {width: {exact: 3840}, height: {exact: 2160}}};
+const cinema4KConstraints = {video: {width: {exact: 4096}, height: {exact: 2160}}};
+const eightKConstraints = {video: {width: {min: 7680}, height: {min: 4320}}};
 let constraints = qvgaConstraints;
 
 function addToEventLog(text, severity = 'info') {
@@ -153,10 +153,14 @@ document.addEventListener('DOMContentLoaded', async function(event) {
   if (stopped) return;
   addToEventLog('DOM Content Loaded');
 
+  if (typeof WebCodecs === 'undefined') {
+    addToEventLog('Your browser does not support the WebCodecs API.', 'fatal');
+    return;
+  }
+
   if (typeof MediaStreamTrackProcessor === 'undefined' ||
       typeof MediaStreamTrackGenerator === 'undefined') {
-    addToEventLog('Your browser does not support the experimental Mediacapture-transform API.\n' +
-        'Please launch with the --enable-blink-features=WebCodecs,MediaStreamInsertableStreams flag','fatal');
+    addToEventLog('Your browser does not support the Mediacapture-transform API.', 'fatal');
     return;
   }
 
@@ -193,11 +197,10 @@ document.addEventListener('DOMContentLoaded', async function(event) {
         data.addColumn('number', 'RTT');
         data.addRows(JSON.parse(e.data.text));
         let options = {
-          width:  800,
-          height: 500,
           title: 'RTT (ms) versus Frame length',
-          haxis: {title: 'Frame length', minvalue:0, maxValue: 30000},
-          vaxis: {title: 'Round Trip Time (ms)', minValue:0, maxValue: 500}
+          haxis: {title: 'Length'},
+          vaxis: {title: 'RTT'},
+          legend: 'none'
         };
         let chart = new google.visualization.ScatterChart(chart_div);
         chart.draw(data, options);  

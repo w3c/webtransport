@@ -743,11 +743,11 @@ SSRC = this.config.ssrc
          const b =   (B1 & 0x08)/8
          const seqno = readUInt32(chunk, 12);
          if (d == 1) {
-           // if the frame is discardable, stop trying to deliver after 2 RTTmin
-           rto = 2 * rtt; 
+           // if the frame is discardable, stop trying to deliver after 1.5 RTTmin
+           rto = 1.5 * rtt; 
          } else {
            //If the frame is non-discardable (keyframe, configuration or base layer) don't give up as easily. 
-           rto = 5 * rtt; 
+           rto = 5 * rtt_stats.median; 
          }
          timeoutId = setTimeout(function() {
            self.postMessage({text: `Aborting send, seqno: ${seqno} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
