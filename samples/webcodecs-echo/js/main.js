@@ -2,6 +2,7 @@
 
 var preferredResolution;
 let mediaStream, videoSource, bitrate = 3000000;
+let len_data = [];
 var stopped = false;
 var preferredCodec ="VP8";
 var mode = "L1T3";
@@ -16,8 +17,10 @@ const codecButtons = document.querySelector('#codecButtons');
 const resButtons = document.querySelector('#resButtons');
 const modeButtons = document.querySelector('#modeButtons');
 const hwButtons = document.querySelector('#hwButtons');
+const chart_div = document.getElementById('chart_div');
 const videoSelect = document.querySelector('select#videoSource');
 const selectors = [videoSelect];
+chart_div.style.display = "none";
 connectButton.disabled = false;
 stopButton.disabled = true;
 
@@ -139,6 +142,7 @@ function stop() {
   stopped = true;
   stopButton.disabled = true;
   connectButton.disabled = true;
+  chart_div.style.display = "initial";
   streamWorker.postMessage({ type: "stop" });
   inputStream.cancel();
   outputStream.abort(); 
@@ -177,7 +181,28 @@ document.addEventListener('DOMContentLoaded', async function(event) {
   addToEventLog('Worker created.');
   // Print messages from the worker in the text area.
   streamWorker.addEventListener('message', function(e) {
-    addToEventLog('Worker msg: ' + e.data.text, e.data.severity);
+    if (e.data.severity != 'chart'){
+       addToEventLog('Worker msg: ' + e.data.text, e.data.severity);
+    } else {
+      //draw chart
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(() => {
+        let data = new google.visualization.DataTable();
+        //addToEventLog('Data dump: ' + e.data.text);
+        data.addColumn('number', 'Length');
+        data.addColumn('number', 'RTT');
+        data.addRows(JSON.parse(e.data.text));
+        let options = {
+          width:  800,
+          height: 500,
+          title: 'RTT (ms) versus Frame length',
+          haxis: {title: 'Frame length', minvalue:0, maxValue: 30000},
+          vaxis: {title: 'Round Trip Time (ms)', minValue:0, maxValue: 500}
+        };
+        let chart = new google.visualization.ScatterChart(chart_div);
+        chart.draw(data, options);  
+      });
+    }
   }, false);
 
   stopButton.onclick = () => {

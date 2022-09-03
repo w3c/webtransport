@@ -69,7 +69,7 @@ let decqueue_aggregate = {
 };
 
 function bwe_update(seqno, len, rtt_new){
-  bwe_aggregate.all.push([seqno, len, rtt_new]);
+  bwe_aggregate.all.push([len, rtt_new]);
   bwe_aggregate.seqmin = Math.min(bwe_aggregate.seqmin, seqno);
   bwe_aggregate.seqmax = Math.max(bwe_aggregate.seqmax, seqno);
   bwe_aggregate.lenmin = Math.min(bwe_aggregate.lenmin, len);
@@ -689,6 +689,7 @@ SSRC = this.config.ssrc
      const decqueue_stats = decqueue_report();
      const rtt_stats = rtt_report();
      const bwe_stats = bwe_report();
+     self.postMessage({severity: 'chart', text: JSON.stringify(bwe_aggregate.all)});
      self.postMessage({text: 'BWE report: ' + JSON.stringify(bwe_stats)});
      self.postMessage({text: 'RTT report: ' + JSON.stringify(rtt_stats)});  
      self.postMessage({text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});
