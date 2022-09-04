@@ -747,7 +747,7 @@ SSRC = this.config.ssrc
            rto = 1.5 * rtt; 
          } else {
            //If the frame is non-discardable (keyframe, configuration or base layer) don't give up as easily. 
-           rto = 5 * rtt_stats.median; 
+           rto = 5 * rtt;
          }
          timeoutId = setTimeout(function() {
            self.postMessage({text: `Aborting send, seqno: ${seqno} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});

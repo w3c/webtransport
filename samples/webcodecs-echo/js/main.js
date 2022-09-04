@@ -153,14 +153,9 @@ document.addEventListener('DOMContentLoaded', async function(event) {
   if (stopped) return;
   addToEventLog('DOM Content Loaded');
 
-  if (typeof WebCodecs === 'undefined') {
-    addToEventLog('Your browser does not support the WebCodecs API.', 'fatal');
-    return;
-  }
-
   if (typeof MediaStreamTrackProcessor === 'undefined' ||
       typeof MediaStreamTrackGenerator === 'undefined') {
-    addToEventLog('Your browser does not support the Mediacapture-transform API.', 'fatal');
+    addToEventLog('Your browser does not support the WebCodecs and Mediacapture-transform APIs.', 'fatal');
     return;
   }
 
@@ -197,6 +192,8 @@ document.addEventListener('DOMContentLoaded', async function(event) {
         data.addColumn('number', 'RTT');
         data.addRows(JSON.parse(e.data.text));
         let options = {
+          width:  800,
+          height: 500,
           title: 'RTT (ms) versus Frame length',
           haxis: {title: 'Length'},
           vaxis: {title: 'RTT'},
