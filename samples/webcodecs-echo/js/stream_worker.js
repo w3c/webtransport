@@ -779,33 +779,36 @@ SSRC = this.config.ssrc
 
    createReceiveStream(self, transport) {
      return new ReadableStream({
-       async start(controller) {
+       start(controller) {
        // called by constructor
          this.streamNumber = 0;
          this.reader = transport.incomingUnidirectionalStreams.getReader();
        },
        async pull(controller) {
-         // called read when controller's queue is empty
-         let stream_reader, number;
-         try {
-           const { value, done } = await this.reader.read();
-           if (done) {
-             controller.close();
-             self.postMessage({severity: 'fatal', text: 'Done accepting unidirectional streams'});
-             return;
+         // When called, keep reading frames 
+         while (true) {
+           let stream_reader, number;
+           try {
+             const { value, done } = await this.reader.read();
+             if (done) {
+               controller.close();
+               self.postMessage({severity: 'fatal', text: 'Done accepting unidirectional streams'});
+               return;
+             } else {
+               number = this.streamNumber++;
+               //self.postMessage({text: 'New incoming stream # ' + number});
+               stream_reader = value.getReader();
+               let frame = await get_frame(stream_reader, number);
+               if (frame) {
+                 controller.enqueue(frame);
+               }
+             }
+           } catch (e) {
+             self.postMessage({severity: 'fatal', text: `Error in obtaining stream.getReader(), stream # ${number} : ${e.message}`});
            }
-           number = this.streamNumber++;
-           //self.postMessage({text: 'New incoming stream # ' + number});
-           stream_reader = value.getReader();
-         } catch (e) {
-           self.postMessage({severity: 'fatal', text: `Error in obtaining stream.getReader(), stream # ${number} : ${e.message}`});
-         }
-         let frame = await get_frame(stream_reader, number);
-         if (frame) {
-           controller.enqueue(frame);
          }
        },
-       async cancel(reason){
+       cancel(reason){
          // called when cancel(reason) is called
          controller.close();
          self.postMessage({severity: 'fatal', text: `Readable Stream Cancelled: ${reason}`});
