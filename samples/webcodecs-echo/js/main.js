@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async function(event) {
         data.addColumn('number', 'RTT');
         data.addRows(JSON.parse(e.data.text));
         let options = {
-          width:  800,
+          width:  900,
           height: 500,
           title: 'RTT (ms) versus Frame length',
           haxis: {title: 'Length'},

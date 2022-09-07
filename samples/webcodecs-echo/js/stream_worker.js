@@ -1,6 +1,6 @@
 'use strict';
 
-let encoder, decoder, pl, started = false, stopped = false, first = true, start_time, end_time, rtt=40.;
+let encoder, decoder, pl, started = false, stopped = false, first = true, start_time, end_time, rtt_min=40.;
 
 let bwe_aggregate = {
    all: [],
@@ -69,7 +69,7 @@ let decqueue_aggregate = {
 };
 
 function bwe_update(seqno, len, rtt_new){
-  bwe_aggregate.all.push([len, rtt_new]);
+  bwe_aggregate.all.push([seqno, len, rtt_new]);
   bwe_aggregate.seqmin = Math.min(bwe_aggregate.seqmin, seqno);
   bwe_aggregate.seqmax = Math.max(bwe_aggregate.seqmax, seqno);
   bwe_aggregate.lenmin = Math.min(bwe_aggregate.lenmin, len);
@@ -77,8 +77,8 @@ function bwe_update(seqno, len, rtt_new){
   bwe_aggregate.recvsum += len;
 }
 
-function rtt_update(rtt_new) {
-  rtt_aggregate.all.push(rtt_new);
+function rtt_update(len, rtt_new) {
+  rtt_aggregate.all.push([len, rtt_new]);
   rtt_aggregate.min = Math.min(rtt_aggregate.min, rtt_new);
   rtt_aggregate.max = Math.max(rtt_aggregate.max, rtt_new);
   rtt_aggregate.sum += rtt_new;
@@ -105,11 +105,18 @@ function bwe_report(){
   const lenmin = bwe_aggregate.lenmin;
   const lenmax = bwe_aggregate.lenmax;
   const recvsum = bwe_aggregate.recvsum;
-  const reorder =  0; // Calculate reordered frames
   const time = end_time - start_time;
   const loss = (bwe_aggregate.seqmax - bwe_aggregate.seqmin + 1) - len ; // Calculate lost frames
   const bwu = 8 * recvsum/(time/1000); //Calculate bandwidth used in bits/second
   const bwe = 0.;
+  let reorder = 0;
+  for (let i = 1; i < len ; i++) {
+    //count the number of times that sequence numbers arrived out of order
+    if (bwe_aggregate.all[i][0] < bwe_aggregate.all[i-1][0] ) {
+      reorder++;
+    } 
+  }
+
   // Todo: Calculate bwe according to model.
   // Model: rtt*1000  = (len * 8 + hdr)/bwe + qd
   // rtt (ms), hdr (link layer + quic headers, bytes), len (app payload, bytes), bwe (bits/second), qd (queueing delay, ms)
@@ -128,16 +135,19 @@ function bwe_report(){
 }
 
 function rtt_report() {
-  rtt_aggregate.all.sort();
+  rtt_aggregate.all.sort((a, b) =>  { 
+    return (a[1] - b[1]); 
+  });
   const len = rtt_aggregate.all.length;
   const half = len >> 1;
   const f = (len + 1) >> 2;
   const t = (3 * (len + 1)) >> 2;
   const alpha1 = (len + 1)/4 - Math.trunc((len + 1)/4);
   const alpha3 = (3 * (len + 1)/4) - Math.trunc(3 * (len + 1)/4);
-  const fquart = rtt_aggregate.all[f] + alpha1 * (rtt_aggregate.all[f + 1] - rtt_aggregate.all[f]);
-  const tquart = rtt_aggregate.all[t] + alpha3 * (rtt_aggregate.all[t + 1] - rtt_aggregate.all[t]);
-  const median = len % 2 === 1 ? rtt_aggregate.all[len >> 1] : (rtt_aggregate.all[half - 1] + rtt_aggregate.all[half]) / 2;
+  const fquart = rtt_aggregate.all[f][1] + alpha1 * (rtt_aggregate.all[f + 1][1] - rtt_aggregate.all[f][1]);
+  const tquart = rtt_aggregate.all[t][1] + alpha3 * (rtt_aggregate.all[t + 1][1] - rtt_aggregate.all[t][1]);
+  const median = len % 2 === 1 ? rtt_aggregate.all[len >> 1][1] : (rtt_aggregate.all[half - 1][1] + rtt_aggregate.all[half][1]) / 2;
+  //self.postMessage({text: 'Data dump: ' + JSON.stringify(rtt_aggregate.all)});
   return {
      count: len,
      min: rtt_aggregate.min,
@@ -259,7 +269,7 @@ async function get_frame(read_stream, number) {
       if (done) {
         if (packlen == totalen) {
            let rtt = ((0xffffffff & Math.trunc(1000 * performance.now())) - sendTime)/1000.; 
-           rtt_update(rtt);
+           rtt_update(packlen, rtt);
            bwe_update(seqno, packlen, rtt); 
            //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen + ' rtt: ' + rtt});
            return frame.buffer; //complete frame has been received
@@ -689,7 +699,7 @@ SSRC = this.config.ssrc
      const decqueue_stats = decqueue_report();
      const rtt_stats = rtt_report();
      const bwe_stats = bwe_report();
-     self.postMessage({severity: 'chart', text: JSON.stringify(bwe_aggregate.all)});
+     self.postMessage({severity: 'chart', text: JSON.stringify(rtt_aggregate.all)});
      self.postMessage({text: 'BWE report: ' + JSON.stringify(bwe_stats)});
      self.postMessage({text: 'RTT report: ' + JSON.stringify(rtt_stats)});  
      self.postMessage({text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});
@@ -725,10 +735,9 @@ SSRC = this.config.ssrc
          if (first) {
            first = false;
          } else {
-           let rtt_stats = rtt_report();
-           rtt = rtt_stats.min;
+           rtt_min = rtt_aggregate.min;
          }
-         //self.postMessage({text: 'RTT: ' + rtt});
+         //self.postMessage({text: 'RTTmin: ' + rtt});
          //check what kind of frame it is
          const first4 = readUInt32(chunk, 0);
          const B0 = (first4 & 0x000000FF);
@@ -744,10 +753,10 @@ SSRC = this.config.ssrc
          const seqno = readUInt32(chunk, 12);
          if (d == 1) {
            // if the frame is discardable, stop trying to deliver after 1.5 RTTmin
-           rto = 1.5 * rtt; 
+           rto = 1.5 * rtt_min; 
          } else {
            //If the frame is non-discardable (keyframe, configuration or base layer) don't give up as easily. 
-           rto = 5 * rtt;
+           rto = 5 * rtt_min;
          }
          timeoutId = setTimeout(function() {
            self.postMessage({text: `Aborting send, seqno: ${seqno} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
