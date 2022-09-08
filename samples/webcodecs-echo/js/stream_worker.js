@@ -5,6 +5,9 @@ let encoder, decoder, pl, started = false, stopped = false, first = true, start_
 let bwe_aggregate = {
    all: [],
    lenmin: Number.MAX_VALUE,
+   lenfquart: 0,
+   lenmedian: 0,
+   lentquart: 0,
    lenmax: 0,
    seqmin: Number.MAX_VALUE,
    seqmax: 0,
@@ -116,9 +119,20 @@ function bwe_report(){
       reorder++;
     } 
   }
-
+  //sort by payload length
+  bwe_aggregate.all.sort((a, b) =>  {
+    return (a[1] - b[1]);
+  });
+  const half = len >> 1;
+  const f = (len + 1) >> 2;
+  const t = (3 * (len + 1)) >> 2;
+  const alpha1 = (len + 1)/4 - Math.trunc((len + 1)/4);
+  const alpha3 = (3 * (len + 1)/4) - Math.trunc(3 * (len + 1)/4);
+  const lenfquart = bwe_aggregate.all[f][1] + alpha1 * (bwe_aggregate.all[f + 1][1] - bwe_aggregate.all[f][1]);
+  const lentquart = bwe_aggregate.all[t][1] + alpha3 * (bwe_aggregate.all[t + 1][1] - bwe_aggregate.all[t][1]);
+  const lenmedian = len % 2 === 1 ? bwe_aggregate.all[len >> 1][1] : (bwe_aggregate.all[half - 1][1] + bwe_aggregate.all[half][1]) / 2;
   // Todo: Calculate bwe according to model.
-  // Model: rtt*1000  = (len * 8 + hdr)/bwe + qd
+  // Model: RTTmin = RTTtrans + (len * 8 + hdr)/bwe
   // rtt (ms), hdr (link layer + quic headers, bytes), len (app payload, bytes), bwe (bits/second), qd (queueing delay, ms)
   return {
     count: len,
@@ -126,6 +140,9 @@ function bwe_report(){
     seqmin: seqmin,
     seqmax: seqmax,
     lenmin: lenmin,
+    lenfquart: lenfquart,
+    lenmedian: lenmedian,
+    lentquart: lentquart,
     lenmax: lenmax,
     reorder: reorder,
     bwe: bwe,
@@ -723,6 +740,7 @@ SSRC = this.config.ssrc
        async start(controller) {
          // called by constructor
          // test to see if transport is still usable?
+         start_time = performance.now();
        },
        async write(chunk, controller) {
          let writable, timeoutId, rto, writer;
@@ -830,7 +848,6 @@ SSRC = this.config.ssrc
      if (stopped) return;
      started = true;
      self.postMessage({text: 'Start method called.'});
-     start_time = performance.now();
      const promise1 = new Promise ((resolve, reject) => {
        this.inputStream
            .pipeThrough(this.EncodeVideoStream(self,this.config))
