@@ -1,6 +1,6 @@
 'use strict';
 
-let encoder, decoder, pl, started = false, stopped = false, first = true, start_time, end_time, rtt_min=100., rtt_var = 10000.;
+let encoder, decoder, pl, started = false, stopped = false, first = true, k = 4, alpha = .125, beta = .25, g = .1, start_time, end_time;
 
 let bwe_aggregate = {
    all: [],
@@ -17,6 +17,9 @@ let rtt_aggregate = {
   max: 0,
   sum: 0,
   sumsq: 0,
+  srtt: 0,
+  rttvar: 0,
+  rto: 0,
 };
 
 let enc_aggregate = {
@@ -62,6 +65,15 @@ function rtt_update(len, rtt_new) {
   rtt_aggregate.max = Math.max(rtt_aggregate.max, rtt_new);
   rtt_aggregate.sum += rtt_new;
   rtt_aggregate.sumsq += rtt_new * rtt_new;
+  if (first) {
+    first = false;
+    rtt_aggregate.srtt = rtt_new;
+    rtt_aggregate.rttvar = rtt_new/2.;
+  } else {
+    rtt_aggregate.srtt = (1 - alpha) * rtt_aggregate.srtt + alpha * rtt_new;
+    rtt_aggregate.rttvar = (1 - beta) * rtt_aggregate.rttvar + beta * (Math.abs(rtt_aggregate.srtt - rtt_new));
+  }
+  rtt_aggregate.rto = rtt_aggregate.srtt + Math.max(g, k * rtt_aggregate.rttvar);
 }
 
 function enc_update(duration) {
@@ -153,6 +165,9 @@ function rtt_report() {
      tquart: tquart,
      max: rtt_aggregate.max,
      stdev: std,
+     srtt: rtt_aggregate.srtt,
+     rttvar: rtt_aggregate.rttvar,
+     rto:  rtt_aggregate.rto,
   };
 }
 
@@ -723,7 +738,7 @@ SSRC = this.config.ssrc
          start_time = performance.now();
        },
        async write(chunk, controller) {
-         let writable, timeoutId, rto, writer, rtt_avg; 
+         let writable, timeoutId, rto, writer, srtt, rttvar, rttmin = 100;
          try {
            writable = await transport.createUnidirectionalStream();
            writer = writable.getWriter();
@@ -733,13 +748,15 @@ SSRC = this.config.ssrc
          let len = rtt_aggregate.all.length;
          if (first) {
            first = false;
-           rtt_avg = rtt_min;
-         } else if (len > 3) {
-           rtt_avg = rtt_aggregate.sum / len;
-           rtt_var = (rtt_aggregate.sumsq - len * rtt_avg  * rtt_avg) / (len - 1);
-           rtt_min = rtt_aggregate.min;
+           srtt = rttmin;
+           rttvar = rttmin/2;
+           rto = srtt + Math.max(g, k * rttvar);
+         } else {
+           srtt = rtt_aggregate.srtt;
+           rttvar = rtt_aggregate.rttvar;
+           rto = rtt_aggregate.rto; 
          }
-         //self.postMessage({text: 'RTTmin: ' + rtt_min + ' RTTavg: ' + rtt_avg + ' RTTstd: ' + Math.sqrt(rtt_var)});
+         //self.postMessage({text: 'SRTT: ' + srtt + ' RTTvar: ' + rttvar + ' RTO: ' + rto});
          //check what kind of frame it is
          const first4 = readUInt32(chunk, 0);
          const B0 = (first4 & 0x000000FF);
@@ -754,23 +771,23 @@ SSRC = this.config.ssrc
          const b =   (B1 & 0x08)/8
          const seqno = readUInt32(chunk, 12);
          if (d == 1) {
-           // if the frame is discardable, allow three standard deviations from the minimum
-           rto = (rtt_min + 3 * Math.sqrt(rtt_var));
+           // if the frame is discardable, set rto to minimum of 200 ms and calculated RTO
+           rto = Math.max(rto, 200.);
          } else {
-           //If the frame is non-discardable (keyframe, configuration or base layer) allow five standard deviations.
-           rto = (rtt_min + 5 * Math.sqrt(rtt_var));
+           //If the frame is non-discardable (keyframe, configuration or base layer) set minimum to 400ms
+           rto = Math.max(rto, 400.);
          }
          try {
            await writer.write(chunk);
          } catch (e) {
-           self.postMessage({text: 'Failure to write frame'});
+           self.postMessage({text: `Failure to write frame: ${e.message}`});
          }
          timeoutId = setTimeout(function() {
            self.postMessage({text: `Aborting send, seqno: ${seqno} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
            writer.abort('Send taking too long').then(() => {
              self.postMessage({text: 'Abort succeeded'});
            }).catch((e) => {
-             self.postMessage({text: 'Abort failed'});
+             self.postMessage({text: `Abort failed: ${e.message}`});
            });
          }, rto);
          try {
@@ -852,6 +869,6 @@ SSRC = this.config.ssrc
         self.postMessage({text: 'Pipelines started'});
      }).catch((e) => {
         self.postMessage({severity: 'fatal', text: `pipeline error: ${e.message}`});
-     })
+     });
    }
 }
