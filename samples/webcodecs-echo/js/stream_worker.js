@@ -142,7 +142,7 @@ function rtt_report() {
   const tquart = rtt_aggregate.all[t][1] + alpha3 * (rtt_aggregate.all[t + 1][1] - rtt_aggregate.all[t][1]);
   const median = len % 2 === 1 ? rtt_aggregate.all[len >> 1][1] : (rtt_aggregate.all[half - 1][1] + rtt_aggregate.all[half][1]) / 2;
   const avg = rtt_aggregate.sum / len;
-  const std = Math.sqrt((rtt_aggregate.sumsq - avg  * avg) / (len - 1));
+  const std = Math.sqrt((rtt_aggregate.sumsq - len * avg  * avg) / (len - 1));
   //self.postMessage({text: 'Data dump: ' + JSON.stringify(rtt_aggregate.all)});
   return {
      count: len,
@@ -736,10 +736,10 @@ SSRC = this.config.ssrc
            rtt_avg = rtt_min;
          } else if (len > 3) {
            rtt_avg = rtt_aggregate.sum / len;
-           rtt_var = (rtt_aggregate.sumsq - rtt_avg  * rtt_avg) / (len - 1);
+           rtt_var = (rtt_aggregate.sumsq - len * rtt_avg  * rtt_avg) / (len - 1);
            rtt_min = rtt_aggregate.min;
          }
-         //self.postMessage({text: 'RTTmin: ' + rtt_min + ' RTTavg: ' + rtt_avg + ' RTTvar: ' + rtt_var});
+         //self.postMessage({text: 'RTTmin: ' + rtt_min + ' RTTavg: ' + rtt_avg + ' RTTstd: ' + Math.sqrt(rtt_var)});
          //check what kind of frame it is
          const first4 = readUInt32(chunk, 0);
          const B0 = (first4 & 0x000000FF);
@@ -754,11 +754,11 @@ SSRC = this.config.ssrc
          const b =   (B1 & 0x08)/8
          const seqno = readUInt32(chunk, 12);
          if (d == 1) {
-           // if the frame is discardable, allow two standard deviations from the minimum
-           rto = (rtt_min + 2 * Math.sqrt(rtt_var))/2;
+           // if the frame is discardable, allow three standard deviations from the minimum
+           rto = (rtt_min + 3 * Math.sqrt(rtt_var));
          } else {
-           //If the frame is non-discardable (keyframe, configuration or base layer) allow three standard deviations.
-           rto = (rtt_min + 3 * Math.sqrt(rtt_var))/2;
+           //If the frame is non-discardable (keyframe, configuration or base layer) allow five standard deviations.
+           rto = (rtt_min + 5 * Math.sqrt(rtt_var));
          }
          try {
            await writer.write(chunk);
