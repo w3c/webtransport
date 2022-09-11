@@ -1,73 +1,49 @@
 'use strict';
 
-let encoder, decoder, pl, started = false, stopped = false, first = true, start_time, end_time, rtt_min=40.;
+let encoder, decoder, pl, started = false, stopped = false, first = true, start_time, end_time, rtt_min=100., rtt_var = 10000.;
 
 let bwe_aggregate = {
    all: [],
    lenmin: Number.MAX_VALUE,
-   lenfquart: 0,
-   lenmedian: 0,
-   lentquart: 0,
    lenmax: 0,
    seqmin: Number.MAX_VALUE,
    seqmax: 0,
    recvsum: 0,
-   bwu: 0,
-   bwe: 0,
 }
 
 let rtt_aggregate = {
   all: [],
-  fquart: 0,
-  median: 0,
-  tquart: 0,
   min: Number.MAX_VALUE,
   max: 0,
-  avg: 0,
   sum: 0,
+  sumsq: 0,
 };
 
 let enc_aggregate = {
   all: [],
-  fquart: 0,
-  median: 0,
-  tquart: 0,
   min: Number.MAX_VALUE,
   max: 0,
-  avg: 0,
   sum: 0,
 };
 
 let dec_aggregate = {
   all: [],
-  fquart: 0,
-  median: 0,
-  tquart: 0,
   min: Number.MAX_VALUE,
   max: 0,
-  avg: 0,
   sum: 0,
 };
 
 let encqueue_aggregate = {
   all: [],
-  fquart: 0,
-  median: 0,
-  tquart: 0,
   min: Number.MAX_VALUE,
   max: 0,
-  avg: 0,
   sum: 0,
 };
 
 let decqueue_aggregate = {
   all: [],
-  fquart: 0,
-  median: 0,
-  tquart: 0,
   min: Number.MAX_VALUE,
   max: 0,
-  avg: 0,
   sum: 0,
 };
 
@@ -85,6 +61,7 @@ function rtt_update(len, rtt_new) {
   rtt_aggregate.min = Math.min(rtt_aggregate.min, rtt_new);
   rtt_aggregate.max = Math.max(rtt_aggregate.max, rtt_new);
   rtt_aggregate.sum += rtt_new;
+  rtt_aggregate.sumsq += rtt_new * rtt_new;
 }
 
 function enc_update(duration) {
@@ -164,15 +141,18 @@ function rtt_report() {
   const fquart = rtt_aggregate.all[f][1] + alpha1 * (rtt_aggregate.all[f + 1][1] - rtt_aggregate.all[f][1]);
   const tquart = rtt_aggregate.all[t][1] + alpha3 * (rtt_aggregate.all[t + 1][1] - rtt_aggregate.all[t][1]);
   const median = len % 2 === 1 ? rtt_aggregate.all[len >> 1][1] : (rtt_aggregate.all[half - 1][1] + rtt_aggregate.all[half][1]) / 2;
+  const avg = rtt_aggregate.sum / len;
+  const std = Math.sqrt((rtt_aggregate.sumsq - avg  * avg) / (len - 1));
   //self.postMessage({text: 'Data dump: ' + JSON.stringify(rtt_aggregate.all)});
   return {
      count: len,
      min: rtt_aggregate.min,
      fquart: fquart,
-     avg: rtt_aggregate.sum / len,
+     avg: avg,
      median: median,
      tquart: tquart,
      max: rtt_aggregate.max,
+     stdev: std,
   };
 }
 
@@ -743,19 +723,23 @@ SSRC = this.config.ssrc
          start_time = performance.now();
        },
        async write(chunk, controller) {
-         let writable, timeoutId, rto, writer;
+         let writable, timeoutId, rto, writer, rtt_avg; 
          try {
            writable = await transport.createUnidirectionalStream();
            writer = writable.getWriter();
          } catch (e) {
            self.postMessage({severity: 'fatal', text: `Failure to create writable stream ${e.message}`});
          }
+         let len = rtt_aggregate.all.length;
          if (first) {
            first = false;
-         } else {
+           rtt_avg = rtt_min;
+         } else if (len > 3) {
+           rtt_avg = rtt_aggregate.sum / len;
+           rtt_var = (rtt_aggregate.sumsq - rtt_avg  * rtt_avg) / (len - 1);
            rtt_min = rtt_aggregate.min;
          }
-         //self.postMessage({text: 'RTTmin: ' + rtt});
+         //self.postMessage({text: 'RTTmin: ' + rtt_min + ' RTTavg: ' + rtt_avg + ' RTTvar: ' + rtt_var});
          //check what kind of frame it is
          const first4 = readUInt32(chunk, 0);
          const B0 = (first4 & 0x000000FF);
@@ -770,26 +754,30 @@ SSRC = this.config.ssrc
          const b =   (B1 & 0x08)/8
          const seqno = readUInt32(chunk, 12);
          if (d == 1) {
-           // if the frame is discardable, stop trying to deliver after 1.5 RTTmin
-           rto = 1.5 * rtt_min; 
+           // if the frame is discardable, allow two standard deviations from the minimum
+           rto = (rtt_min + 2 * Math.sqrt(rtt_var))/2;
          } else {
-           //If the frame is non-discardable (keyframe, configuration or base layer) don't give up as easily. 
-           rto = 5 * rtt_min;
+           //If the frame is non-discardable (keyframe, configuration or base layer) allow three standard deviations.
+           rto = (rtt_min + 3 * Math.sqrt(rtt_var))/2;
+         }
+         try {
+           await writer.write(chunk);
+         } catch (e) {
+           self.postMessage({text: 'Failure to write frame'});
          }
          timeoutId = setTimeout(function() {
            self.postMessage({text: `Aborting send, seqno: ${seqno} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
-           writer.abort(' Send taking too long').then(() => {
+           writer.abort('Send taking too long').then(() => {
              self.postMessage({text: 'Abort succeeded'});
            }).catch((e) => {
              self.postMessage({text: 'Abort failed'});
            });
          }, rto);
          try {
-           await writer.write(chunk);
            await writer.close();
            clearTimeout(timeoutId);
-         } catch(e) {
-           self.postMessage({text: 'Failure to write frame'});
+         } catch (e) {
+           self.postMessage({text: `Stream close failed: ${e.mssage}`});
          }
        }, 
        async close(controller) {
