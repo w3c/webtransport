@@ -1,6 +1,6 @@
 'use strict';
 
-let encoder, decoder, pl, started = false, stopped = false, first = true, k = 4, alpha = .125, beta = .25, g = .1, start_time, end_time;
+let encoder, decoder, pl, started = false, stopped = false, rtt_min = 100., k = 4, alpha = .125, beta = .25, g = .1, start_time, end_time;
 
 let bwe_aggregate = {
    all: [],
@@ -65,8 +65,7 @@ function rtt_update(len, rtt_new) {
   rtt_aggregate.max = Math.max(rtt_aggregate.max, rtt_new);
   rtt_aggregate.sum += rtt_new;
   rtt_aggregate.sumsq += rtt_new * rtt_new;
-  if (first) {
-    first = false;
+  if (rtt_aggregate.all.length == 1) {
     rtt_aggregate.srtt = rtt_new;
     rtt_aggregate.rttvar = rtt_new/2.;
   } else {
@@ -738,7 +737,7 @@ SSRC = this.config.ssrc
          start_time = performance.now();
        },
        async write(chunk, controller) {
-         let writable, timeoutId, rto, writer, srtt, rttvar, rttmin = 100;
+         let writable, timeoutId, rto, writer, srtt, rttvar;
          try {
            writable = await transport.createUnidirectionalStream();
            writer = writable.getWriter();
@@ -746,10 +745,9 @@ SSRC = this.config.ssrc
            self.postMessage({severity: 'fatal', text: `Failure to create writable stream ${e.message}`});
          }
          let len = rtt_aggregate.all.length;
-         if (first) {
-           first = false;
-           srtt = rttmin;
-           rttvar = rttmin/2;
+         if (len == 0) {
+           srtt = rtt_min;
+           rttvar = rtt_min/2;
            rto = srtt + Math.max(g, k * rttvar);
          } else {
            srtt = rtt_aggregate.srtt;
@@ -771,11 +769,11 @@ SSRC = this.config.ssrc
          const b =   (B1 & 0x08)/8
          const seqno = readUInt32(chunk, 12);
          if (d == 1) {
-           // if the frame is discardable, set rto to minimum of 200 ms and calculated RTO
-           rto = Math.max(rto, 200.);
+           // if the frame is discardable, set rto to minimum of 100 ms and calculated RTO
+           rto = Math.max(rto, 100.);
          } else {
-           //If the frame is non-discardable (keyframe, configuration or base layer) set minimum to 400ms
-           rto = Math.max(rto, 400.);
+           //If the frame is non-discardable (keyframe, configuration or base layer) set minimum higher
+           rto = Math.max(rto, 200.);
          }
          try {
            await writer.write(chunk);
@@ -792,9 +790,13 @@ SSRC = this.config.ssrc
          }, rto);
          try {
            await writer.close();
+         } catch (e) {
+           self.postMessage({text: `Stream close failed: ${e.message}`});
+         }
+         try {
            clearTimeout(timeoutId);
          } catch (e) {
-           self.postMessage({text: `Stream close failed: ${e.mssage}`});
+           self.postMessage({text: `clearTimeout failed: ${e.message}`});
          }
        }, 
        async close(controller) {

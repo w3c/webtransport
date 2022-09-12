@@ -2,7 +2,6 @@
 
 var preferredResolution;
 let mediaStream, videoSource, bitrate = 3000000;
-let len_data = [];
 var stopped = false;
 var preferredCodec ="VP8";
 var mode = "L1T3";
