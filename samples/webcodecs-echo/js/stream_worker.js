@@ -283,6 +283,7 @@ async function get_frame(read_stream, number) {
            rtt_update(packlen, rtt);
            bwe_update(seqno, packlen, rtt); 
            //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen + ' rtt: ' + rtt});
+           read_stream.releaseLock();
            return frame.buffer; //complete frame has been received
         } else {
           self.postMessage({severity: 'fatal', text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
@@ -792,6 +793,11 @@ SSRC = this.config.ssrc
            await writer.close();
          } catch (e) {
            self.postMessage({text: `Stream close failed: ${e.message}`});
+         }
+         try {
+           writer.releaseLock();
+         } catch (e) {
+           self.postMessage({text: `Stream release failed: ${e.message}`});
          }
          try {
            clearTimeout(timeoutId);
