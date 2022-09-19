@@ -1,6 +1,6 @@
 'use strict';
 
-let encoder, decoder, pl, started = false, stopped = false, rtt_min = 100., k = 4, alpha = .125, beta = .25, g = .1, start_time, end_time;
+let encoder, decoder, pl, started = false, stopped = false, rtt_min = 100., start_time, end_time;
 
 let bwe_aggregate = {
    all: [],
@@ -60,6 +60,7 @@ function bwe_update(seqno, len, rtt_new){
 }
 
 function rtt_update(len, rtt_new) {
+  let k=4, g=.1, alpha = .125, beta = .25 ;
   rtt_aggregate.all.push([len, rtt_new]);
   rtt_aggregate.min = Math.min(rtt_aggregate.min, rtt_new);
   rtt_aggregate.max = Math.max(rtt_aggregate.max, rtt_new);
@@ -272,27 +273,32 @@ function decqueue_report() {
   };
 }
 
-async function get_frame(read_stream, number) {
+async function get_frame(readable, number) {
   let i=0, packlen, totalen = 0, frame, sendTime, seqno, first = true;
+  let reader = readable.getReader();
   while (true) {
     try {
-      const { value, done } = await read_stream.read();
+      const { value, done } = await reader.read();
       if (done) {
         if (packlen == totalen) {
            let rtt = ((0xffffffff & Math.trunc(1000 * performance.now())) - sendTime)/1000.; 
            rtt_update(packlen, rtt);
            bwe_update(seqno, packlen, rtt); 
            //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen + ' rtt: ' + rtt});
-           read_stream.releaseLock();
+           reader.releaseLock();
            return frame.buffer; //complete frame has been received
         } else {
-          self.postMessage({severity: 'fatal', text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
-       }
+          reader.releaseLock();
+          self.postMessage({text: 'get_frame error: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
+          return;
+        }
       }
       if (first) {
         packlen = (value[4] << 24) | (value[5] << 16) | (value[6] << 8) | (value[7] << 0);
         if ((packlen < 1) || (packlen > 200000)) {
-          self.postMessage({severity: 'fatal', text: 'Frame length problem: ' + packlen});
+          reader.releaseLock();
+          self.postMessage({text: 'Frame length problem: ' + packlen});
+          return;
         }
         // Retrieve sendTime from value
         sendTime = (value[8] << 24) | (value[9] << 16) | (value[10] << 8) | (value[11] << 0);
@@ -738,7 +744,7 @@ SSRC = this.config.ssrc
          start_time = performance.now();
        },
        async write(chunk, controller) {
-         let writable, timeoutId, rto, writer, srtt, rttvar;
+         let writable, timeoutId, rto, writer, srtt, rttvar, k=4, g=.1;
          try {
            writable = await transport.createUnidirectionalStream();
            writer = writable.getWriter();
@@ -769,12 +775,10 @@ SSRC = this.config.ssrc
          const d =   (B1 & 0x10)/16;
          const b =   (B1 & 0x08)/8
          const seqno = readUInt32(chunk, 12);
-         if (d == 1) {
-           // if the frame is discardable, set rto to minimum of 100 ms and calculated RTO
-           rto = Math.max(rto, 100.);
-         } else {
+         rto = Math.max(rto, 100.);
+         if (d == 0) {
            //If the frame is non-discardable (keyframe, configuration or base layer) set minimum higher
-           rto = Math.max(rto, 200.);
+           rto = 2. * rto ;
          }
          try {
            await writer.write(chunk);
@@ -831,14 +835,14 @@ SSRC = this.config.ssrc
            try {
              const { value, done } = await this.reader.read();
              if (done) {
+               this.reader.releaseLock();
                controller.close();
                self.postMessage({severity: 'fatal', text: 'Done accepting unidirectional streams'});
                return;
              } else {
                number = this.streamNumber++;
-               //self.postMessage({text: 'New incoming stream # ' + number});
-               stream_reader = value.getReader();
-               let frame = await get_frame(stream_reader, number);
+               //self.postMessage({text: `New incoming stream # ${number}`});
+               let frame = await get_frame(value, number);
                if (frame) {
                  controller.enqueue(frame);
                }
