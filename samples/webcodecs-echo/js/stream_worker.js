@@ -756,7 +756,8 @@ SSRC = this.config.ssrc
            rto = rtt_aggregate.rto; 
          }
          //self.postMessage({text: 'SRTT: ' + srtt + ' RTTvar: ' + rttvar + ' RTO: ' + rto});
-         //check what kind of frame it is
+         //check what kind of frame it is and how big
+         const packlen = readUInt32(chunk, 0);
          const first4 = readUInt32(chunk, 4);
          const B0 = (first4 & 0x000000FF);
          const B1 = (first4 & 0x0000FF00) >> 8;
@@ -781,17 +782,17 @@ SSRC = this.config.ssrc
            self.postMessage({text: `Failure to write frame: ${e.message}`});
          }
          timeoutId = setTimeout(function() {
-           self.postMessage({text: `Aborting send, seqno: ${seqno} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
+           self.postMessage({text: `Aborting seqno: ${seqno} len: ${packlen} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
            writer.abort('Send taking too long').then(() => {
              self.postMessage({text: 'Abort succeeded'});
            }).catch((e) => {
-             self.postMessage({text: `Abort failed: ${e.message}`});
+             self.postMessage({text: 'Send Aborted.'});
            });
          }, rto);
          try {
            await writer.close();
          } catch (e) {
-           self.postMessage({text: `Stream close failed: ${e.message}`});
+           self.postMessage({text: 'Stream cannot be closed (due to abort).'});
          }
          try {
            writer.releaseLock();
