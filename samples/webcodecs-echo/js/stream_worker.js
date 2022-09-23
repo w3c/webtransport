@@ -1,6 +1,7 @@
 'use strict';
 
 let encoder, decoder, pl, started = false, stopped = false, rtt_min = 100., start_time, end_time;
+const HEADER_LENGTH = 28;
 
 let bwe_aggregate = {
    all: [],
@@ -60,7 +61,7 @@ function bwe_update(seqno, len, rtt_new){
 }
 
 function rtt_update(len, rtt_new) {
-  let k=4, g=.1, alpha = .125, beta = .25 ;
+  let alpha = .125, beta = .250, k = 4, g = .1;
   rtt_aggregate.all.push([len, rtt_new]);
   rtt_aggregate.min = Math.min(rtt_aggregate.min, rtt_new);
   rtt_aggregate.max = Math.max(rtt_aggregate.max, rtt_new);
@@ -273,51 +274,56 @@ function decqueue_report() {
   };
 }
 
-async function get_frame(readable, number) {
-  let i=0, packlen, totalen = 0, frame, sendTime, seqno, first = true;
-  let reader = readable.getReader();
-  while (true) {
-    try {
-      const { value, done } = await reader.read();
-      if (done) {
-        if (packlen == totalen) {
-           let rtt = ((0xffffffff & Math.trunc(1000 * performance.now())) - sendTime)/1000.; 
-           rtt_update(packlen, rtt);
-           bwe_update(seqno, packlen, rtt); 
-           //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen + ' rtt: ' + rtt});
-           reader.releaseLock();
-           return frame.buffer; //complete frame has been received
-        } else {
-          reader.releaseLock();
-          self.postMessage({text: 'get_frame error: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
-          return;
-        }
-      }
-      if (first) {
-        packlen = (value[4] << 24) | (value[5] << 16) | (value[6] << 8) | (value[7] << 0);
-        if ((packlen < 1) || (packlen > 200000)) {
-          reader.releaseLock();
-          self.postMessage({text: 'Frame length problem: ' + packlen});
-          return;
-        }
-        // Retrieve sendTime from value
-        sendTime = (value[8] << 24) | (value[9] << 16) | (value[10] << 8) | (value[11] << 0);
-        seqno = (value[12] << 24) | (value[13] << 16) | (value[14] << 8) | (value[15] << 0);
-        frame = new Uint8Array(packlen);
-        frame.set(new Uint8Array(value), 0);
-        //self.postMessage({text: 'Fragment: ' + i + ' Length: ' + value.byteLength + ' Total: ' + packlen});
-        first = false;
-        totalen += value.byteLength;
-      } else {
-        i++;
-        //self.postMessage({text: 'Fragment: ' + i + ' Length: ' + value.byteLength + ' Total: ' + packlen});
-        frame.set(new Uint8Array(value), totalen);
-        totalen += value.byteLength;
-      }
-    } catch (e) {
-      self.postMessage({text: `Error while reading from stream # ${number}: ${e.message}`});
-      return ;
+async function readInto(reader, buffer, offset) {
+  let off = offset;
+  while (off < buffer.byteLength) {
+    const {value: view, done} =
+     await reader.read(new Uint8Array(buffer, off, buffer.byteLength - off));
+    buffer = view.buffer;
+    if (done) {
+      break;
     }
+    off += view.byteLength;
+  }
+  return buffer;
+}
+
+async function get_frame(readable, number) {
+  let packlen, totalen = 0, frame, header, sendTime, seqno;
+  let hdr = new ArrayBuffer(HEADER_LENGTH);
+  let reader = readable.getReader({mode: "byob"}); 
+  try {
+    header = new Uint8Array(await readInto(reader, hdr, 0));
+  } catch (e) {
+    self.PostMessage({severity: 'fatal', text: `Couldn't read frame header from stream# ${number}: ${e.message}`});
+  }
+  packlen = (header[0] << 24) | (header[1] << 16) | (header[2] << 8) | (header[3] << 0);
+  if ((packlen < 1) || (packlen > 200000)) {
+    self.postMessage({severity: 'fatal', text: 'Frame length problem: ' + packlen});
+  }
+  // Retrieve sendTime from header
+  sendTime = (header[8] << 24) | (header[9] << 16) | (header[10] << 8) | (header[11] << 0);
+  seqno = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | (header[15] << 0);
+  frame = new Uint8Array(packlen);
+  frame.set(header, 0);
+  totalen += HEADER_LENGTH;
+  //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen});
+  try {
+    frame = await readInto(reader, frame.buffer, totalen);
+  } catch (e) {
+    self.postMessage({severity: 'fatal', text: `readInto failed: ${e.message}`});
+  }
+  totalen = frame.byteLength;
+  if (packlen == totalen) {
+    let rtt = ((0xffffffff & Math.trunc(1000 * performance.now())) - sendTime)/1000.; 
+    rtt_update(packlen, rtt);
+    bwe_update(seqno, packlen, rtt); 
+    //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen + ' rtt: ' + rtt});
+    reader.releaseLock();
+    return frame; //complete frame has been received
+  } else {
+    reader.releaseLock();
+    self.postMessage({severity: 'fatal', text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
   }
 }
 
@@ -389,21 +395,17 @@ class pipeline {
    }
 
 /*
-Header format:
+Header format (28 octets):
                      1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|1 1 0 0 0 0 0 0|       PT      |S|E|I|D|B| TID |    LID        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                      length                                   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|1 1 0 0 0 0 0 0|       PT      |S|E|I|D|B| TID |    LID        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                   send time (performance.now)                 |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                      sequence number                          |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                      keyframe index                           |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                      deltaframe index                         |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                      timestamp...
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -414,6 +416,7 @@ Header format:
 |                      Payload...
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+length = length of the frame, including the header
 PT = payload type:
   x00 = Decoder Configuration
   x01 = H.264
@@ -428,11 +431,8 @@ S, E, I, D, B, TID, LID defined in draft-ietf-avtext-framemarking
    B = Base layer frame
    TID = chunk.svc.temporalLayerId
    LID = 0 (no support for spatial scalability yet)
-length = length of the frame, including the header
 send time = time at which the packet was sent, in ms * 1000
 sequence number = counter incrementing with each frame
-keyframe index = how many keyframes have been sent
-deltaframe index = how many delta frames since the last keyframe
 timestamp = chunk.timestamp
 SSRC = this.config.ssrc
 */
@@ -465,7 +465,7 @@ SSRC = this.config.ssrc
            pt = config.pt;
          }
          //Serialize the chunk
-         let hdr = new ArrayBuffer( 4 + 4 + 4 + 4 + 8 + 4 + 4 + 4);
+         let hdr = new ArrayBuffer( HEADER_LENGTH );
          let i = (chunk.type == 'key' ? 1 : 0);
          let lid = 0;
          let d;
@@ -484,27 +484,25 @@ SSRC = this.config.ssrc
          //self.postMessage({text: 'Serial B0: ' + B0 + ' B1: ' + B1 + ' B2: ' + B2 + ' B3: ' + B3}); 
          let first4 = (B3 & 0xff) | ((B2 & 0xff) << 8) | ((B1 & 0xff) << 16) | ((B0 & 0xff) << 24);
          let sendTime = (0xffffffff & Math.trunc(1000 * performance.now()));
-         writeUInt32(hdr, 0, first4);
+         writeUInt32(hdr, 4, first4);
          writeUInt32(hdr, 8, sendTime);
          writeUInt32(hdr, 12, chunk.seqNo);
-         writeUInt32(hdr, 16, chunk.keyframeIndex);
-         writeUInt32(hdr, 20, chunk.deltaframeIndex);
-         writeUInt64(hdr, 24, BigInt(timestamp));
-         writeUInt32(hdr, 32, config.ssrc);
+         writeUInt64(hdr, 16, BigInt(timestamp));
+         writeUInt32(hdr, 24, config.ssrc);
          if (chunk.type == "config") {
            let enc = new TextEncoder();
            const cfg = enc.encode(chunk.config);
            // self.postMessage({text: 'Serial Config: ' + chunk.config + ' Length: ' + cfg.length});
            let result = new Uint8Array( hdr.byteLength + cfg.length);
-           let len = (cfg.length + 36) & 0xFFFFFFFF; 
-           writeUInt32(hdr, 4, len); 
+           let len = (cfg.length + HEADER_LENGTH) & 0xFFFFFFFF; 
+           writeUInt32(hdr, 0, len); 
            result.set(new Uint8Array(hdr), 0);
            result.set(new Uint8Array(cfg), hdr.byteLength);
            //self.postMessage({text: 'Serialize now: ' + sendTime/1000. + ' seqNo: ' + chunk.seqNo + ' lid: ' + lid + ' tid: ' + tid + ' pt: 0 i: ' + i + ' d: ' + d + ' b: ' + b + ' kfi: ' + chunk.keyframeIndex + ' dfi: ' + chunk.deltaframeIndex +  ' ts: ' + timestamp + ' ssrc: ' + config.ssrc + ' actual len: ' + result.byteLength + ' pack len: ' + len});
            controller.enqueue(result.buffer);
          } else {
-           let len = (chunk.byteLength + 36) & 0xFFFFFFFF;
-           writeUInt32(hdr, 4, len);
+           let len = (chunk.byteLength + HEADER_LENGTH) & 0xFFFFFFFF;
+           writeUInt32(hdr, 0, len);
            let result = new Uint8Array( hdr.byteLength + chunk.byteLength);
            result.set(new Uint8Array(hdr), 0);
            let data = new ArrayBuffer(chunk.byteLength);
@@ -523,7 +521,7 @@ SSRC = this.config.ssrc
        start (controller) {
        },
        transform(chunk, controller) {
-         const first4 = readUInt32(chunk, 0);
+         const first4 = readUInt32(chunk, 4);
          //self.postMessage({text: 'First4: ' + first4});
          const B0 = (first4 & 0x000000FF);
          const B1 = (first4 & 0x0000FF00) >> 8;
@@ -536,15 +534,13 @@ SSRC = this.config.ssrc
          const i =   (B1 & 0x20)/32;
          const d =   (B1 & 0x10)/16;
          const b =   (B1 & 0x08)/8
-         const len = readUInt32(chunk, 4)
+         const len = readUInt32(chunk, 0)
          const sendTime = readUInt32(chunk, 8);
          const seqNo = readUInt32(chunk, 14);
-         const keyframeIndex   = readUInt32(chunk, 16);
-         const deltaframeIndex = readUInt32(chunk, 20);
-         const timestamp = readUInt64(chunk, 24);
-         const ssrc = readUInt32(chunk, 32);
+         const timestamp = readUInt64(chunk, 16);
+         const ssrc = readUInt32(chunk, 24);
          const duration = 0;
-         //self.postMessage({text: 'Dserializ sendTime: ' + sendTime/1000. + ' seqNo: ' + seqNo + ' lid: ' + lid + ' tid: ' + tid + ' pt: ' + pt +  ' i: ' + i + ' d: ' + d + ' b: ' + b + ' kfi: ' + keyframeIndex + ' dfi: ' + deltaframeIndex + ' ts: ' + timestamp + ' ssrc: ' + ssrc + ' length: ' + chunk.byteLength});
+         //self.postMessage({text: 'Dserializ sendTime: ' + sendTime/1000. + ' seqNo: ' + seqNo + ' lid: ' + lid + ' tid: ' + tid + ' pt: ' + pt +  ' i: ' + i + ' d: ' + d + ' b: ' + b + ' ts: ' + timestamp + ' ssrc: ' + ssrc + ' length: ' + chunk.byteLength});
          let hydChunk;
          if (pt == 0) {
            hydChunk = {
@@ -552,11 +548,11 @@ SSRC = this.config.ssrc
              timestamp: timestamp,
            };
            let dec = new TextDecoder();
-           hydChunk.config = dec.decode(new Uint8Array(chunk, 36));
+           hydChunk.config = dec.decode(new Uint8Array(chunk, HEADER_LENGTH));
            // self.postMessage({text: 'Deserial Config: ' + hydChunk.config});
          } else {
-           let data = new Uint8Array(chunk.byteLength - 36); //create Uint8Array for data
-           data.set(new Uint8Array(chunk, 36));
+           let data = new Uint8Array(chunk.byteLength - HEADER_LENGTH); //create Uint8Array for data
+           data.set(new Uint8Array(chunk, HEADER_LENGTH));
            hydChunk = new EncodedVideoChunk ({
               type: (i == 1 ? 'key' : 'delta'),
               timestamp: timestamp,
@@ -568,9 +564,7 @@ SSRC = this.config.ssrc
          hydChunk.ssrc = ssrc;
          hydChunk.pt = pt;
          hydChunk.seqNo = seqNo;
-         hydChunk.keyframeIndex = keyframeIndex;
-         hydChunk.deltaframeIndex = deltaframeIndex;
-         //self.postMessage({text: 'Deserial hdr: 36 ' + 'chunk length: ' + chunk.byteLength });
+         //self.postMessage({text: 'Deserial hdr: ' + HEADER_LENGTH + ' + 'chunk length: ' + chunk.byteLength });
          controller.enqueue(hydChunk);
        }
      });
@@ -604,7 +598,7 @@ SSRC = this.config.ssrc
               })
            } else {
              try {
-              // self.postMessage({text: 'size: ' + chunk.byteLength + ' seq: ' + chunk.seqNo + ' kf: ' + chunk.keyframeIndex + ' delta: ' + chunk.deltaframeIndex + ' dur: ' + chunk.duration + ' ts: ' + chunk.timestamp + ' ssrc: ' + chunk.ssrc + ' pt: ' + chunk.pt + ' tid: ' + chunk.temporalLayerId + ' type: ' + chunk.type});
+              // self.postMessage({text: 'size: ' + chunk.byteLength + ' seq: ' + chunk.seqNo + ' dur: ' + chunk.duration + ' ts: ' + chunk.timestamp + ' ssrc: ' + chunk.ssrc + ' pt: ' + chunk.pt + ' tid: ' + chunk.temporalLayerId + ' type: ' + chunk.type});
                const queue = this.decoder.decodeQueueSize;
                decqueue_update(queue);
                const before = performance.now();
@@ -613,7 +607,7 @@ SSRC = this.config.ssrc
                const duration = after - before;
                dec_update(duration);
              } catch (e) {
-               self.postMessage({severity: 'fatal', text: 'Derror size: ' + chunk.byteLength + ' seq: ' + chunk.seqNo + ' kf: ' + chunk.keyframeIndex + ' delta: ' + chunk.deltaframeIndex + ' dur: ' + chunk.duration + ' ts: ' + chunk.timestamp + ' ssrc: ' + chunk.ssrc + ' pt: ' + chunk.pt + ' tid: ' + chunk.temporalLayerId + ' type: ' + chunk.type});
+               self.postMessage({severity: 'fatal', text: 'Derror size: ' + chunk.byteLength + ' seq: ' + chunk.seqNo + ' dur: ' + chunk.duration + ' ts: ' + chunk.timestamp + ' ssrc: ' + chunk.ssrc + ' pt: ' + chunk.pt + ' tid: ' + chunk.temporalLayerId + ' type: ' + chunk.type});
                self.postMessage({severity: 'fatal', text: `Catch Decode error: ${e.message}`});
              }
            }
@@ -744,7 +738,7 @@ SSRC = this.config.ssrc
          start_time = performance.now();
        },
        async write(chunk, controller) {
-         let writable, timeoutId, rto, writer, srtt, rttvar, k=4, g=.1;
+         let writable, timeoutId, rto, writer, srtt, rttvar, g=.1, k=4;
          try {
            writable = await transport.createUnidirectionalStream();
            writer = writable.getWriter();
@@ -763,7 +757,7 @@ SSRC = this.config.ssrc
          }
          //self.postMessage({text: 'SRTT: ' + srtt + ' RTTvar: ' + rttvar + ' RTO: ' + rto});
          //check what kind of frame it is
-         const first4 = readUInt32(chunk, 0);
+         const first4 = readUInt32(chunk, 4);
          const B0 = (first4 & 0x000000FF);
          const B1 = (first4 & 0x0000FF00) >> 8;
          const B2 = (first4 & 0x00FF0000) >> 16;
@@ -775,10 +769,11 @@ SSRC = this.config.ssrc
          const d =   (B1 & 0x10)/16;
          const b =   (B1 & 0x08)/8
          const seqno = readUInt32(chunk, 12);
+         // Ensure rto is > 100 ms
          rto = Math.max(rto, 100.);
-         if (d == 0) {
-           //If the frame is non-discardable (keyframe, configuration or base layer) set minimum higher
-           rto = 2. * rto ;
+         if (d == 0 ) {
+           // if the frame is non-discardable, double the RTO
+           rto = 2 * rto ;
          }
          try {
            await writer.write(chunk);
@@ -829,31 +824,32 @@ SSRC = this.config.ssrc
          this.reader = transport.incomingUnidirectionalStreams.getReader();
        },
        async pull(controller) {
-         // When called, keep reading frames 
+         // When called, keep reading frames
          while (true) {
-           let stream_reader, number;
-           try {
-             const { value, done } = await this.reader.read();
-             if (done) {
-               this.reader.releaseLock();
-               controller.close();
-               self.postMessage({severity: 'fatal', text: 'Done accepting unidirectional streams'});
-               return;
-             } else {
-               number = this.streamNumber++;
-               //self.postMessage({text: `New incoming stream # ${number}`});
+           const { value, done } = await this.reader.read();
+           if (done) {
+             this.reader.releaseLock();
+             controller.close();
+             self.postMessage({severity: 'fatal', text: 'Done accepting unidirectional streams'});
+             return;
+           } else {
+             let number = this.streamNumber++;
+             //self.postMessage({text: 'New incoming stream # ' + number});
+             try {
                let frame = await get_frame(value, number);
                if (frame) {
                  controller.enqueue(frame);
                }
+             } catch (e) {
+               self.postMessage({severity: 'fatal', text: `Unable to open reader# ${number}: ${e.messsage}`});
+               return;
              }
-           } catch (e) {
-             self.postMessage({severity: 'fatal', text: `Error in obtaining stream.getReader(), stream # ${number} : ${e.message}`});
            }
          }
        },
        cancel(reason){
          // called when cancel(reason) is called
+         this.reader.releaseLock();
          controller.close();
          self.postMessage({severity: 'fatal', text: `Readable Stream Cancelled: ${reason}`});
        }
