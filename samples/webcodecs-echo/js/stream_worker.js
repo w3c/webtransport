@@ -306,7 +306,7 @@ async function get_frame(readable, number) {
   seqno = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | (header[15] << 0);
   frame = new Uint8Array(packlen);
   frame.set(header, 0);
-  totalen += HEADER_LENGTH;
+  totalen = HEADER_LENGTH;
   //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen});
   try {
     frame = await readInto(reader, frame.buffer, totalen);
@@ -319,12 +319,11 @@ async function get_frame(readable, number) {
     rtt_update(packlen, rtt);
     bwe_update(seqno, packlen, rtt); 
     //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen + ' rtt: ' + rtt});
-    reader.releaseLock();
     return frame; //complete frame has been received
   } else {
-    reader.releaseLock();
-    self.postMessage({severity: 'fatal', text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
+    self.postMessage({text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
   }
+  reader.releaseLock();
 }
 
 function readUInt32(arr, pos) {
@@ -744,6 +743,8 @@ SSRC = this.config.ssrc
            writer = writable.getWriter();
          } catch (e) {
            self.postMessage({severity: 'fatal', text: `Failure to create writable stream ${e.message}`});
+           writer.releaseLock();
+           writable.close();
          }
          let len = rtt_aggregate.all.length;
          if (len == 0) {
