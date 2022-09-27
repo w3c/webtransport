@@ -550,12 +550,15 @@ interface WebTransport {
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 
+  /* if unset, event will fire at default of every second */
+  attribute unsigned long? congestionControlFeedbackIntervalMs;
   /* of type CongestionControlFeedbackEvent */
   attribute EventHandler oncongestioncontrolfeedback;
 };
 
 interface CongestionControlFeedbackEvent: Event {
-  readonly attribute unsigned long? targetBps;
+  /* The rate you should send, on average, to avoid queuing */
+  readonly attribute unsigned long? averageTargetBps;
 }
 
 
