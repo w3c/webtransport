@@ -8,7 +8,7 @@ var mode = "L1T3";
 var latencyPref = "realtime";
 var hw = "no-preference";
 var streamWorker;
-var inputStream, outputStream;
+let inputStream, outputStream;
 const rate = document.querySelector('#rate');
 const connectButton = document.querySelector('#connect');
 const stopButton = document.querySelector('#stop');
@@ -107,13 +107,13 @@ async function getResValue(radio) {
     constraints.deviceId = (videoSource ? {exact: videoSource} : undefined);
     //addToEventLog('videoSource: ' + JSON.stringify(videoSource) + ' DeviceId: ' + constraints.deviceId);
   } catch(e) {
-    addToEventLog(`EnumerateDevices error: ${e.message}`);
+    addToEventLog(`EnumerateDevices error: ${e.message}`, 'fatal');
   }
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
     document.getElementById('inputVideo').srcObject = mediaStream;
   } catch(e) {
-    addToEventLog(`getUserMedia error: ${e.message}`);
+    addToEventLog(`getUserMedia error: ${e.message}`, 'fatal');
   }
 }
 
@@ -143,9 +143,18 @@ function stop() {
   connectButton.disabled = true;
   chart_div.style.display = "initial";
   streamWorker.postMessage({ type: "stop" });
-  inputStream.cancel();
-  outputStream.abort(); 
-  addToEventLog('stop(): input stream cancelled and output stream aborted');
+  try {
+    inputStream.cancel();
+    addToEventLog('inputStream cancelled');
+  } catch(e) {
+    addToEventLog(`Could not cancel inputStream: ${e.message}`);
+  }
+  try {
+    outputStream.abort();
+    addToEventLog('outputStream aborted');
+  } catch(e) {
+    addToEventLog(`Could not abort outputStream: ${e.message}`);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async function(event) {
@@ -166,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async function(event) {
   try {
     gotDevices(await navigator.mediaDevices.enumerateDevices());
   } catch (e) {
-    addToEventLog('Error in Device enumeration');
+    addToEventLog('Error in Device enumeration', 'fatal');
   }
   constraints.deviceId = videoSource ? {exact: videoSource} : undefined;
   //addToEventLog('videoSource: ' + JSON.stringify(videoSource) + ' DeviceId: ' + constraints.deviceId);
@@ -286,10 +295,8 @@ document.addEventListener('DOMContentLoaded', async function(event) {
        // config.codec = "hvc1.1.6.L123.00"  // Main profile, level 4.1, main Tier
           config.hevc = { format: "annexb" };
           config.pt = 2;
-          //addToEventLog('HEVC Encoding not supported yet', 'fatal');
-          //stop();
-          //return;
-          break;
+          addToEventLog('HEVC Encoding not supported', 'fatal');
+          return;
         case "VP8":
           config.codec = "vp8";
           config.pt = 3;
@@ -299,7 +306,8 @@ document.addEventListener('DOMContentLoaded', async function(event) {
            config.pt = 4;
            break;
         case "AV1":
-           config.codec = "av01.0.08M.10.0.112.09.16.09.0" // AV1 Main Profile, level 4.0, Main tier, 10-bit content, non-monochrome, with 4:2:0 chroma subsampling
+           //config.codec = "av01.0.08M.10.0.110.09.16.09.0" // AV1 Main Profile, level 4.0, Main tier, 10-bit content, non-monochrome, with 4:2:0 chroma subsampling
+           config.codec = "av01.0.08M.10.0.110.09" // AV1 Main Profile, level 4.0, Main tier, 10-bit content, non-monochrome, with 4:2:0 chroma subsampling
            config.pt = 5;
            break;
       }

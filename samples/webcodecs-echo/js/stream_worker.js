@@ -575,7 +575,7 @@ SSRC = this.config.ssrc
          this.decoder = decoder = new VideoDecoder({
            output: frame => controller.enqueue(frame),
            error: (e) => {
-              self.postMessage({severity: 'fatal', text: `Init Decoder error: ${e.message}`});
+              self.postMessage({severity: 'fatal', text: `Decoder error: ${e.message}`});
            }
          });
        },
@@ -589,11 +589,10 @@ SSRC = this.config.ssrc
                   self.postMessage({text: 'Decoder successfully configured:\n' + JSON.stringify(decoderSupport.config)});
                  // self.postMessage({text: 'Decoder state: ' + JSON.stringify(this.decoder.state)});
                 } else {
-                self.postMessage({severity: 'fatal', text: 'Config not supported:\n' + JSON.stringify(decoderSupport.config)});
+                  self.postMessage({severity: 'fatal', text: 'Config not supported:\n' + JSON.stringify(decoderSupport.config)});
                 }
-              })
-              .catch((e) => {
-                 self.postMessage({severity: 'fatal', text: 'Configuration error: ' + e.message});
+              }).catch((e) => {
+                 self.postMessage({severity: 'fatal', text: `Configuration error:  ${e.message}`});
               })
            } else {
              try {
@@ -718,14 +717,13 @@ SSRC = this.config.ssrc
      self.postMessage({text: 'Decoder Time report: ' + JSON.stringify(dec_stats)});
      self.postMessage({text: 'Decoder Queue report: ' + JSON.stringify(decqueue_stats)});
      if (stopped) return;
-     stopped = true;
-     this.stopped = true;
-     self.postMessage({severity: 'fatal', text: 'stop() called'});
      // TODO: There might be a more elegant way of closing a stream, or other
      // events to listen for.
      if (encoder.state != "closed") encoder.close();
      if (decoder.state != "closed") decoder.close();
-     self.postMessage({severity: 'fatal', text: "stop(): frame, encoder and decoder closed"});
+     stopped = true;
+     this.stopped = true;
+     self.postMessage({text: 'stop(): encoder and decoder closed'});
      return;
    }
 
@@ -858,8 +856,7 @@ SSRC = this.config.ssrc
      });
    }
 
-   start()
-   {
+   start() {
      if (stopped) return;
      started = true;
      self.postMessage({text: 'Start method called.'});
@@ -876,9 +873,9 @@ SSRC = this.config.ssrc
            .pipeTo(this.outputStream);
      });
      Promise.all([promise1, promise2]).then(() => {
-        self.postMessage({text: 'Pipelines started'});
+       self.postMessage({text: 'Pipelines started'});
      }).catch((e) => {
-        self.postMessage({severity: 'fatal', text: `pipeline error: ${e.message}`});
+       self.postMessage({severity: 'fatal', text: `pipeline error: ${e.message}`});
      });
    }
 }
