@@ -302,7 +302,8 @@ document.addEventListener('DOMContentLoaded', async function(event) {
           config.pt = 3;
           break;
         case "VP9":
-           config.codec = "vp09.00.10.08";
+           config.codec = "vp09.00.10.08"; //VP9, Profile 0, level 1, bit depth 8
+           //config.codec = "vp09.01.20.08.01" //VP9, Profile 1, level 2, bit depth 8
            config.pt = 4;
            break;
         case "AV1":

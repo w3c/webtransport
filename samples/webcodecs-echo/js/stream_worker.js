@@ -771,9 +771,9 @@ SSRC = this.config.ssrc
          const seqno = readUInt32(chunk, 12);
          // Ensure rto is > 100 ms
          rto = Math.max(rto, 100.);
-         if (d == 0 ) {
-           // if the frame is non-discardable, double the RTO
-           rto = 2 * rto ;
+         if (d == 0) {
+           //If the frame is non-discardable (config or base layer) set minimum much higher
+           rto = 4. * rto ;
          }
          try {
            await writer.write(chunk);
