@@ -1,11 +1,11 @@
 'use strict';
 
 var preferredResolution;
-let mediaStream, videoSource, bitrate = 3000000;
+let mediaStream, videoSource, bitrate = 10000000;
 var stopped = false;
 var preferredCodec ="VP8";
 var mode = "L1T3";
-var latencyPref = "realtime";
+var latencyPref = "quality";
 var hw = "no-preference";
 var streamWorker;
 let inputStream, outputStream;
@@ -234,93 +234,92 @@ document.addEventListener('DOMContentLoaded', async function(event) {
   async function startMedia() {
     if (stopped) return;
     addToEventLog('startMedia called'); 
-    try {
-      // Collect the bitrate
-      const rate = document.getElementById('rate').value;
+    // Collect the bitrate
+    const rate = document.getElementById('rate').value;
 
-      // Collect the keyframe gap
-      const keygap = document.getElementById('keygap').value;
+    // Collect the keyframe gap
+    const keygap = document.getElementById('keygap').value;
 
-      // Create a MediaStreamTrackProcessor, which exposes frames from the track
-      // as a ReadableStream of VideoFrames.
-      let [track] = mediaStream.getVideoTracks();
-      let ts = track.getSettings();
-      // Uses non-standard Chrome-only API
-      const processor = new MediaStreamTrackProcessor(track);
-      inputStream = processor.readable;
+    // Create a MediaStreamTrackProcessor, which exposes frames from the track
+    // as a ReadableStream of VideoFrames.
+    let [track] = mediaStream.getVideoTracks();
+    let ts = track.getSettings();
+    // Uses non-standard Chrome-only API
+    const processor = new MediaStreamTrackProcessor(track);
+    inputStream = processor.readable;
 
-      // Create a MediaStreamTrackGenerator, which exposes a track from a
-      // WritableStream of VideoFrames, using non-standard Chrome API
-      const generator = new MediaStreamTrackGenerator({kind: 'video'});
-      outputStream = generator.writable;
-      document.getElementById('outputVideo').srcObject = new MediaStream([generator]);
+    // Create a MediaStreamTrackGenerator, which exposes a track from a
+    // WritableStream of VideoFrames, using non-standard Chrome API
+    const generator = new MediaStreamTrackGenerator({kind: 'video'});
+    outputStream = generator.writable;
+    document.getElementById('outputVideo').srcObject = new MediaStream([generator]);
 
-      //Create video Encoder configuration
-      const vConfig = {
-         keyInterval: keygap,
-         resolutionScale: 1,
-         framerateScale: 1.0,
-      };
+    //Create video Encoder configuration
+    const vConfig = {
+      keyInterval: keygap,
+      resolutionScale: 1,
+      framerateScale: 1.0,
+    };
    
-      let ssrcArr = new Uint32Array(1);
-      window.crypto.getRandomValues(ssrcArr);
-      const ssrc = ssrcArr[0];
+    let ssrcArr = new Uint32Array(1);
+    window.crypto.getRandomValues(ssrcArr);
+    const ssrc = ssrcArr[0];
   
-      const config = {
-        alpha: "discard",
-        latencyMode: latencyPref,
-        bitrateMode: "variable",
-        codec: preferredCodec,
-        width: ts.width/vConfig.resolutionScale,
-        height: ts.height/vConfig.resolutionScale,
-        hardwareAcceleration: hw,
-        bitrate: rate, 
-        framerate: ts.frameRate/vConfig.framerateScale,
-        keyInterval: vConfig.keyInterval,
-        ssrc:  ssrc
-      };
+    const config = {
+      alpha: "discard",
+      latencyMode: latencyPref,
+      bitrateMode: "variable",
+      codec: preferredCodec,
+      width: ts.width/vConfig.resolutionScale,
+      height: ts.height/vConfig.resolutionScale,
+      hardwareAcceleration: hw,
+      bitrate: rate, 
+      framerate: ts.frameRate/vConfig.framerateScale,
+      keyInterval: vConfig.keyInterval,
+      ssrc:  ssrc
+    };
 
-      if (mode != "L1T1") {
-        config.scalabilityMode = mode;
-      }
+    if (mode != "L1T1") {
+      config.scalabilityMode = mode;
+    }
 
-      switch(preferredCodec){
-        case "H264":
-          config.codec = "avc1.42002A";  // baseline profile, level 4.2
-          config.avc = { format: "annexb" };
-          config.pt = 1;
-          break;
-        case "H265":
-          config.codec = "hvc1.2.4.L123.00"; // Main 10 profile, level 4.1, main Tier
-       // config.codec = "hvc1.1.6.L123.00"  // Main profile, level 4.1, main Tier
-          config.hevc = { format: "annexb" };
-          config.pt = 2;
-          addToEventLog('HEVC Encoding not supported', 'fatal');
-          return;
-        case "VP8":
-          config.codec = "vp8";
-          config.pt = 3;
-          break;
-        case "VP9":
-           config.codec = "vp09.00.10.08"; //VP9, Profile 0, level 1, bit depth 8
-           //config.codec = "vp09.01.20.08.01" //VP9, Profile 1, level 2, bit depth 8
-           config.pt = 4;
-           break;
-        case "AV1":
-           //config.codec = "av01.0.08M.10.0.110.09.16.09.0" // AV1 Main Profile, level 4.0, Main tier, 10-bit content, non-monochrome, with 4:2:0 chroma subsampling
-           config.codec = "av01.0.08M.10.0.110.09" // AV1 Main Profile, level 4.0, Main tier, 10-bit content, non-monochrome, with 4:2:0 chroma subsampling
-           config.pt = 5;
-           break;
-      }
+    switch(preferredCodec){
+      case "H264":
+        config.codec = "avc1.42002A";  // baseline profile, level 4.2
+        config.avc = { format: "annexb" };
+        config.pt = 1;
+        break;
+      case "H265":
+        config.codec = "hvc1.2.4.L123.00"; // Main 10 profile, level 4.1, main Tier
+     // config.codec = "hvc1.1.6.L123.00"  // Main profile, level 4.1, main Tier
+        config.hevc = { format: "annexb" };
+        config.pt = 2;
+        addToEventLog('HEVC Encoding not supported', 'fatal');
+        return;
+      case "VP8":
+        config.codec = "vp8";
+        config.pt = 3;
+        break;
+      case "VP9":
+         config.codec = "vp09.00.10.08"; //VP9, Profile 0, level 1, bit depth 8
+         //config.codec = "vp09.01.20.08.01" //VP9, Profile 1, level 2, bit depth 8
+         config.pt = 4;
+         break;
+      case "AV1":
+         //config.codec = "av01.0.08M.10.0.110.09.16.09.0" // AV1 Main Profile, level 4.0, Main tier, 10-bit content, non-monochrome, with 4:2:0 chroma subsampling
+         config.codec = "av01.0.08M.10.0.110.09" // AV1 Main Profile, level 4.0, Main tier, 10-bit content, non-monochrome, with 4:2:0 chroma subsampling
+         config.pt = 5;
+         break;
+    }
 
-      // Collect the WebTransport URL
-      const url = document.getElementById('url').value;
+    // Collect the WebTransport URL
+    const url = document.getElementById('url').value;
 
-      // Transfer the readable stream to the worker, as well as other info from the user interface.
-      // NOTE: transferring frameStream and reading it in the worker is more
-      // efficient than reading frameStream here and transferring VideoFrames individually.
+    // Transfer the readable stream to the worker, as well as other info from the user interface.
+    // NOTE: transferring frameStream and reading it in the worker is more
+    // efficient than reading frameStream here and transferring VideoFrames individually.
+    try {
       streamWorker.postMessage({ type: "stream", config: config, url: url, streams: {input: inputStream, output: outputStream}}, [inputStream, outputStream]);
-
     } catch(e) {
        addToEventLog(e.name + ": " + e.message, 'fatal');
     }

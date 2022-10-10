@@ -326,6 +326,16 @@ async function get_frame(readable, number) {
   reader.releaseLock();
 }
 
+function writeUInt32(arr, pos, val) {
+  let view = new DataView(arr);
+  view.setUint32(pos, val, false); //Big-endian
+};
+
+function writeUInt64(arr, pos, val) {
+  let view = new DataView(arr);
+  view.setBigUint64(pos, val, false); //Big-endian
+};
+
 function readUInt32(arr, pos) {
   let view = new DataView(arr);
   return view.getUint32(pos, false); //Big-endian
@@ -430,7 +440,7 @@ S, E, I, D, B, TID, LID defined in draft-ietf-avtext-framemarking
    B = Base layer frame
    TID = chunk.svc.temporalLayerId
    LID = 0 (no support for spatial scalability yet)
-send time = time at which the packet was sent, in ms * 1000
+send time = time at which the packet was sent, in microseconds
 sequence number = counter incrementing with each frame
 timestamp = chunk.timestamp
 SSRC = this.config.ssrc
@@ -441,16 +451,6 @@ SSRC = this.config.ssrc
        start (controller) {
        },
        transform(chunk, controller) {
-         const writeUInt32 = function(arr, pos, val)
-         {
-           let view = new DataView(arr);
-           view.setUint32(pos, val, false); //Big-endian
-         };
-         const writeUInt64 = function(arr, pos, val)
-         {
-           let view = new DataView(arr);
-           view.setBigUint64(pos, val, false); //Big-endian
-         };
          let tid, pt, duration, timestamp;
          if (chunk.type == 'config') {
            tid = 0;
@@ -701,32 +701,6 @@ SSRC = this.config.ssrc
      });
    }
 
-   stop() {
-     end_time = performance.now();
-     const enc_stats = enc_report();
-     const encqueue_stats = encqueue_report();
-     const dec_stats = dec_report();
-     const decqueue_stats = decqueue_report();
-     const rtt_stats = rtt_report();
-     const bwe_stats = bwe_report();
-     self.postMessage({severity: 'chart', text: JSON.stringify(rtt_aggregate.all)});
-     self.postMessage({text: 'BWE report: ' + JSON.stringify(bwe_stats)});
-     self.postMessage({text: 'RTT report: ' + JSON.stringify(rtt_stats)});  
-     self.postMessage({text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});
-     self.postMessage({text: 'Encoder Queue report: ' + JSON.stringify(encqueue_stats)});
-     self.postMessage({text: 'Decoder Time report: ' + JSON.stringify(dec_stats)});
-     self.postMessage({text: 'Decoder Queue report: ' + JSON.stringify(decqueue_stats)});
-     if (stopped) return;
-     // TODO: There might be a more elegant way of closing a stream, or other
-     // events to listen for.
-     if (encoder.state != "closed") encoder.close();
-     if (decoder.state != "closed") decoder.close();
-     stopped = true;
-     this.stopped = true;
-     self.postMessage({text: 'stop(): encoder and decoder closed'});
-     return;
-   }
-
    createSendStream(self, transport) {
      return new WritableStream({
        async start(controller) {
@@ -805,10 +779,12 @@ SSRC = this.config.ssrc
          }
        }, 
        async close(controller) {
+         controller.close();
          // close the transport? 
          await transport.close();
        }, 
        async abort(reason) {
+         controller.close();
          // called when ws.abort(reason)
          // close the transport?
          await transport.close(); 
@@ -877,5 +853,31 @@ SSRC = this.config.ssrc
      }).catch((e) => {
        self.postMessage({severity: 'fatal', text: `pipeline error: ${e.message}`});
      });
+   }
+
+   stop() {
+     end_time = performance.now();
+     const enc_stats = enc_report();
+     const encqueue_stats = encqueue_report();
+     const dec_stats = dec_report();
+     const decqueue_stats = decqueue_report();
+     const rtt_stats = rtt_report();
+     const bwe_stats = bwe_report();
+     self.postMessage({severity: 'chart', text: JSON.stringify(rtt_aggregate.all)});
+     self.postMessage({text: 'BWE report: ' + JSON.stringify(bwe_stats)});
+     self.postMessage({text: 'RTT report: ' + JSON.stringify(rtt_stats)});
+     self.postMessage({text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});
+     self.postMessage({text: 'Encoder Queue report: ' + JSON.stringify(encqueue_stats)});
+     self.postMessage({text: 'Decoder Time report: ' + JSON.stringify(dec_stats)});
+     self.postMessage({text: 'Decoder Queue report: ' + JSON.stringify(decqueue_stats)});
+     if (stopped) return;
+     // TODO: There might be a more elegant way of closing a stream, or other
+     // events to listen for.
+     if (encoder.state != "closed") encoder.close();
+     if (decoder.state != "closed") decoder.close();
+     stopped = true;
+     this.stopped = true;
+     self.postMessage({text: 'stop(): encoder and decoder closed'});
+     return;
    }
 }
