@@ -1,11 +1,11 @@
 'use strict';
 
 var preferredResolution;
-let mediaStream, videoSource, bitrate = 1000000;
+let mediaStream, videoSource, bitrate = 300000;
 var stopped = false;
 var preferredCodec ="VP8";
 var mode = "L1T3";
-var latencyPref = "quality";
+var latencyPref = "realtime";
 var hw = "no-preference";
 var streamWorker;
 let inputStream, outputStream;
