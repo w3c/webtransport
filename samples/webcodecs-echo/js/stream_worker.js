@@ -1,7 +1,13 @@
 'use strict';
 
-let encoder, decoder, pl, started = false, stopped = false, rtt_min = 100., start_time, end_time;
+let encoder, decoder, pl, started = false, stopped = false, rtt_min = 100., start_time, end_time, seqPointer = 0;
 const HEADER_LENGTH = 28;
+
+let jitter_buffer = {
+   all: [],
+   seqmin: Number.MAX_VALUE,
+   seqmax: 0, 
+}
 
 let bwe_aggregate = {
    all: [],
@@ -50,6 +56,24 @@ let decqueue_aggregate = {
   max: 0,
   sum: 0,
 };
+
+function jb_update(chunk) {
+  jitter_buffer.all.push(chunk);
+  jitter_buffer.all.sort((a, b) =>  {
+    return (a.seqNo - b.seqNo);
+  }); 
+  jitter_buffer.seqmin = jitter_buffer.all[0].seqNo;
+  let len = jitter_buffer.all.length;
+  jitter_buffer.seqmax = jitter_buffer.all[len-1].seqNo;
+}
+
+function jb_dequeue(pointer) {
+  if (jitter_buffer.all[0].seqNo == pointer) {
+     return(jitter_buffer.all.shift());
+  } else {
+    return;
+  }
+}
 
 function bwe_update(seqno, len, rtt_new){
   bwe_aggregate.all.push([seqno, len, rtt_new]);
@@ -520,6 +544,7 @@ SSRC = this.config.ssrc
        start (controller) {
        },
        transform(chunk, controller) {
+         let newChunk;
          const first4 = readUInt32(chunk, 4);
          //self.postMessage({text: 'First4: ' + first4});
          const B0 = (first4 & 0x000000FF);
@@ -535,7 +560,7 @@ SSRC = this.config.ssrc
          const b =   (B1 & 0x08)/8
          const len = readUInt32(chunk, 0)
          const sendTime = readUInt32(chunk, 8);
-         const seqNo = readUInt32(chunk, 14);
+         const seqNo = readUInt32(chunk, 12);
          const timestamp = readUInt64(chunk, 16);
          const ssrc = readUInt32(chunk, 24);
          const duration = 0;
@@ -563,8 +588,13 @@ SSRC = this.config.ssrc
          hydChunk.ssrc = ssrc;
          hydChunk.pt = pt;
          hydChunk.seqNo = seqNo;
-         //self.postMessage({text: 'Deserial hdr: ' + HEADER_LENGTH + ' + 'chunk length: ' + chunk.byteLength });
-         controller.enqueue(hydChunk);
+         //self.postMessage({text: 'seqNo: ' + seqNo + ' Deserial hdr: ' + HEADER_LENGTH + ' + ' chunk length: ' + hydChunk.byteLength });
+         jb_update(hydChunk);
+         if (newChunk = jb_dequeue(seqPointer)) {
+            //self.postMessage({text: 'seqNo: ' + newChunk.seqNo + ' chunk length: ' + newChunk.byteLength });
+            seqPointer++
+            controller.enqueue(newChunk);
+         }
        }
      });
    }
@@ -758,12 +788,12 @@ SSRC = this.config.ssrc
            });
          }, rto);
          try {
-           await writer.write(chunk);
+           writer.write(chunk);
          } catch (e) {
            self.postMessage({text: `Failure to write frame: ${e.message}`});
          }
          try {
-           await writer.close();
+           writer.close();
          } catch (e) {
            self.postMessage({text: 'Stream cannot be closed (due to abort).'});
          }
