@@ -592,7 +592,7 @@ SSRC = this.config.ssrc
          jb_update(hydChunk);
          if (newChunk = jb_dequeue(seqPointer)) {
             //self.postMessage({text: 'seqNo: ' + newChunk.seqNo + ' chunk length: ' + newChunk.byteLength });
-            seqPointer++
+            seqPointer++;
             controller.enqueue(newChunk);
          }
        }
@@ -671,7 +671,7 @@ SSRC = this.config.ssrc
                controller.enqueue(configChunk); 
              } 
              chunk.temporalLayerId = 0;
-             if (cfg.svc.temporalLayerId) {
+             if (cfg.svc) {
                chunk.temporalLayerId = cfg.svc.temporalLayerId;
              }
              this.seqNo++;
