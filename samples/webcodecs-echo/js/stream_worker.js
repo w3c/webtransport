@@ -151,6 +151,9 @@ function bwe_report(){
   return {
     count: len,
     loss: loss,
+    reorder: reorder,
+    bwe: bwe,
+    bwu: bwu,
     seqmin: seqmin,
     seqmax: seqmax,
     lenmin: lenmin,
@@ -158,9 +161,6 @@ function bwe_report(){
     lenmedian: lenmedian,
     lentquart: lentquart,
     lenmax: lenmax,
-    reorder: reorder,
-    bwe: bwe,
-    bwu: bwu,
     recvsum: recvsum,
   };
 }
@@ -788,6 +788,7 @@ SSRC = this.config.ssrc
            });
          }, rto);
          try {
+           await writer.ready;
            writer.write(chunk);
          } catch (e) {
            self.postMessage({text: `Failure to write frame: ${e.message}`});
