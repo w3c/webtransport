@@ -773,11 +773,11 @@ SSRC = this.config.ssrc
          const d =   (B1 & 0x10)/16;
          const b =   (B1 & 0x08)/8
          const seqno = readUInt32(chunk, 12);
-         // Ensure rto is > 100 ms
-         rto = Math.max(rto, 100.);
+         // Ensure rto is > 50 ms
+         rto = Math.max(rto, 50.);
          if (d == 0) {
            //If the frame is non-discardable (config or base layer) set minimum much higher
-           rto = 4. * rto ;
+           rto = 3. * rto ;
          }
          timeoutId = setTimeout(function() {
            self.postMessage({text: `Aborting seqno: ${seqno} len: ${packlen} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
@@ -793,21 +793,12 @@ SSRC = this.config.ssrc
          } catch (e) {
            self.postMessage({text: `Failure to write frame: ${e.message}`});
          }
-         try {
-           writer.close();
-         } catch (e) {
-           self.postMessage({text: 'Stream cannot be closed (due to abort).'});
-         }
-         try {
-           writer.releaseLock();
-         } catch (e) {
-           self.postMessage({text: `writer releaseLock failed: ${e.message}`});
-         }
-         try {
+         writer.close().then(() => {
            clearTimeout(timeoutId);
-         } catch (e) {
-           self.postMessage({text: `clearTimeout failed: ${e.message}`});
-         }
+           writer.releaseLock();
+         }).catch((e) => {
+           self.postMessage({text: 'Stream cannot be closed (due to abort).'});
+         });
        }, 
        async close(controller) {
          controller.close();
