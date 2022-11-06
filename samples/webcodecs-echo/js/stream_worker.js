@@ -780,11 +780,10 @@ SSRC = this.config.ssrc
            rto = 3. * rto ;
          }
          timeoutId = setTimeout(function() {
-           self.postMessage({text: `Aborting seqno: ${seqno} len: ${packlen} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
            writer.abort('Send taking too long').then(() => {
-             self.postMessage({text: 'Abort succeeded'});
+             self.postMessage({text: 'Abort failed.'});
            }).catch((e) => {
-             self.postMessage({text: 'Send Aborted.'});
+             self.postMessage({text: `Aborted seqno: ${seqno} len: ${packlen} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
            });
          }, rto);
          try {
@@ -797,7 +796,7 @@ SSRC = this.config.ssrc
            clearTimeout(timeoutId);
            writer.releaseLock();
          }).catch((e) => {
-           self.postMessage({text: 'Stream cannot be closed (due to abort).'});
+           //self.postMessage({text: 'Stream cannot be closed (due to abort).'});
          });
        }, 
        async close(controller) {
