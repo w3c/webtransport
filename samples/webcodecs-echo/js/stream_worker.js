@@ -589,11 +589,18 @@ SSRC = this.config.ssrc
          hydChunk.pt = pt;
          hydChunk.seqNo = seqNo;
          //self.postMessage({text: 'seqNo: ' + seqNo + ' Deserial hdr: ' + HEADER_LENGTH + ' + ' chunk length: ' + hydChunk.byteLength });
-         jb_update(hydChunk);
-         if (newChunk = jb_dequeue(seqPointer)) {
-            //self.postMessage({text: 'seqNo: ' + newChunk.seqNo + ' chunk length: ' + newChunk.byteLength });
-            seqPointer++;
-            controller.enqueue(newChunk);
+         if (hydChunk.seqNo == seqPointer) {
+           // No holes in the sequence number space
+           seqPointer++
+           controller.enqueue(hydChunk); 
+         } else {
+           // Received chunk is not the one we are looking for
+           jb_update(hydChunk);
+           if (newChunk = jb_dequeue(seqPointer)) {
+              //self.postMessage({text: 'seqNo: ' + newChunk.seqNo + ' chunk length: ' + newChunk.byteLength });
+              seqPointer++;
+              controller.enqueue(newChunk);
+           }
          }
        }
      });
@@ -744,9 +751,10 @@ SSRC = this.config.ssrc
            writable = await transport.createUnidirectionalStream();
            writer = writable.getWriter();
          } catch (e) {
-           self.postMessage({severity: 'fatal', text: `Failure to create writable stream ${e.message}`});
+           self.postMessage({text: `Failure to create writable stream ${e.message}`});
            writer.releaseLock();
            writable.close();
+           controller.close();
          }
          let len = rtt_aggregate.all.length;
          if (len == 0) {
@@ -773,18 +781,17 @@ SSRC = this.config.ssrc
          const d =   (B1 & 0x10)/16;
          const b =   (B1 & 0x08)/8
          const seqno = readUInt32(chunk, 12);
-         // Ensure rto is > 50 ms
-         rto = Math.max(rto, 50.);
+         // Ensure rto is > 100 ms
+         rto = Math.max(rto, 100.);
          if (d == 0) {
            //If the frame is non-discardable (config or base layer) set minimum much higher
            rto = 3. * rto ;
          }
-         timeoutId = setTimeout(function() {
-           writer.abort('Send taking too long').then(() => {
-             self.postMessage({text: 'Abort failed.'});
-           }).catch((e) => {
-             self.postMessage({text: `Aborted seqno: ${seqno} len: ${packlen} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});
-           });
+         timeoutId = setTimeout(() => {
+           writer.abort().then(
+             ()  => {self.postMessage({text: 'Abort failed.'});},
+             (e) => {self.postMessage({text: `Aborted seqno: ${seqno} len: ${packlen} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});}
+           );
          }, rto);
          try {
            await writer.ready;
@@ -792,20 +799,21 @@ SSRC = this.config.ssrc
          } catch (e) {
            self.postMessage({text: `Failure to write frame: ${e.message}`});
          }
-         writer.close().then(() => {
+         try {
+           await writer.close();
            clearTimeout(timeoutId);
            writer.releaseLock();
-         }).catch((e) => {
+         } catch (e) {
            //self.postMessage({text: 'Stream cannot be closed (due to abort).'});
-         });
+         };
        }, 
        async close(controller) {
-         controller.close();
          await transport.close();
+         controller.close();
        }, 
        async abort(reason) {
+         await transport.close();
          controller.close();
-         await transport.close(); 
        } 
      });
    }
@@ -813,33 +821,30 @@ SSRC = this.config.ssrc
    createReceiveStream(self, transport) {
      return new ReadableStream({
        start(controller) {
-       // called by constructor
          this.streamNumber = 0;
          this.reader = transport.incomingUnidirectionalStreams.getReader();
        },
-       async pull(controller) {
-         // When called, keep reading frames
-         while (true) {
-           const { value, done } = await this.reader.read();
+       pull(controller) {
+         this.reader.read().then(({value, done}) => {
            if (done) {
              this.reader.releaseLock();
+             self.postMessage({text: 'Done accepting unidirectional streams'});
              controller.close();
-             self.postMessage({severity: 'fatal', text: 'Done accepting unidirectional streams'});
              return;
-           } else {
-             let number = this.streamNumber++;
-             //self.postMessage({text: 'New incoming stream # ' + number});
-             try {
-               let frame = await get_frame(value, number);
+           } 
+           let number = this.streamNumber++;
+           //self.postMessage({text: 'New incoming stream # ' + number});
+           get_frame(value, number).then(
+             (frame) => {
                if (frame) {
                  controller.enqueue(frame);
                }
-             } catch (e) {
-               self.postMessage({severity: 'fatal', text: `Unable to open reader# ${number}: ${e.messsage}`});
-               return;
-             }
-           }
-         }
+             }, 
+             (e) => {
+              self.postMessage({severity: 'fatal', text: `Unable to open reader# ${number}: ${e.messsage}`});
+              return;
+             });
+         });
        },
        cancel(reason){
          // called when cancel(reason) is called
@@ -858,19 +863,24 @@ SSRC = this.config.ssrc
        this.inputStream
            .pipeThrough(this.EncodeVideoStream(self,this.config))
            .pipeThrough(this.Serialize(self,this.config))
-           .pipeTo(this.createSendStream(self,this.transport));
-     }); 
+           .pipeTo(this.createSendStream(self,this.transport)).then(
+             () =>  {resolve('Receive pipeline ')},
+             (e) => {reject(e)}
+           );
+     });
      const promise2 = new Promise ((resolve, reject) => {
        this.createReceiveStream(self,this.transport)
            .pipeThrough(this.Deserialize(self))
            .pipeThrough(this.DecodeVideoStream(self))
-           .pipeTo(this.outputStream);
+           .pipeTo(this.outputStream).then(
+             () =>  {resolve('Send pipeline ')}, 
+             (e) => {reject(e)}
+           );
      });
-     Promise.all([promise1, promise2]).then(() => {
-       self.postMessage({text: 'Pipelines started'});
-     }).catch((e) => {
-       self.postMessage({severity: 'fatal', text: `pipeline error: ${e.message}`});
-     });
+     Promise.all([promise1, promise2]).then(
+       (values) => { self.postMessage({text: 'Resolutions: ' + JSON.stringify(values)}); },
+       (e) => { self.postMessage({severity: 'fatal', text: `pipeline error: ${e.message}`}); }
+     );
    }
 
    stop() {
