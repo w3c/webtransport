@@ -2095,9 +2095,9 @@ following example datagrams are only sent if the transport is ready to send.
 async function sendDatagrams(url, datagrams) {
   const wt = new WebTransport(url);
   const writer = wt.datagrams.writable.getWriter();
-  for (const datagram of datagrams) {
+  for (const bytes of datagrams) {
     await writer.ready;
-    writer.write(datagram).catch(() => {});
+    writer.write(bytes).catch(() => {});
   }
 }
 </pre>
@@ -2117,8 +2117,8 @@ async function sendFixedRate(url, createDatagram, ms = 100) {
   const wt = new WebTransport(url);
   await wt.ready;
   const writer = wt.datagrams.writable.getWriter();
-  const datagram = createDatagram();
-  setInterval(() => writer.write(datagram).catch(() => {}), ms);
+  const bytes = createDatagram();
+  setInterval(() => writer.write(bytes).catch(() => {}), ms);
 }
 </pre>
 
@@ -2148,14 +2148,22 @@ Sending data as a one-way stream can be achieved by using the
 {{WebTransport/createUnidirectionalStream}} function and the resulting stream's writer.
 
 <pre class="example" highlight="js">
-async function sendData(url, data) {
+async function sendData(url, ...data) {
   const wt = new WebTransport(url);
   const writable = await wt.createUnidirectionalStream();
   const writer = writable.getWriter();
-  await writer.write(data);
+  for (const bytes of data) {
+    await writer.ready;
+    writer.write(bytes).catch(() => {});
+  }
   await writer.close();
 }
 </pre>
+<div class="note">
+  <p>The streams spec
+    [discourages](https://streams.spec.whatwg.org/#example-manual-write-dont-await)
+    awaiting the promise from write().</p>
+</div>
 
 Encoding can also be done through pipes from a {{ReadableStream}}, for example using
 {{TextEncoderStream}}.
@@ -2182,11 +2190,11 @@ and then consuming each {{WebTransportReceiveStream}} by iterating over its chun
 async function receiveData(url, processTheData) {
   const wt = new WebTransport(url);
   for await (const readable of wt.incomingUnidirectionalStreams) {
-    // consume streams individually, reporting per-stream errors
+    // consume streams individually using IFFEs, reporting per-stream errors
     ((async () => {
       try {
-        for await (const chunk of readable) {
-          processTheData(chunk);
+        for await (const bytes of readable) {
+          processTheData(bytes);
         }
       } catch (e) {
         console.error(e);
@@ -2257,21 +2265,22 @@ connect.onclick = async () => {
 
 sendData.onclick = async () => {
   const form = document.forms.sending.elements;
-  const rawData = sending.data.value;
-  const data = new TextEncoder('utf-8').encode(rawData);
+  const data = sending.data.value;
+  const bytes = new TextEncoder('utf-8').encode(data);
   try {
     switch (form.sendtype.value) {
       case 'datagram': {
-        await datagramWriter.write(data);
-        addToEventLog(&#96;Sent datagram: ${rawData}&#96;);
+        await datagramWriter.ready;
+        datagramWriter.write(bytes).catch(() => {});
+        addToEventLog(&#96;Sent datagram: ${data}&#96;);
         break;
       }
       case 'unidi': {
         const writable = await wt.createUnidirectionalStream();
         const writer = writable.getWriter();
-        await writer.write(data);
+        writer.write(bytes).catch(() => {});
         await writer.close();
-        addToEventLog(&#96;Sent a unidirectional stream with data: ${rawData}&#96;);
+        addToEventLog(&#96;Sent a unidirectional stream with data: ${data}&#96;);
         break;
       }
       case 'bidi': {
@@ -2280,9 +2289,9 @@ sendData.onclick = async () => {
         readFromIncomingStream(duplexStream.readable, n);
 
         const writer = duplexStream.writable.getWriter();
-        await writer.write(data);
+        writer.write(bytes).catch(() => {});
         await writer.close();
-        addToEventLog(&#96;Sent bidirectional stream #${n} with data: ${rawData}&#96;);
+        addToEventLog(&#96;Sent bidirectional stream #${n} with data: ${data}&#96;);
         break;
       }
     }
@@ -2321,8 +2330,8 @@ async function acceptUnidirectionalStreams() {
 async function readFromIncomingStream(readable, number) {
   try {
     const decoder = new TextDecoderStream('utf-8');
-    for await (const chunk of readable.pipeThrough(decoder)) {
-      addToEventLog(&#96;Received data on stream #${number}: ${chunk}&#96;);
+    for await (const data of readable.pipeThrough(decoder)) {
+      addToEventLog(&#96;Received data on stream #${number}: ${data}&#96;);
     }
     addToEventLog(&#96;Stream #${number} closed&#96;);
   } catch (e) {
