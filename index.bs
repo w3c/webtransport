@@ -538,7 +538,7 @@ interface WebTransport {
   readonly attribute WebTransportReliabilityMode reliability;
   readonly attribute WebTransportCongestionControl congestionControl;
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
-  readonly attribute Promise&lt;WebTransportCloseInfo&gt; draining;
+  readonly attribute Promise&lt;undefined&gt; draining;
   undefined close(optional WebTransportCloseInfo closeInfo = {});
 
   readonly attribute WebTransportDatagramDuplexStream datagrams;
@@ -621,7 +621,7 @@ A {{WebTransport}} object has the following internal slots.
   <tr>
    <td><dfn>`[[Draining]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated {{WebTransport}} object
-   receives DRAIN_WEBTRANSPORT_SESSION.
+   receives a DRAIN_WEBTRANSPORT_SESSION capsule.
   </tr>
   <tr>
    <td><dfn>`[[Datagrams]]`</dfn>
@@ -829,9 +829,7 @@ these steps.
    `closeCode` fields of {{WebTransportCloseInfo}}.
 : <dfn for="WebTransport" attribute>draining</dfn>
 :: On getting, it MUST return [=this=]'s {{[[Draining]]}}.
-:: This promise MUST be [=resolved=] when the transport receives DRAIN_WEBTRANSPORT_SESSION;
-   an implementation SHOULD include error information in the `reason` and
-   `closeCode` fields of {{WebTransportCloseInfo}}.
+:: This promise MUST be [=resolved=] when the transport receives a DRAIN_WEBTRANSPORT_SESSION capsule.
 : <dfn for="WebTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this session.
    The getter steps for the `datagrams` attribute SHALL be:
@@ -912,7 +910,7 @@ these steps.
    following steps:
 
    1. Let |transport| be [=this=].
-   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+   1. If |transport|.{{[[State]]}} is `"draining"`, `"closed"` or `"failed"`,
       return a new [=rejected=] promise with an {{InvalidStateError}}.
    1. Let |p| be a new promise.
    1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
@@ -940,7 +938,7 @@ these steps.
    When `createUnidirectionalStream()` method is called, the user agent MUST
    run the following steps:
      1. Let |transport| be [=this=].
-     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+     1. If |transport|.{{[[State]]}} is `"draining"`, `"closed"` or `"failed"`,
         return a new [=rejected=] promise with an {{InvalidStateError}}.
      1. Let |p| be a new promise.
      1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
@@ -1987,8 +1985,8 @@ not be immediate due to buffering.
     </thead>
     <tbody>
       <tr>
-        <td>Received [=session/draining] with closeInfo<br>
-        <td>(await wt.{{WebTransport/draining}}).closeInfo
+        <td>Received [=session/draining]<br>
+        <td>(await wt.{{WebTransport/draining}})
       </tr>
     </tbody>
   </table>
