@@ -682,6 +682,8 @@ agent MUST run the following steps:
     :: |congestionControl|
     : {{[[Closed]]}}
     :: a new promise
+    : {{[[Draining]]}}
+    :: a new promise
     : {{[[Datagrams]]}}
     :: |datagrams|
     : {{[[Session]]}}
@@ -824,6 +826,11 @@ these steps.
 :: On getting, it MUST return [=this=]'s {{[[Closed]]}}.
 :: This promise MUST be [=resolved=] when the transport is closed; an
    implementation SHOULD include error information in the `reason` and
+   `closeCode` fields of {{WebTransportCloseInfo}}.
+: <dfn for="WebTransport" attribute>draining</dfn>
+:: On getting, it MUST return [=this=]'s {{[[Draining]]}}.
+:: This promise MUST be [=resolved=] when the transport receives DRAIN_WEBTRANSPORT_SESSION;
+   an implementation SHOULD include error information in the `reason` and
    `closeCode` fields of {{WebTransportCloseInfo}}.
 : <dfn for="WebTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this session.
