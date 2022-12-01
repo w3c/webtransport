@@ -166,6 +166,11 @@ with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomo
 as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 
+A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
+HTTP/3 stream associated with the CONNECT request that initiated |session| receives an
+{{DRAIN_WEBTRANSPORT_SESSION}} capsule, as described at [[!WEB-TRANSPORT-HTTP3]]
+[section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6).
+
 To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an optional integer
 |code| and an optional [=byte sequence=] |reason|, follow [[!WEB-TRANSPORT-HTTP3]]
 [section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
@@ -175,6 +180,24 @@ an integer |code| and a [=byte sequence=] |reason|, when the HTTP/3 stream assoc
 CONNECT request that initiated |session| is closed by the server, as described at
 [[!WEB-TRANSPORT-HTTP3]]
 [section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
+
+A [=WebTransport session=] has the following signals:
+
+<table class="data" dfn-for="session-signal">
+ <thead>
+  <tr>
+   <th>event
+   <th>definition
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>DRAIN_WEBTRANSPORT_SESSION</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
+  </tr>
+ </tbody>
+</table>
 
 <dfn>WebTransport stream</dfn> is a concept for HTTP/3 stream on a [=WebTransport session=].
 
@@ -257,24 +280,6 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
    <td>Yes
    <td>No
    <td>Yes
-  </tr>
- </tbody>
-</table>
-
-A [=WebTransport session=] has the following signals:
-
-<table class="data" dfn-for="session-signal">
- <thead>
-  <tr>
-   <th>event
-   <th>definition
-  </tr>
- </thead>
- <tbody>
-  <tr>
-   <td><dfn>DRAIN_WEBTRANSPORT_SESSION</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
   </tr>
  </tbody>
 </table>
