@@ -1259,7 +1259,7 @@ It is a {{WritableStream}} of {{Uint8Array}} that can be written to, to send
 data to the server.
 
 <pre class="idl">
-[Exposed=(Window,Worker), SecureContext]
+[Exposed=(Window,Worker), SecureContext, Transferable]
 interface WebTransportSendStream : WritableStream {
   Promise&lt;WebTransportSendStreamStats&gt; getStats();
 };
@@ -1267,6 +1267,10 @@ interface WebTransportSendStream : WritableStream {
 
 A {{WebTransportSendStream}} is always created by the
 [=WebTransportSendStream/create=] procedure.
+
+The {{WebTransportSendStream}}'s [=transfer steps=] and
+[=transfer-receiving steps=] are
+[those of](https://streams.spec.whatwg.org/#ws-transfer) {{WritableStream}}.
 
 ## Methods ##  {#send-stream-methods}
 
@@ -1490,11 +1494,8 @@ data received from the server. {{WebTransportReceiveStream}} is a [=readable byt
 and hence it allows
 its consumers to use a [=BYOB reader=] as well as a [=default reader=].
 
-A {{WebTransportReceiveStream}} is always created by the
-[=WebTransportReceiveStream/create=] procedure.
-
 <pre class="idl">
-[Exposed=(Window,Worker), SecureContext]
+[Exposed=(Window,Worker), SecureContext, Transferable]
 interface WebTransportReceiveStream : ReadableStream {
   Promise&lt;WebTransportReceiveStreamStats&gt; getStats();
 };
@@ -1502,6 +1503,10 @@ interface WebTransportReceiveStream : ReadableStream {
 
 A {{WebTransportReceiveStream}} is always created by the
 [=WebTransportReceiveStream/create=] procedure.
+
+The {{WebTransportReceiveStream}}'s [=transfer steps=] and
+[=transfer-receiving steps=] are
+[those of](https://streams.spec.whatwg.org/#rs-transfer) {{ReadableStream}}.
 
 ## Methods ##  {#receive-stream-methods}
 
