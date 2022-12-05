@@ -1361,10 +1361,18 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 1. Return |promise| and run the remaining steps [=in parallel=].
 1. [=stream/Send=] |bytes| on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the
    operation to complete.
-   This sending MAY be interleaved with sending of previously queued streams and datagrams,
-   as well as streams and datagrams yet to be queued to be sent over this transport.
+   By default, if no order is specified, the prioritization of this sending of
+   bytes is [=implementation-defined=], but SHOULD, to the extent allowed by
+   flow control, be interleaved with sending of any previously queued bytes on
+   other streams and datagrams, as well as bytes yet to be queued on other
+   streams and datagrams to be sent over this transport, regardless of whether
+   the other streams and datagrams are strictly ordered or not.
 
-   Note: Solving prioritization is an outstanding issue.
+   If an order is specified, bytes queued on streams with the same order number
+   SHOULD be sent at equal rates, to the extent allowed by flow control, but
+   MUST be sent ahead of bytes queued on streams with a lower order number,
+   unless blocked by flow control.
+
 1. If the previous step failed, abort the remaining steps.
 
   Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
