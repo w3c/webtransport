@@ -551,13 +551,13 @@ interface WebTransport {
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 
   /* if unset, default is 1 second */
-  attribute unsigned long? congestionControlFeedbackMinIntervalMs;
-  /* of type CongestionControlFeedbackEvent */
+  attribute unsigned long? rateControlFeedbackMinIntervalMs;
   /* fires when the value changes, but at most every congestionControlFeedbackMinIntervalMs */
-  attribute EventHandler oncongestioncontrolfeedback;
+  attribute EventHandler onratecontrolfeedback;
+  readonly attribute RateControlFeedback rateControlFeedback;
 };
 
-interface CongestionControlFeedbackEvent: Event {
+interface RateControlFeedback {
   /* The rate you should send, on average, to avoid queuing */
   readonly attribute unsigned long? averageTargetBps;
 }
