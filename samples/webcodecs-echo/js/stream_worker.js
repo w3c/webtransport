@@ -298,19 +298,29 @@ function decqueue_report() {
   };
 }
 
-async function writeChunk(chunk, writer, rto, info) {
-  await writer.ready;
-  let timeoutId = setTimeout(() => {
+async function writeChunk(transport, chunk, rto, info) {
+  let writable, writer, timeoutId;
+  try {
+    writable = await transport.createUnidirectionalStream();
+    writer = writable.getWriter();
+    await writer.ready;
+  } catch (e) {
+    self.postMessage({text: `Failure to create writable stream ${e.message}`});
+    writer.releaseLock();
+    writable.close();
+    return Promise.reject(e);
+  }
+  timeoutId = setTimeout(() => {
     writer.abort().then(
       ()  => {
         self.postMessage({text: 'Abort failed.'});
         writer.releaseLock();
-        return;
+        return Promise.resolve();
       },
       (e) => {
         self.postMessage({text: `Aborted seqno: ${info.seqno} len: ${info.packlen} i: ${info.i} d: ${info.d} b: ${info.b} pt: ${info.pt} tid: ${info.tid} Send RTO: ${rto}`});
         writer.releaseLock();
-        return;       
+        return Promise.resolve();       
       }
     );
   }, rto);
@@ -319,12 +329,12 @@ async function writeChunk(chunk, writer, rto, info) {
     () => {
       clearTimeout(timeoutId);
       writer.releaseLock();
-      return;
+      return Promise.resolve();
     }, 
     (e) => {
       //self.postMessage({text: 'Stream cannot be closed (due to abort).'});
       writer.releaseLock();
-      return;
+      return Promise.resolve();
     }
   );
 }
@@ -777,16 +787,7 @@ SSRC = this.config.ssrc
          start_time = performance.now();
        },
        async write(chunk, controller) {
-         let writable, timeoutId, rto, writer, srtt, rttvar, g=.1, k=4;
-         try {
-           writable = await transport.createUnidirectionalStream();
-           writer = writable.getWriter();
-         } catch (e) {
-           self.postMessage({text: `Failure to create writable stream ${e.message}`});
-           writer.releaseLock();
-           writable.close();
-           controller.close();
-         }
+         let rto, srtt, rttvar, g=.1, k=4;
          let len = rtt_aggregate.all.length;
          if (len == 0) {
            srtt = rtt_min;
@@ -827,7 +828,7 @@ SSRC = this.config.ssrc
            pt: pt,
            tid: tid
          }
-         writeChunk(chunk, writer, rto, info).then(
+         writeChunk(transport, chunk, rto, info).then(
            () => {return;},
            (e) => {
              self.postMessage({text: `Error: ${e.message}`});
