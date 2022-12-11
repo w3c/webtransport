@@ -298,6 +298,37 @@ function decqueue_report() {
   };
 }
 
+async function writeChunk(chunk, writer, rto, info) {
+  await writer.ready;
+  let timeoutId = setTimeout(() => {
+    writer.abort().then(
+      ()  => {
+        self.postMessage({text: 'Abort failed.'});
+        writer.releaseLock();
+        return;
+      },
+      (e) => {
+        self.postMessage({text: `Aborted seqno: ${info.seqno} len: ${info.packlen} i: ${info.i} d: ${info.d} b: ${info.b} pt: ${info.pt} tid: ${info.tid} Send RTO: ${rto}`});
+        writer.releaseLock();
+        return;       
+      }
+    );
+  }, rto);
+  writer.write(chunk);
+  writer.close().then(
+    () => {
+      clearTimeout(timeoutId);
+      writer.releaseLock();
+      return;
+    }, 
+    (e) => {
+      //self.postMessage({text: 'Stream cannot be closed (due to abort).'});
+      writer.releaseLock();
+      return;
+    }
+  );
+}
+
 async function readInto(reader, buffer, offset) {
   let off = offset;
   while (off < buffer.byteLength) {
@@ -787,25 +818,21 @@ SSRC = this.config.ssrc
            //If the frame is non-discardable (config or base layer) set minimum much higher
            rto = 3. * rto ;
          }
-         timeoutId = setTimeout(() => {
-           writer.abort().then(
-             ()  => {self.postMessage({text: 'Abort failed.'});},
-             (e) => {self.postMessage({text: `Aborted seqno: ${seqno} len: ${packlen} i: ${i} d: ${d} b: ${b} pt: ${pt} tid: ${tid} Send RTO: ${rto}`});}
-           );
-         }, rto);
-         try {
-           await writer.ready;
-           writer.write(chunk);
-         } catch (e) {
-           self.postMessage({text: `Failure to write frame: ${e.message}`});
+         let info = {
+           seqno: seqno,
+           packlen: packlen,
+           i: i,
+           d: d,
+           b: b, 
+           pt: pt,
+           tid: tid
          }
-         try {
-           await writer.close();
-           clearTimeout(timeoutId);
-           writer.releaseLock();
-         } catch (e) {
-           //self.postMessage({text: 'Stream cannot be closed (due to abort).'});
-         };
+         writeChunk(chunk, writer, rto, info).then(
+           () => {return;},
+           (e) => {
+             self.postMessage({text: `Error: ${e.message}`});
+           }
+         );
        }, 
        async close(controller) {
          await transport.close();
@@ -841,8 +868,8 @@ SSRC = this.config.ssrc
                }
              }, 
              (e) => {
-              self.postMessage({severity: 'fatal', text: `Unable to open reader# ${number}: ${e.messsage}`});
-              return;
+               self.postMessage({severity: 'fatal', text: `Unable to open reader# ${number}: ${e.messsage}`});
+               return;
              });
          });
        },
