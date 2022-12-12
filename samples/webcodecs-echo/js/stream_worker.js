@@ -363,10 +363,12 @@ async function get_frame(readable, number) {
   try {
     header = new Uint8Array(await readInto(reader, hdr, 0));
   } catch (e) {
+    reader.releaseLock();
     self.PostMessage({severity: 'fatal', text: `Couldn't read frame header from stream# ${number}: ${e.message}`});
   }
   packlen = (header[0] << 24) | (header[1] << 16) | (header[2] << 8) | (header[3] << 0);
-  if ((packlen < 1) || (packlen > 200000)) {
+  if ((packlen < 1) || (packlen > 300000)) {
+    reader.releaseLock();
     self.postMessage({severity: 'fatal', text: 'Frame length problem: ' + packlen});
   }
   // Retrieve sendTime from header
@@ -379,6 +381,7 @@ async function get_frame(readable, number) {
   try {
     frame = await readInto(reader, frame.buffer, totalen);
   } catch (e) {
+    reader.releaseLock();
     self.postMessage({severity: 'fatal', text: `readInto failed: ${e.message}`});
   }
   totalen = frame.byteLength;
@@ -387,6 +390,7 @@ async function get_frame(readable, number) {
     rtt_update(packlen, rtt);
     bwe_update(seqno, packlen, rtt); 
     //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen + ' rtt: ' + rtt});
+    reader.releaseLock();
     return frame; //complete frame has been received
   } else {
     self.postMessage({text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
@@ -873,6 +877,7 @@ SSRC = this.config.ssrc
                }
              }
            ).catch((e) => {
+               this.reader.releaseLock();
                self.postMessage({severity: 'fatal', text: `Unable to open reader# ${number}: ${e.messsage}`});
                return;
            });
