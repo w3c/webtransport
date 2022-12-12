@@ -316,27 +316,30 @@ async function writeChunk(transport, chunk, rto, info) {
         self.postMessage({text: 'Abort failed.'});
         writer.releaseLock();
         return Promise.resolve();
-      },
-      (e) => {
+      }).catch((e) => {
         self.postMessage({text: `Aborted seqno: ${info.seqno} len: ${info.packlen} i: ${info.i} d: ${info.d} b: ${info.b} pt: ${info.pt} tid: ${info.tid} Send RTO: ${rto}`});
         writer.releaseLock();
         return Promise.resolve();       
-      }
-    );
+      });
   }, rto);
-  writer.write(chunk);
+  try {
+    writer.write(chunk);
+  } catch (e) {
+    self.postMessage({text: `Chunk cannot be written: ${e.message}`});
+    writer.releaseLock();
+    return Promise.reject(e);
+  }
   writer.close().then(
     () => {
       clearTimeout(timeoutId);
       writer.releaseLock();
       return Promise.resolve();
-    }, 
-    (e) => {
+    }).catch((e) => {
+      clearTimeout(timeoutId);
       //self.postMessage({text: 'Stream cannot be closed (due to abort).'});
       writer.releaseLock();
       return Promise.resolve();
-    }
-  );
+    });
 }
 
 async function readInto(reader, buffer, offset) {
@@ -829,11 +832,12 @@ SSRC = this.config.ssrc
            tid: tid
          }
          writeChunk(transport, chunk, rto, info).then(
-           () => {return;},
-           (e) => {
-             self.postMessage({text: `Error: ${e.message}`});
+           () => {
+             return;
            }
-         );
+           ).catch((e) => {
+             self.postMessage({text: `Error: ${e.message}`});
+           });
        }, 
        async close(controller) {
          await transport.close();
@@ -867,11 +871,11 @@ SSRC = this.config.ssrc
                if (frame) {
                  controller.enqueue(frame);
                }
-             }, 
-             (e) => {
+             }
+           ).catch((e) => {
                self.postMessage({severity: 'fatal', text: `Unable to open reader# ${number}: ${e.messsage}`});
                return;
-             });
+           });
          });
        },
        cancel(reason){
@@ -887,28 +891,31 @@ SSRC = this.config.ssrc
      if (stopped) return;
      started = true;
      self.postMessage({text: 'Start method called.'});
-     const promise1 = new Promise ((resolve, reject) => {
-       this.inputStream
-           .pipeThrough(this.EncodeVideoStream(self,this.config))
-           .pipeThrough(this.Serialize(self,this.config))
-           .pipeTo(this.createSendStream(self,this.transport)).then(
-             () =>  {resolve('Receive pipeline ')},
-             (e) => {reject(e)}
-           );
-     });
-     const promise2 = new Promise ((resolve, reject) => {
-       this.createReceiveStream(self,this.transport)
-           .pipeThrough(this.Deserialize(self))
-           .pipeThrough(this.DecodeVideoStream(self))
-           .pipeTo(this.outputStream).then(
-             () =>  {resolve('Send pipeline ')}, 
-             (e) => {reject(e)}
-           );
-     });
+     const promise1 =  this.inputStream
+          .pipeThrough(this.EncodeVideoStream(self,this.config))
+          .pipeThrough(this.Serialize(self,this.config))
+          .pipeTo(this.createSendStream(self,this.transport)).then(
+            () =>  {
+              Promise.resolve('Receive pipeline ');
+           }).catch((e) => {
+             Promise.reject(e);
+           });
+     const promise2 =  this.createReceiveStream(self,this.transport)
+          .pipeThrough(this.Deserialize(self))
+          .pipeThrough(this.DecodeVideoStream(self))
+          .pipeTo(this.outputStream).then(
+            () =>  {
+              Promise.resolve('Send pipeline ');
+            }
+          ).catch((e) => {
+            Promise.reject(e);
+          });
      Promise.all([promise1, promise2]).then(
-       (values) => { self.postMessage({text: 'Resolutions: ' + JSON.stringify(values)}); },
-       (e) => { self.postMessage({severity: 'fatal', text: `pipeline error: ${e.message}`}); }
-     );
+       (values) => { self.postMessage({text: 'Resolutions: ' + JSON.stringify(values)});
+       }
+       ).catch((e) => { 
+         self.postMessage({severity: 'fatal', text: `pipeline error: ${e.message}`}); 
+       });
    }
 
    stop() {
