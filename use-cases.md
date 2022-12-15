@@ -6,7 +6,7 @@ Ordinality of listing does not imply priority.
     1. Speech translation/emotion analysis  - sending audio/video data from client to server for analysis and receiving translated data/text/audio in return.
     1. Security camera analysis - data and/or video sent to cloud service for analysis. Service may return data instructions.
 1. **Multiplayer Gaming - web and consoles**
-    1. Game play instructions sent from client to cloud based game engine. Some instructions are time sensitive (such as location data) , others are stateful (avatar selection). Dataflow is bi-directional between client and server.  
+    1. Game play instructions sent from client to cloud based game engine. Some instructions are time sensitive (such as location data), others are stateful (avatar selection). Dataflow is bi-directional between client and server.  
     1. AR gaming requires real-world interaction, including virtual theatre - geo-separate actors with virtual backgrounds. 
 1. **Low-latency live streaming**
     1. Unidirectional Broadcast - one to many - sports events, news, wagering, latency equivalent to social media delay and quality to support UHD, HDR, HFR, DRM. 
