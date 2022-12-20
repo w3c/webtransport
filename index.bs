@@ -542,12 +542,13 @@ interface WebTransport {
 
   readonly attribute WebTransportDatagramDuplexStream datagrams;
 
-  Promise&lt;WebTransportBidirectionalStream&gt; createBidirectionalStream();
+  Promise&lt;WebTransportBidirectionalStream&gt; createBidirectionalStream(
+      optional WebTransportSendStreamOptions options = {});
   /* a ReadableStream of WebTransportBidirectionalStream objects */
   readonly attribute ReadableStream incomingBidirectionalStreams;
 
   Promise&lt;WebTransportSendStream&gt; createUnidirectionalStream(
-      optional WebTransportUnidirectionalStreamOptions options = {});
+      optional WebTransportSendStreamOptions options = {});
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 };
@@ -1161,32 +1162,32 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportCloseInfo" dict-member>reason</dfn>
 :: The reason for closing the {{WebTransport}}.
 
-## `WebTransportUnidirectionalStreamOptions` Dictionary ##  {#uni-stream-options}
+## `WebTransportSendStreamOptions` Dictionary ##  {#uni-stream-options}
 
-The <dfn dictionary>WebTransportUnidirectionalStreamOptions</dfn> is a
+The <dfn dictionary>WebTransportSendStreamOptions</dfn> is a
 dictionary of parameters that affect how {{WebTransportSendStream}}s created by
-{{WebTransport/createUnidirectionalStream}} behave.
+{{WebTransport/createUnidirectionalStream}} and
+{{WebTransport/createBidirectionalStream}} behave.
 
 <pre class="idl">
-dictionary WebTransportUnidirectionalStreamOptions {
-  unsigned long long order;
+dictionary WebTransportSendStreamOptions {
+  long long sendOrder;
 };
 </pre>
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportUnidirectionalStreamOptions" dict-member>order</dfn>
-:: An order number that, if provided, opts the created
+: <dfn for="WebTransportSendStreamOptions" dict-member>sendOrder</dfn>
+:: An send order number that, if provided, opts the created
    {{WebTransportSendStream}} in to participating in <dfn>strict ordering</dfn>.
    Bytes currently queued on [=strict ordering|strictly ordered=]
    {{WebTransportSendStream}}s MUST be sent ahead of bytes currently queued on
    other [=strict ordering|strictly ordered=] {{WebTransportSendStream}}s
-   created with lower order numbers.
+   created with lower send order numbers.
 
-   If no order number is provided, the created {{WebTransportSendStream}}
-   MUST NOT participate in [=strict ordering=], meaning the order in which the
+   If no send order number is provided, then the order in which the
    user agent sends bytes from it relative to other {{WebTransportSendStream}}s
-   remains [=implementation-defined=].
+   is [=implementation-defined=].
 
    Note: This is sender-side data prioritization which does not guarantee
    reception order.
