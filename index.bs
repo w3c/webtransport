@@ -2123,6 +2123,17 @@ that the client knows what the server certificate is or how to contact it is
 not sufficient.  The application has to establish the identity of the client
 in-band if necessary.
 
+## Pooled Sessions
+
+When pooling, if information from to session is affected by the activity of another
+session, one session may infer information about the activity of another session.
+For example, if the rate control feedback of one session is affected by the rate at
+which an application is sending data on another session, one session may learn about the
+the rate at which another application is sending data.  To avoid this, a user agent
+may restrict access to information or modify information provided.  For example, it may leave
+the send rate of the rate control feedback undefined, or modify it to make it more difficult
+to infer anything from it.
+
 # Examples #  {#examples}
 
 ## Sending a buffer of datagrams ##  {#example-datagrams}
