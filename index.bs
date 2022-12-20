@@ -550,18 +550,9 @@ interface WebTransport {
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 
-  /* if unset, default is 1 second; in units of milliseconds */
   attribute unsigned long? rateControlFeedbackMinInterval;
-  /* fires when the value changes, but at most every rateControlFeedbackMinInterval */
   attribute EventHandler onratecontrolfeedback;
-  readonly attribute RateControlFeedback rateControlFeedback;
-};
-
-[Exposed=(Window,Worker), SecureContext]
-interface RateControlFeedback {
-  readonly attribute WebTransportCongestionControl congestionControl;
-  /* The rate you should send, on average, to avoid queuing */
-  readonly attribute unsigned long long? averageTargetBps;
+  readonly attribute WebTransportRateControlFeedback rateControlFeedback;
 };
 
 enum WebTransportReliabilityMode {
@@ -665,6 +656,7 @@ agent MUST run the following steps:
    congestion control algorithms that optimize for |congestionControl|, as allowed by
    [[!RFC9002]] [section 7](https://datatracker.ietf.org/doc/html/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
+1. Let |rateControlFeedbackMinInterval| be 1000 milliseconds.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
@@ -859,6 +851,21 @@ these steps.
    throughput or low latency for sending on this connection. If a preference was
    requested but not satisfied, then the value is `"default"`
    The getter steps are to return [=this=]'s {{[[CongestionControl]]}}.
+
+: <dfn for="WebTransport" attribute>rateControlFeedbackMinInterval</dfn>
+:: The application's preference, if changed from the default,
+   for the minimum interval between any two times when
+   [=this=]'s {{[[onratecontrolfeedback]]}} is fired.
+   This effectively allows the application
+   to control the maximum frequency of this event.
+
+: <dfn for="WebTransport" attribute>onratecontrolfeedback</dfn>
+:: Fired when [=this=]'s {{[[rateControlFeedback]]}} changes.
+   May be delayed by  [=this=]'s {{[[rateControlFeedbackMinInterval]]}}.
+
+: <dfn for="WebTransport" attribute>rateControlFeedback</dfn>
+:: Information available to the application to control the rate at which is
+   sends data by writing to stream and sending datagrams.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -1261,6 +1268,24 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportDatagramStats" dict-member>lostOutgoing</dfn>
 :: The number of sent datagrams that were declared lost, as defined in
    [[!RFC9002]] [Section 6.1](https://www.rfc-editor.org/rfc/rfc9002#section-6.1).
+
+## `WebTransportRateControlFeedback` Dictionary ##  {#web-transport-rate-control-feedback}
+
+The <dfn dictionary>WebTransportRateControlFeedback</dfn> dictionary includes information
+useful for the application to control the rate of data sent using both streams and datagrams.
+
+<pre class="idl">
+dictionary WebTransportRateControlFeedback {
+  unsigned long long? queueDrainRate;
+};
+</pre>
+
+The dictionary SHALL have the following attributes:
+
+: <dfn for="WebTransportRateControlFeedback" dict-member>queueDrainRate</dfn>
+:: The rate at which queued data is dequeued and sent, in bits per second.
+   If the application wishes to avoid queuing, it should not send more than this rate.
+   This rate applies to all streams and datagrams that share a [=connection=].
 
 # Interface `WebTransportSendStream` #  {#send-stream}
 
