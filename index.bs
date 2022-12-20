@@ -542,11 +542,13 @@ interface WebTransport {
 
   readonly attribute WebTransportDatagramDuplexStream datagrams;
 
-  Promise&lt;WebTransportBidirectionalStream&gt; createBidirectionalStream();
+  Promise&lt;WebTransportBidirectionalStream&gt; createBidirectionalStream(
+      optional WebTransportSendStreamOptions options = {});
   /* a ReadableStream of WebTransportBidirectionalStream objects */
   readonly attribute ReadableStream incomingBidirectionalStreams;
 
-  Promise&lt;WebTransportSendStream&gt; createUnidirectionalStream();
+  Promise&lt;WebTransportSendStream&gt; createUnidirectionalStream(
+      optional WebTransportSendStreamOptions options = {});
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 };
@@ -901,6 +903,8 @@ these steps.
    1. Let |transport| be [=this=].
    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
       return a new [=rejected=] promise with an {{InvalidStateError}}.
+   1. Let |sendOrder| be {{WebTransport/createBidirectionalStream(options)/options}}'s
+      {{WebTransportSendStreamOptions/sendOrder}}.
    1. Let |p| be a new promise.
    1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
@@ -914,7 +918,7 @@ these steps.
         1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
            [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
         1. Let |stream| be the result of [=BidirectionalStream/creating=] a
-           {{WebTransportBidirectionalStream}} with |internalStream| and |transport|.
+           {{WebTransportBidirectionalStream}} with |internalStream|, |transport|, and |sendOrder|.
         1. [=Resolve=] |p| with |stream|.
    1. return |p|.
 
@@ -929,6 +933,8 @@ these steps.
      1. Let |transport| be [=this=].
      1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
         return a new [=rejected=] promise with an {{InvalidStateError}}.
+     1. Let |sendOrder| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
+        {{WebTransportSendStreamOptions/sendOrder}}.
      1. Let |p| be a new promise.
      1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
         {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
@@ -942,7 +948,7 @@ these steps.
           1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
              [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
           1. Let |stream| be the result of [=WebTransportSendStream/creating=] a {{WebTransportSendStream}} with
-             |internalStream| and |transport|.
+             |internalStream|, |transport|, and |sendOrder|.
           1. [=Resolve=] |p| with |stream|.
      1. return |p|.
 
@@ -1160,6 +1166,36 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportCloseInfo" dict-member>reason</dfn>
 :: The reason for closing the {{WebTransport}}.
 
+## `WebTransportSendStreamOptions` Dictionary ##  {#uni-stream-options}
+
+The <dfn dictionary>WebTransportSendStreamOptions</dfn> is a
+dictionary of parameters that affect how {{WebTransportSendStream}}s created by
+{{WebTransport/createUnidirectionalStream}} and
+{{WebTransport/createBidirectionalStream}} behave.
+
+<pre class="idl">
+dictionary WebTransportSendStreamOptions {
+  long long? sendOrder = null;
+};
+</pre>
+
+The dictionary SHALL have the following attributes:
+
+: <dfn for="WebTransportSendStreamOptions" dict-member>sendOrder</dfn>
+:: An send order number that, if provided, opts the created
+   {{WebTransportSendStream}} in to participating in <dfn>strict ordering</dfn>.
+   Bytes currently queued on [=strict ordering|strictly ordered=]
+   {{WebTransportSendStream}}s MUST be sent ahead of bytes currently queued on
+   other [=strict ordering|strictly ordered=] {{WebTransportSendStream}}s
+   created with lower send order numbers.
+
+   If no send order number is provided, then the order in which the
+   user agent sends bytes from it relative to other {{WebTransportSendStream}}s
+   is [=implementation-defined=].
+
+   Note: This is sender-side data prioritization which does not guarantee
+   reception order.
+
 ## `WebTransportStats` Dictionary ##  {#web-transport-stats}
 
 The <dfn dictionary>WebTransportStats</dfn> dictionary includes information
@@ -1313,6 +1349,10 @@ A {{WebTransportSendStream}} has the following internal slots.
    <td><dfn>`[[Transport]]`</dfn>
    <td class="non-normative">A {{WebTransport}} which owns this {{WebTransportSendStream}}.
   </tr>
+  <tr>
+   <td><dfn>`[[SendOrder]]`</dfn>
+   <td class="non-normative">An optional send order number, or null.
+  </tr>
  <tbody>
 </table>
 
@@ -1322,7 +1362,7 @@ A {{WebTransportSendStream}} has the following internal slots.
 
 To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
 {{WebTransportSendStream}}, with an [=outgoing unidirectional=] or [=bidirectional=] [=WebTransport stream=]
-|internalStream| and a {{WebTransport}} |transport|, run these steps:
+|internalStream|, a {{WebTransport}} |transport|, and a |sendOrder|, run these steps:
 
 1. Let |stream| be a [=new=] {{WebTransportSendStream}}, with:
     : {{WebTransportSendStream/[[InternalStream]]}}
@@ -1331,6 +1371,8 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
     :: null
     : {{WebTransportSendStream/[[Transport]]}}
     :: |transport|
+    : {{WebTransportSendStream/[[SendOrder]]}}
+    :: |sendOrder|
 1. Let |writeAlgorithm| be an action that [=writes=] |chunk| to |stream|, given |chunk|.
 1. Let |closeAlgorithm| be an action that [=closes=] |stream|.
 1. Let |abortAlgorithm| be an action that [=aborts=] |stream| with |reason|, given |reason|.
@@ -1752,13 +1794,13 @@ A {{WebTransportBidirectionalStream}} has the following internal slots.
 
 <div algorithm="create a BidirectionalStream">
 To <dfn for=BidirectionalStream>create</dfn> a {{WebTransportBidirectionalStream}} with a
-[=bidirectional=] [=WebTransport stream=] |internalStream| and a {{WebTransport}}
-object |transport|, run these steps.
+[=bidirectional=] [=WebTransport stream=] |internalStream|, a {{WebTransport}}
+object |transport|, and a |sendOrder|, run these steps.
 
 1. Let |readable| be the result of [=WebTransportReceiveStream/creating=] a {{WebTransportReceiveStream}} with
    |internalStream| and |transport|.
 1. Let |writable| be the result of [=WebTransportSendStream/creating=] a {{WebTransportSendStream}} with
-   |internalStream| and |transport|.
+   |internalStream|, |transport|, and |sendOrder|.
 1. Let |stream| be a [=new=] {{WebTransportBidirectionalStream}}, with:
     : {{WebTransportBidirectionalStream/[[Readable]]}}
     :: |readable|
