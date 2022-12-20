@@ -657,6 +657,7 @@ agent MUST run the following steps:
    [[!RFC9002]] [section 7](https://datatracker.ietf.org/doc/html/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
 1. Let |rateControlFeedbackMinInterval| be 1000 milliseconds.
+1. Let |rateControlFeedback| be a [=new=] {{RateControlFeedback}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
@@ -864,8 +865,7 @@ these steps.
    May be delayed by  [=this=]'s rateControlFeedbackMinInterval.
 
 : <dfn for="WebTransport" attribute>rateControlFeedback</dfn>
-:: Information available to the application to control the rate at which is
-   sends data by writing to stream and sending datagrams.
+:: Information useful for the application to control the rate at which it sends data.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -1269,27 +1269,6 @@ The dictionary SHALL have the following attributes:
 :: The number of sent datagrams that were declared lost, as defined in
    [[!RFC9002]] [Section 6.1](https://www.rfc-editor.org/rfc/rfc9002#section-6.1).
 
-## `WebTransportRateControlFeedback` Dictionary ##  {#web-transport-rate-control-feedback}
-
-The <dfn dictionary>WebTransportRateControlFeedback</dfn> dictionary includes information
-useful for the application to control the rate of data sent using both streams and datagrams.
-
-<pre class="idl">
-dictionary WebTransportRateControlFeedback {
-  unsigned long long? sendRate;
-};
-</pre>
-
-The dictionary SHALL have the following attributes:
-
-: <dfn for="WebTransportRateControlFeedback" dict-member>sendRate</dfn>
-:: The rate at which queued data will be dequeued and sent, in bits per second.
-   If the application wishes to avoid queuing, it should not send more than this rate.
-   This rate applies to all streams and datagrams that share a [=session=]
-   and is calculated using {{WebTransport/congestionControl}}. If this [=session=] is
-   pooled with others in a shared [=connection=], it is the rate at which the user
-   agent will drain the queues for this [=session=].  If the user agent cannot
-   determine a value (perhaps because of pooling), it may leave the value unset.
 
 # Interface `WebTransportSendStream` #  {#send-stream}
 
@@ -1806,6 +1785,68 @@ object |transport|, run these steps.
 1. Return |stream|.
 
 </div>
+
+# Interface `WebTransportRateControlFeedback` #  {#rate-control-feedback}
+
+A {{WebTransportRateControlFeedback}} contains information
+useful for the application to control the rate at which it sends data.
+
+<pre class="idl">
+interface WebTransportRateControlFeedback {
+  readonly attribute unsigned long long? sendRate;
+};
+</pre>
+
+## Internal slots ## {#rate-control-feedback-internal-slots}
+
+A {{WebTransportRateControlFeedback}} has the following internal slots.
+
+<table class="data" dfn-for="WebTransportRateControlFeedback" dfn-type="attribute">
+ <thead>
+  <tr>
+   <th>Internal Slot
+   <th>Description (<em>non-normative</em>)
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>`[[SendRate]]`</dfn>
+   <td class="non-normative">The rate at which the {{WebTransport}} dequeues and sends data,
+   which is the maximum rate the applcation should send at to avoid queuing.
+  </tr>
+ </tbody>
+</table>
+
+## Attributes ##  {#rate-control-feedback-attributes}
+
+: <dfn for="WebTransportRateControlFeedback" attribute>sendRate</dfn>
+:: The getter steps are to return [=this=]'s {{WebTransportRateControlFeedback/[[SendRate]]}}.
+   This is the rate at which queued data will be dequeued and sent by the user agent, in bits per second.
+   If the application wishes to avoid queuing, it should not send more than this rate.
+   This rate applies to all streams and datagrams that share a [=session=]
+   and is calculated using {{WebTransport/congestionControl}}. If this [=session=] is
+   pooled with others in a shared [=connection=], it is the rate at which the user
+   agent will drain the queues for this [=session=].  If the user agent cannot
+   determine a value (perhaps because of pooling), it may leave the value unset.
+
+## Procedures ## {#rate-control-feedback-procedures}
+
+<div algorithm="create a WebTransportRateControlFeedback">
+To <dfn for=WebTransportRateControlFeedback>create</dfn> a {{WebTransportRateControlFeedback}} with a
+send rate {sendRate}, run these steps.
+
+1. Let |feedback| be a [=new=] {{WebTransportRateControlFeedback}}, with:
+    : {{WebTransportRateControlFeedback/[[SendRate]]}}
+    :: |sendRate|
+1. Return |feedback|.
+</div>
+
+<div algorithm="updating a WebTransportRateControlFeedback">
+When the user agent changes the rate at which is dequeues and sends for a [=session=],
+it MUST update the value of {{WebTransportRateControlFeedback/[[SendRate]]}} of the
+{{WebTransport/congestionControl}} of the [=session=].
+</div>
+
 
 # `WebTransportError` Interface #  {#web-transport-error-interface}
 
