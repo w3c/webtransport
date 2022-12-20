@@ -550,17 +550,18 @@ interface WebTransport {
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 
-  /* if unset, default is 1 second */
-  attribute unsigned long? rateControlFeedbackMinIntervalMs;
-  /* fires when the value changes, but at most every rateControlFeedbackMinIntervalMs */
+  /* if unset, default is 1 second; in units of milliseconds */
+  attribute unsigned long? rateControlFeedbackMinInterval;
+  /* fires when the value changes, but at most every rateControlFeedbackMinInterval */
   attribute EventHandler onratecontrolfeedback;
   readonly attribute RateControlFeedback rateControlFeedback;
 };
 
 [Exposed=(Window,Worker), SecureContext]
 interface RateControlFeedback {
+  readonly attribute WebTransportCongestionControl congestionControl;
   /* The rate you should send, on average, to avoid queuing */
-  readonly attribute unsigned long? averageTargetBps;
+  readonly attribute unsigned long long? averageTargetBps;
 };
 
 enum WebTransportReliabilityMode {
