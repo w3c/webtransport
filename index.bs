@@ -258,6 +258,14 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
    <td>No
    <td>Yes
   </tr>
+  <tr>
+   <td><dfn>flow control</dfn>
+   <td>[[!QUIC]]
+   [section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-4.1)
+   <td>No
+   <td>Yes
+   <td>Yes
+  </tr>
  </tbody>
 </table>
 
@@ -1404,7 +1412,15 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
    This sending MAY be interleaved with sending of previously queued streams and datagrams,
    as well as streams and datagrams yet to be queued to be sent over this transport.
 
-   Note: Solving prioritization is an outstanding issue.
+   If |stream|.{{[[SendOrder]]}} is `null` then this sending MUST NOT starve
+   except for [=flow control=] reasons or [=WritableStream/Error | error=].
+
+   If |stream|.{{[[SendOrder]]}} is not `null` then this sending MUST starve
+   until all bytes queued for sending on {{WebTransportSendStream}}s with a
+   non-null and higher {{[[SendOrder]]}}, that are neither
+   [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
+   sent.
+
 1. If the previous step failed, abort the remaining steps.
 
   Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
