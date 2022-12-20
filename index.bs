@@ -1276,17 +1276,20 @@ useful for the application to control the rate of data sent using both streams a
 
 <pre class="idl">
 dictionary WebTransportRateControlFeedback {
-  unsigned long long? queueDrainRate;
+  unsigned long long? dequeRate;
 };
 </pre>
 
 The dictionary SHALL have the following attributes:
 
 : <dfn for="WebTransportRateControlFeedback" dict-member>queueDrainRate</dfn>
-:: The rate at which queued data is dequeued and sent, in bits per second.
+:: The rate at which queued data will be dequeued and sent, in bits per second.
    If the application wishes to avoid queuing, it should not send more than this rate.
-   This rate applies to all streams and datagrams that share a [=connection=]
-   and is calculated using {{WebTransport/congestionControl}}.
+   This rate applies to all streams and datagrams that share a [=session=]
+   and is calculated using {{WebTransport/congestionControl}}. If this [=session=] is
+   pooled with others in a shared [=connection=], it is the rate at which the user
+   agent will drain the queues for this [=session=].  If the user agent cannot
+   determine a value (perhaps because of pooling), it may leave the value unset.
 
 # Interface `WebTransportSendStream` #  {#send-stream}
 
