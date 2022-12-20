@@ -933,7 +933,7 @@ these steps.
    following steps:
 
    1. Let |transport| be [=this=].
-   1. If |transport|.{{[[State]]}} is `"draining"`, `"closed"` or `"failed"`,
+   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
       return a new [=rejected=] promise with an {{InvalidStateError}}.
    1. Let |p| be a new promise.
    1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
@@ -961,7 +961,7 @@ these steps.
    When `createUnidirectionalStream()` method is called, the user agent MUST
    run the following steps:
      1. Let |transport| be [=this=].
-     1. If |transport|.{{[[State]]}} is `"draining"`, `"closed"` or `"failed"`,
+     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
         return a new [=rejected=] promise with an {{InvalidStateError}}.
      1. Let |p| be a new promise.
      1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
