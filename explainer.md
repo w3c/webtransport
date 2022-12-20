@@ -32,9 +32,7 @@ unidirectional and bidirectional streams, and unreliable datagrams
 - Provide a way to communicate with servers with low latency, including support
 for unreliable and unordered communication.
 
-- Provide an API that can be used for many use cases and network protocols,
-including both reliable and unreliable, ordered and unordered, client-server and
-p2p, data and media.
+- Provide an API that can be used for many use cases and that facilitates the transmission of data reliably and unreliably, in both ordered and unordered flows, between a client and a server.
 
 - Ensure the same security properties as WebSockets (use of TLS,
   server-controlled origin policy)
