@@ -1276,13 +1276,13 @@ useful for the application to control the rate of data sent using both streams a
 
 <pre class="idl">
 dictionary WebTransportRateControlFeedback {
-  unsigned long long? dequeueRate;
+  unsigned long long? sendRate;
 };
 </pre>
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportRateControlFeedback" dict-member>dequeueRate</dfn>
+: <dfn for="WebTransportRateControlFeedback" dict-member>sendRate</dfn>
 :: The rate at which queued data will be dequeued and sent, in bits per second.
    If the application wishes to avoid queuing, it should not send more than this rate.
    This rate applies to all streams and datagrams that share a [=session=]
