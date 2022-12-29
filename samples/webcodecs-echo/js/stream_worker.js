@@ -844,12 +844,11 @@ SSRC = this.config.ssrc
            tid: tid
          }
          writeChunk(transport, chunk, rto, info).then(
-           () => {
-             return;
-           }
+           () => {}
            ).catch((e) => {
              self.postMessage({text: `Error: ${e.message}`});
            });
+         return;
        }, 
        async close(controller) {
          await transport.close();
