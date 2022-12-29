@@ -353,7 +353,7 @@ async function readInto(reader, buffer, offset) {
     }
     off += view.byteLength;
   }
-  return buffer;
+  return Promise.resolve(buffer);
 }
 
 async function get_frame(readable, number) {
@@ -364,12 +364,16 @@ async function get_frame(readable, number) {
     header = new Uint8Array(await readInto(reader, hdr, 0));
   } catch (e) {
     reader.releaseLock();
-    self.PostMessage({severity: 'fatal', text: `Couldn't read frame header from stream# ${number}: ${e.message}`});
+    self.PostMessage({text: `Couldn't read frame header from stream# ${number}: ${e.message}`});
+    return Promise.reject(e);
   }
   packlen = (header[0] << 24) | (header[1] << 16) | (header[2] << 8) | (header[3] << 0);
   if ((packlen < 1) || (packlen > 300000)) {
     reader.releaseLock();
-    self.postMessage({severity: 'fatal', text: 'Frame length problem: ' + packlen});
+    let e;
+    e.message = `Frame length problem: ${packen}`;
+    self.postMessage({text: `${e.message}`});  
+    return Promise.reject(e);
   }
   // Retrieve sendTime from header
   sendTime = (header[8] << 24) | (header[9] << 16) | (header[10] << 8) | (header[11] << 0);
@@ -382,7 +386,8 @@ async function get_frame(readable, number) {
     frame = await readInto(reader, frame.buffer, totalen);
   } catch (e) {
     reader.releaseLock();
-    self.postMessage({severity: 'fatal', text: `readInto failed: ${e.message}`});
+    self.postMessage({text: `readInto failed: ${e.message}`});
+    return Promise.reject(e);
   }
   totalen = frame.byteLength;
   if (packlen == totalen) {
@@ -391,9 +396,12 @@ async function get_frame(readable, number) {
     bwe_update(seqno, packlen, rtt); 
     //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen + ' rtt: ' + rtt});
     reader.releaseLock();
-    return frame; //complete frame has been received
+    return Promise.resolve(frame); //complete frame has been received
   } else {
-    self.postMessage({text: 'ReceiveStream: frame # ' + number + ' Received len: ' + totalen + ' Packet Len: ' + packlen + ' Actual len: ' + frame.byteLength});
+    let e;
+    e.message = `ReceiveStream: frame #: ${number} Received len: ${totalen} Packet Len: ${packlen} Actual len: ${frame.byteLength}`;
+    self.postMessage({text: `${e.message}`});
+    return Promise.reject(e);
   }
   reader.releaseLock();
 }
@@ -824,7 +832,7 @@ SSRC = this.config.ssrc
          rto = Math.max(rto, 100.);
          if (d == 0) {
            //If the frame is non-discardable (config or base layer) set minimum much higher
-           rto = 3. * rto ;
+           rto = 5. * rto ;
          }
          let info = {
            seqno: seqno,
