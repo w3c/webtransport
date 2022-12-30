@@ -370,8 +370,7 @@ async function get_frame(readable, number) {
   packlen = (header[0] << 24) | (header[1] << 16) | (header[2] << 8) | (header[3] << 0);
   if ((packlen < 1) || (packlen > 300000)) {
     reader.releaseLock();
-    let e;
-    e.message = `Frame length problem: ${packen}`;
+    let e = new Error(`Frame length problem: ${packen}`);
     self.postMessage({text: `${e.message}`});  
     return Promise.reject(e);
   }
@@ -398,8 +397,7 @@ async function get_frame(readable, number) {
     reader.releaseLock();
     return Promise.resolve(frame); //complete frame has been received
   } else {
-    let e;
-    e.message = `ReceiveStream: frame #: ${number} Received len: ${totalen} Packet Len: ${packlen} Actual len: ${frame.byteLength}`;
+    let e = new Error(`ReceiveStream: frame #: ${number} Received len: ${totalen} Packet Len: ${packlen} Actual len: ${frame.byteLength}`);
     self.postMessage({text: `${e.message}`});
     return Promise.reject(e);
   }
