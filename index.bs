@@ -732,7 +732,7 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
   1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
      `"session"`.
-  1. [=Cleanup=] |transport| with |error|, |error| and true.
+  1. [=Cleanup=] |transport| with |error|.
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
 1. Run the remaining steps [=in parallel=], but abort them whenever |transport|.{{[[State]]}} becomes `"closed"` or `"failed"`.
@@ -827,9 +827,6 @@ these steps.
 :: On getting, it MUST return [=this=]'s {{[[Ready]]}}.
 : <dfn for="WebTransport" attribute>closed</dfn>
 :: On getting, it MUST return [=this=]'s {{[[Closed]]}}.
-:: This promise MUST be [=resolved=] when the transport is closed; an
-   implementation SHOULD include error information in the `reason` and
-   `closeCode` fields of {{WebTransportCloseInfo}}.
 : <dfn for="WebTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this session.
    The getter steps for the `datagrams` attribute SHALL be:
@@ -962,8 +959,8 @@ these steps.
 ## Procedures ##  {#webtransport-procedures}
 
 <div algorithm="cleanup a WebTransport">
-To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |reason|,
-|error| and a boolean |abruptly|, run these steps:
+To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |error| and
+optionally |closeInfo|, run these steps:
 1. Let |sendStreams| be a copy of |transport|.{{[[SendStreams]]}}.
 1. Let |receiveStreams| be a copy of |transport|.{{[[ReceiveStreams]]}}.
 1. Let |ready| be |transport|.{{[[Ready]]}}.
@@ -1016,7 +1013,7 @@ Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} 
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
      `"session"`.
-  1. If |cleanly| is false, then [=Cleanup|cleanup=] |transport| with |error|, and abort these steps.
+  1. If |cleanly| is false, then [=cleanup=] |transport| with |error|, and abort these steps.
   1. Let |closeInfo| be a [=new=] {{WebTransportCloseInfo}}.
   1. If |code| is given, set |closeInfo|'s {{WebTransportCloseInfo/closeCode}} to |code|.
   1. If |reasonBytes| is given, set |closeInfo|'s {{WebTransportCloseInfo/reason}} to |reasonBytes|,
@@ -1033,7 +1030,7 @@ run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
      `"session"`.
-  1. [=Cleanup=] |transport| with |error|, |error| and true.
+  1. [=Cleanup=] |transport| with |error|.
 
 </div>
 
