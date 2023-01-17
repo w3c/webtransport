@@ -61,6 +61,7 @@ spec:streams; type:interface; text:ReadableStream
 spec:fetch; type:dfn; for:/; text:fetch
 spec:url; type:dfn; text:scheme
 spec:url; type:dfn; text:fragment
+spec:infra; type:dfn; for:/; text:ASCII case-insensitive
 spec:webdriver-bidi; type:dfn; text:session
 </pre>
 <pre class="anchors">
@@ -258,6 +259,14 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
    [section 19.4](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-19.4)
    <td>Yes
    <td>No
+   <td>Yes
+  </tr>
+  <tr>
+   <td><dfn>flow control</dfn>
+   <td>[[!QUIC]]
+   [section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-4.1)
+   <td>No
+   <td>Yes
    <td>Yes
   </tr>
  </tbody>
@@ -544,11 +553,13 @@ interface WebTransport {
 
   readonly attribute WebTransportDatagramDuplexStream datagrams;
 
-  Promise&lt;WebTransportBidirectionalStream&gt; createBidirectionalStream();
+  Promise&lt;WebTransportBidirectionalStream&gt; createBidirectionalStream(
+      optional WebTransportSendStreamOptions options = {});
   /* a ReadableStream of WebTransportBidirectionalStream objects */
   readonly attribute ReadableStream incomingBidirectionalStreams;
 
-  Promise&lt;WebTransportSendStream&gt; createUnidirectionalStream();
+  Promise&lt;WebTransportSendStream&gt; createUnidirectionalStream(
+      optional WebTransportSendStreamOptions options = {});
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 
@@ -729,7 +740,7 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
   1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
      `"session"`.
-  1. [=Cleanup=] |transport| with |error|, |error| and true.
+  1. [=Cleanup=] |transport| with |error|.
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
 1. Run the remaining steps [=in parallel=], but abort them whenever |transport|.{{[[State]]}} becomes `"closed"` or `"failed"`.
@@ -824,9 +835,6 @@ these steps.
 :: On getting, it MUST return [=this=]'s {{[[Ready]]}}.
 : <dfn for="WebTransport" attribute>closed</dfn>
 :: On getting, it MUST return [=this=]'s {{[[Closed]]}}.
-:: This promise MUST be [=resolved=] when the transport is closed; an
-   implementation SHOULD include error information in the `reason` and
-   `closeCode` fields of {{WebTransportCloseInfo}}.
 : <dfn for="WebTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this session.
    The getter steps for the `datagrams` attribute SHALL be:
@@ -923,11 +931,12 @@ these steps.
    1. Let |transport| be [=this=].
    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
       return a new [=rejected=] promise with an {{InvalidStateError}}.
+   1. Let |sendOrder| be {{WebTransport/createBidirectionalStream(options)/options}}'s
+      {{WebTransportSendStreamOptions/sendOrder}}.
    1. Let |p| be a new promise.
    1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
       [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}.
-      1. Wait for |transport|.{{[[State]]}} to be `"connected"`.
       1. Let |internalStream| be the result of [=creating a bidirectional stream=] with
          |transport|.{{[[Session]]}}.
 
@@ -936,7 +945,7 @@ these steps.
         1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
            [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
         1. Let |stream| be the result of [=BidirectionalStream/creating=] a
-           {{WebTransportBidirectionalStream}} with |internalStream| and |transport|.
+           {{WebTransportBidirectionalStream}} with |internalStream|, |transport|, and |sendOrder|.
         1. [=Resolve=] |p| with |stream|.
    1. return |p|.
 
@@ -951,11 +960,12 @@ these steps.
      1. Let |transport| be [=this=].
      1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
         return a new [=rejected=] promise with an {{InvalidStateError}}.
+     1. Let |sendOrder| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
+        {{WebTransportSendStreamOptions/sendOrder}}.
      1. Let |p| be a new promise.
      1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
         {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
         [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}.
-        1. Wait for |transport|.{{[[State]]}} to be `"connected"`.
         1. Let |internalStream| be the result of [=creating an outgoing unidirectional stream=] with
            |transport|.{{[[Session]]}}.
 
@@ -964,15 +974,15 @@ these steps.
           1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
              [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
           1. Let |stream| be the result of [=WebTransportSendStream/creating=] a {{WebTransportSendStream}} with
-             |internalStream| and |transport|.
+             |internalStream|, |transport|, and |sendOrder|.
           1. [=Resolve=] |p| with |stream|.
      1. return |p|.
 
 ## Procedures ##  {#webtransport-procedures}
 
 <div algorithm="cleanup a WebTransport">
-To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |reason|,
-|error| and a boolean |abruptly|, run these steps:
+To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |error| and
+optionally |closeInfo|, run these steps:
 1. Let |sendStreams| be a copy of |transport|.{{[[SendStreams]]}}.
 1. Let |receiveStreams| be a copy of |transport|.{{[[ReceiveStreams]]}}.
 1. Let |ready| be |transport|.{{[[Ready]]}}.
@@ -1025,7 +1035,7 @@ Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} 
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
      `"session"`.
-  1. If |cleanly| is false, then [=Cleanup|cleanup=] |transport| with |error|, and abort these steps.
+  1. If |cleanly| is false, then [=cleanup=] |transport| with |error|, and abort these steps.
   1. Let |closeInfo| be a [=new=] {{WebTransportCloseInfo}}.
   1. If |code| is given, set |closeInfo|'s {{WebTransportCloseInfo/closeCode}} to |code|.
   1. If |reasonBytes| is given, set |closeInfo|'s {{WebTransportCloseInfo/reason}} to |reasonBytes|,
@@ -1042,7 +1052,7 @@ run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
      `"session"`.
-  1. [=Cleanup=] |transport| with |error|, |error| and true.
+  1. [=Cleanup=] |transport| with |error|.
 
 </div>
 
@@ -1140,7 +1150,7 @@ To <dfn>verify a certificate hash</dfn>, do the following:
 1. For every hash |hash| in |hashes|:
    1. If |hash|.{{WebTransportHash/value}} is not null:
      1. Let |hashValue| be the byte sequence which |hash|.{{WebTransportHash/value}} represents.
-     1. If {{WebTransportHash/algorithm}} of |hash| is equal to "sha-256", and |hashValue| is equal
+     1. If {{WebTransportHash/algorithm}} of |hash| is an [=ASCII case-insensitive=] match with "sha-256", and |hashValue| is equal
         to |referenceHash|, the certificate is valid. Return true.
 1. Return false.
 
@@ -1171,7 +1181,7 @@ frame.
 <pre class="idl">
 dictionary WebTransportCloseInfo {
   unsigned long closeCode = 0;
-  DOMString reason = "";
+  USVString reason = "";
 };
 </pre>
 
@@ -1181,6 +1191,36 @@ The dictionary SHALL have the following attributes:
 :: The error code communicated to the peer.
 : <dfn for="WebTransportCloseInfo" dict-member>reason</dfn>
 :: The reason for closing the {{WebTransport}}.
+
+## `WebTransportSendStreamOptions` Dictionary ##  {#uni-stream-options}
+
+The <dfn dictionary>WebTransportSendStreamOptions</dfn> is a
+dictionary of parameters that affect how {{WebTransportSendStream}}s created by
+{{WebTransport/createUnidirectionalStream}} and
+{{WebTransport/createBidirectionalStream}} behave.
+
+<pre class="idl">
+dictionary WebTransportSendStreamOptions {
+  long long? sendOrder = null;
+};
+</pre>
+
+The dictionary SHALL have the following attributes:
+
+: <dfn for="WebTransportSendStreamOptions" dict-member>sendOrder</dfn>
+:: An send order number that, if provided, opts the created
+   {{WebTransportSendStream}} in to participating in <dfn>strict ordering</dfn>.
+   Bytes currently queued on [=strict ordering|strictly ordered=]
+   {{WebTransportSendStream}}s MUST be sent ahead of bytes currently queued on
+   other [=strict ordering|strictly ordered=] {{WebTransportSendStream}}s
+   created with lower send order numbers.
+
+   If no send order number is provided, then the order in which the
+   user agent sends bytes from it relative to other {{WebTransportSendStream}}s
+   is [=implementation-defined=].
+
+   Note: This is sender-side data prioritization which does not guarantee
+   reception order.
 
 ## `WebTransportStats` Dictionary ##  {#web-transport-stats}
 
@@ -1282,7 +1322,7 @@ It is a {{WritableStream}} of {{Uint8Array}} that can be written to, to send
 data to the server.
 
 <pre class="idl">
-[Exposed=(Window,Worker), SecureContext]
+[Exposed=(Window,Worker), SecureContext, Transferable]
 interface WebTransportSendStream : WritableStream {
   Promise&lt;WebTransportSendStreamStats&gt; getStats();
 };
@@ -1290,6 +1330,10 @@ interface WebTransportSendStream : WritableStream {
 
 A {{WebTransportSendStream}} is always created by the
 [=WebTransportSendStream/create=] procedure.
+
+The {{WebTransportSendStream}}'s [=transfer steps=] and
+[=transfer-receiving steps=] are
+[those of](https://streams.spec.whatwg.org/#ws-transfer) {{WritableStream}}.
 
 ## Methods ##  {#send-stream-methods}
 
@@ -1332,6 +1376,10 @@ A {{WebTransportSendStream}} has the following internal slots.
    <td><dfn>`[[Transport]]`</dfn>
    <td class="non-normative">A {{WebTransport}} which owns this {{WebTransportSendStream}}.
   </tr>
+  <tr>
+   <td><dfn>`[[SendOrder]]`</dfn>
+   <td class="non-normative">An optional send order number, or null.
+  </tr>
  <tbody>
 </table>
 
@@ -1341,7 +1389,7 @@ A {{WebTransportSendStream}} has the following internal slots.
 
 To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
 {{WebTransportSendStream}}, with an [=outgoing unidirectional=] or [=bidirectional=] [=WebTransport stream=]
-|internalStream| and a {{WebTransport}} |transport|, run these steps:
+|internalStream|, a {{WebTransport}} |transport|, and a |sendOrder|, run these steps:
 
 1. Let |stream| be a [=new=] {{WebTransportSendStream}}, with:
     : {{WebTransportSendStream/[[InternalStream]]}}
@@ -1350,6 +1398,8 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
     :: null
     : {{WebTransportSendStream/[[Transport]]}}
     :: |transport|
+    : {{WebTransportSendStream/[[SendOrder]]}}
+    :: |sendOrder|
 1. Let |writeAlgorithm| be an action that [=writes=] |chunk| to |stream|, given |chunk|.
 1. Let |closeAlgorithm| be an action that [=closes=] |stream|.
 1. Let |abortAlgorithm| be an action that [=aborts=] |stream| with |reason|, given |reason|.
@@ -1383,7 +1433,15 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
    This sending MAY be interleaved with sending of previously queued streams and datagrams,
    as well as streams and datagrams yet to be queued to be sent over this transport.
 
-   Note: Solving prioritization is an outstanding issue.
+   If |stream|.{{[[SendOrder]]}} is `null` then this sending MUST NOT starve
+   except for [=flow control=] reasons or [=WritableStream/Error | error=].
+
+   If |stream|.{{[[SendOrder]]}} is not `null` then this sending MUST starve
+   until all bytes queued for sending on {{WebTransportSendStream}}s with a
+   non-null and higher {{[[SendOrder]]}}, that are neither
+   [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
+   sent.
+
 1. If the previous step failed, abort the remaining steps.
 
   Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
@@ -1513,11 +1571,8 @@ data received from the server. {{WebTransportReceiveStream}} is a [=readable byt
 and hence it allows
 its consumers to use a [=BYOB reader=] as well as a [=default reader=].
 
-A {{WebTransportReceiveStream}} is always created by the
-[=WebTransportReceiveStream/create=] procedure.
-
 <pre class="idl">
-[Exposed=(Window,Worker), SecureContext]
+[Exposed=(Window,Worker), SecureContext, Transferable]
 interface WebTransportReceiveStream : ReadableStream {
   Promise&lt;WebTransportReceiveStreamStats&gt; getStats();
 };
@@ -1525,6 +1580,10 @@ interface WebTransportReceiveStream : ReadableStream {
 
 A {{WebTransportReceiveStream}} is always created by the
 [=WebTransportReceiveStream/create=] procedure.
+
+The {{WebTransportReceiveStream}}'s [=transfer steps=] and
+[=transfer-receiving steps=] are
+[those of](https://streams.spec.whatwg.org/#rs-transfer) {{ReadableStream}}.
 
 ## Methods ##  {#receive-stream-methods}
 
@@ -1726,8 +1785,8 @@ The dictionary SHALL have the following attributes:
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
 interface WebTransportBidirectionalStream {
-  readonly attribute ReadableStream readable;
-  readonly attribute WritableStream writable;
+  readonly attribute WebTransportReceiveStream readable;
+  readonly attribute WebTransportSendStream writable;
 };
 </pre>
 
@@ -1770,13 +1829,13 @@ A {{WebTransportBidirectionalStream}} has the following internal slots.
 
 <div algorithm="create a BidirectionalStream">
 To <dfn for=BidirectionalStream>create</dfn> a {{WebTransportBidirectionalStream}} with a
-[=bidirectional=] [=WebTransport stream=] |internalStream| and a {{WebTransport}}
-object |transport|, run these steps.
+[=bidirectional=] [=WebTransport stream=] |internalStream|, a {{WebTransport}}
+object |transport|, and a |sendOrder|, run these steps.
 
 1. Let |readable| be the result of [=WebTransportReceiveStream/creating=] a {{WebTransportReceiveStream}} with
    |internalStream| and |transport|.
 1. Let |writable| be the result of [=WebTransportSendStream/creating=] a {{WebTransportSendStream}} with
-   |internalStream| and |transport|.
+   |internalStream|, |transport|, and |sendOrder|.
 1. Let |stream| be a [=new=] {{WebTransportBidirectionalStream}}, with:
     : {{WebTransportBidirectionalStream/[[Readable]]}}
     :: |readable|
@@ -2194,9 +2253,9 @@ following example datagrams are only sent if the transport is ready to send.
 async function sendDatagrams(url, datagrams) {
   const wt = new WebTransport(url);
   const writer = wt.datagrams.writable.getWriter();
-  for (const datagram of datagrams) {
+  for (const bytes of datagrams) {
     await writer.ready;
-    writer.write(datagram).catch(() => {});
+    writer.write(bytes).catch(() => {});
   }
 }
 </pre>
@@ -2216,8 +2275,8 @@ async function sendFixedRate(url, createDatagram, ms = 100) {
   const wt = new WebTransport(url);
   await wt.ready;
   const writer = wt.datagrams.writable.getWriter();
-  const datagram = createDatagram();
-  setInterval(() => writer.write(datagram).catch(() => {}), ms);
+  const bytes = createDatagram();
+  setInterval(() => writer.write(bytes).catch(() => {}), ms);
 }
 </pre>
 
@@ -2247,14 +2306,22 @@ Sending data as a one-way stream can be achieved by using the
 {{WebTransport/createUnidirectionalStream}} function and the resulting stream's writer.
 
 <pre class="example" highlight="js">
-async function sendData(url, data) {
+async function sendData(url, ...data) {
   const wt = new WebTransport(url);
   const writable = await wt.createUnidirectionalStream();
   const writer = writable.getWriter();
-  await writer.write(data);
+  for (const bytes of data) {
+    await writer.ready;
+    writer.write(bytes).catch(() => {});
+  }
   await writer.close();
 }
 </pre>
+<div class="note">
+  <p>The streams spec
+    [discourages](https://streams.spec.whatwg.org/#example-manual-write-dont-await)
+    awaiting the promise from write().</p>
+</div>
 
 Encoding can also be done through pipes from a {{ReadableStream}}, for example using
 {{TextEncoderStream}}.
@@ -2281,11 +2348,11 @@ and then consuming each {{WebTransportReceiveStream}} by iterating over its chun
 async function receiveData(url, processTheData) {
   const wt = new WebTransport(url);
   for await (const readable of wt.incomingUnidirectionalStreams) {
-    // consume streams individually, reporting per-stream errors
+    // consume streams individually using IFFEs, reporting per-stream errors
     ((async () => {
       try {
-        for await (const chunk of readable) {
-          processTheData(chunk);
+        for await (const bytes of readable) {
+          processTheData(bytes);
         }
       } catch (e) {
         console.error(e);
@@ -2356,21 +2423,22 @@ connect.onclick = async () => {
 
 sendData.onclick = async () => {
   const form = document.forms.sending.elements;
-  const rawData = sending.data.value;
-  const data = new TextEncoder('utf-8').encode(rawData);
+  const data = sending.data.value;
+  const bytes = new TextEncoder('utf-8').encode(data);
   try {
     switch (form.sendtype.value) {
       case 'datagram': {
-        await datagramWriter.write(data);
-        addToEventLog(&#96;Sent datagram: ${rawData}&#96;);
+        await datagramWriter.ready;
+        datagramWriter.write(bytes).catch(() => {});
+        addToEventLog(&#96;Sent datagram: ${data}&#96;);
         break;
       }
       case 'unidi': {
         const writable = await wt.createUnidirectionalStream();
         const writer = writable.getWriter();
-        await writer.write(data);
+        writer.write(bytes).catch(() => {});
         await writer.close();
-        addToEventLog(&#96;Sent a unidirectional stream with data: ${rawData}&#96;);
+        addToEventLog(&#96;Sent a unidirectional stream with data: ${data}&#96;);
         break;
       }
       case 'bidi': {
@@ -2379,9 +2447,9 @@ sendData.onclick = async () => {
         readFromIncomingStream(duplexStream.readable, n);
 
         const writer = duplexStream.writable.getWriter();
-        await writer.write(data);
+        writer.write(bytes).catch(() => {});
         await writer.close();
-        addToEventLog(&#96;Sent bidirectional stream #${n} with data: ${rawData}&#96;);
+        addToEventLog(&#96;Sent bidirectional stream #${n} with data: ${data}&#96;);
         break;
       }
     }
@@ -2420,8 +2488,8 @@ async function acceptUnidirectionalStreams() {
 async function readFromIncomingStream(readable, number) {
   try {
     const decoder = new TextDecoderStream('utf-8');
-    for await (const chunk of readable.pipeThrough(decoder)) {
-      addToEventLog(&#96;Received data on stream #${number}: ${chunk}&#96;);
+    for await (const data of readable.pipeThrough(decoder)) {
+      addToEventLog(&#96;Received data on stream #${number}: ${data}&#96;);
     }
     addToEventLog(&#96;Stream #${number} closed&#96;);
   } catch (e) {
