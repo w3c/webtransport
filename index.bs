@@ -657,7 +657,7 @@ agent MUST run the following steps:
    [[!RFC9002]] [section 7](https://datatracker.ietf.org/doc/html/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
 1. Let |rateControlFeedbackMinInterval| be 1000 milliseconds.
-1. Let |rateControlFeedback| be a [=new=] {{RateControlFeedback}}.
+1. Let |rateControlFeedback| be a [=new=] {{WebTransportRateControlFeedback}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
@@ -1832,6 +1832,7 @@ A {{WebTransportRateControlFeedback}} has the following internal slots.
 ## Procedures ## {#rate-control-feedback-procedures}
 
 <div algorithm="create a WebTransportRateControlFeedback">
+
 To <dfn for=WebTransportRateControlFeedback>create</dfn> a {{WebTransportRateControlFeedback}} with a
 send rate {sendRate}, run these steps.
 
@@ -1839,6 +1840,7 @@ send rate {sendRate}, run these steps.
     : {{WebTransportRateControlFeedback/[[SendRate]]}}
     :: |sendRate|
 1. Return |feedback|.
+
 </div>
 
 <div algorithm="updating a WebTransportRateControlFeedback">
