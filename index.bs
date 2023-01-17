@@ -541,7 +541,7 @@ defined in [[!WEB-TRANSPORT-HTTP3]].
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
-interface WebTransport {
+interface WebTransport : EventTarget {
   constructor(USVString url, optional WebTransportOptions options = {});
 
   Promise&lt;WebTransportStats&gt; getStats();
@@ -871,11 +871,17 @@ these steps.
    to control the maximum frequency of this event.
 
 : <dfn for="WebTransport" attribute>onratecontrolfeedback</dfn>
-:: Fired when [=this=]'s rateControlFeedback changes.
-   May be delayed by  [=this=]'s rateControlFeedbackMinInterval.
+:: An [=event handler IDL attribute=] whose [=event handler event type=] is
+    {{WebTransport/ratecontrolfeedback}}.
 
 : <dfn for="WebTransport" attribute>rateControlFeedback</dfn>
 :: Information useful for the application to control the rate at which it sends data.
+
+## Events ## {#webtransport-events}
+
+: <dfn event for=WebTransport>ratecontrolfeedback</dfn>
+:: Fired at the {{WebTransport}} when the {{WebTransport/rateControlFeedback}} has
+    changed.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -1906,9 +1912,14 @@ send rate {sendRate}, run these steps.
 </div>
 
 <div algorithm="updating a WebTransportRateControlFeedback">
+
 When the user agent changes the rate at which it dequeues bytes for sending on a [=session=],
-it MUST update the value of {{WebTransportRateControlFeedback/[[SendRate]]}} of the
-{{WebTransport/congestionControl}} of the [=session=].
+it MUST run these steps.
+
+1. Update the value of {{WebTransportRateControlFeedback/[[SendRate]]}} of the
+   {{WebTransport/rateControlFeedback}} of the [=session=].
+1. Fire an event named {{WebTransport/ratecontrolfeedback}} at the {{WebTransport}} of the [=session=].
+
 </div>
 
 
