@@ -60,6 +60,7 @@ spec:streams; type:interface; text:ReadableStream
 spec:fetch; type:dfn; for:/; text:fetch
 spec:url; type:dfn; text:scheme
 spec:url; type:dfn; text:fragment
+spec:infra; type:dfn; for:/; text:ASCII case-insensitive
 </pre>
 <pre class="anchors">
 url: https://html.spec.whatwg.org/multipage/origin.html#concept-origin; type: dfn; text: origin; for:/
@@ -1130,7 +1131,7 @@ To <dfn>verify a certificate hash</dfn>, do the following:
 1. For every hash |hash| in |hashes|:
    1. If |hash|.{{WebTransportHash/value}} is not null:
      1. Let |hashValue| be the byte sequence which |hash|.{{WebTransportHash/value}} represents.
-     1. If {{WebTransportHash/algorithm}} of |hash| is equal to "sha-256", and |hashValue| is equal
+     1. If {{WebTransportHash/algorithm}} of |hash| is an [=ASCII case-insensitive=] match with "sha-256", and |hashValue| is equal
         to |referenceHash|, the certificate is valid. Return true.
 1. Return false.
 
