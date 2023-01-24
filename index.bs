@@ -1720,8 +1720,7 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportReceiveStream
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. [=set/Remove=] |stream| from |transport|.{{[[ReceiveStreams]]}}.
   1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
-     `"stream"`.
-  1. Set |error|.{{WebTransportError/[[StreamErrorCode]]}} to |code|.
+     `"stream"` and |code|.
   1. [=ReadableStream/Error=] |stream| with |error|.
 
 </div>
@@ -1832,17 +1831,17 @@ object |transport|, and a |sendOrder|, run these steps.
  - A reason for a client-initiated abort operation.
 
 <pre class="idl">
-[Exposed=(Window,Worker), SecureContext]
+[Exposed=(Window,Worker), Serializable, SecureContext]
 interface WebTransportError : DOMException {
-  constructor(optional WebTransportErrorInit init = {});
+  constructor(optional DOMString message = "", WebTransportErrorOptions options = {});
 
   readonly attribute WebTransportErrorSource source;
   readonly attribute octet? streamErrorCode;
 };
 
-dictionary WebTransportErrorInit {
-  [Clamp] octet streamErrorCode;
-  DOMString message;
+dictionary WebTransportErrorOptions {
+  WebTransportErrorSource source = "stream";
+  [Clamp] octet? streamErrorCode = null;
 };
 
 enum WebTransportErrorSource {
@@ -1877,14 +1876,30 @@ A {{WebTransportError}} has the following internal slots.
 ## Constructor ##  {#web-transport-error-constructor1}
 
 <div algorithm>
+To <dfn for="WebTransportError">create</dfn> a {{WebTransportError}} error with a
+{{WebTransportErrorSource}} |source| and optionally a |streamErrorCode| defaulting
+to `null`, run these steps:
+1. Let |message| be an [=implementation-defined=] string.
+1. Let |options| be `{source, streamErrorCode}`.
+1. Return a new {{WebTransportError/constructor()}} with |message| and |options|.
+</div>
+
+<div algorithm>
 
 The <dfn constructor for="WebTransportError"
-lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps are:
+lt="WebTransportError(message, options)">new WebTransportError(message, options)</dfn>
+constructor steps are:
 
-1. Let |error| be [=this=].
-1. Let |message| be |init|.{{WebTransportErrorInit/message}} if it exists, and `""` otherwise.
-1. [=WebTransportError/Set up=] |error| with |message| and `"stream"`.
-1. Set |error|.{{WebTransportError/[[StreamErrorCode]]}} to |init|.{{WebTransportErrorInit/streamErrorCode}} if it exists.
+1. Set |this|'s internal slots as follows:
+    : {{WebTransportError/[[Source]]}}
+    :: |options|.{{WebTransportErrorOptions/source}}
+    : {{WebTransportError/[[StreamErrorCode]]}}
+    :: |options|.{{WebTransportErrorOptions/streamErrorCode}}
+1. Run the [=DOMException/new DOMException(message, name)=] constructor steps on
+   [=this=] with |message| and `"WebTransportError"`.
+
+   Note: This name does not have a mapping to a legacy code, so [=this=]'s {{DOMException/code}}
+   is 0.
 
 </div>
 
@@ -1895,34 +1910,22 @@ lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps
 : <dfn for="WebTransportError" attribute>streamErrorCode</dfn>
 :: The getter steps are to return [=this=]'s {{WebTransportError/[[StreamErrorCode]]}}.
 
-## Procedures ## {#web-transport-error-procedures}
+## Serialization ## {#web-transport-error-serialization}
 
 <div algorithm>
 
-To <dfn for="WebTransportError">create</dfn> a {{WebTransportError}} |error| with a
-{{WebTransportErrorSource}} |source|, run these steps:
+{{WebTransportError}} objects are [=serializable objects=].
+Their [=serialization steps=], given |value| and |serialized|, are:
 
-1. Let |message| be an [=implementation-defined=] string.
-1. Let |error| be a [=new=] {{WebTransportError}}.
-1. [=Set up=] |error| with |message| and |source|.
+1. Run the {{DOMException}} [=serialization steps=] given |value| and |serialized|.
+1. Set |serialized|.`[[Source]]` to |value|.{{WebTransportError/[[Source]]}}.
+1. Set |serialized|.`[[StreamErrorCode]]` to |value|.{{WebTransportError/[[StreamErrorCode]]}}.
 
-</div>
+Their [=deserialization steps=], given |serialized| and |value|, are:
 
-<div algorithm>
-
-To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| with a {{DOMString}}
-|message| and a {{WebTransportErrorSource}} |source|, run these steps:
-
-1. Set |error|'s internal slots as:
-    : {{WebTransportError/[[StreamErrorCode]]}}
-    :: null
-    : {{WebTransportError/[[Source]]}}
-    :: |source|
-1. Run [=DOMException/new DOMException(message, name)=] constructor steps with |error|, |message|
-   and `"WebTransportError"`.
-
-   Note: This name does not have a mapping to a legacy code, so [=this=]'s {{DOMException/code}}
-   is 0.
+1. Run the {{DOMException}} [=deserialization steps=] given |serialized| and |value|.
+1. Set |value|.{{WebTransportError/[[Source]]}} to |serialized|.`[[Source]]`.
+1. Set |value|.{{WebTransportError/[[StreamErrorCode]]}} |serialized|.`[[StreamErrorCode]]`.
 
 </div>
 
