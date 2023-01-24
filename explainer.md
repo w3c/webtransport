@@ -147,7 +147,7 @@ for await (const {readable, writable} of wt.incomingBidirectionalStreams) {
   }
   const notification = new Notification(deserializeNotification(buffers));
   notification.addEventListener('onclick', () => {
-    const clickMessage = encodeClickMessage(notification);
+    const clickMessage = serializeClickedMessage(notification);
     const writer = writable.getWriter();
     writer.write(clickMessage);
     writer.close();
