@@ -1833,7 +1833,7 @@ object |transport|, and a |sendOrder|, run these steps.
 <pre class="idl">
 [Exposed=(Window,Worker), Serializable, SecureContext]
 interface WebTransportError : DOMException {
-  constructor(optional DOMString message = "", WebTransportErrorOptions options = {});
+  constructor(optional DOMString message = "", optional WebTransportErrorOptions options = {});
 
   readonly attribute WebTransportErrorSource source;
   readonly attribute octet? streamErrorCode;
@@ -1876,12 +1876,15 @@ A {{WebTransportError}} has the following internal slots.
 ## Constructor ##  {#web-transport-error-constructor1}
 
 <div algorithm>
+
 To <dfn for="WebTransportError">create</dfn> a {{WebTransportError}} error with a
 {{WebTransportErrorSource}} |source| and optionally a |streamErrorCode| defaulting
 to `null`, run these steps:
+
 1. Let |message| be an [=implementation-defined=] string.
 1. Let |options| be `{source, streamErrorCode}`.
 1. Return a new {{WebTransportError/constructor()}} with |message| and |options|.
+
 </div>
 
 <div algorithm>
@@ -1912,8 +1915,6 @@ constructor steps are:
 
 ## Serialization ## {#web-transport-error-serialization}
 
-<div algorithm>
-
 {{WebTransportError}} objects are [=serializable objects=].
 Their [=serialization steps=], given |value| and |serialized|, are:
 
@@ -1926,8 +1927,6 @@ Their [=deserialization steps=], given |serialized| and |value|, are:
 1. Run the {{DOMException}} [=deserialization steps=] given |serialized| and |value|.
 1. Set |value|.{{WebTransportError/[[Source]]}} to |serialized|.`[[Source]]`.
 1. Set |value|.{{WebTransportError/[[StreamErrorCode]]}} |serialized|.`[[StreamErrorCode]]`.
-
-</div>
 
 # Protocol Mappings # {#protocol-mapping}
 
