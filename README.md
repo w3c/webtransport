@@ -28,10 +28,10 @@ See the [proposed spec](https://wicg.github.io/web-transport/).
 # Samples
 
 Basic Echo
-  Live: https://webrtc.internaut.com/wt/
-  Source: https://github.com/w3c/webtransport/tree/main/samples/echo
+- Live: https://webrtc.internaut.com/wt/
+- Source: https://github.com/w3c/webtransport/tree/main/samples/echo
   
 WebCodecs Echo
-   Live: https://webrtc.internaut.com/wc/wtSender10/
-   Source: https://github.com/w3c/webtransport/pull/430
+ - Live: https://webrtc.internaut.com/wc/wtSender10/
+ - Source: https://github.com/w3c/webtransport/pull/430
    
