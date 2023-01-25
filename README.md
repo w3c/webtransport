@@ -33,5 +33,6 @@ Basic Echo
   
 WebCodecs Echo
  - Live: https://webrtc.internaut.com/wc/wtSender10/
- - Source: https://github.com/w3c/webtransport/pull/430
+ - Source: https://github.com/aboba/wt-demo
+ - PR: https://github.com/w3c/webtransport/pull/430
    
