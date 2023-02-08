@@ -1931,8 +1931,11 @@ To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| wit
 *This section is non-normative.*
 
 This section describes the [[QUIC]] protocol behavior of methods defined
-in this specification, utilizing [[WEB-TRANSPORT-HTTP3]]. Cause and effect may
-not be immediate due to buffering.
+in this specification, utilizing [[WEB-TRANSPORT-HTTP3]]. The application
+{{WebTransportError/streamErrorCode}} in the {{WebTransportError}} error is
+converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-HTTP3]]
+[section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.3).
+Cause and effect may not be immediate due to buffering.
 
   <table class="data">
     <colgroup class="header"><col></colgroup>
@@ -1945,12 +1948,12 @@ not be immediate due to buffering.
     </thead>
     <tbody>
       <tr>
-        <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(errorCode)</td>
-        <td>[=stream/Reset|sends RESET_STREAM=] with errorCode</td>
+        <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(error)</td>
+        <td>[=stream/Reset|sends RESET_STREAM=] with httpErrorCode</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/close}}()</td>
-        <td>[=stream/Send|sends=] STREAM_FINAL</td>
+        <td>[=stream/Send|sends=] STREAM with FIN bit set</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/write}}()</td>
@@ -1958,19 +1961,19 @@ not be immediate due to buffering.
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/close}}()</td>
-        <td>[=stream/Send|sends=] STREAM_FINAL</td>
+        <td>[=stream/Send|sends=] STREAM with FIN bit set</td>
       </tr>
       <tr>
-        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(errorCode)</td>
-        <td>[=stream/Reset|sends RESET_STREAM=] with errorCode</td>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(error)</td>
+        <td>[=stream/Reset|sends RESET_STREAM=] with httpErrorCode</td>
       </tr>
       <tr>
-        <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(errorCode)</td>
-        <td>[=send STOP_SENDING|sends STOP_SENDING=] with errorCode</td>
+        <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(error)</td>
+        <td>[=send STOP_SENDING|sends STOP_SENDING=] with httpErrorCode</td>
       </tr>
       <tr>
-        <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(errorCode)</td>
-        <td>[=send STOP_SENDING|sends STOP_SENDING=] with errorCode</td>
+        <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(error)</td>
+        <td>[=send STOP_SENDING|sends STOP_SENDING=] with httpErrorCode</td>
       </tr>
       <tr>
         <td>wt.{{WebTransport/close}}(closeInfo)</td>
@@ -1990,7 +1993,7 @@ not be immediate due to buffering.
     </thead>
     <tbody>
       <tr>
-        <td>received [=stream-signal/STOP_SENDING=] with errorCode</td>
+        <td>received [=stream-signal/STOP_SENDING=] with httpErrorCode</td>
         <td>[=WritableStream/Error|errors=] {{WebTransportBidirectionalStream/writable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
@@ -2000,12 +2003,12 @@ not be immediate due to buffering.
           {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).value</td>
       </tr>
       <tr>
-        <td>[=stream/Receive|received=] STREAM_FINAL</td>
+        <td>[=stream/Receive|received=] STREAM with FIN bit set</td>
         <td>(await
           {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).done</td>
       </tr>
       <tr>
-        <td>received [=stream-signal/RESET_STREAM=] with errorCode</td>
+        <td>received [=stream-signal/RESET_STREAM=] with httpErrorCode</td>
         <td>[=ReadableStream/Error|errors=] {{WebTransportBidirectionalStream/readable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
