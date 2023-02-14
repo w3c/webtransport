@@ -7,10 +7,11 @@ Group: webtransport
 ED: https://w3c.github.io/webtransport/
 TR: https://www.w3.org/TR/webtransport/
 Editor: Bernard Aboba, w3cid 65611, Microsoft Corporation
-Editor: Victor Vasiliev, w3cid 113328,Google
-Editor: Yutaka Hirano, w3cid 100504,Google
+Editor: Nidhi Jaju, w3cid 136840, Google
+Editor: Victor Vasiliev, w3cid 113328, Google
 Former Editor: Peter Thatcher, Google
 Former Editor: Robin Raymond, Optical Tone Ltd.
+Former Editor: Yutaka Hirano, Google
 Abstract:
   This document defines a set of ECMAScript APIs in WebIDL to allow data to be
   sent and received between a browser and server, utilizing [[WEB-TRANSPORT-HTTP3]].
@@ -73,7 +74,9 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMA
     text: settled; url: sec-promise-objects
 urlPrefix: https://heycam.github.io/webidl/; spec: WEBIDL
   type: dfn
-    text: new DOMException(message, name); for:DOMException; url: dom-domexception-domexception
+    text: created; for:DOMException; url: dfn-create-exception
+    text: name; for:DOMException; url: domexception-name
+    text: message; for:DOMException; url: domexception-message
 </pre>
 
 # Introduction #    {#introduction}
@@ -281,10 +284,10 @@ interface WebTransportDatagramDuplexStream {
   readonly attribute WritableStream writable;
 
   readonly attribute unsigned long maxDatagramSize;
-  attribute double? incomingMaxAge;
-  attribute double? outgoingMaxAge;
-  attribute long incomingHighWaterMark;
-  attribute long outgoingHighWaterMark;
+  attribute unrestricted double incomingMaxAge;
+  attribute unrestricted double outgoingMaxAge;
+  attribute unrestricted double incomingHighWaterMark;
+  attribute unrestricted double outgoingHighWaterMark;
 };
 </pre>
 
@@ -318,13 +321,13 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsHighWaterMark]]`</dfn>
-   <td class="non-normative">An integer representing the [=high water mark=] of the incoming
-   datagrams.
+   <td class="non-normative">An {{unrestricted double}} representing the
+   [=high water mark=] of the incoming datagrams.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsExpirationDuration]]`</dfn>
-   <td class="non-normative">A {{double}} value representing the expiration duration for incoming
-   datagrams (in milliseconds), or null.
+   <td class="non-normative">An {{unrestricted double}} representing the
+   expiration duration for incoming datagrams (in milliseconds).
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
@@ -333,13 +336,13 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsHighWaterMark]]`</dfn>
-   <td class="non-normative">An integer representing the [=high water mark=] of the outgoing
-   datagrams.
+   <td class="non-normative">An {{unrestricted double}} representing the
+   [=high water mark=] of the outgoing datagrams.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsExpirationDuration]]`</dfn>
-   <td class="non-normative">A {{double}} value representing the expiration duration for outgoing
-   datagrams (in milliseconds), or null.
+   <td class="non-normative">An {{unrestricted double}} value representing the
+   expiration duration for outgoing datagrams (in milliseconds).
   </tr>
   <tr>
    <td><dfn>`[[OutgoingMaxDatagramSize]]`</dfn>
@@ -367,19 +370,19 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     : {{[[IncomingDatagramsPullPromise]]}}
     :: null
     : {{[[IncomingDatagramsHighWaterMark]]}}
-    :: an [=implementation-defined=] integer
+    :: an [=implementation-defined=] value
     : {{[[IncomingDatagramsExpirationDuration]]}}
-    :: null
+    :: +∞
     : {{[[OutgoingDatagramsQueue]]}}
     :: an empty queue
     : {{[[OutgoingDatagramsHighWaterMark]]}}
-    :: an [=implementation-defined=] integer
+    :: an [=implementation-defined=] value
        <div class="note">
         <p>This implementation-defined value should be tuned to ensure decent throughput, without
            jeopardizing the timeliness of transmitted data.</p>
        </div>
     : {{[[OutgoingDatagramsExpirationDuration]]}}
-    :: null
+    :: +∞
     : {{[[OutgoingMaxDatagramSize]]}}
     :: an [=implementation-defined=] integer.
  1. Return |stream|.
@@ -397,10 +400,10 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxAge</dfn>
 :: The getter steps are:
      1. Return [=this=].{{[[IncomingDatagramsExpirationDuration]]}}.
-:: The setter steps are:
-     1. Let |value| be the given value.
-     1. If |value| is null or |value| > 0:
-       1. Set [=this=].{{[[IncomingDatagramsExpirationDuration]]}} to |value|.
+:: The setter steps, given |value|, are:
+     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
+     1. If |value| is `0`, set |value| to +∞.
+     1. Set [=this=].{{[[IncomingDatagramsExpirationDuration]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>maxDatagramSize</dfn>
 :: The maximum size data that may be passed to {{WebTransportDatagramDuplexStream/writable}}.
@@ -409,26 +412,26 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 : <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingMaxAge</dfn>
 :: The getter steps are:
      1. Return [=this=]'s {{[[OutgoingDatagramsExpirationDuration]]}}.
-:: The setter steps are:
-     1. Let |value| be the given value.
-     1. If |value| is null or |value| > 0:
-       1. Set [=this=]'s {{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
+:: The setter steps, given |value|, are:
+     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
+     1. If |value| is `0`, set |value| to +∞.
+     1. Set [=this=].{{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingHighWaterMark</dfn>
 :: The getter steps are:
      1. Return [=this=].{{[[IncomingDatagramsHighWaterMark]]}}.
-:: The setter steps are:
-     1. Let |value| be the given value.
-     1. If |value| ≥ 0:
-       1. Set [=this=].{{[[IncomingDatagramsHighWaterMark]]}} to |value|.
+:: The setter steps, given |value|, are:
+     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
+     1. If |value| is < `1`, set |value| to `1`.
+     1. Set [=this=].{{[[IncomingDatagramsHighWaterMark]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingHighWaterMark</dfn>
 :: The getter steps are:
      1. Return [=this=].{{[[OutgoingDatagramsHighWaterMark]]}}.
-:: The setter steps are:
-     1. Let |value| be the given value.
-     1. If |value| ≥ 0:
-       1. Set [=this=].{{[[OutgoingDatagramsHighWaterMark]]}} to |value|.
+:: The setter steps, given |value|, are:
+     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
+     1. If |value| is < `1`, set |value| to `1`.
+     1. Set [=this=].{{[[OutgoingDatagramsHighWaterMark]]}} to |value|.
 
 ## Procedures ## {#datagram-duplex-stream-procedures}
 
@@ -456,7 +459,8 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
   1. Let |chunk| be a pair of |datagram| and |timestamp|.
   1. [=queue/Enqueue=] |chunk| to |queue|.
 1. Let |toBeRemoved| be the length of |queue| minus |datagrams|.{{[[IncomingDatagramsHighWaterMark]]}}.
-1. If |toBeRemoved| is positive, repeat [=queue/dequeuing=] |queue| |toBeRemoved| times.
+1. If |toBeRemoved| is positive, repeat [=queue/dequeuing=] |queue| |toBeRemoved|
+   ([rounded down](https://tc39.github.io/ecma262/#eqn-floor)) times.
 1. While |queue| is not empty:
   1. Let |bytes| and |timestamp| be |queue|'s first element.
   1. If more than |duration| milliseconds have passed since |timestamp|, then [=queue/dequeue=] |queue|.
@@ -663,7 +667,7 @@ agent MUST run the following steps:
 1. If |parsedURL| [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
 1. Let |allowPooling| be {{WebTransport/constructor(url, options)/options}}'s
-   {{WebTransportOptions/allowPooling}} if it exists, and false otherwise.
+   {{WebTransportOptions/allowPooling}}.
 1. Let |dedicated| be the negation of |allowPooling|.
 1. Let |serverCertificateHashes| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/serverCertificateHashes}} if it exists, and null otherwise.
@@ -750,8 +754,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
    returns <b>blocked</b>, then abort the remaining steps and [=queue a network task=] with |transport|
    to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
-     `"session"`.
+  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+     {{WebTransportErrorOptions/source}} is `"session"`.
   1. [=Cleanup=] |transport| with |error|.
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
@@ -764,8 +768,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
    |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
-     `"session"`.
+  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+     {{WebTransportErrorOptions/source}} is `"session"`.
   1. [=Cleanup=] |transport| with |error|.
 1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
    represents the SETTINGS frame.
@@ -773,8 +777,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
    contain H3_DATAGRAM with a value of 1, then abort the remaining steps and [=queue a network
    task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
-     `"session"`.
+  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+     {{WebTransportErrorOptions/source}} is `"session"`.
   1. [=Cleanup=] |transport| with |error|.
 1. [=session/Establish=] a [=WebTransport session=] with |origin| on |connection|.
 
@@ -783,8 +787,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 1. If the previous step fails, abort the remaining steps and [=queue a network task=] with
    |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
-     `"session"`.
+  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+     {{WebTransportErrorOptions/source}} is `"session"`.
   1. [=Cleanup=] |transport| with |error|.
 1. Let |session| be the established [=WebTransport session=].
 1. Assert: |maxDatagramSize| is an integer.
@@ -877,7 +881,7 @@ these steps.
 
 : <dfn for="WebTransport" attribute>rateControlFeedbackMinInterval</dfn>
 :: The minimum interval between any two times when
-   the [=ratecontrolfeedback=] event is fired.
+   the {{WebTransport/ratecontrolfeedback}} event is fired.
    This effectively allows the application
    to control the maximum frequency of this event.
 
@@ -886,7 +890,7 @@ these steps.
     {{WebTransport/ratecontrolfeedback}}.
 
 : <dfn for="WebTransport" attribute>rateControlFeedbackSendRate</dfn>
-:: The getter steps are to return [=this=]'s {{WebTransportRateControlFeedback/[[SendRate]]}}.
+:: The getter steps are to return [=this=]'s {{WebTransport/[[RateControlFeedbackSendRate]]}}.
    This is the rate at which queued data will be dequeued and sent by the user agent, in bits per second.
    If the application wishes to avoid queuing, it can send at a rate less than this value.
    This rate applies to all streams and datagrams that share a [=WebTransport session=]
@@ -899,7 +903,7 @@ these steps.
 ## Events ## {#webtransport-events}
 
 : <dfn event for=WebTransport>ratecontrolfeedback</dfn>
-:: Fired at the {{WebTransport}} when the {{WebTransport/rateControlFeedback}} has
+:: Fired at the {{WebTransport}} when the {{WebTransport/[[RateControlFeedbackSendRate]]}} has
     changed.
 
 ## Methods ##  {#webtransport-methods}
@@ -913,8 +917,8 @@ these steps.
      1. Let |transport| be [=this=].
      1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
      1. If |transport|.{{[[State]]}} is `"connecting"`:
-       1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
-          `"session"`.
+       1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+          {{WebTransportErrorOptions/source}} is `"session"`.
        1. [=Cleanup=] |transport| with |error|.
        1. Abort these steps.
      1. Let |session| be |transport|.{{[[Session]]}}.
@@ -1051,7 +1055,7 @@ series of steps |steps|, run these steps:
 <div algorithm="updating a WebTransportRateControlFeedback">
 
 When the user agent changes the rate at which it dequeues bytes for sending on a
-{{WebTransport}} |transport|'s [=WebTransport/session=],
+{{WebTransport}} |transport|'s [=WebTransport session=],
 it MUST [=queue a network task=] with |transport| to run these steps:
 
 1. Set |transport|.{{WebTransport/[[RateControlFeedbackSendRate]]}}
@@ -1070,8 +1074,8 @@ Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} 
    request that initiated |transport|.{{[[Session]]}} is in the "Data Recvd" state. [[!QUIC]]
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
-  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
-     `"session"`.
+  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+     {{WebTransportErrorOptions/source}} is `"session"`.
   1. If |cleanly| is false, then [=cleanup=] |transport| with |error|, and abort these steps.
   1. Let |closeInfo| be a [=new=] {{WebTransportCloseInfo}}.
   1. If |code| is given, set |closeInfo|'s {{WebTransportCloseInfo/closeCode}} to |code|.
@@ -1087,8 +1091,8 @@ run these steps:
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
-  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
-     `"session"`.
+  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+     {{WebTransportErrorOptions/source}} is `"session"`.
   1. [=Cleanup=] |transport| with |error|.
 
 </div>
@@ -1521,7 +1525,7 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
 1. Let |promise| be a new promise.
 1. Let |code| be 0.
 1. [=set/Remove=] |stream| from |transport|.{{[[SendStreams]]}}.
-1. If |reason| is a {{WebTransportError}} and |reasons|.{{WebTransportError/[[StreamErrorCode]]}} is not
+1. If |reason| is a {{WebTransportError}} and |reason|.{{WebTransportError/[[StreamErrorCode]]}} is not
    null, then set |code| to |reason|.{{WebTransportError/[[StreamErrorCode]]}}.
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 255, then set |code| to 255.
@@ -1550,9 +1554,9 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportSendStream}} 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. [=set/Remove=] |stream| from |transport|.{{[[SendStreams]]}}.
-  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
-     `"stream"`.
-  1. Set |error|.{{WebTransportError/[[StreamErrorCode]]}} to |code|.
+  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+     {{WebTransportErrorOptions/source}} is `"stream"` and
+     {{WebTransportErrorOptions/streamErrorCode}} is |code|.
   1. [=WritableStream/Error=] |stream| with |error|.
 
 </div>
@@ -1743,7 +1747,7 @@ steps.
 1. Let |internalStream| be |stream|.{{WebTransportReceiveStream/[[InternalStream]]}}.
 1. Let |promise| be a new promise.
 1. Let |code| be 0.
-1. If |reason| is a {{WebTransportError}} and |reasons|.{{WebTransportError/[[StreamErrorCode]]}} is not
+1. If |reason| is a {{WebTransportError}} and |reason|.{{WebTransportError/[[StreamErrorCode]]}} is not
    null, then set |code| to |reason|.{{WebTransportError/[[StreamErrorCode]]}}.
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 255, then set |code| to 255.
@@ -1779,9 +1783,9 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportReceiveStream
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. [=set/Remove=] |stream| from |transport|.{{[[ReceiveStreams]]}}.
-  1. Let |error| be the result of [=WebTransportError/creating=] a {{WebTransportError}} with
-     `"stream"`.
-  1. Set |error|.{{WebTransportError/[[StreamErrorCode]]}} to |code|.
+  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+     {{WebTransportErrorOptions/source}} is `"stream"` and
+     {{WebTransportErrorOptions/streamErrorCode}} is |code|.
   1. [=ReadableStream/Error=] |stream| with |error|.
 
 </div>
@@ -1890,17 +1894,17 @@ object |transport|, and a |sendOrder|, run these steps.
  - A reason for a client-initiated abort operation.
 
 <pre class="idl">
-[Exposed=(Window,Worker), SecureContext]
+[Exposed=(Window,Worker), Serializable, SecureContext]
 interface WebTransportError : DOMException {
-  constructor(optional WebTransportErrorInit init = {});
+  constructor(optional DOMString message = "", optional WebTransportErrorOptions options = {});
 
   readonly attribute WebTransportErrorSource source;
   readonly attribute octet? streamErrorCode;
 };
 
-dictionary WebTransportErrorInit {
-  [Clamp] octet streamErrorCode;
-  DOMString message;
+dictionary WebTransportErrorOptions {
+  WebTransportErrorSource source = "stream";
+  [Clamp] octet? streamErrorCode = null;
 };
 
 enum WebTransportErrorSource {
@@ -1937,12 +1941,19 @@ A {{WebTransportError}} has the following internal slots.
 <div algorithm>
 
 The <dfn constructor for="WebTransportError"
-lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps are:
+lt="WebTransportError(message, options)">new WebTransportError(message, options)</dfn>
+constructor steps are:
 
-1. Let |error| be [=this=].
-1. Let |message| be |init|.{{WebTransportErrorInit/message}} if it exists, and `""` otherwise.
-1. [=WebTransportError/Set up=] |error| with |message| and `"stream"`.
-1. Set |error|.{{WebTransportError/[[StreamErrorCode]]}} to |init|.{{WebTransportErrorInit/streamErrorCode}} if it exists.
+1. Set |this|'s [=DOMException/name=] to `"WebTransportError"`.
+1. Set |this|'s [=DOMException/message=] to |message|.
+1. Set |this|'s internal slots as follows:
+    : {{WebTransportError/[[Source]]}}
+    :: |options|.{{WebTransportErrorOptions/source}}
+    : {{WebTransportError/[[StreamErrorCode]]}}
+    :: |options|.{{WebTransportErrorOptions/streamErrorCode}}
+
+   Note: This name does not have a mapping to a legacy code, so [=this=]'s {{DOMException/code}}
+   is 0.
 
 </div>
 
@@ -1953,36 +1964,20 @@ lt="WebTransportError(init)">new WebTransportError(init)</dfn> constructor steps
 : <dfn for="WebTransportError" attribute>streamErrorCode</dfn>
 :: The getter steps are to return [=this=]'s {{WebTransportError/[[StreamErrorCode]]}}.
 
-## Procedures ## {#web-transport-error-procedures}
+## Serialization ## {#web-transport-error-serialization}
 
-<div algorithm>
+{{WebTransportError}} objects are [=serializable objects=].
+Their [=serialization steps=], given |value| and |serialized|, are:
 
-To <dfn for="WebTransportError">create</dfn> a {{WebTransportError}} |error| with a
-{{WebTransportErrorSource}} |source|, run these steps:
+1. Run the {{DOMException}} [=serialization steps=] given |value| and |serialized|.
+1. Set |serialized|.`[[Source]]` to |value|.{{WebTransportError/[[Source]]}}.
+1. Set |serialized|.`[[StreamErrorCode]]` to |value|.{{WebTransportError/[[StreamErrorCode]]}}.
 
-1. Let |message| be an [=implementation-defined=] string.
-1. Let |error| be a [=new=] {{WebTransportError}}.
-1. [=Set up=] |error| with |message| and |source|.
+Their [=deserialization steps=], given |serialized| and |value|, are:
 
-</div>
-
-<div algorithm>
-
-To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| with a {{DOMString}}
-|message| and a {{WebTransportErrorSource}} |source|, run these steps:
-
-1. Set |error|'s internal slots as:
-    : {{WebTransportError/[[StreamErrorCode]]}}
-    :: null
-    : {{WebTransportError/[[Source]]}}
-    :: |source|
-1. Run [=DOMException/new DOMException(message, name)=] constructor steps with |error|, |message|
-   and `"WebTransportError"`.
-
-   Note: This name does not have a mapping to a legacy code, so [=this=]'s {{DOMException/code}}
-   is 0.
-
-</div>
+1. Run the {{DOMException}} [=deserialization steps=] given |serialized| and |value|.
+1. Set |value|.{{WebTransportError/[[Source]]}} to |serialized|.`[[Source]]`.
+1. Set |value|.{{WebTransportError/[[StreamErrorCode]]}} |serialized|.`[[StreamErrorCode]]`.
 
 # Protocol Mappings # {#protocol-mapping}
 
@@ -1990,7 +1985,10 @@ To <dfn for="WebTransportError">set up</dfn> a {{WebTransportError}} |error| wit
 
 This section describes the [[QUIC]] protocol behavior of methods defined
 in this specification, utilizing [[WEB-TRANSPORT-HTTP3]]. Cause and effect may
-not be immediate due to buffering.
+not be immediate due to buffering. The application
+{{WebTransportError/streamErrorCode}} in the {{WebTransportError}} error is
+converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-HTTP3]]
+[section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.3).
 
   <table class="data">
     <colgroup class="header"><col></colgroup>
@@ -2003,12 +2001,12 @@ not be immediate due to buffering.
     </thead>
     <tbody>
       <tr>
-        <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(errorCode)</td>
-        <td>[=stream/Reset|sends RESET_STREAM=] with errorCode</td>
+        <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(error)</td>
+        <td>[=stream/Reset|sends RESET_STREAM=] with httpErrorCode</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/close}}()</td>
-        <td>[=stream/Send|sends=] STREAM_FINAL</td>
+        <td>[=stream/Send|sends=] STREAM with FIN bit set</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/write}}()</td>
@@ -2016,19 +2014,19 @@ not be immediate due to buffering.
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/close}}()</td>
-        <td>[=stream/Send|sends=] STREAM_FINAL</td>
+        <td>[=stream/Send|sends=] STREAM with FIN bit set</td>
       </tr>
       <tr>
-        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(errorCode)</td>
-        <td>[=stream/Reset|sends RESET_STREAM=] with errorCode</td>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(error)</td>
+        <td>[=stream/Reset|sends RESET_STREAM=] with httpErrorCode</td>
       </tr>
       <tr>
-        <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(errorCode)</td>
-        <td>[=send STOP_SENDING|sends STOP_SENDING=] with errorCode</td>
+        <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(error)</td>
+        <td>[=send STOP_SENDING|sends STOP_SENDING=] with httpErrorCode</td>
       </tr>
       <tr>
-        <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(errorCode)</td>
-        <td>[=send STOP_SENDING|sends STOP_SENDING=] with errorCode</td>
+        <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(error)</td>
+        <td>[=send STOP_SENDING|sends STOP_SENDING=] with httpErrorCode</td>
       </tr>
       <tr>
         <td>wt.{{WebTransport/close}}(closeInfo)</td>
@@ -2048,7 +2046,7 @@ not be immediate due to buffering.
     </thead>
     <tbody>
       <tr>
-        <td>received [=stream-signal/STOP_SENDING=] with errorCode</td>
+        <td>received [=stream-signal/STOP_SENDING=] with httpErrorCode</td>
         <td>[=WritableStream/Error|errors=] {{WebTransportBidirectionalStream/writable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
@@ -2058,12 +2056,12 @@ not be immediate due to buffering.
           {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).value</td>
       </tr>
       <tr>
-        <td>[=stream/Receive|received=] STREAM_FINAL</td>
+        <td>[=stream/Receive|received=] STREAM with FIN bit set</td>
         <td>(await
           {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).done</td>
       </tr>
       <tr>
-        <td>received [=stream-signal/RESET_STREAM=] with errorCode</td>
+        <td>received [=stream-signal/RESET_STREAM=] with httpErrorCode</td>
         <td>[=ReadableStream/Error|errors=] {{WebTransportBidirectionalStream/readable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
