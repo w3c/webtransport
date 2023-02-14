@@ -62,7 +62,6 @@ spec:fetch; type:dfn; for:/; text:fetch
 spec:url; type:dfn; text:scheme
 spec:url; type:dfn; text:fragment
 spec:infra; type:dfn; for:/; text:ASCII case-insensitive
-spec:webdriver-bidi; type:dfn; text:session
 </pre>
 <pre class="anchors">
 url: https://html.spec.whatwg.org/multipage/origin.html#concept-origin; type: dfn; text: origin; for:/
@@ -1891,11 +1890,11 @@ A {{WebTransportRateControlFeedback}} has the following internal slots.
 :: The getter steps are to return [=this=]'s {{WebTransportRateControlFeedback/[[SendRate]]}}.
    This is the rate at which queued data will be dequeued and sent by the user agent, in bits per second.
    If the application wishes to avoid queuing, it can send at a rate less than this value.
-   This rate applies to all streams and datagrams that share a [=session=]
+   This rate applies to all streams and datagrams that share a [=WebTransport session=]
    and is calculated by the congestion control algorithm (potentially chosen by
-   {{WebTransport/congestionControl}}). If this [=session=] is
+   {{WebTransport/congestionControl}}). If this [=WebTransport session=] is
    pooled with others in a shared [=connection=], it is the rate at which the user
-   agent will drain the queues for this [=session=].  If the user agent cannot
+   agent will drain the queues for this [=WebTransport session=].  If the user agent cannot
    determine a value (perhaps because of pooling), it may leave the value unset.
 
 ## Procedures ## {#rate-control-feedback-procedures}
@@ -1918,7 +1917,7 @@ When the user agent changes the rate at which it dequeues bytes for sending on a
 it MUST [=queue a network task=] with |transport| to run these steps:
 
 1. Set |transport|.{{WebTransport/rateControlFeedback}}.{{WebTransportRateControlFeedback/[[SendRate]]}}
-    to the new rate for [=session=].
+    to the new rate for [=WebTransport session=].
 1. Fire an event named {{WebTransport/ratecontrolfeedback}} at |transport|.
 
 </div>
