@@ -1913,8 +1913,9 @@ send rate {sendRate}, run these steps.
 
 <div algorithm="updating a WebTransportRateControlFeedback">
 
-When the user agent changes the rate at which it dequeues bytes for sending on a [=session=],
-it MUST run these steps.
+When the user agent changes the rate at which it dequeues bytes for sending on a
+{{WebTransport}} |transport|'s [=WebTransport/session=],
+it MUST [=queue a network task=] with |transport| to run these steps:
 
 1. Set |transport|.{{WebTransport/rateControlFeedback}}.{{WebTransportRateControlFeedback/[[SendRate]]}}
     to the new rate for [=session=].
