@@ -628,6 +628,16 @@ A {{WebTransport}} object has the following internal slots.
    by the user agent, or `"default"`.
   </tr>
   <tr>
+   <td><dfn>`[[RateControlFeedbackMinInterval]]`</dfn>
+   <td class="non-normative">A {{long}} indicating the maximum frequency
+   that the {{WebTransport/ratecontrolfeedback}} will be fired.
+  </tr>
+  <tr>
+   <td><dfn>`[[RateControlFeedback]]`</dfn>
+   <td class="non-normative">A {{WebTransportRateControlFeedback}} providing
+    information about rate control.
+  </tr>
+  <tr>
    <td><dfn>`[[Closed]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated {{WebTransport}} object is
    closed gracefully, or rejected when it is closed abruptly or failed on initialization.
@@ -691,6 +701,10 @@ agent MUST run the following steps:
     :: "pending"
     : {{[[CongestionControl]]}}
     :: |congestionControl|
+    : {{[[RateControlFeedbackMinInterval]]}}
+    :: |rateControlFeedbackMinInterval|
+    : {{[[RateControlFeedback]]}}
+    :: |rateControlFeedback|
     : {{[[Closed]]}}
     :: a new promise
     : {{[[Datagrams]]}}
