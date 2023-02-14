@@ -561,7 +561,6 @@ interface WebTransport : EventTarget {
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
 
-  attribute unsigned long rateControlFeedbackMinInterval;
   attribute EventHandler onratecontrolfeedback;
   [SameObject] readonly attribute WebTransportRateControlFeedback rateControlFeedback;
 };
@@ -628,14 +627,10 @@ A {{WebTransport}} object has the following internal slots.
    by the user agent, or `"default"`.
   </tr>
   <tr>
-   <td><dfn>`[[RateControlFeedbackMinInterval]]`</dfn>
-   <td class="non-normative">A {{long}} indicating the maximum frequency
-   that the {{WebTransport/ratecontrolfeedback}} will be fired.
-  </tr>
-  <tr>
    <td><dfn>`[[RateControlFeedback]]`</dfn>
    <td class="non-normative">A {{WebTransportRateControlFeedback}} providing
-    information about rate control.
+    information about rate control, and control over the maximum frequency
+    that the {{WebTransport/ratecontrolfeedback}} will be fired.
   </tr>
   <tr>
    <td><dfn>`[[Closed]]`</dfn>
@@ -677,7 +672,6 @@ agent MUST run the following steps:
    congestion control algorithms that optimize for |congestionControl|, as allowed by
    [[!RFC9002]] [section 7](https://datatracker.ietf.org/doc/html/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
-1. Let |rateControlFeedbackMinInterval| be 1000 milliseconds.
 1. Let |rateControlFeedback| be a [=new=] {{WebTransportRateControlFeedback}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
@@ -701,8 +695,6 @@ agent MUST run the following steps:
     :: "pending"
     : {{[[CongestionControl]]}}
     :: |congestionControl|
-    : {{[[RateControlFeedbackMinInterval]]}}
-    :: |rateControlFeedbackMinInterval|
     : {{[[RateControlFeedback]]}}
     :: |rateControlFeedback|
     : {{[[Closed]]}}
@@ -874,12 +866,6 @@ these steps.
    throughput or low latency for sending on this connection. If a preference was
    requested but not satisfied, then the value is `"default"`
    The getter steps are to return [=this=]'s {{[[CongestionControl]]}}.
-
-: <dfn for="WebTransport" attribute>rateControlFeedbackMinInterval</dfn>
-:: The minimum interval between any two times when
-   the [=ratecontrolfeedback=] event is fired.
-   This effectively allows the application
-   to control the maximum frequency of this event.
 
 : <dfn for="WebTransport" attribute>onratecontrolfeedback</dfn>
 :: An [=event handler IDL attribute=] whose [=event handler event type=] is
@@ -1873,6 +1859,7 @@ useful for the application to adapt the rate at which it sends data.
 [Exposed=(Window,Worker), SecureContext]
 interface WebTransportRateControlFeedback {
   readonly attribute unsigned long long? sendRate;
+  attribute unsigned long minInterval;
 };
 </pre>
 
@@ -1893,6 +1880,11 @@ A {{WebTransportRateControlFeedback}} has the following internal slots.
    <td class="non-normative">The rate at which the {{WebTransport}} dequeues and sends data,
    which is the maximum rate the application can send at without inducing queue buildup.
   </tr>
+  <tr>
+   <td><dfn>`[[MinInterval]]`</dfn>
+   <td class="non-normative">The minimum interval between any two times when
+   the [=ratecontrolfeedback=] event is fired.
+  </tr>
  </tbody>
 </table>
 
@@ -1909,6 +1901,10 @@ A {{WebTransportRateControlFeedback}} has the following internal slots.
    agent will drain the queues for this [=WebTransport session=].  If the user agent cannot
    determine a value (perhaps because of pooling), it may leave the value unset.
 
+: <dfn for="WebTransportRateControlFeedback" attribute>minInterval</dfn>
+:: The getter steps are to return [=this=]'s {{WebTransportRateControlFeedback/[[MinInterval]]}}.
+   The setters steps are to set [=this=]'s {{WebTransportRateControlFeedback/[[MinInterval]]}}.
+
 ## Procedures ## {#rate-control-feedback-procedures}
 
 <div algorithm="create a WebTransportRateControlFeedback">
@@ -1918,6 +1914,8 @@ To <dfn for=WebTransportRateControlFeedback>create</dfn> a {{WebTransportRateCon
 1. Let |feedback| be a [=new=] {{WebTransportRateControlFeedback}}, with:
     : {{WebTransportRateControlFeedback/[[SendRate]]}}
     :: |sendRate|
+    : {{WebTransportRateControlFeedback/[[MinInterval]]}}
+    :: |1000|
 1. Return |feedback|.
 
 </div>
