@@ -1892,7 +1892,8 @@ A {{WebTransportRateControlFeedback}} has the following internal slots.
    This is the rate at which queued data will be dequeued and sent by the user agent, in bits per second.
    If the application wishes to avoid queuing, it can send at a rate less than this value.
    This rate applies to all streams and datagrams that share a [=session=]
-   and is calculated using {{WebTransport/congestionControl}}. If this [=session=] is
+   and is calculated by the congestion control algorithm (potentially chosen by
+   {{WebTransport/congestionControl}}). If this [=session=] is
    pooled with others in a shared [=connection=], it is the rate at which the user
    agent will drain the queues for this [=session=].  If the user agent cannot
    determine a value (perhaps because of pooling), it may leave the value unset.
