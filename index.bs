@@ -283,10 +283,10 @@ interface WebTransportDatagramDuplexStream {
   readonly attribute WritableStream writable;
 
   readonly attribute unsigned long maxDatagramSize;
-  attribute double? incomingMaxAge;
-  attribute double? outgoingMaxAge;
-  attribute long incomingHighWaterMark;
-  attribute long outgoingHighWaterMark;
+  attribute unrestricted double incomingMaxAge;
+  attribute unrestricted double outgoingMaxAge;
+  attribute unrestricted double incomingHighWaterMark;
+  attribute unrestricted double outgoingHighWaterMark;
 };
 </pre>
 
@@ -320,13 +320,13 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsHighWaterMark]]`</dfn>
-   <td class="non-normative">An integer representing the [=high water mark=] of the incoming
-   datagrams.
+   <td class="non-normative">An {{unrestricted double}} representing the
+   [=high water mark=] of the incoming datagrams.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsExpirationDuration]]`</dfn>
-   <td class="non-normative">A {{double}} value representing the expiration duration for incoming
-   datagrams (in milliseconds), or null.
+   <td class="non-normative">An {{unrestricted double}} representing the
+   expiration duration for incoming datagrams (in milliseconds).
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
@@ -335,13 +335,13 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsHighWaterMark]]`</dfn>
-   <td class="non-normative">An integer representing the [=high water mark=] of the outgoing
-   datagrams.
+   <td class="non-normative">An {{unrestricted double}} representing the
+   [=high water mark=] of the outgoing datagrams.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsExpirationDuration]]`</dfn>
-   <td class="non-normative">A {{double}} value representing the expiration duration for outgoing
-   datagrams (in milliseconds), or null.
+   <td class="non-normative">An {{unrestricted double}} value representing the
+   expiration duration for outgoing datagrams (in milliseconds).
   </tr>
   <tr>
    <td><dfn>`[[OutgoingMaxDatagramSize]]`</dfn>
@@ -369,19 +369,19 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     : {{[[IncomingDatagramsPullPromise]]}}
     :: null
     : {{[[IncomingDatagramsHighWaterMark]]}}
-    :: an [=implementation-defined=] integer
+    :: an [=implementation-defined=] value
     : {{[[IncomingDatagramsExpirationDuration]]}}
-    :: null
+    :: +∞
     : {{[[OutgoingDatagramsQueue]]}}
     :: an empty queue
     : {{[[OutgoingDatagramsHighWaterMark]]}}
-    :: an [=implementation-defined=] integer
+    :: an [=implementation-defined=] value
        <div class="note">
         <p>This implementation-defined value should be tuned to ensure decent throughput, without
            jeopardizing the timeliness of transmitted data.</p>
        </div>
     : {{[[OutgoingDatagramsExpirationDuration]]}}
-    :: null
+    :: +∞
     : {{[[OutgoingMaxDatagramSize]]}}
     :: an [=implementation-defined=] integer.
  1. Return |stream|.
@@ -399,10 +399,10 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxAge</dfn>
 :: The getter steps are:
      1. Return [=this=].{{[[IncomingDatagramsExpirationDuration]]}}.
-:: The setter steps are:
-     1. Let |value| be the given value.
-     1. If |value| is null or |value| > 0:
-       1. Set [=this=].{{[[IncomingDatagramsExpirationDuration]]}} to |value|.
+:: The setter steps, given |value|, are:
+     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
+     1. If |value| is `0`, set |value| to +∞.
+     1. Set [=this=].{{[[IncomingDatagramsExpirationDuration]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>maxDatagramSize</dfn>
 :: The maximum size data that may be passed to {{WebTransportDatagramDuplexStream/writable}}.
@@ -411,26 +411,26 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 : <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingMaxAge</dfn>
 :: The getter steps are:
      1. Return [=this=]'s {{[[OutgoingDatagramsExpirationDuration]]}}.
-:: The setter steps are:
-     1. Let |value| be the given value.
-     1. If |value| is null or |value| > 0:
-       1. Set [=this=]'s {{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
+:: The setter steps, given |value|, are:
+     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
+     1. If |value| is `0`, set |value| to +∞.
+     1. Set [=this=].{{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingHighWaterMark</dfn>
 :: The getter steps are:
      1. Return [=this=].{{[[IncomingDatagramsHighWaterMark]]}}.
-:: The setter steps are:
-     1. Let |value| be the given value.
-     1. If |value| ≥ 0:
-       1. Set [=this=].{{[[IncomingDatagramsHighWaterMark]]}} to |value|.
+:: The setter steps, given |value|, are:
+     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
+     1. If |value| is < `1`, set |value| to `1`.
+     1. Set [=this=].{{[[IncomingDatagramsHighWaterMark]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingHighWaterMark</dfn>
 :: The getter steps are:
      1. Return [=this=].{{[[OutgoingDatagramsHighWaterMark]]}}.
-:: The setter steps are:
-     1. Let |value| be the given value.
-     1. If |value| ≥ 0:
-       1. Set [=this=].{{[[OutgoingDatagramsHighWaterMark]]}} to |value|.
+:: The setter steps, given |value|, are:
+     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
+     1. If |value| is < `1`, set |value| to `1`.
+     1. Set [=this=].{{[[OutgoingDatagramsHighWaterMark]]}} to |value|.
 
 ## Procedures ## {#datagram-duplex-stream-procedures}
 
@@ -458,7 +458,8 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
   1. Let |chunk| be a pair of |datagram| and |timestamp|.
   1. [=queue/Enqueue=] |chunk| to |queue|.
 1. Let |toBeRemoved| be the length of |queue| minus |datagrams|.{{[[IncomingDatagramsHighWaterMark]]}}.
-1. If |toBeRemoved| is positive, repeat [=queue/dequeuing=] |queue| |toBeRemoved| times.
+1. If |toBeRemoved| is positive, repeat [=queue/dequeuing=] |queue| |toBeRemoved|
+   ([rounded down](https://tc39.github.io/ecma262/#eqn-floor)) times.
 1. While |queue| is not empty:
   1. Let |bytes| and |timestamp| be |queue|'s first element.
   1. If more than |duration| milliseconds have passed since |timestamp|, then [=queue/dequeue=] |queue|.
