@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version 859efb4bd, updated Fri Jan 27 16:04:01 2023 -0800" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="a2a1679e226cd0d20496c918c05d803759f7b54e" name="document-revision">
+  <meta content="17088e1f4d2a742103ff7d5cbaffccbcc9b397b1" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -2796,7 +2796,8 @@ Their <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/struc
    <p><em>This section is non-normative.</em></p>
    <p>This section describes the <a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> protocol behavior of methods defined
 in this specification, utilizing <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>. Cause and effect may
-not be immediate due to buffering.</p>
+not be immediate due to buffering. The application <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode①">streamErrorCode</a></code> in the <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror①④">WebTransportError</a></code> error is
+converted to an httpErrorCode, and vice versa, as specified in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.3">section 4.3</a>.</p>
    <table class="data">
     <colgroup class="header">
      <col>
@@ -2808,26 +2809,26 @@ not be immediate due to buffering.</p>
       <th>QUIC Protocol Action
     <tbody>
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable①">writable</a></code>.<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#ws-abort" id="ref-for-ws-abort">abort</a></code>(errorCode)
-      <td><a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset②">sends RESET_STREAM</a> with errorCode
+      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable①">writable</a></code>.<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#ws-abort" id="ref-for-ws-abort">abort</a></code>(error)
+      <td><a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset②">sends RESET_STREAM</a> with httpErrorCode
      <tr>
       <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable②">writable</a></code>.<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#ws-close" id="ref-for-ws-close">close</a></code>()
-      <td><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send②">sends</a> STREAM_FINAL
+      <td><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send②">sends</a> STREAM with FIN bit set
      <tr>
       <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable③">writable</a></code>.getWriter().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-writer-write" id="ref-for-default-writer-write①">write</a></code>()
       <td><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send③">sends</a> STREAM
      <tr>
       <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable④">writable</a></code>.getWriter().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-writer-close" id="ref-for-default-writer-close">close</a></code>()
-      <td><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send④">sends</a> STREAM_FINAL
+      <td><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send④">sends</a> STREAM with FIN bit set
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable⑤">writable</a></code>.getWriter().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-writer-abort" id="ref-for-default-writer-abort">abort</a></code>(errorCode)
-      <td><a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset③">sends RESET_STREAM</a> with errorCode
+      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable⑤">writable</a></code>.getWriter().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-writer-abort" id="ref-for-default-writer-abort">abort</a></code>(error)
+      <td><a data-link-type="dfn" href="#stream-reset" id="ref-for-stream-reset③">sends RESET_STREAM</a> with httpErrorCode
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable①">readable</a></code>.<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#rs-cancel" id="ref-for-rs-cancel">cancel</a></code>(errorCode)
-      <td><a data-link-type="dfn" href="#stream-send-stop_sending" id="ref-for-stream-send-stop_sending②">sends STOP_SENDING</a> with errorCode
+      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable①">readable</a></code>.<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#rs-cancel" id="ref-for-rs-cancel">cancel</a></code>(error)
+      <td><a data-link-type="dfn" href="#stream-send-stop_sending" id="ref-for-stream-send-stop_sending②">sends STOP_SENDING</a> with httpErrorCode
      <tr>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable②">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#generic-reader-cancel" id="ref-for-generic-reader-cancel">cancel</a></code>(errorCode)
-      <td><a data-link-type="dfn" href="#stream-send-stop_sending" id="ref-for-stream-send-stop_sending③">sends STOP_SENDING</a> with errorCode
+      <td><code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable②">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#generic-reader-cancel" id="ref-for-generic-reader-cancel">cancel</a></code>(error)
+      <td><a data-link-type="dfn" href="#stream-send-stop_sending" id="ref-for-stream-send-stop_sending③">sends STOP_SENDING</a> with httpErrorCode
      <tr>
       <td>wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-close" id="ref-for-dom-webtransport-close①">close</a></code>(closeInfo)
       <td><a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate③">terminates</a> session with closeInfo<br> 
@@ -2843,17 +2844,17 @@ not be immediate due to buffering.</p>
       <th>API Effect
     <tbody>
      <tr>
-      <td>received <a data-link-type="dfn" href="#stream-signal-stop_sending" id="ref-for-stream-signal-stop_sending①">STOP_SENDING</a> with errorCode
-      <td><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-error" id="ref-for-writablestream-error④">errors</a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable⑥">writable</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode①">streamErrorCode</a></code>
+      <td>received <a data-link-type="dfn" href="#stream-signal-stop_sending" id="ref-for-stream-signal-stop_sending①">STOP_SENDING</a> with httpErrorCode
+      <td><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-error" id="ref-for-writablestream-error④">errors</a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable" id="ref-for-dom-webtransportbidirectionalstream-writable⑥">writable</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode②">streamErrorCode</a></code>
      <tr>
       <td><a data-link-type="dfn" href="#stream-receive" id="ref-for-stream-receive①">received</a> STREAM
       <td>(await <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable③">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-reader-read" id="ref-for-default-reader-read">read</a></code>()).value
      <tr>
-      <td><a data-link-type="dfn" href="#stream-receive" id="ref-for-stream-receive②">received</a> STREAM_FINAL
+      <td><a data-link-type="dfn" href="#stream-receive" id="ref-for-stream-receive②">received</a> STREAM with FIN bit set
       <td>(await <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable④">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-reader-read" id="ref-for-default-reader-read①">read</a></code>()).done
      <tr>
-      <td>received <a data-link-type="dfn" href="#stream-signal-reset_stream" id="ref-for-stream-signal-reset_stream①">RESET_STREAM</a> with errorCode
-      <td><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error④">errors</a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable⑤">readable</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode②">streamErrorCode</a></code>
+      <td>received <a data-link-type="dfn" href="#stream-signal-reset_stream" id="ref-for-stream-signal-reset_stream①">RESET_STREAM</a> with httpErrorCode
+      <td><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error④">errors</a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable⑤">readable</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode③">streamErrorCode</a></code>
      <tr>
       <td>Session cleanly <a data-link-type="dfn" href="#session-terminated" id="ref-for-session-terminated①">terminated</a> with closeInfo<br> 
       <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed①">closed</a></code>).closeInfo, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑤">errors</a> open streams
@@ -5857,6 +5858,7 @@ or are impossible to define for pooled connections. <a class="issue-return" href
     <li><a href="#ref-for-webtransporterror①①">9. WebTransportError Interface</a>
     <li><a href="#ref-for-webtransporterror①②">9.1. Internal slots</a>
     <li><a href="#ref-for-webtransporterror①③">9.4. Serialization</a>
+    <li><a href="#ref-for-webtransporterror①④">10. Protocol Mappings</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dictdef-webtransporterroroptions">
@@ -5926,7 +5928,7 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <b><a href="#dom-webtransporterror-streamerrorcode">#dom-webtransporterror-streamerrorcode</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-webtransporterror-streamerrorcode">9. WebTransportError Interface</a>
-    <li><a href="#ref-for-dom-webtransporterror-streamerrorcode①">10. Protocol Mappings</a> <a href="#ref-for-dom-webtransporterror-streamerrorcode②">(2)</a>
+    <li><a href="#ref-for-dom-webtransporterror-streamerrorcode①">10. Protocol Mappings</a> <a href="#ref-for-dom-webtransporterror-streamerrorcode②">(2)</a> <a href="#ref-for-dom-webtransporterror-streamerrorcode③">(3)</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
