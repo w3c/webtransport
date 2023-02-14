@@ -563,7 +563,7 @@ interface WebTransport : EventTarget {
 
   attribute unsigned long rateControlFeedbackMinInterval;
   attribute EventHandler onratecontrolfeedback;
-  [SameObject] readonly attribute WebTransportRateControlFeedback rateControlFeedback;
+  readonly attribute unsigned long long? rateControlFeedbackSendRate;
 };
 
 enum WebTransportReliabilityMode {
@@ -633,9 +633,9 @@ A {{WebTransport}} object has the following internal slots.
    that the {{WebTransport/ratecontrolfeedback}} will be fired.
   </tr>
   <tr>
-   <td><dfn>`[[RateControlFeedback]]`</dfn>
-   <td class="non-normative">A {{WebTransportRateControlFeedback}} providing
-    information about rate control.
+   <td><dfn>`[[RateControlFeedbackSendRate]]`</dfn>
+   <td class="non-normative">The rate at which the {{WebTransport}} dequeues and sends data,
+   which is the maximum rate the application can send at without inducing queue buildup.
   </tr>
   <tr>
    <td><dfn>`[[Closed]]`</dfn>
@@ -678,7 +678,7 @@ agent MUST run the following steps:
    [[!RFC9002]] [section 7](https://datatracker.ietf.org/doc/html/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
 1. Let |rateControlFeedbackMinInterval| be 1000 milliseconds.
-1. Let |rateControlFeedback| be a [=new=] {{WebTransportRateControlFeedback}}.
+1. Let |rateControlFeedbackSendRate| be undefined.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
@@ -703,8 +703,8 @@ agent MUST run the following steps:
     :: |congestionControl|
     : {{[[RateControlFeedbackMinInterval]]}}
     :: |rateControlFeedbackMinInterval|
-    : {{[[RateControlFeedback]]}}
-    :: |rateControlFeedback|
+    : {{[[RateControlFeedbackSendRate]]}}
+    :: |rateControlFeedbackSendRate|
     : {{[[Closed]]}}
     :: a new promise
     : {{[[Datagrams]]}}
@@ -885,8 +885,16 @@ these steps.
 :: An [=event handler IDL attribute=] whose [=event handler event type=] is
     {{WebTransport/ratecontrolfeedback}}.
 
-: <dfn for="WebTransport" attribute>rateControlFeedback</dfn>
-:: Information useful for the application to control the rate at which it sends data.
+: <dfn for="WebTransport" attribute>rateControlFeedbackSendRate</dfn>
+:: The getter steps are to return [=this=]'s {{WebTransportRateControlFeedback/[[SendRate]]}}.
+   This is the rate at which queued data will be dequeued and sent by the user agent, in bits per second.
+   If the application wishes to avoid queuing, it can send at a rate less than this value.
+   This rate applies to all streams and datagrams that share a [=WebTransport session=]
+   and is calculated by the congestion control algorithm (potentially chosen by
+   {{WebTransport/congestionControl}}). If this [=WebTransport session=] is
+   pooled with others in a shared [=connection=], it is the rate at which the user
+   agent will drain the queues for this [=WebTransport session=].  If the user agent cannot
+   determine a value (perhaps because of pooling), it may leave the value unset.
 
 ## Events ## {#webtransport-events}
 
@@ -1037,6 +1045,18 @@ To <dfn for="WebTransport">queue a network task</dfn> with a {{WebTransport}} |t
 series of steps |steps|, run these steps:
 1. [=Queue a global task=] on the [=network task source=] with |transport|'s
    [=relevant global object=] to run |steps|.
+
+</div>
+
+<div algorithm="updating a WebTransportRateControlFeedback">
+
+When the user agent changes the rate at which it dequeues bytes for sending on a
+{{WebTransport}} |transport|'s [=WebTransport/session=],
+it MUST [=queue a network task=] with |transport| to run these steps:
+
+1. Set |transport|.{{WebTransport/[[RateControlFeedbackSendRate]]}}
+    to the new rate for [=WebTransport session=].
+1. Fire an event named {{WebTransport/ratecontrolfeedback}} at |transport|.
 
 </div>
 
@@ -1863,79 +1883,6 @@ object |transport|, and a |sendOrder|, run these steps.
 1. Return |stream|.
 
 </div>
-
-# Interface `WebTransportRateControlFeedback` #  {#rate-control-feedback}
-
-A {{WebTransportRateControlFeedback}} contains information
-useful for the application to adapt the rate at which it sends data.
-
-<pre class="idl">
-[Exposed=(Window,Worker), SecureContext]
-interface WebTransportRateControlFeedback {
-  readonly attribute unsigned long long? sendRate;
-};
-</pre>
-
-## Internal slots ## {#rate-control-feedback-internal-slots}
-
-A {{WebTransportRateControlFeedback}} has the following internal slots.
-
-<table class="data" dfn-for="WebTransportRateControlFeedback" dfn-type="attribute">
- <thead>
-  <tr>
-   <th>Internal Slot
-   <th>Description (<em>non-normative</em>)
-  </tr>
- </thead>
- <tbody>
-  <tr>
-   <td><dfn>`[[SendRate]]`</dfn>
-   <td class="non-normative">The rate at which the {{WebTransport}} dequeues and sends data,
-   which is the maximum rate the application can send at without inducing queue buildup.
-  </tr>
- </tbody>
-</table>
-
-## Attributes ##  {#rate-control-feedback-attributes}
-
-: <dfn for="WebTransportRateControlFeedback" attribute>sendRate</dfn>
-:: The getter steps are to return [=this=]'s {{WebTransportRateControlFeedback/[[SendRate]]}}.
-   This is the rate at which queued data will be dequeued and sent by the user agent, in bits per second.
-   If the application wishes to avoid queuing, it can send at a rate less than this value.
-   This rate applies to all streams and datagrams that share a [=WebTransport session=]
-   and is calculated by the congestion control algorithm (potentially chosen by
-   {{WebTransport/congestionControl}}). If this [=WebTransport session=] is
-   pooled with others in a shared [=connection=], it is the rate at which the user
-   agent will drain the queues for this [=WebTransport session=].  If the user agent cannot
-   determine a value (perhaps because of pooling), it may leave the value unset.
-
-## Procedures ## {#rate-control-feedback-procedures}
-
-<div algorithm="create a WebTransportRateControlFeedback">
-
-To <dfn for=WebTransportRateControlFeedback>create</dfn> a {{WebTransportRateControlFeedback}}, given a |sendRate|, run these steps:
-
-1. Let |feedback| be a [=new=] {{WebTransportRateControlFeedback}}, with:
-    : {{WebTransportRateControlFeedback/[[SendRate]]}}
-    :: |sendRate|
-1. Return |feedback|.
-
-</div>
-
-<div algorithm="updating a WebTransportRateControlFeedback">
-
-When the user agent changes the rate at which it dequeues bytes for sending on a
-{{WebTransport}} |transport|'s [=WebTransport/session=],
-it MUST [=queue a network task=] with |transport| to run these steps:
-
-1. Set |transport|.{{WebTransport/rateControlFeedback}}.{{WebTransportRateControlFeedback/[[SendRate]]}}
-    to the new rate for [=WebTransport session=].
-1. Fire an event named {{WebTransport/ratecontrolfeedback}} at |transport|.
-
-</div>
-
-
-# `WebTransportError` Interface #  {#web-transport-error-interface}
 
 <dfn interface>WebTransportError</dfn> is a subclass of {{DOMException}} that represents
 
