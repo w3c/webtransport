@@ -170,6 +170,11 @@ with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomo
 as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 
+A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
+HTTP/3 stream associated with the CONNECT request that initiated |session| receives an
+[=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, as described at [[!WEB-TRANSPORT-HTTP3]]
+[section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6).
+
 To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an optional integer
 |code| and an optional [=byte sequence=] |reason|, follow [[!WEB-TRANSPORT-HTTP3]]
 [section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
@@ -229,6 +234,25 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
    <td>No
    <td>Yes
    <td>Yes
+  </tr>
+ </tbody>
+</table>
+
+
+A [=WebTransport session=] has the following signals:
+
+<table class="data" dfn-for="session-signal">
+ <thead>
+  <tr>
+   <th>event
+   <th>definition
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>DRAIN_WEBTRANSPORT_SESSION</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
   </tr>
  </tbody>
 </table>
@@ -551,6 +575,7 @@ interface WebTransport : EventTarget {
   readonly attribute WebTransportReliabilityMode reliability;
   readonly attribute WebTransportCongestionControl congestionControl;
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
+  readonly attribute Promise&lt;undefined&gt; draining;
   undefined close(optional WebTransportCloseInfo closeInfo = {});
 
   readonly attribute WebTransportDatagramDuplexStream datagrams;
@@ -610,7 +635,7 @@ A {{WebTransport}} object has the following internal slots.
   <tr>
    <td><dfn>`[[State]]`</dfn>
    <td class="non-normative">An enum indicating the state of the transport. One of `"connecting"`,
-   `"connected"`, `"closed"`, and `"failed"`.
+`  "connected"`, `"draining"`, `"closed"`, and `"failed"`.
   </tr>
   <tr>
    <td><dfn>`[[Ready]]`</dfn>
@@ -645,6 +670,11 @@ A {{WebTransport}} object has the following internal slots.
    <td><dfn>`[[Closed]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated {{WebTransport}} object is
    closed gracefully, or rejected when it is closed abruptly or failed on initialization.
+  </tr>
+  <tr>
+   <td><dfn>`[[Draining]]`</dfn>
+   <td class="non-normative">A promise fulfilled when the associated [=WebTransport session=]
+   receives a [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule.
   </tr>
   <tr>
    <td><dfn>`[[Datagrams]]`</dfn>
@@ -710,6 +740,8 @@ agent MUST run the following steps:
     : {{[[RateControlFeedback]]}}
     :: |rateControlFeedback|
     : {{[[Closed]]}}
+    :: a new promise
+    : {{[[Draining]]}}
     :: a new promise
     : {{[[Datagrams]]}}
     :: |datagrams|
@@ -851,6 +883,8 @@ these steps.
 :: On getting, it MUST return [=this=]'s {{[[Ready]]}}.
 : <dfn for="WebTransport" attribute>closed</dfn>
 :: On getting, it MUST return [=this=]'s {{[[Closed]]}}.
+: <dfn for="WebTransport" attribute>draining</dfn>
+:: On getting, it MUST return [=this=]'s {{[[Draining]]}}.
 : <dfn for="WebTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this session.
    The getter steps for the `datagrams` attribute SHALL be:
@@ -2127,6 +2161,23 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
         <td>Network error<br>
         <td>(await wt.{{WebTransport/closed}}) rejects, and
           [=ReadableStream/error|errors=] open streams</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>WebTransport Protocol Action</th>
+        <th>API Effect</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>received [=session-signal/DRAIN_WEBTRANSPORT_SESSION=]</td>
+        <td>await wt.{{WebTransport/draining}}</td>
       </tr>
     </tbody>
   </table>
