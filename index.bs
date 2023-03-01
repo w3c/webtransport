@@ -767,48 +767,48 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
   1. [=Cleanup=] |transport| with |error|.
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
-1. Run the remaining steps [=in parallel=], but abort them whenever |transport|.{{[[State]]}} becomes `"closed"` or `"failed"`.
-1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
-1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
-   |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|. If the user agent
-   supports more than one congestion control algorithm, choose one appropriate for
-   |congestionControl| for sending of data on this |connection|.
-1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
-   |transport| to run these steps:
-  1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
-     {{WebTransportErrorOptions/source}} is `"session"`.
-  1. [=Cleanup=] |transport| with |error|.
-1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
-   represents the SETTINGS frame.
-1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
-   contain H3_DATAGRAM with a value of 1, then abort the remaining steps and [=queue a network
-   task=] with |transport| to run these steps:
-  1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
-     {{WebTransportErrorOptions/source}} is `"session"`.
-  1. [=Cleanup=] |transport| with |error|.
-1. [=session/Establish=] a [=WebTransport session=] with |origin| on |connection|.
+1. Run the following steps [=in parallel=], but [=abort when=] |transport|.{{[[State]]}} becomes `"closed"` or `"failed"`:
+  1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
+  1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
+     |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|. If the user agent
+     supports more than one congestion control algorithm, choose one appropriate for
+     |congestionControl| for sending of data on this |connection|.
+  1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
+     |transport| to run these steps:
+    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
+    1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+       {{WebTransportErrorOptions/source}} is `"session"`.
+    1. [=Cleanup=] |transport| with |error|.
+  1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
+     represents the SETTINGS frame.
+  1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
+     contain H3_DATAGRAM with a value of 1, then abort the remaining steps and [=queue a network
+     task=] with |transport| to run these steps:
+    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
+    1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+       {{WebTransportErrorOptions/source}} is `"session"`.
+    1. [=Cleanup=] |transport| with |error|.
+  1. [=session/Establish=] a [=WebTransport session=] with |origin| on |connection|.
 
-  Note: This step also contains the transport parameter exchange specified in [[!QUIC-DATAGRAM]].
+    Note: This step also contains the transport parameter exchange specified in [[!QUIC-DATAGRAM]].
 
-1. If the previous step fails, abort the remaining steps and [=queue a network task=] with
-   |transport| to run these steps:
-  1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
-     {{WebTransportErrorOptions/source}} is `"session"`.
-  1. [=Cleanup=] |transport| with |error|.
-1. Let |session| be the established [=WebTransport session=].
-1. Assert: |maxDatagramSize| is an integer.
-1. [=Queue a network task=] with |transport| to run these steps:
-  1. If |transport|.{{[[State]]}} is not `"connecting"`:
-    1. [=In parallel=], [=session/terminate=] |session|.
-    1. Abort these steps.
-  1. Set |transport|.{{[[State]]}} to `"connected"`.
-  1. Set |transport|.{{[[Session]]}} to |session|.
-  1. If the connection is an HTTP/3 connection, set |transport|'s {{[[Reliability]]}} to `"supports-unreliable"`.
-  1. If the connection is an HTTP/2 connection [[WEB-TRANSPORT-HTTP2]], set |transport|'s {{[[Reliability]]}} to `"reliable-only"`.
-  1. [=Resolve=] |transport|.{{[[Ready]]}} with undefined.
+  1. If the previous step fails, abort the remaining steps and [=queue a network task=] with
+     |transport| to run these steps:
+    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
+    1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+       {{WebTransportErrorOptions/source}} is `"session"`.
+    1. [=Cleanup=] |transport| with |error|.
+  1. Let |session| be the established [=WebTransport session=].
+  1. Assert: |maxDatagramSize| is an integer.
+  1. [=Queue a network task=] with |transport| to run these steps:
+    1. If |transport|.{{[[State]]}} is not `"connecting"`:
+      1. [=In parallel=], [=session/terminate=] |session|.
+      1. Abort these steps.
+    1. Set |transport|.{{[[State]]}} to `"connected"`.
+    1. Set |transport|.{{[[Session]]}} to |session|.
+    1. If the connection is an HTTP/3 connection, set |transport|'s {{[[Reliability]]}} to `"supports-unreliable"`.
+    1. If the connection is an HTTP/2 connection [[WEB-TRANSPORT-HTTP2]], set |transport|'s {{[[Reliability]]}} to `"reliable-only"`.
+    1. [=Resolve=] |transport|.{{[[Ready]]}} with undefined.
 
 </div>
 
@@ -821,15 +821,16 @@ these steps.
   1. Return the result of [=pullBidirectionalStream=] with |transport|.
 1. Let |session| be |transport|.{{[[Session]]}}.
 1. Let |p| be a new promise.
-1. Return |p| and run the remaining steps [=in parallel=].
-1. Wait until there is an [=session/receive a bidirectional stream|available incoming bidirectional
-   stream=].
-1. Let |internalStream| be the result of [=session/receiving a bidirectional stream=].
-1. [=Queue a network task=] with |transport| to run these steps:
-  1. Let |stream| be the result of [=BidirectionalStream/creating=] a
-     {{WebTransportBidirectionalStream}} with |internalStream| and |transport|.
-  1. [=ReadableStream/Enqueue=] |stream| to |transport|.{{[[IncomingBidirectionalStreams]]}}.
-  1. [=Resolve=] |p| with undefined.
+1. Run the following steps [=in parallel=]:
+  1. Wait until there is an [=session/receive a bidirectional stream|available incoming bidirectional
+     stream=].
+  1. Let |internalStream| be the result of [=session/receiving a bidirectional stream=].
+  1. [=Queue a network task=] with |transport| to run these steps:
+    1. Let |stream| be the result of [=BidirectionalStream/creating=] a
+       {{WebTransportBidirectionalStream}} with |internalStream| and |transport|.
+    1. [=ReadableStream/Enqueue=] |stream| to |transport|.{{[[IncomingBidirectionalStreams]]}}.
+    1. [=Resolve=] |p| with undefined.
+1. Return |p|.
 
 </div>
 
@@ -842,15 +843,16 @@ these steps.
   1. Return the result of [=pullUnidirectionalStream=] with |transport|.
 1. Let |session| be |transport|.{{[[Session]]}}.
 1. Let |p| be a new promise.
-1. Return |p| and run the remaining steps [=in parallel=].
-1. Wait until there is an
-   [=session/receive an incoming unidirectional stream|available incoming unidirectional stream=].
-1. Let |internalStream| be the result of [=session/receiving an incoming unidirectional stream=].
-1. [=Queue a network task=] with |transport| to run these steps:
-  1. Let |stream| be the result of [=WebTransportReceiveStream/creating=] a {{WebTransportReceiveStream}} with
-     |internalStream| and |transport|.
-  1. [=ReadableStream/Enqueue=] |stream| to |transport|.{{[[IncomingUnidirectionalStreams]]}}.
-  1. [=Resolve=] |p| with undefined.
+1. Run the following steps [=in parallel=]:
+  1. Wait until there is an
+     [=session/receive an incoming unidirectional stream|available incoming unidirectional stream=].
+  1. Let |internalStream| be the result of [=session/receiving an incoming unidirectional stream=].
+  1. [=Queue a network task=] with |transport| to run these steps:
+    1. Let |stream| be the result of [=WebTransportReceiveStream/creating=] a {{WebTransportReceiveStream}} with
+       |internalStream| and |transport|.
+    1. [=ReadableStream/Enqueue=] |stream| to |transport|.{{[[IncomingUnidirectionalStreams]]}}.
+    1. [=Resolve=] |p| with undefined.
+1. Return |p|.
 
 </div>
 
@@ -943,12 +945,13 @@ these steps.
    When getStats is called, the user agent MUST run the following steps:
      1. Let |transport| be [=this=].
      1. Let |p| be a new promise.
-     1. Return |p| and continue the following steps [=in parallel=].
+     1. Run the following steps [=in parallel=]:
          1. Gather the stats from the underlying QUIC connection, including stats on datagrams.
          1. Wait for the stats to be ready.
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportStats}} object representing the gathered stats.
            1. [=Resolve=] |p| with |stats|.
+     1. Return |p|.
 
 : <dfn for="WebTransport" method>createBidirectionalStream()</dfn>
 :: Creates a {{WebTransportBidirectionalStream}} object for an outgoing bidirectional
@@ -964,9 +967,9 @@ these steps.
    1. Let |sendOrder| be {{WebTransport/createBidirectionalStream(options)/options}}'s
       {{WebTransportSendStreamOptions/sendOrder}}.
    1. Let |p| be a new promise.
-   1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
+   1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
-      [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}.
+      [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
       1. Let |internalStream| be the result of [=creating a bidirectional stream=] with
          |transport|.{{[[Session]]}}.
 
@@ -977,7 +980,7 @@ these steps.
         1. Let |stream| be the result of [=BidirectionalStream/creating=] a
            {{WebTransportBidirectionalStream}} with |internalStream|, |transport|, and |sendOrder|.
         1. [=Resolve=] |p| with |stream|.
-   1. return |p|.
+   1. Return |p|.
 
 : <dfn for="WebTransport" method>createUnidirectionalStream()</dfn>
 
@@ -993,9 +996,9 @@ these steps.
      1. Let |sendOrder| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
         {{WebTransportSendStreamOptions/sendOrder}}.
      1. Let |p| be a new promise.
-     1. Run the following steps [=in parallel=], but abort them whenever |transport|'s
+     1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
         {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
-        [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}.
+        [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
         1. Let |internalStream| be the result of [=creating an outgoing unidirectional stream=] with
            |transport|.{{[[Session]]}}.
 
@@ -1373,13 +1376,14 @@ The {{WebTransportSendStream}}'s [=transfer steps=] and
 
    When getStats is called, the user agent MUST run the following steps:
      1. Let |p| be a new promise.
-     1. Return |p| and continue the following steps [=in parallel=].
+     1. Run the following steps [=in parallel=]:
          1. Gather the stats specific to this {{WebTransportSendStream}}.
          1. Wait for the stats to be ready.
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportSendStreamStats}} object
               representing the gathered stats.
            1. [=Resolve=] |p| with |stats|.
+     1. Return |p|.
 
 ## Internal Slots ## {#send-stream-internal-slots}
 
@@ -1457,29 +1461,30 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of the [=byte sequence=] which |chunk| represents.
 1. Set |stream|.{{[[PendingOperation]]}} to |promise|.
-1. Return |promise| and run the remaining steps [=in parallel=].
-1. [=stream/Send=] |bytes| on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the
-   operation to complete.
-   This sending MAY be interleaved with sending of previously queued streams and datagrams,
-   as well as streams and datagrams yet to be queued to be sent over this transport.
+1. Run the following steps [=in parallel=]:
+  1. [=stream/Send=] |bytes| on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the
+     operation to complete.
+     This sending MAY be interleaved with sending of previously queued streams and datagrams,
+     as well as streams and datagrams yet to be queued to be sent over this transport.
 
-   If |stream|.{{[[SendOrder]]}} is `null` then this sending MUST NOT starve
-   except for [=flow control=] reasons or [=WritableStream/Error | error=].
+     If |stream|.{{[[SendOrder]]}} is `null` then this sending MUST NOT starve
+     except for [=flow control=] reasons or [=WritableStream/Error | error=].
 
-   If |stream|.{{[[SendOrder]]}} is not `null` then this sending MUST starve
-   until all bytes queued for sending on {{WebTransportSendStream}}s with a
-   non-null and higher {{[[SendOrder]]}}, that are neither
-   [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
-   sent.
+     If |stream|.{{[[SendOrder]]}} is not `null` then this sending MUST starve
+     until all bytes queued for sending on {{WebTransportSendStream}}s with a
+     non-null and higher {{[[SendOrder]]}}, that are neither
+     [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
+     sent.
 
-1. If the previous step failed, abort the remaining steps.
+  1. If the previous step failed, abort the remaining steps.
 
-  Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
-  error |stream| and reject the result of this write operation.
+    Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
+    error |stream| and reject the result of this write operation.
 
-1. [=Queue a network task=] with |transport| to run these steps:
-  1. Set |stream|.{{[[PendingOperation]]}} to null.
-  1. [=Resolve=] |promise| with undefined.
+  1. [=Queue a network task=] with |transport| to run these steps:
+    1. Set |stream|.{{[[PendingOperation]]}} to null.
+    1. [=Resolve=] |promise| with undefined.
+1. Return |promise|.
 
 Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
 SHOULD have a fixed upper limit, to carry the backpressure information to the user of
@@ -1497,13 +1502,14 @@ To <dfn for="WebTransportSendStream">close</dfn> a {{WebTransportSendStream}} |s
 1. Let |promise| be a new promise.
 1. [=set/Remove=] |stream| from |transport|.{{[[SendStreams]]}}.
 1. Set |stream|.{{[[PendingOperation]]}} to |promise|.
-1. Return |promise| and run the remaining steps [=in parallel=].
-1. [=stream/Send=] FIN on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the operation to
-   complete.
-1. Wait for |stream|.{{WebTransportSendStream/[[InternalStream]]}} to enter the "Data Recvd" state. [[!QUIC]]
-1. [=Queue a network task=] with |transport| to run these steps:
-  1. Set |stream|.{{[[PendingOperation]]}} to null.
-  1. [=Resolve=] |promise| with undefined.
+1. Run the following steps [=in parallel=]:
+  1. [=stream/Send=] FIN on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the operation to
+     complete.
+  1. Wait for |stream|.{{WebTransportSendStream/[[InternalStream]]}} to enter the "Data Recvd" state. [[!QUIC]]
+  1. [=Queue a network task=] with |transport| to run these steps:
+    1. Set |stream|.{{[[PendingOperation]]}} to null.
+    1. [=Resolve=] |promise| with undefined.
+1. Return |promise|.
 
 </div>
 
@@ -1522,9 +1528,10 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
    Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
          [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
 
-1. Return |promise| and run the remaining steps [=in parallel=].
-1. [=stream/Reset=] |stream|.{{WebTransportSendStream/[[InternalStream]]}} with |code|.
-1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+1. Run the following steps [=in parallel=]:
+  1. [=stream/Reset=] |stream|.{{WebTransportSendStream/[[InternalStream]]}} with |code|.
+  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+1. Return |promise|.
 
 </div>
 
@@ -1623,13 +1630,14 @@ The {{WebTransportReceiveStream}}'s [=transfer steps=] and
 
    When getStats is called, the user agent MUST run the following steps:
      1. Let |p| be a new promise.
-     1. Return |p| and continue the following steps [=in parallel=].
+     1. Run the following steps [=in parallel=]:
          1. Gather the stats specific to this {{WebTransportReceiveStream}}.
          1. Wait for the stats to be ready.
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportReceiveStreamStats}} object
               representing the gathered stats.
            1. [=Resolve=] |p| with |stats|.
+     1. Return |p|.
 
 ## Internal Slots ## {#receive-stream-internal-slots}
 
@@ -1697,33 +1705,34 @@ To <dfn for="WebTransportReceiveStream">pull bytes</dfn> from a {{WebTransportRe
   1. Set |maxBytes| to an [=implementation-defined=] size.
   1. Set |buffer| be a [=new=] {{ArrayBuffer}} with |maxBytes| size. If allocating the
      {{ArrayBuffer}} fails, return [=a promise rejected with=] a {{RangeError}}.
-1. Return |promise| and run the remaining steps [=in parallel=].
-1. [=ArrayBuffer/Write=] the bytes that area [=stream/receive|read=] from |internalStream| into
-   |buffer| with offset |offset|, up to |maxBytes| bytes. Wait until either at least one byte is
-   read or FIN is received. Let |read| be the number of read bytes, and let |hasReceivedFIN| be
-   whether FIN was accompanied.
-   Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
-   SHOULD have a fixed upper limit, to carry the backpressure information to the server.
+1. Run the following steps [=in parallel=]:
+  1. [=ArrayBuffer/Write=] the bytes that area [=stream/receive|read=] from |internalStream| into
+     |buffer| with offset |offset|, up to |maxBytes| bytes. Wait until either at least one byte is
+     read or FIN is received. Let |read| be the number of read bytes, and let |hasReceivedFIN| be
+     whether FIN was accompanied.
+     Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
+     SHOULD have a fixed upper limit, to carry the backpressure information to the server.
 
-   Note: This operation may return before filling up all of |bytes|.
+     Note: This operation may return before filling up all of |bytes|.
 
-1. If the previous step failed, abort the remaining steps.
+  1. If the previous step failed, abort the remaining steps.
 
-  Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
-  error |stream| and reject the result of this read operation.
+    Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
+    error |stream| and reject the result of this read operation.
 
-1. [=Queue a network task=] with |transport| to run these steps:
+  1. [=Queue a network task=] with |transport| to run these steps:
 
-   Note: If the buffer described above is available in the [=agent/event loop=] where this procedure is
-   running, the following steps may run immediately.
+     Note: If the buffer described above is available in the [=agent/event loop=] where this procedure is
+     running, the following steps may run immediately.
 
-  1. If |read| > 0:
-    1. Set |view| to a new {{Uint8Array}} with |buffer|, |offset| and |read|.
-    1. [=ReadableStream/Enqueue=] |view| into |stream|.
-  1. If |hasReceivedFIN| is true:
-    1. [=set/Remove=] |stream| from |transport|.{{[[ReceiveStreams]]}}.
-    1. [=ReadableStream/Close=] |stream|.
-  1. [=Resolve=] |promise| with undefined.
+    1. If |read| > 0:
+      1. Set |view| to a new {{Uint8Array}} with |buffer|, |offset| and |read|.
+      1. [=ReadableStream/Enqueue=] |view| into |stream|.
+    1. If |hasReceivedFIN| is true:
+      1. [=set/Remove=] |stream| from |transport|.{{[[ReceiveStreams]]}}.
+      1. [=ReadableStream/Close=] |stream|.
+    1. [=Resolve=] |promise| with undefined.
+1. Return |promise|.
 
 </div>
 
@@ -1745,15 +1754,16 @@ steps.
          [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
 
 1. [=set/Remove=] |stream| from |transport|.{{[[SendStreams]]}}.
-1. Return |promise| and run the remaining steps [=in parallel=].
-1. [=Send STOP_SENDING=] with |internalStream| and |code|.
-1. [=Queue a network task=] with |transport| to run these steps:
+1. Run the following steps [=in parallel=]:
+  1. [=Send STOP_SENDING=] with |internalStream| and |code|.
+  1. [=Queue a network task=] with |transport| to run these steps:
 
-  Note: If the buffer described above is available in the [=agent/event loop=] where this procedure is
-  running, the following steps may run immediately.
+    Note: If the buffer described above is available in the [=agent/event loop=] where this procedure is
+    running, the following steps may run immediately.
 
-  1. [=set/Remove=] |stream| from |transport|.{{[[ReceiveStreams]]}}.
-  1. [=Resolve=] |promise| with undefined.
+    1. [=set/Remove=] |stream| from |transport|.{{[[ReceiveStreams]]}}.
+    1. [=Resolve=] |promise| with undefined.
+1. Return |promise|.
 
 </div>
 
