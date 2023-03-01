@@ -172,7 +172,8 @@ When establishing a session, the client MUST NOT provide any [=credentials=].
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
 HTTP/3 stream associated with the CONNECT request that initiated |session| receives an
-[=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, as described at [[!WEB-TRANSPORT-HTTP3]]
+[=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when an HTTP/3
+[=session-signal/GOAWAY=] frame is received, as described at [[!WEB-TRANSPORT-HTTP3]]
 [section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6).
 
 To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an optional integer
@@ -250,6 +251,11 @@ A [=WebTransport session=] has the following signals:
  <tbody>
   <tr>
    <td><dfn>DRAIN_WEBTRANSPORT_SESSION</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
+  </tr>
+  <tr>
+   <td><dfn>GOAWAY</dfn>
    <td>[[!WEB-TRANSPORT-HTTP3]]
    [section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
   </tr>
@@ -673,7 +679,8 @@ A {{WebTransport}} object has the following internal slots.
   <tr>
    <td><dfn>`[[Draining]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated [=WebTransport session=]
-   receives a [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule.
+   receives a [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule or a
+   [=session-signal/GOAWAY=] frame.
   </tr>
   <tr>
    <td><dfn>`[[Datagrams]]`</dfn>
@@ -2176,6 +2183,23 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
     <tbody>
       <tr>
         <td>received [=session-signal/DRAIN_WEBTRANSPORT_SESSION=]</td>
+        <td>await wt.{{WebTransport/draining}}</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>HTTP/3 Protocol Action</th>
+        <th>API Effect</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>received [=session-signal/GOAWAY=]</td>
         <td>await wt.{{WebTransport/draining}}</td>
       </tr>
     </tbody>
