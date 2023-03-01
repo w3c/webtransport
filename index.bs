@@ -51,6 +51,13 @@ Boilerplate: omit conformance
     "title": "WebTransport over HTTP/3",
     "status": "Internet-Draft",
     "publisher": "IETF"
+  },
+    "web-transport-http2": {
+    "authors": ["A. Frindell", "E. Kinnear", "T. Pauly", "M. Thomson", "V. Vasiliev", "G. Xie"],
+    "href": "https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/",
+    "title": "WebTransport over HTTP/2",
+    "status": "Internet-Draft",
+    "publisher": "IETF"
   }
 }
 </pre>
@@ -83,15 +90,15 @@ urlPrefix: https://heycam.github.io/webidl/; spec: WEBIDL
 
 *This section is non-normative.*
 
-This specification uses [[!WEB-TRANSPORT-HTTP3]] to send data to and receive
-data from servers. It can be used like WebSockets but with support for multiple
-streams, unidirectional streams, out-of-order delivery, and reliable as well as
-unreliable transport.
+This specification uses [[!WEB-TRANSPORT-HTTP3]] and [[WEB-TRANSPORT-HTTP2]] to
+send data to and receive data from servers. It can be used like WebSockets but
+with support for multiple streams, unidirectional streams, out-of-order delivery,
+and reliable as well as unreliable transport.
 
 Note: The API presented in this specification represents a preliminary proposal
 based on work-in-progress within the IETF WEBTRANS WG. Since the [[!WEB-TRANSPORT-HTTP3]]
-specification is a work-in-progress, both the protocol and API are likely to
-change significantly going forward.
+and [[WEB-TRANSPORT-HTTP2]] specifications are a work-in-progress, both the protocol
+and API are likely to change significantly going forward.
 
 # Conformance #  {#conformance}
 
@@ -621,8 +628,9 @@ A {{WebTransport}} object has the following internal slots.
   <tr>
    <td><dfn>`[[Reliability]]`</dfn>
    <td class="non-normative">A {{WebTransportReliabilityMode}} indicating whether
-   unreliable (UDP) transport is supported or whether only reliable (TCP fallback)
-   transport is used. Returns `"pending"` until a connection has been established.
+   the first hop supports unreliable (UDP) transport or whether only reliable
+   (TCP fallback) transport is available. Returns `"pending"` until a connection
+   has been established.
   </tr>
   <tr>
    <td><dfn>`[[CongestionControl]]`</dfn>
@@ -798,7 +806,8 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
     1. Abort these steps.
   1. Set |transport|.{{[[State]]}} to `"connected"`.
   1. Set |transport|.{{[[Session]]}} to |session|.
-  1. Set |transport|'s {{[[Reliability]]}} to `"supports-unreliable"`.
+  1. If the connection is an HTTP/3 connection, set |transport|'s {{[[Reliability]]}} to `"supports-unreliable"`.
+  1. If the connection is an HTTP/2 connection [[WEB-TRANSPORT-HTTP2]], set |transport|'s {{[[Reliability]]}} to `"reliable-only"`.
   1. [=Resolve=] |transport|.{{[[Ready]]}} with undefined.
 
 </div>
