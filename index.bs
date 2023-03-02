@@ -1314,7 +1314,7 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportStats" dict-member>minRtt</dfn>
 :: The minimum round-trip time observed on the entire connection.
 
-## `WebTransportDatagramStats` Dictionary ##  {#web-transport-stats}
+## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
 
 The <dfn dictionary>WebTransportDatagramStats</dfn> dictionary includes statistics
 on datagram transmission over the HTTP/3 connection.
@@ -2293,7 +2293,7 @@ or transmitted by the client, or as part of the statistics provided by the API
 (see [[#web-transport-stats]]).  Consequently, restrictions on information in
 user agents is unlikely to be the only way to manage privacy risks.
 
-### Static Observations
+### Static Observations ### {#fp-static}
 
 A site can observe available network capacity or round trip time (RTT) between a
 user agent and a chosen server.  This information can be identifying when
@@ -2308,7 +2308,7 @@ many people as their network location does not change and the position of
 network bottlenecks--which determine available capacity--can be close to a user
 agent.
 
-### Shared Networking
+### Shared Networking ### {#fp-shared}
 
 Contested links present sites with opportunities to enable
 [[privacy-principles#dfn-cross-site-recognition|cross-site recognition]],
@@ -2325,10 +2325,10 @@ originates from the same user.
 
 A user agent could limit or degrade access to feedback mechanisms such as
 statistics ([[#web-transport-stats]]) for sites that are inactive or do not have
-[[html#system-focus]].  As noted, this does not prevent a server from making
-observations about changes in the network.
+focus ([[html/interaction#focus]]).  As noted, this does not prevent a server
+from making observations about changes in the network.
 
-### Pooled Sessions
+### Pooled Sessions ### {#fp-pooled}
 
 Similar to shared networking scenarios, when sessions are pooled on a single
 connection, information from one session is affected by the activity of another
@@ -2336,10 +2336,8 @@ session.  One session could infer information about the activity of another
 session, such as the rate at which another application is sending data.
 
 The use of a shared connection already allows the server to correlate sessions.
-Use of a [[fetch#network-partition-key|network partition key]] might disable
-pooling where use of a shared session might enable unwanted cross-site
-recognition, after which other privacy mitigations--like degrading access to
-feedback--might become effective.
+Use of a [[fetch#network-partition-keys|network partition key]] disables pooling where use of a shared
+session might enable unwanted cross-site recognition.
 
 
 # Examples #  {#examples}
