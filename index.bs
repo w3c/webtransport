@@ -2262,21 +2262,85 @@ The WebTransport API lets the application specify multiple certificate
 hashes at once, allowing the client to accept multiple certificates for a
 period in which a new certificate is being rolled out.
 
-Unlike a similar mechanism in WebRTC, the server certificate hash API in
+Unlike a similar mechanism in [=WebRTC=], the server certificate hash API in
 WebTransport does not provide any means of authenticating the client; the fact
 that the client knows what the server certificate is or how to contact it is
 not sufficient.  The application has to establish the identity of the client
 in-band if necessary.
 
-## Pooled Sessions
+## Fingerprinting and Tracking ## {#fingerprinting}
 
-When pooling, if information from one session is affected by the activity of another
-session, one session could infer information about the activity of another session.
-For example, if the rate control feedback of one session is affected by the rate at
-which an application is sending data on another session, one session could learn about the
-the rate at which another application is sending data.  To avoid this, a user agent
-can restrict access to information or modify information provided.  For example, it could leave
-the send rate at an artifical value to make it more difficult to infer anything from it.
+This API provides sites with the ability to generate network activity and
+closely observe the effect of this activity.  The information obtained in this
+way might be <a
+href="https://infra.spec.whatwg.org/#tracking-vector">identifying</a>.
+
+It is important to recognize that very similar networking capabilities are
+provided by other web platform APIs (such as [=fetch=] and [[webrtc]]).  The net
+adverse effect on privacy due to adding WebTransport is therefore minimal.  The
+considerations in this section applies equally to other networking capabilities.
+
+Measuring network characteristics requires that the network be used and that the
+effect of that usage be measured, both of which are enabled by this API.
+WebTransport provides sites with an ability to generate network activity toward
+a server of their choice and observe the effects.  Observations of both the
+stable properties of a network path and dynamic effect of network usage are
+possible.
+
+Information about the network is available to the server either directly through
+its own networking stack, indirectly through the rate at which data is consumed
+or transmitted by the client, or as part of the statistics provided by the API
+(see [[#web-transport-stats]]).  Consequently, restrictions on information in
+user agents is unlikely to be the only way to manage privacy risks.
+
+### Static Observations
+
+A site can observe available network capacity or round trip time (RTT) between a
+user agent and a chosen server.  This information can be identifying when
+combined with other tracking vectors.  RTT can also reveal something of the
+physical location of a user agent, especially if multiple measurements can be
+made from multiple vantage points.
+
+Though networking is shared, network use is often sporadic, which means that
+sites are often able to observe the capacity and round trip times of an
+uncontested or lightly loaded network path.  These properties are stable for
+many people as their network location does not change and the position of
+network bottlenecks--which determine available capacity--can be close to a user
+agent.
+
+### Shared Networking
+
+Contested links present sites with opportunities to enable
+[[privacy-principles#dfn-cross-site-recognition|cross-site recognition]],
+which might be used to perform unsanctioned tracking [[UNSANCTIONED-TRACKING]].
+Network capacity is a finite shared resource, so a user agent that concurrently
+accesses different sites might reveal a connection between the identity
+presented to each site.
+
+The use of networking capabilities on one site reduces the capacity available to
+other sites, which can be observed using networking APIs.  Network usage and
+metrics can change dynamically, so any change can be observed in real time.
+This might allow sites to increase confidence that activity on different sites
+originates from the same user.
+
+A user agent could limit or degrade access to feedback mechanisms such as
+statistics ([[#web-transport-stats]]) for sites that are inactive or do not have
+[[html#system-focus]].  As noted, this does not prevent a server from making
+observations about changes in the network.
+
+### Pooled Sessions
+
+Similar to shared networking scenarios, when sessions are pooled on a single
+connection, information from one session is affected by the activity of another
+session.  One session could infer information about the activity of another
+session, such as the rate at which another application is sending data.
+
+The use of a shared connection already allows the server to correlate sessions.
+Use of a [[fetch#network-partition-key|network partition key]] might disable
+pooling where use of a shared session might enable unwanted cross-site
+recognition, after which other privacy mitigations--like degrading access to
+feedback--might become effective.
+
 
 # Examples #  {#examples}
 
