@@ -702,7 +702,7 @@ agent MUST run the following steps:
 1. Let |serverCertificateHashes| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/serverCertificateHashes}} if it exists, and null otherwise.
 1. If |dedicated| is false and |serverCertificateHashes| is non-null, then [=throw=] a
-   {{TypeError}}.
+   {{NotSupportedError}} exception.
 1. Let |requireUnreliable| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/requireUnreliable}}.
 1. Let |congestionControl| be {{WebTransport/constructor(url, options)/options}}'s
@@ -1175,22 +1175,23 @@ that determine how WebTransport connection is established and used.
    </div>
 
 <div algorithm>
-To <dfn>compute a certificate hash</dfn>, do the following:
-1. Let |cert| be the input certificate, represented as a DER encoding of
+To <dfn>compute a certificate hash</dfn>, given a |certificate|, perform the following steps:
+1. Let |cert| be |certificate|, represented as a DER encoding of
    Certificate message defined in [[!RFC5280]].
 1. Compute the SHA-256 hash of |cert| and return the computed value.
 
 </div>
 
 <div algorithm>
-To <dfn>verify a certificate hash</dfn>, do the following:
-1. Let |hashes| be the input array of hashes.
-1. Let |referenceHash| be the [=compute a certificate hash|computed hash=] of the input certificate.
+To <dfn>verify a certificate hash</dfn>, given a |certificate| and an array of hashes |hashes|,
+perform the following steps:
+1. Let |referenceHash| be the result of [=computing a certificate hash=] with |certificate|.
 1. For every hash |hash| in |hashes|:
    1. If |hash|.{{WebTransportHash/value}} is not null:
      1. Let |hashValue| be the byte sequence which |hash|.{{WebTransportHash/value}} represents.
-     1. If {{WebTransportHash/algorithm}} of |hash| is an [=ASCII case-insensitive=] match with "sha-256", and |hashValue| is equal
-        to |referenceHash|, the certificate is valid. Return true.
+     1. If |hash|.{{WebTransportHash/algorithm}} is an [=ASCII case-insensitive=] match with
+        "sha-256", and |hashValue| is equal to |referenceHash|, the |certificate| is valid.
+	Return true.
 1. Return false.
 
 </div>
