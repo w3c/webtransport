@@ -758,7 +758,7 @@ agent MUST run the following steps:
    [=ReadableStream/set up/pullAlgorithm=] set to |pullUnidirectionalStreamAlgorithm|, and
    [=ReadableStream/set up/highWaterMark=] set to 0.
 1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL|, |dedicated|,
-   |requireUnreliable|, and |congestionControl|.
+   |requireUnreliable|, |congestionControl|, and |serverCertificateHashes|.
 1. Return |transport|.
 
 </div>
@@ -766,7 +766,8 @@ agent MUST run the following steps:
 <div algorithm>
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 <var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, a boolean
-|http3Only|, and a {{WebTransportCongestionControl}} |congestionControl|, run these steps.
+|http3Only|, a {{WebTransportCongestionControl}} |congestionControl|, and a
+sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 
 1. Let |client| be |transport|'s [=relevant settings object=].
 1. Let |origin| be |client|'s [=environment settings object/origin=].
@@ -797,6 +798,11 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
     1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
        {{WebTransportErrorOptions/source}} is `"session"`.
     1. [=Cleanup=] |transport| with |error|.
+  1. If [=verify a certificate hash|verifying the certificate hash=] from |connection| against
+     |serverCertificateHashes| returns false or the certificate does not satisfy [=custom certificate requirements=],
+     then abort the remaining steps and [=queue a network task=] with |transport| to run these steps:
+    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
+    1. [=Cleanup=] |transport| with a {{SecurityError}}.
   1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
      represents the SETTINGS frame.
   1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
