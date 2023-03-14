@@ -1995,13 +1995,6 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
       </tr>
     </tbody>
   </table>
-  
-Note: As discussed in [[QUIC]] Section 3.2, receipt of a RESET_STREAM frame can
-be handled differently by implementations. Some implementations will signal the
-receipt of the RESET_STREAM immediately, interrupting delivery of stream data
-with any data not consumed being discarded. However, if stream data is completely
-received and is buffered to be read by the application, the RESET_STREAM signal
-might be suppressed.
 
   <table class="data">
     <colgroup class="header"><col></colgroup>
@@ -2045,6 +2038,14 @@ might be suppressed.
       </tr>
     </tbody>
   </table>
+  
+Note: As discussed in [[QUIC]] Section 3.2, receipt of a RESET_STREAM
+frame not always be indicated to the application. Receipt of the
+RESET_STREAM can be signaled immediately, interrupting delivery of
+stream data with any data not consumed being discarded. However, 
+immediate signaling is not required. Also, if stream data
+is completely received and is buffered to be read by the
+application, the RESET_STREAM signal can be suppressed.
 
 # Privacy and Security Considerations #  {#privacy-security}
 
