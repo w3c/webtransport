@@ -6,9 +6,9 @@
   <meta content="w3c/ED" name="w3c-status">
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
-  <meta content="Bikeshed version 077497365, updated Thu Mar 2 15:15:29 2023 -0800" name="generator">
+  <meta content="Bikeshed version d9f9c3533, updated Fri Mar 10 11:31:29 2023 -0800" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="2081df6b8cfa0e7cbbe48255820e5c1f4a6a8dd8" name="document-revision">
+  <meta content="cf7738a5df38cafa525ae06f6ee807db520d7d46" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -600,7 +600,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2023-03-03">3 March 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2023-03-14">14 March 2023</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -811,13 +811,15 @@ follow <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebT
 with using <var>origin</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin" id="ref-for-ascii-serialisation-of-an-origin">serialized</a> and <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#isomorphic-encode" id="ref-for-isomorphic-encode">isomorphic encoded</a>,
 as the <span>`<code><a data-link-type="http-header" href="https://fetch.spec.whatwg.org/#http-origin" id="ref-for-http-origin">Origin</a></code>`</span> header of the request.
 When establishing a session, the client MUST NOT provide any <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#credentials" id="ref-for-credentials">credentials</a>.</p>
-   <p>To <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminate">terminate</dfn> a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session③">WebTransport session</a> <var>session</var> with an optional integer <var>code</var> and an optional <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence">byte sequence</a> <var>reason</var>, follow <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5">section 5</a>.</p>
-   <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session④">WebTransport session</a> <var>session</var> is <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminated">terminated</dfn>, with optionally
+   <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session③">WebTransport session</a> <var>session</var> is <dfn data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-draining">draining<a class="self-link" href="#session-draining"></a></dfn> when the
+HTTP/3 stream associated with the CONNECT request that initiated <var>session</var> receives an <a data-link-type="dfn" href="#session-signal-drain_webtransport_session" id="ref-for-session-signal-drain_webtransport_session">DRAIN_WEBTRANSPORT_SESSION</a> capsule, or when an HTTP/3 <a data-link-type="dfn" href="#session-signal-goaway" id="ref-for-session-signal-goaway">GOAWAY</a> frame is received, as described in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6">Section 4.6</a>.</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminate">terminate</dfn> a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session④">WebTransport session</a> <var>session</var> with an optional integer <var>code</var> and an optional <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence">byte sequence</a> <var>reason</var>, follow <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5">section 5</a>.</p>
+   <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑤">WebTransport session</a> <var>session</var> is <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminated">terminated</dfn>, with optionally
 an integer <var>code</var> and a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence①">byte sequence</a> <var>reason</var>, when the HTTP/3 stream associated with the
 CONNECT request that initiated <var>session</var> is closed by the server, as described at <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5">section 5</a>.</p>
-   <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="webtransport-stream">WebTransport stream</dfn> is a concept for HTTP/3 stream on a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑤">WebTransport session</a>.</p>
+   <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="webtransport-stream">WebTransport stream</dfn> is a concept for HTTP/3 stream on a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑥">WebTransport session</a>.</p>
    <p>A <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream">WebTransport stream</a> is one of <dfn class="dfn-paneled" data-dfn-for="stream" data-dfn-type="dfn" data-noexport id="stream-incoming-unidirectional">incoming unidirectional</dfn>, <dfn class="dfn-paneled" data-dfn-for="stream" data-dfn-type="dfn" data-noexport id="stream-outgoing-unidirectional">outgoing unidirectional</dfn> or <dfn class="dfn-paneled" data-dfn-for="stream" data-dfn-type="dfn" data-noexport id="stream-bidirectional">bidirectional</dfn>.</p>
-   <p><a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream①">WebTransport stream</a> has the following capabilities:</p>
+   <p>A <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream①">WebTransport stream</a> has the following capabilities:</p>
    <table class="data">
     <thead>
      <tr>
@@ -852,7 +854,21 @@ CONNECT request that initiated <var>session</var> is closed by the server, as de
       <td>Yes 
       <td>Yes 
    </table>
-   <p><a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream③">WebTransport stream</a> has the following signals:</p>
+   <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑦">WebTransport session</a> has the following signals:</p>
+   <table class="data">
+    <thead>
+     <tr>
+      <th>event 
+      <th>definition 
+    <tbody>
+     <tr>
+      <td><dfn class="dfn-paneled" data-dfn-for="session-signal" data-dfn-type="dfn" data-noexport id="session-signal-drain_webtransport_session">DRAIN_WEBTRANSPORT_SESSION</dfn> 
+      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6">Section 4.6</a> 
+     <tr>
+      <td><dfn class="dfn-paneled" data-dfn-for="session-signal" data-dfn-type="dfn" data-noexport id="session-signal-goaway">GOAWAY</dfn> 
+      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6">Section 4.6</a> 
+   </table>
+   <p>A <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream③">WebTransport stream</a> has the following signals:</p>
    <table class="data">
     <thead>
      <tr>
@@ -1253,16 +1269,17 @@ defined in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransportreliabilitymode" id="ref-for-enumdef-webtransportreliabilitymode"><c- n>WebTransportReliabilityMode</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportReliabilityMode" href="#dom-webtransport-reliability" id="ref-for-dom-webtransport-reliability"><c- g>reliability</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol"><c- n>WebTransportCongestionControl</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportCongestionControl" href="#dom-webtransport-congestioncontrol" id="ref-for-dom-webtransport-congestioncontrol"><c- g>congestionControl</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise②"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo"><c- n>WebTransportCloseInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<WebTransportCloseInfo>" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed"><c- g>closed</c-></a>;
-  <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined①"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-webtransport-close" id="ref-for-dom-webtransport-close"><c- g>close</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo①"><c- n>WebTransportCloseInfo</c-></a> <dfn class="idl-code" data-dfn-for="WebTransport/close(closeInfo), WebTransport/close()" data-dfn-type="argument" data-export id="dom-webtransport-close-closeinfo-closeinfo"><code><c- g>closeInfo</c-></code><a class="self-link" href="#dom-webtransport-close-closeinfo-closeinfo"></a></dfn> = {});
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise③"><c- b>Promise</c-></a>&lt;<a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined①"><c- b>undefined</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<undefined>" href="#dom-webtransport-draining" id="ref-for-dom-webtransport-draining"><c- g>draining</c-></a>;
+  <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined②"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-webtransport-close" id="ref-for-dom-webtransport-close"><c- g>close</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo①"><c- n>WebTransportCloseInfo</c-></a> <dfn class="idl-code" data-dfn-for="WebTransport/close(closeInfo), WebTransport/close()" data-dfn-type="argument" data-export id="dom-webtransport-close-closeinfo-closeinfo"><code><c- g>closeInfo</c-></code><a class="self-link" href="#dom-webtransport-close-closeinfo-closeinfo"></a></dfn> = {});
 
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#webtransportdatagramduplexstream" id="ref-for-webtransportdatagramduplexstream④"><c- n>WebTransportDatagramDuplexStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportDatagramDuplexStream" href="#dom-webtransport-datagrams" id="ref-for-dom-webtransport-datagrams"><c- g>datagrams</c-></a>;
 
-  <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise③"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#webtransportbidirectionalstream" id="ref-for-webtransportbidirectionalstream"><c- n>WebTransportBidirectionalStream</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransport-createbidirectionalstream" id="ref-for-dom-webtransport-createbidirectionalstream"><c- g>createBidirectionalStream</c-></a>(
+  <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise④"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#webtransportbidirectionalstream" id="ref-for-webtransportbidirectionalstream"><c- n>WebTransportBidirectionalStream</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransport-createbidirectionalstream" id="ref-for-dom-webtransport-createbidirectionalstream"><c- g>createBidirectionalStream</c-></a>(
       <c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransportsendstreamoptions" id="ref-for-dictdef-webtransportsendstreamoptions"><c- n>WebTransportSendStreamOptions</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport/createBidirectionalStream(options), WebTransport/createBidirectionalStream()" data-dfn-type="argument" data-export id="dom-webtransport-createbidirectionalstream-options-options"><code><c- g>options</c-></code></dfn> = {});
   /* a ReadableStream of WebTransportBidirectionalStream objects */
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream③"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-webtransport-incomingbidirectionalstreams" id="ref-for-dom-webtransport-incomingbidirectionalstreams"><c- g>incomingBidirectionalStreams</c-></a>;
 
-  <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise④"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#webtransportsendstream" id="ref-for-webtransportsendstream"><c- n>WebTransportSendStream</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransport-createunidirectionalstream" id="ref-for-dom-webtransport-createunidirectionalstream"><c- g>createUnidirectionalStream</c-></a>(
+  <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise⑤"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#webtransportsendstream" id="ref-for-webtransportsendstream"><c- n>WebTransportSendStream</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransport-createunidirectionalstream" id="ref-for-dom-webtransport-createunidirectionalstream"><c- g>createUnidirectionalStream</c-></a>(
       <c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransportsendstreamoptions" id="ref-for-dictdef-webtransportsendstreamoptions①"><c- n>WebTransportSendStreamOptions</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport/createUnidirectionalStream(options), WebTransport/createUnidirectionalStream()" data-dfn-type="argument" data-export id="dom-webtransport-createunidirectionalstream-options-options"><code><c- g>options</c-></code></dfn> = {});
   /* a ReadableStream of WebTransportReceiveStream objects */
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream④"><c- n>ReadableStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="ReadableStream" href="#dom-webtransport-incomingunidirectionalstreams" id="ref-for-dom-webtransport-incomingunidirectionalstreams"><c- g>incomingUnidirectionalStreams</c-></a>;
@@ -1296,10 +1313,10 @@ defined in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="
       <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream⑥">ReadableStream</a></code> consisting of <code class="idl"><a data-link-type="idl" href="#webtransportreceivestream" id="ref-for-webtransportreceivestream①">WebTransportReceiveStream</a></code>s. 
      <tr>
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-state-slot"><code>[[State]]</code></dfn> 
-      <td class="non-normative">An enum indicating the state of the transport. One of <code>"connecting"</code>, <code>"connected"</code>, <code>"closed"</code>, and <code>"failed"</code>. 
+      <td class="non-normative">An enum indicating the state of the transport. One of <code>"connecting"</code>, <code>"connected"</code>, <code>"draining"</code>, <code>"closed"</code>, and <code>"failed"</code>. 
      <tr>
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-ready-slot"><code>[[Ready]]</code></dfn> 
-      <td class="non-normative">A promise fulfilled when the associated <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑥">WebTransport session</a> gets <a data-link-type="dfn" href="#session-establish" id="ref-for-session-establish">established</a>, or rejected if the <a data-link-type="dfn" href="#session-establish" id="ref-for-session-establish①">establishment process</a> failed. 
+      <td class="non-normative">A promise fulfilled when the associated <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑧">WebTransport session</a> gets <a data-link-type="dfn" href="#session-establish" id="ref-for-session-establish">established</a>, or rejected if the <a data-link-type="dfn" href="#session-establish" id="ref-for-session-establish①">establishment process</a> failed. 
      <tr>
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-reliability-slot"><code>[[Reliability]]</code></dfn> 
       <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="#enumdef-webtransportreliabilitymode" id="ref-for-enumdef-webtransportreliabilitymode①">WebTransportReliabilityMode</a></code> indicating whether
@@ -1317,11 +1334,14 @@ defined in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="
       <td class="non-normative">A promise fulfilled when the associated <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑨">WebTransport</a></code> object is
    closed gracefully, or rejected when it is closed abruptly or failed on initialization. 
      <tr>
+      <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-draining-slot"><code>[[Draining]]</code></dfn> 
+      <td class="non-normative">A promise fulfilled when the associated <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑨">WebTransport session</a> receives a <a data-link-type="dfn" href="#session-signal-drain_webtransport_session" id="ref-for-session-signal-drain_webtransport_session①">DRAIN_WEBTRANSPORT_SESSION</a> capsule or a <a data-link-type="dfn" href="#session-signal-goaway" id="ref-for-session-signal-goaway①">GOAWAY</a> frame. 
+     <tr>
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-datagrams-slot"><code>[[Datagrams]]</code></dfn> 
       <td class="non-normative">A <code class="idl"><a data-link-type="idl" href="#webtransportdatagramduplexstream" id="ref-for-webtransportdatagramduplexstream⑤">WebTransportDatagramDuplexStream</a></code>. 
      <tr>
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-session-slot"><code>[[Session]]</code></dfn> 
-      <td class="non-normative">A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑦">WebTransport session</a> for this <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①⓪">WebTransport</a></code> object, or null. 
+      <td class="non-normative">A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session①⓪">WebTransport session</a> for this <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①⓪">WebTransport</a></code> object, or null. 
    </table>
    <h3 class="heading settled" data-level="5.2" id="webtransport-constructor"><span class="secno">5.2. </span><span class="content">Constructor</span><a class="self-link" href="#webtransport-constructor"></a></h3>
    <div class="algorithm" data-algorithm="webtransport-contructor">
@@ -1386,6 +1406,9 @@ agent MUST run the following steps:
        <dd data-md>
         <p><var>congestionControl</var></p>
        <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed-slot" id="ref-for-dom-webtransport-closed-slot">[[Closed]]</a></code>
+       <dd data-md>
+        <p>a new promise</p>
+       <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransport-draining-slot" id="ref-for-dom-webtransport-draining-slot">[[Draining]]</a></code>
        <dd data-md>
         <p>a new promise</p>
        <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot③">[[Datagrams]]</a></code>
@@ -1475,7 +1498,7 @@ agent MUST run the following steps:
           <p><a data-link-type="dfn" href="#webtransport-cleanup" id="ref-for-webtransport-cleanup②">Cleanup</a> <var>transport</var> with <var>error</var>.</p>
         </ol>
        <li data-md>
-        <p><a data-link-type="dfn" href="#session-establish" id="ref-for-session-establish②">Establish</a> a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑧">WebTransport session</a> with <var>origin</var> on <var>connection</var>.</p>
+        <p><a data-link-type="dfn" href="#session-establish" id="ref-for-session-establish②">Establish</a> a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session①①">WebTransport session</a> with <var>origin</var> on <var>connection</var>.</p>
         <p class="note" role="note"><span class="marker">Note:</span> This step also contains the transport parameter exchange specified in <a data-link-type="biblio" href="#biblio-quic-datagram" title="An Unreliable Datagram Extension to QUIC">[QUIC-DATAGRAM]</a>.</p>
        <li data-md>
         <p>If the previous step fails, abort the remaining steps and <a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task⑥">queue a network task</a> with <var>transport</var> to run these steps:</p>
@@ -1488,7 +1511,7 @@ agent MUST run the following steps:
           <p><a data-link-type="dfn" href="#webtransport-cleanup" id="ref-for-webtransport-cleanup③">Cleanup</a> <var>transport</var> with <var>error</var>.</p>
         </ol>
        <li data-md>
-        <p>Let <var>session</var> be the established <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑨">WebTransport session</a>.</p>
+        <p>Let <var>session</var> be the established <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session①②">WebTransport session</a>.</p>
        <li data-md>
         <p class="assertion">Assert: <var>maxDatagramSize</var> is an integer.</p>
        <li data-md>
@@ -1593,19 +1616,22 @@ these steps.
    </div>
    <h3 class="heading settled" data-level="5.3" id="webtransport-attributes"><span class="secno">5.3. </span><span class="content">Attributes</span><a class="self-link" href="#webtransport-attributes"></a></h3>
    <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-ready"><code>ready</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined②">undefined</a>>, readonly</span>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-ready"><code>ready</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined③">undefined</a>>, readonly</span>
     <dd data-md>
      <p>On getting, it MUST return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①①">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-ready-slot" id="ref-for-dom-webtransport-ready-slot④">[[Ready]]</a></code>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-closed"><code>closed</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo" id="ref-for-dictdef-webtransportcloseinfo②">WebTransportCloseInfo</a>>, readonly</span>
     <dd data-md>
      <p>On getting, it MUST return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①②">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed-slot" id="ref-for-dom-webtransport-closed-slot①">[[Closed]]</a></code>.</p>
+    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-draining"><code>draining</code></dfn>, <span> of type Promise&lt;<a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined④">undefined</a>>, readonly</span>
+    <dd data-md>
+     <p>On getting, it MUST return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①③">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-draining-slot" id="ref-for-dom-webtransport-draining-slot①">[[Draining]]</a></code>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-datagrams"><code>datagrams</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransportdatagramduplexstream" id="ref-for-webtransportdatagramduplexstream⑦">WebTransportDatagramDuplexStream</a>, readonly</span>
     <dd data-md>
      <p>A single duplex stream for sending and receiving datagrams over this session.
  The getter steps for the <code>datagrams</code> attribute SHALL be:</p>
      <ol>
       <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①③">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot④">[[Datagrams]]</a></code>.</p>
+       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①④">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot④">[[Datagrams]]</a></code>.</p>
      </ol>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-incomingbidirectionalstreams"><code>incomingBidirectionalStreams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⓪">ReadableStream</a>, readonly</span>
     <dd data-md>
@@ -1614,7 +1640,7 @@ these steps.
  The getter steps for the <code>incomingBidirectionalStreams</code> attribute SHALL be:</p>
      <ol>
       <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①④">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingbidirectionalstreams-slot" id="ref-for-dom-webtransport-incomingbidirectionalstreams-slot③">[[IncomingBidirectionalStreams]]</a></code>.</p>
+       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑤">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingbidirectionalstreams-slot" id="ref-for-dom-webtransport-incomingbidirectionalstreams-slot③">[[IncomingBidirectionalStreams]]</a></code>.</p>
      </ol>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-incomingunidirectionalstreams"><code>incomingUnidirectionalStreams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①②">ReadableStream</a>, readonly</span>
     <dd data-md>
@@ -1622,31 +1648,31 @@ these steps.
  The getter steps for <code>incomingUnidirectionalStreams</code> are:</p>
      <ol>
       <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑤">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingunidirectionalstreams-slot" id="ref-for-dom-webtransport-incomingunidirectionalstreams-slot③">[[IncomingUnidirectionalStreams]]</a></code>.</p>
+       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑥">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingunidirectionalstreams-slot" id="ref-for-dom-webtransport-incomingunidirectionalstreams-slot③">[[IncomingUnidirectionalStreams]]</a></code>.</p>
      </ol>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-reliability"><code>reliability</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransportreliabilitymode" id="ref-for-enumdef-webtransportreliabilitymode②">WebTransportReliabilityMode</a>, readonly</span>
     <dd data-md>
      <p>Whether connection supports unreliable (over UDP) transport or only reliable
  (over TCP fallback) transport.
  Returns <code>"pending"</code> until a connection has been established.
- The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑥">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-reliability-slot" id="ref-for-dom-webtransport-reliability-slot③">[[Reliability]]</a></code>.</p>
+ The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑦">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-reliability-slot" id="ref-for-dom-webtransport-reliability-slot③">[[Reliability]]</a></code>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-congestioncontrol"><code>congestionControl</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol③">WebTransportCongestionControl</a>, readonly</span>
     <dd data-md>
      <p>The application’s preference, if requested in the constructor, and satisfied
  by the user agent, for a congestion control algorithm optimized for either
  throughput or low latency for sending on this connection. If a preference was
- requested but not satisfied, then the value is <code>"default"</code> The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑦">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-congestioncontrol-slot" id="ref-for-dom-webtransport-congestioncontrol-slot①">[[CongestionControl]]</a></code>.</p>
+ requested but not satisfied, then the value is <code>"default"</code> The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑧">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-congestioncontrol-slot" id="ref-for-dom-webtransport-congestioncontrol-slot①">[[CongestionControl]]</a></code>.</p>
    </dl>
    <h3 class="heading settled" data-level="5.4" id="webtransport-methods"><span class="secno">5.4. </span><span class="content">Methods</span><a class="self-link" href="#webtransport-methods"></a></h3>
    <div class="algorithm" data-algorithm="close(closeInfo)" data-algorithm-for="WebTransport">
     <dl>
      <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="method" data-export data-lt="close(closeInfo)|close()" id="dom-webtransport-close"><code>close(closeInfo)</code></dfn>
      <dd data-md>
-      <p>Terminates the <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session①⓪">WebTransport session</a> associated with the WebTransport object.</p>
+      <p>Terminates the <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session①③">WebTransport session</a> associated with the WebTransport object.</p>
       <p>When close is called, the user agent MUST run the following steps:</p>
       <ol>
        <li data-md>
-        <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑧">this</a>.</p>
+        <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑨">this</a>.</p>
        <li data-md>
         <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⑥">[[State]]</a></code> is <code>"closed"</code> or <code>"failed"</code>, then abort these steps.</p>
        <li data-md>
@@ -1684,7 +1710,7 @@ these steps.
      <p>When getStats is called, the user agent MUST run the following steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑨">this</a>.</p>
+       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⓪">this</a>.</p>
       <li data-md>
        <p>Let <var>p</var> be a new promise.</p>
       <li data-md>
@@ -1715,7 +1741,7 @@ these steps.
  following steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⓪">this</a>.</p>
+       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②①">this</a>.</p>
       <li data-md>
        <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⑧">[[State]]</a></code> is <code>"closed"</code> or <code>"failed"</code>,
   return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑧">rejected</a> promise with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror">InvalidStateError</a></code>.</p>
@@ -1752,7 +1778,7 @@ these steps.
  run the following steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②①">this</a>.</p>
+       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②②">this</a>.</p>
       <li data-md>
        <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②①">[[State]]</a></code> is <code>"closed"</code> or <code>"failed"</code>,
   return a new <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①②">rejected</a> promise with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror③">InvalidStateError</a></code>.</p>
@@ -1848,7 +1874,7 @@ series of steps <var>steps</var>, run these steps:</p>
    </div>
    <h3 class="heading settled" data-level="5.6" id="web-transport-termination"><span class="secno">5.6. </span><span class="content">Session termination not initiated by the client</span><a class="self-link" href="#web-transport-termination"></a></h3>
    <div class="algorithm" data-algorithm="termination-initiated-by-server">
-     Whenever a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session①①">WebTransport session</a> which is associated with a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①⑧">WebTransport</a></code> <var>transport</var> is <a data-link-type="dfn" href="#session-terminated" id="ref-for-session-terminated">terminated</a> with optionally <var>code</var> and <var>reasonBytes</var>, run these steps: 
+     Whenever a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session①④">WebTransport session</a> which is associated with a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①⑧">WebTransport</a></code> <var>transport</var> is <a data-link-type="dfn" href="#session-terminated" id="ref-for-session-terminated">terminated</a> with optionally <var>code</var> and <var>reasonBytes</var>, run these steps: 
     <ol>
      <li data-md>
       <p>Let <var>cleanly</var> be a boolean representing whether the HTTP/3 stream associated with the CONNECT
@@ -2146,7 +2172,7 @@ features with an <a data-link-type="dfn" href="#stream-outgoing-unidirectional" 
 data to the server.</p>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed" id="ref-for-Exposed②"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->), <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext②"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://html.spec.whatwg.org/multipage/structured-data.html#transferable" id="ref-for-transferable"><c- g>Transferable</c-></a>]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="webtransportsendstream"><code><c- g>WebTransportSendStream</c-></code></dfn> : <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑦"><c- n>WritableStream</c-></a> {
-  <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise⑤"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportsendstreamstats" id="ref-for-dictdef-webtransportsendstreamstats"><c- n>WebTransportSendStreamStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransportsendstream-getstats" id="ref-for-dom-webtransportsendstream-getstats"><c- g>getStats</c-></a>();
+  <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise⑥"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportsendstreamstats" id="ref-for-dictdef-webtransportsendstreamstats"><c- n>WebTransportSendStreamStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransportsendstream-getstats" id="ref-for-dom-webtransportsendstream-getstats"><c- g>getStats</c-></a>();
 };
 </pre>
    <p>A <code class="idl"><a data-link-type="idl" href="#webtransportsendstream" id="ref-for-webtransportsendstream①⓪">WebTransportSendStream</a></code> is always created by the <a data-link-type="dfn" href="#webtransportsendstream-create" id="ref-for-webtransportsendstream-create①">create</a> procedure.</p>
@@ -2436,7 +2462,7 @@ and hence it allows
 its consumers to use a <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#byob-reader" id="ref-for-byob-reader">BYOB reader</a> as well as a <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#default-reader" id="ref-for-default-reader">default reader</a>.</p>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->), <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext③"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://html.spec.whatwg.org/multipage/structured-data.html#transferable" id="ref-for-transferable①"><c- g>Transferable</c-></a>]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="webtransportreceivestream"><code><c- g>WebTransportReceiveStream</c-></code></dfn> : <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⑥"><c- n>ReadableStream</c-></a> {
-  <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise⑥"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportreceivestreamstats" id="ref-for-dictdef-webtransportreceivestreamstats"><c- n>WebTransportReceiveStreamStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransportreceivestream-getstats" id="ref-for-dom-webtransportreceivestream-getstats"><c- g>getStats</c-></a>();
+  <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise⑦"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportreceivestreamstats" id="ref-for-dictdef-webtransportreceivestreamstats"><c- n>WebTransportReceiveStreamStats</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-webtransportreceivestream-getstats" id="ref-for-dom-webtransportreceivestream-getstats"><c- g>getStats</c-></a>();
 };
 </pre>
    <p>A <code class="idl"><a data-link-type="idl" href="#webtransportreceivestream" id="ref-for-webtransportreceivestream⑥">WebTransportReceiveStream</a></code> is always created by the <a data-link-type="dfn" href="#webtransportreceivestream-create" id="ref-for-webtransportreceivestream-create①">create</a> procedure.</p>
@@ -2712,10 +2738,10 @@ information on stats specific to one <code class="idl"><a data-link-type="idl" h
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportBidirectionalStream" data-dfn-type="attribute" data-export id="dom-webtransportbidirectionalstream-readable"><code>readable</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransportreceivestream" id="ref-for-webtransportreceivestream②②">WebTransportReceiveStream</a>, readonly</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②②">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable-slot" id="ref-for-dom-webtransportbidirectionalstream-readable-slot">[[Readable]]</a></code>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②③">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable-slot" id="ref-for-dom-webtransportbidirectionalstream-readable-slot">[[Readable]]</a></code>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportBidirectionalStream" data-dfn-type="attribute" data-export id="dom-webtransportbidirectionalstream-writable"><code>writable</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransportsendstream" id="ref-for-webtransportsendstream③⓪">WebTransportSendStream</a>, readonly</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②③">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable-slot" id="ref-for-dom-webtransportbidirectionalstream-writable-slot">[[Writable]]</a></code>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②④">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-writable-slot" id="ref-for-dom-webtransportbidirectionalstream-writable-slot">[[Writable]]</a></code>.</p>
    </dl>
    <h3 class="heading settled" data-level="8.3" id="bidirectional-stream-procedures"><span class="secno">8.3. </span><span class="content">Procedures</span><a class="self-link" href="#bidirectional-stream-procedures"></a></h3>
    <div class="algorithm" data-algorithm="create a BidirectionalStream">
@@ -2801,17 +2827,17 @@ information on stats specific to one <code class="idl"><a data-link-type="idl" h
        <dd data-md>
         <p><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterroroptions-streamerrorcode" id="ref-for-dom-webtransporterroroptions-streamerrorcode②">streamErrorCode</a></code></p>
       </dl>
-      <p class="note" role="note"><span class="marker">Note:</span> This name does not have a mapping to a legacy code, so <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②④">this</a>'s <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#dom-domexception-code" id="ref-for-dom-domexception-code">code</a></code> is 0.</p>
+      <p class="note" role="note"><span class="marker">Note:</span> This name does not have a mapping to a legacy code, so <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⑤">this</a>'s <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#dom-domexception-code" id="ref-for-dom-domexception-code">code</a></code> is 0.</p>
     </ol>
    </div>
    <h3 class="heading settled" data-level="9.3" id="web-transport-error-attributes"><span class="secno">9.3. </span><span class="content">Attributes</span><a class="self-link" href="#web-transport-error-attributes"></a></h3>
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportError" data-dfn-type="attribute" data-export id="dom-webtransporterror-source"><code>source</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransporterrorsource" id="ref-for-enumdef-webtransporterrorsource③">WebTransportErrorSource</a>, readonly</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⑤">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot①">[[Source]]</a></code>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⑥">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot①">[[Source]]</a></code>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportError" data-dfn-type="attribute" data-export id="dom-webtransporterror-streamerrorcode"><code>streamErrorCode</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-octet" id="ref-for-idl-octet②">octet</a>, readonly, nullable</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⑥">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode-slot" id="ref-for-dom-webtransporterror-streamerrorcode-slot⑤">[[StreamErrorCode]]</a></code>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②⑦">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode-slot" id="ref-for-dom-webtransporterror-streamerrorcode-slot⑤">[[StreamErrorCode]]</a></code>.</p>
    </dl>
    <h3 class="heading settled" data-level="9.4" id="web-transport-error-serialization"><span class="secno">9.4. </span><span class="content">Serialization</span><a class="self-link" href="#web-transport-error-serialization"></a></h3>
    <p><code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror①③">WebTransportError</a></code> objects are <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#serializable-objects" id="ref-for-serializable-objects">serializable objects</a>.
@@ -2902,6 +2928,34 @@ converted to an httpErrorCode, and vice versa, as specified in <a data-link-type
      <tr>
       <td>Network error<br> 
       <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed②">closed</a></code>) rejects, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑥">errors</a> open streams
+   </table>
+   <table class="data">
+    <colgroup class="header">
+     <col>
+    <colgroup>
+     <col>
+    <thead>
+     <tr>
+      <th>WebTransport Protocol Action
+      <th>API Effect
+    <tbody>
+     <tr>
+      <td>received <a data-link-type="dfn" href="#session-signal-drain_webtransport_session" id="ref-for-session-signal-drain_webtransport_session②">DRAIN_WEBTRANSPORT_SESSION</a>
+      <td>await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-draining" id="ref-for-dom-webtransport-draining①">draining</a></code>
+   </table>
+   <table class="data">
+    <colgroup class="header">
+     <col>
+    <colgroup>
+     <col>
+    <thead>
+     <tr>
+      <th>HTTP/3 Protocol Action
+      <th>API Effect
+    <tbody>
+     <tr>
+      <td>received <a data-link-type="dfn" href="#session-signal-goaway" id="ref-for-session-signal-goaway②">GOAWAY</a>
+      <td>await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-draining" id="ref-for-dom-webtransport-draining②">draining</a></code>
    </table>
    <h2 class="heading settled" data-level="11" id="privacy-security"><span class="secno">11. </span><span class="content">Privacy and Security Considerations</span><a class="self-link" href="#privacy-security"></a></h2>
    <p>This section is non-normative; it specifies no new behaviour, but instead
@@ -3312,6 +3366,14 @@ and has been adapted for use in this specification.</p>
      <li><a href="#dom-webtransportstats-datagrams">dict-member for WebTransportStats</a><span>, in § 5.12</span>
     </ul>
    <li><a href="#dom-webtransportcongestioncontrol-default">"default"</a><span>, in § 5.9</span>
+   <li><a href="#dom-webtransport-draining-slot">[[Draining]]</a><span>, in § 5.1</span>
+   <li>
+    draining
+    <ul>
+     <li><a href="#dom-webtransport-draining">attribute for WebTransport</a><span>, in § 5.3</span>
+     <li><a href="#session-draining">dfn for session</a><span>, in § 3</span>
+    </ul>
+   <li><a href="#session-signal-drain_webtransport_session">DRAIN_WEBTRANSPORT_SESSION</a><span>, in § 3</span>
    <li><a href="#dom-webtransportdatagramstats-droppedincoming">droppedIncoming</a><span>, in § 5.13</span>
    <li><a href="#session-establish">establish</a><span>, in § 3</span>
    <li><a href="#dom-webtransportdatagramstats-expiredoutgoing">expiredOutgoing</a><span>, in § 5.13</span>
@@ -3323,6 +3385,7 @@ and has been adapted for use in this specification.</p>
      <li><a href="#dom-webtransportreceivestream-getstats">method for WebTransportReceiveStream</a><span>, in § 7.1</span>
      <li><a href="#dom-webtransportsendstream-getstats">method for WebTransportSendStream</a><span>, in § 6.1</span>
     </ul>
+   <li><a href="#session-signal-goaway">GOAWAY</a><span>, in § 3</span>
    <li><a href="#dom-webtransport-incomingbidirectionalstreams-slot">[[IncomingBidirectionalStreams]]</a><span>, in § 5.1</span>
    <li><a href="#dom-webtransport-incomingbidirectionalstreams">incomingBidirectionalStreams</a><span>, in § 5.3</span>
    <li><a href="#dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot">[[IncomingDatagramsExpirationDuration]]</a><span>, in § 4.1</span>
@@ -4195,9 +4258,9 @@ and has been adapted for use in this specification.</p>
   <aside aria-labelledby="infopaneltitle-for-93669c631ec1ef8e696b4c083bdbe12c" class="dfn-panel" data-for="93669c631ec1ef8e696b4c083bdbe12c" id="infopanel-for-93669c631ec1ef8e696b4c083bdbe12c">
    <span id="infopaneltitle-for-93669c631ec1ef8e696b4c083bdbe12c" style="display:none">Info about the 'Promise' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-promise">https://webidl.spec.whatwg.org/#idl-promise</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-idl-promise">5. WebTransport Interface</a> <a href="#ref-for-idl-promise①">(2)</a> <a href="#ref-for-idl-promise②">(3)</a> <a href="#ref-for-idl-promise③">(4)</a> <a href="#ref-for-idl-promise④">(5)</a>
-    <li><a href="#ref-for-idl-promise⑤">6. Interface WebTransportSendStream</a>
-    <li><a href="#ref-for-idl-promise⑥">7. Interface WebTransportReceiveStream</a>
+    <li><a href="#ref-for-idl-promise">5. WebTransport Interface</a> <a href="#ref-for-idl-promise①">(2)</a> <a href="#ref-for-idl-promise②">(3)</a> <a href="#ref-for-idl-promise③">(4)</a> <a href="#ref-for-idl-promise④">(5)</a> <a href="#ref-for-idl-promise⑤">(6)</a>
+    <li><a href="#ref-for-idl-promise⑥">6. Interface WebTransportSendStream</a>
+    <li><a href="#ref-for-idl-promise⑦">7. Interface WebTransportReceiveStream</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-04b3ab4ac1c03b8ef3df67e1fed2c870" class="dfn-panel" data-for="04b3ab4ac1c03b8ef3df67e1fed2c870" id="infopanel-for-04b3ab4ac1c03b8ef3df67e1fed2c870">
@@ -4339,11 +4402,11 @@ and has been adapted for use in this specification.</p>
    <span id="infopaneltitle-for-be0933df03cd63338f98de217c4158c7" style="display:none">Info about the 'this' external reference.</span><a href="https://webidl.spec.whatwg.org/#this">https://webidl.spec.whatwg.org/#this</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-this">4.2. Attributes</a> <a href="#ref-for-this①">(2)</a> <a href="#ref-for-this②">(3)</a> <a href="#ref-for-this③">(4)</a> <a href="#ref-for-this④">(5)</a> <a href="#ref-for-this⑤">(6)</a> <a href="#ref-for-this⑥">(7)</a> <a href="#ref-for-this⑦">(8)</a> <a href="#ref-for-this⑧">(9)</a> <a href="#ref-for-this⑨">(10)</a> <a href="#ref-for-this①⓪">(11)</a>
-    <li><a href="#ref-for-this①①">5.3. Attributes</a> <a href="#ref-for-this①②">(2)</a> <a href="#ref-for-this①③">(3)</a> <a href="#ref-for-this①④">(4)</a> <a href="#ref-for-this①⑤">(5)</a> <a href="#ref-for-this①⑥">(6)</a> <a href="#ref-for-this①⑦">(7)</a>
-    <li><a href="#ref-for-this①⑧">5.4. Methods</a> <a href="#ref-for-this①⑨">(2)</a> <a href="#ref-for-this②⓪">(3)</a> <a href="#ref-for-this②①">(4)</a>
-    <li><a href="#ref-for-this②②">8.2. Attributes</a> <a href="#ref-for-this②③">(2)</a>
-    <li><a href="#ref-for-this②④">9.2. Constructor</a>
-    <li><a href="#ref-for-this②⑤">9.3. Attributes</a> <a href="#ref-for-this②⑥">(2)</a>
+    <li><a href="#ref-for-this①①">5.3. Attributes</a> <a href="#ref-for-this①②">(2)</a> <a href="#ref-for-this①③">(3)</a> <a href="#ref-for-this①④">(4)</a> <a href="#ref-for-this①⑤">(5)</a> <a href="#ref-for-this①⑥">(6)</a> <a href="#ref-for-this①⑦">(7)</a> <a href="#ref-for-this①⑧">(8)</a>
+    <li><a href="#ref-for-this①⑨">5.4. Methods</a> <a href="#ref-for-this②⓪">(2)</a> <a href="#ref-for-this②①">(3)</a> <a href="#ref-for-this②②">(4)</a>
+    <li><a href="#ref-for-this②③">8.2. Attributes</a> <a href="#ref-for-this②④">(2)</a>
+    <li><a href="#ref-for-this②⑤">9.2. Constructor</a>
+    <li><a href="#ref-for-this②⑥">9.3. Attributes</a> <a href="#ref-for-this②⑦">(2)</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-2ffe113543b75964c47c7e6248fef5eb" class="dfn-panel" data-for="2ffe113543b75964c47c7e6248fef5eb" id="infopanel-for-2ffe113543b75964c47c7e6248fef5eb">
@@ -4356,8 +4419,8 @@ and has been adapted for use in this specification.</p>
   <aside aria-labelledby="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" class="dfn-panel" data-for="cee863f1f2ec91066cfb7f5d309d59dc" id="infopanel-for-cee863f1f2ec91066cfb7f5d309d59dc">
    <span id="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" style="display:none">Info about the 'undefined' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-undefined">https://webidl.spec.whatwg.org/#idl-undefined</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-idl-undefined">5. WebTransport Interface</a> <a href="#ref-for-idl-undefined①">(2)</a>
-    <li><a href="#ref-for-idl-undefined②">5.3. Attributes</a>
+    <li><a href="#ref-for-idl-undefined">5. WebTransport Interface</a> <a href="#ref-for-idl-undefined①">(2)</a> <a href="#ref-for-idl-undefined②">(3)</a>
+    <li><a href="#ref-for-idl-undefined③">5.3. Attributes</a> <a href="#ref-for-idl-undefined④">(2)</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-699ca41c02762e303155864b1b0fde31" class="dfn-panel" data-for="699ca41c02762e303155864b1b0fde31" id="infopanel-for-699ca41c02762e303155864b1b0fde31">
@@ -4660,6 +4723,7 @@ and has been adapted for use in this specification.</p>
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransportreliabilitymode"><c- n>WebTransportReliabilityMode</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportReliabilityMode" href="#dom-webtransport-reliability"><c- g>reliability</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-webtransportcongestioncontrol"><c- n>WebTransportCongestionControl</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportCongestionControl" href="#dom-webtransport-congestioncontrol"><c- g>congestionControl</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo"><c- n>WebTransportCloseInfo</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<WebTransportCloseInfo>" href="#dom-webtransport-closed"><c- g>closed</c-></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise"><c- b>Promise</c-></a>&lt;<a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-undefined"><c- b>undefined</c-></a>> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Promise<undefined>" href="#dom-webtransport-draining"><c- g>draining</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-undefined"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-webtransport-close"><c- g>close</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-webtransportcloseinfo"><c- n>WebTransportCloseInfo</c-></a> <a href="#dom-webtransport-close-closeinfo-closeinfo"><code><c- g>closeInfo</c-></code></a> = {});
 
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#webtransportdatagramduplexstream"><c- n>WebTransportDatagramDuplexStream</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="WebTransportDatagramDuplexStream" href="#dom-webtransport-datagrams"><c- g>datagrams</c-></a>;
@@ -4795,11 +4859,11 @@ or are impossible to define for pooled connections. <a class="issue-return" href
   <aside aria-labelledby="infopaneltitle-for-protocol-webtransport-session" class="dfn-panel" data-for="protocol-webtransport-session" id="infopanel-for-protocol-webtransport-session">
    <span id="infopaneltitle-for-protocol-webtransport-session" style="display:none">Info about the 'WebTransport session' definition.</span><b><a href="#protocol-webtransport-session">#protocol-webtransport-session</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-protocol-webtransport-session">3. Protocol concepts</a> <a href="#ref-for-protocol-webtransport-session①">(2)</a> <a href="#ref-for-protocol-webtransport-session②">(3)</a> <a href="#ref-for-protocol-webtransport-session③">(4)</a> <a href="#ref-for-protocol-webtransport-session④">(5)</a> <a href="#ref-for-protocol-webtransport-session⑤">(6)</a>
-    <li><a href="#ref-for-protocol-webtransport-session⑥">5.1. Internal slots</a> <a href="#ref-for-protocol-webtransport-session⑦">(2)</a>
-    <li><a href="#ref-for-protocol-webtransport-session⑧">5.2. Constructor</a> <a href="#ref-for-protocol-webtransport-session⑨">(2)</a>
-    <li><a href="#ref-for-protocol-webtransport-session①⓪">5.4. Methods</a>
-    <li><a href="#ref-for-protocol-webtransport-session①①">5.6. Session termination not initiated by the client</a>
+    <li><a href="#ref-for-protocol-webtransport-session">3. Protocol concepts</a> <a href="#ref-for-protocol-webtransport-session①">(2)</a> <a href="#ref-for-protocol-webtransport-session②">(3)</a> <a href="#ref-for-protocol-webtransport-session③">(4)</a> <a href="#ref-for-protocol-webtransport-session④">(5)</a> <a href="#ref-for-protocol-webtransport-session⑤">(6)</a> <a href="#ref-for-protocol-webtransport-session⑥">(7)</a> <a href="#ref-for-protocol-webtransport-session⑦">(8)</a>
+    <li><a href="#ref-for-protocol-webtransport-session⑧">5.1. Internal slots</a> <a href="#ref-for-protocol-webtransport-session⑨">(2)</a> <a href="#ref-for-protocol-webtransport-session①⓪">(3)</a>
+    <li><a href="#ref-for-protocol-webtransport-session①①">5.2. Constructor</a> <a href="#ref-for-protocol-webtransport-session①②">(2)</a>
+    <li><a href="#ref-for-protocol-webtransport-session①③">5.4. Methods</a>
+    <li><a href="#ref-for-protocol-webtransport-session①④">5.6. Session termination not initiated by the client</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-session-send-a-datagram" class="dfn-panel" data-for="session-send-a-datagram" id="infopanel-for-session-send-a-datagram">
@@ -4936,6 +5000,22 @@ or are impossible to define for pooled connections. <a class="issue-return" href
     <li><a href="#ref-for-stream-reset">5.4. Methods</a>
     <li><a href="#ref-for-stream-reset①">6.3. Procedures</a>
     <li><a href="#ref-for-stream-reset②">10. Protocol Mappings</a> <a href="#ref-for-stream-reset③">(2)</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-session-signal-drain_webtransport_session" class="dfn-panel" data-for="session-signal-drain_webtransport_session" id="infopanel-for-session-signal-drain_webtransport_session">
+   <span id="infopaneltitle-for-session-signal-drain_webtransport_session" style="display:none">Info about the 'DRAIN_WEBTRANSPORT_SESSION' definition.</span><b><a href="#session-signal-drain_webtransport_session">#session-signal-drain_webtransport_session</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-session-signal-drain_webtransport_session">3. Protocol concepts</a>
+    <li><a href="#ref-for-session-signal-drain_webtransport_session①">5.1. Internal slots</a>
+    <li><a href="#ref-for-session-signal-drain_webtransport_session②">10. Protocol Mappings</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-session-signal-goaway" class="dfn-panel" data-for="session-signal-goaway" id="infopanel-for-session-signal-goaway">
+   <span id="infopaneltitle-for-session-signal-goaway" style="display:none">Info about the 'GOAWAY' definition.</span><b><a href="#session-signal-goaway">#session-signal-goaway</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-session-signal-goaway">3. Protocol concepts</a>
+    <li><a href="#ref-for-session-signal-goaway①">5.1. Internal slots</a>
+    <li><a href="#ref-for-session-signal-goaway②">10. Protocol Mappings</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-stream-signal-stop_sending" class="dfn-panel" data-for="stream-signal-stop_sending" id="infopanel-for-stream-signal-stop_sending">
@@ -5279,6 +5359,13 @@ or are impossible to define for pooled connections. <a class="issue-return" href
     <li><a href="#ref-for-dom-webtransport-closed-slot②">5.5. Procedures</a>
    </ul>
   </aside>
+  <aside aria-labelledby="infopaneltitle-for-dom-webtransport-draining-slot" class="dfn-panel" data-for="dom-webtransport-draining-slot" id="infopanel-for-dom-webtransport-draining-slot">
+   <span id="infopaneltitle-for-dom-webtransport-draining-slot" style="display:none">Info about the '[[Draining]]' definition.</span><b><a href="#dom-webtransport-draining-slot">#dom-webtransport-draining-slot</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-webtransport-draining-slot">5.2. Constructor</a>
+    <li><a href="#ref-for-dom-webtransport-draining-slot①">5.3. Attributes</a>
+   </ul>
+  </aside>
   <aside aria-labelledby="infopaneltitle-for-dom-webtransport-datagrams-slot" class="dfn-panel" data-for="dom-webtransport-datagrams-slot" id="infopanel-for-dom-webtransport-datagrams-slot">
    <span id="infopaneltitle-for-dom-webtransport-datagrams-slot" style="display:none">Info about the '[[Datagrams]]' definition.</span><b><a href="#dom-webtransport-datagrams-slot">#dom-webtransport-datagrams-slot</a></b><b>Referenced in:</b>
    <ul>
@@ -5326,6 +5413,13 @@ or are impossible to define for pooled connections. <a class="issue-return" href
    <ul>
     <li><a href="#ref-for-dom-webtransport-closed">5. WebTransport Interface</a>
     <li><a href="#ref-for-dom-webtransport-closed①">10. Protocol Mappings</a> <a href="#ref-for-dom-webtransport-closed②">(2)</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-dom-webtransport-draining" class="dfn-panel" data-for="dom-webtransport-draining" id="infopanel-for-dom-webtransport-draining">
+   <span id="infopaneltitle-for-dom-webtransport-draining" style="display:none">Info about the 'draining' definition.</span><b><a href="#dom-webtransport-draining">#dom-webtransport-draining</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-webtransport-draining">5. WebTransport Interface</a>
+    <li><a href="#ref-for-dom-webtransport-draining①">10. Protocol Mappings</a> <a href="#ref-for-dom-webtransport-draining②">(2)</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-dom-webtransport-datagrams" class="dfn-panel" data-for="dom-webtransport-datagrams" id="infopanel-for-dom-webtransport-datagrams">
