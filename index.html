@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version d9f9c3533, updated Fri Mar 10 11:31:29 2023 -0800" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="cf7738a5df38cafa525ae06f6ee807db520d7d46" name="document-revision">
+  <meta content="5e8422f5deef943831c5fdc007465c5b31ae8fd6" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -632,9 +632,8 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
    <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
    <p>This document defines a set of ECMAScript APIs in WebIDL to allow data to be
 
-  sent and received between a browser and server, utilizing <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.
-  This specification is being developed in conjunction with a protocol
-  specification developed by the IETF WEBTRANS Working Group.</p>
+  sent and received between a browser and server, utilizing <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> and <a data-link-type="biblio" href="#biblio-web-transport-http2" title="WebTransport over HTTP/2">[WEB-TRANSPORT-HTTP2]</a>. This specification is being developed in conjunction 
+  with protocol specifications developed by the IETF WEBTRANS Working Group.</p>
   </div>
   <h2 class="no-num no-toc no-ref heading settled" id="sotd"><span class="content">Status of this document</span></h2>
   <div data-fill-with="status">
@@ -789,34 +788,34 @@ There may be multiple <a data-link-type="dfn" href="#protocol-webtransport-sessi
     <tbody>
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-send-a-datagram">send a datagram</dfn> 
-      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4">section 4.4</a> 
+      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4">Section 4.4</a> 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-receive-a-datagram">receive a datagram</dfn> 
-      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4">section 4.4</a> 
+      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4">Section 4.4</a> 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-create-an-outgoing-unidirectional-stream">create an <a data-link-type="dfn" href="#stream-outgoing-unidirectional" id="ref-for-stream-outgoing-unidirectional">outgoing unidirectional</a> stream</dfn> 
-      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1">section 4.1</a> 
+      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1">Section 4.1</a> 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-create-a-bidirectional-stream">create a <a data-link-type="dfn" href="#stream-bidirectional" id="ref-for-stream-bidirectional">bidirectional</a> stream</dfn> 
-      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2">section 4.2</a> 
+      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2">Section 4.2</a> 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-receive-an-incoming-unidirectional-stream">receive an <a data-link-type="dfn" href="#stream-incoming-unidirectional" id="ref-for-stream-incoming-unidirectional">incoming unidirectional</a> stream</dfn> 
-      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1">section 4.1</a> 
+      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1">Section 4.1</a> 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-receive-a-bidirectional-stream">receive a <a data-link-type="dfn" href="#stream-bidirectional" id="ref-for-stream-bidirectional①">bidirectional</a> stream</dfn> 
-      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2">section 4.2</a> 
+      <td><a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2">Section 4.2</a> 
    </table>
    <p>To <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-establish">establish</dfn> a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session②">WebTransport session</a> with an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin">origin</a> <var>origin</var>,
-follow <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.3">section 3.3</a>,
+follow <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.3">Section 3.3</a>,
 with using <var>origin</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin" id="ref-for-ascii-serialisation-of-an-origin">serialized</a> and <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#isomorphic-encode" id="ref-for-isomorphic-encode">isomorphic encoded</a>,
 as the <span>`<code><a data-link-type="http-header" href="https://fetch.spec.whatwg.org/#http-origin" id="ref-for-http-origin">Origin</a></code>`</span> header of the request.
 When establishing a session, the client MUST NOT provide any <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#credentials" id="ref-for-credentials">credentials</a>.</p>
    <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session③">WebTransport session</a> <var>session</var> is <dfn data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-draining">draining<a class="self-link" href="#session-draining"></a></dfn> when the
 HTTP/3 stream associated with the CONNECT request that initiated <var>session</var> receives an <a data-link-type="dfn" href="#session-signal-drain_webtransport_session" id="ref-for-session-signal-drain_webtransport_session">DRAIN_WEBTRANSPORT_SESSION</a> capsule, or when an HTTP/3 <a data-link-type="dfn" href="#session-signal-goaway" id="ref-for-session-signal-goaway">GOAWAY</a> frame is received, as described in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6">Section 4.6</a>.</p>
-   <p>To <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminate">terminate</dfn> a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session④">WebTransport session</a> <var>session</var> with an optional integer <var>code</var> and an optional <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence">byte sequence</a> <var>reason</var>, follow <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5">section 5</a>.</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminate">terminate</dfn> a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session④">WebTransport session</a> <var>session</var> with an optional integer <var>code</var> and an optional <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence">byte sequence</a> <var>reason</var>, follow <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5">Section 5</a>.</p>
    <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑤">WebTransport session</a> <var>session</var> is <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminated">terminated</dfn>, with optionally
 an integer <var>code</var> and a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence①">byte sequence</a> <var>reason</var>, when the HTTP/3 stream associated with the
-CONNECT request that initiated <var>session</var> is closed by the server, as described at <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5">section 5</a>.</p>
+CONNECT request that initiated <var>session</var> is closed by the server, as described at <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5">Section 5</a>.</p>
    <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="webtransport-stream">WebTransport stream</dfn> is a concept for HTTP/3 stream on a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑥">WebTransport session</a>.</p>
    <p>A <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream">WebTransport stream</a> is one of <dfn class="dfn-paneled" data-dfn-for="stream" data-dfn-type="dfn" data-noexport id="stream-incoming-unidirectional">incoming unidirectional</dfn>, <dfn class="dfn-paneled" data-dfn-for="stream" data-dfn-type="dfn" data-noexport id="stream-outgoing-unidirectional">outgoing unidirectional</dfn> or <dfn class="dfn-paneled" data-dfn-for="stream" data-dfn-type="dfn" data-noexport id="stream-bidirectional">bidirectional</dfn>.</p>
    <p>A <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream①">WebTransport stream</a> has the following capabilities:</p>
@@ -831,25 +830,25 @@ CONNECT request that initiated <var>session</var> is closed by the server, as de
     <tbody>
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="stream" data-dfn-type="dfn" data-noexport id="stream-send">send</dfn> bytes (potentially with FIN) 
-      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-2.2">section 2.2</a> 
+      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://www.rfc-editor.org/rfc/rfc9000#section-2.2">Section 2.2</a> 
       <td>No 
       <td>Yes 
       <td>Yes 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="stream" data-dfn-type="dfn" data-noexport id="stream-receive">receive</dfn> bytes (potentially with FIN) 
-      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-2.2">section 2.2</a> 
+      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://www.rfc-editor.org/rfc/rfc9000#section-2.2">Section 2.2</a> 
       <td>Yes 
       <td>No 
       <td>Yes 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="stream" data-dfn-type="dfn" data-noexport id="stream-send-stop_sending">send STOP_SENDING</dfn> 
-      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-3.5">section 3.5</a> 
+      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://www.rfc-editor.org/rfc/rfc9000#section-3.5">Section 3.5</a> 
       <td>Yes 
       <td>No 
       <td>Yes 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="stream" data-dfn-type="dfn" data-noexport id="stream-reset">reset</dfn> a <a data-link-type="dfn" href="#webtransport-stream" id="ref-for-webtransport-stream②">WebTransport stream</a> 
-      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-19.4">section 19.4</a> 
+      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://www.rfc-editor.org/rfc/rfc9000#section-19.4">Section 19.4</a> 
       <td>No 
       <td>Yes 
       <td>Yes 
@@ -880,19 +879,19 @@ CONNECT request that initiated <var>session</var> is closed by the server, as de
     <tbody>
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="stream-signal" data-dfn-type="dfn" data-noexport id="stream-signal-stop_sending">STOP_SENDING</dfn> 
-      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-3.5">section 3.5</a> 
+      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://www.rfc-editor.org/rfc/rfc9000#section-3.5">Section 3.5</a> 
       <td>No 
       <td>Yes 
       <td>Yes 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="stream-signal" data-dfn-type="dfn" data-noexport id="stream-signal-reset_stream">RESET_STREAM</dfn> 
-      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-19.4">section 19.4</a> 
+      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://www.rfc-editor.org/rfc/rfc9000#section-19.4">Section 19.4</a> 
       <td>Yes 
       <td>No 
       <td>Yes 
      <tr>
       <td><dfn class="dfn-paneled" data-dfn-for="stream-signal" data-dfn-type="dfn" data-noexport id="stream-signal-flow-control">flow control</dfn> 
-      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-4.1">section 4.1</a> 
+      <td><a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> <a href="https://www.rfc-editor.org/rfc/rfc9000#section-4.1">Section 4.1</a> 
       <td>No 
       <td>Yes 
       <td>Yes 
@@ -1370,7 +1369,7 @@ agent MUST run the following steps:
       <p>Let <var>congestionControl</var> be <code class="idl"><a data-link-type="idl" href="#dom-webtransport-webtransport-url-options-options" id="ref-for-dom-webtransport-webtransport-url-options-options③">options</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransportoptions-congestioncontrol" id="ref-for-dom-webtransportoptions-congestioncontrol">congestionControl</a></code>.</p>
      <li data-md>
       <p>If <var>congestionControl</var> is not <code>"default"</code>, and the user agent does not support any
- congestion control algorithms that optimize for <var>congestionControl</var>, as allowed by <a data-link-type="biblio" href="#biblio-rfc9002" title="QUIC Loss Detection and Congestion Control">[RFC9002]</a> <a href="https://datatracker.ietf.org/doc/html/rfc9002#section-7">section 7</a>,
+ congestion control algorithms that optimize for <var>congestionControl</var>, as allowed by <a data-link-type="biblio" href="#biblio-rfc9002" title="QUIC Loss Detection and Congestion Control">[RFC9002]</a> <a href="https://www.rfc-editor.org/rfc/rfc9002#section-7">Section 7</a>,
  then set <var>congestionControl</var> to <code>"default"</code>.</p>
      <li data-md>
       <p>Let <var>incomingDatagrams</var> be a <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#new" id="ref-for-new①">new</a> <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream⑦">ReadableStream</a></code>.</p>
@@ -2864,7 +2863,7 @@ Their <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/struc
    <p>This section describes the <a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> protocol behavior of methods defined
 in this specification, utilizing <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>. Cause and effect may
 not be immediate due to buffering. The application <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode①">streamErrorCode</a></code> in the <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror①④">WebTransportError</a></code> error is
-converted to an httpErrorCode, and vice versa, as specified in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.3">section 4.3</a>.</p>
+converted to an httpErrorCode, and vice versa, as specified in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.3">Section 4.3</a>.</p>
    <table class="data">
     <colgroup class="header">
      <col>
@@ -4666,9 +4665,9 @@ and has been adapted for use in this specification.</p>
    <dt id="biblio-infra">[INFRA]
    <dd>Anne van Kesteren; Domenic Denicola. <a href="https://infra.spec.whatwg.org/"><cite>Infra Standard</cite></a>. Living Standard. URL: <a href="https://infra.spec.whatwg.org/">https://infra.spec.whatwg.org/</a>
    <dt id="biblio-quic">[QUIC]
-   <dd>Jana Iyengar; Martin Thomson. <a href="https://tools.ietf.org/html/draft-ietf-quic-transport"><cite>QUIC: A UDP-Based Multiplexed and Secure Transport</cite></a>. Internet-Draft. URL: <a href="https://tools.ietf.org/html/draft-ietf-quic-transport">https://tools.ietf.org/html/draft-ietf-quic-transport</a>
+   <dd>Jana Iyengar; Martin Thomson. <a href="https://www.rfc-editor.org/rfc/rfc9000"><cite>QUIC: A UDP-Based Multiplexed and Secure Transport</cite></a>. Internet-Draft. URL: <a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>
    <dt id="biblio-quic-datagram">[QUIC-DATAGRAM]
-   <dd>Tommy Pauly; Eric Kinnear; David Schinazi. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-datagram/"><cite>An Unreliable Datagram Extension to QUIC</cite></a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-datagram/">https://datatracker.ietf.org/doc/html/draft-ietf-quic-datagram/</a>
+   <dd>Tommy Pauly; Eric Kinnear; David Schinazi. <a href="https://www.rfc-editor.org/rfc/rfc9221"><cite>An Unreliable Datagram Extension to QUIC</cite></a>. Internet-Draft. URL: <a href="https://www.rfc-editor.org/rfc/rfc9221">https://www.rfc-editor.org/rfc/rfc9221</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
    <dt id="biblio-rfc3279">[RFC3279]
@@ -4685,8 +4684,10 @@ and has been adapted for use in this specification.</p>
    <dd>Adam Rice; et al. <a href="https://streams.spec.whatwg.org/"><cite>Streams Standard</cite></a>. Living Standard. URL: <a href="https://streams.spec.whatwg.org/">https://streams.spec.whatwg.org/</a>
    <dt id="biblio-url">[URL]
    <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/"><cite>URL Standard</cite></a>. Living Standard. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
+   <dt id="biblio-web-transport-http2">[WEB-TRANSPORT-HTTP2]
+   <dd>Alan Frindell; et al. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/"><cite>WebTransport over HTTP/2</cite></a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/">https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/</a>
    <dt id="biblio-web-transport-http3">[WEB-TRANSPORT-HTTP3]
-   <dd>Victor Vasiliev. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/"><cite>WebTransport over HTTP/3</cite></a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/">https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/</a>
+   <dd>Alan Frindell; Eric Kinnear; Victor Vasiliev. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/"><cite>WebTransport over HTTP/3</cite></a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/">https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/</a>
    <dt id="biblio-web-transport-overview">[WEB-TRANSPORT-OVERVIEW]
    <dd>Victor Vasiliev. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview"><cite>WebTransport Protocol Framework</cite></a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview">https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview</a>
    <dt id="biblio-webidl">[WEBIDL]
@@ -4698,8 +4699,6 @@ and has been adapted for use in this specification.</p>
    <dd>S. Friedl; et al. <a href="https://www.rfc-editor.org/rfc/rfc7301"><cite>Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension</cite></a>. July 2014. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc7301">https://www.rfc-editor.org/rfc/rfc7301</a>
    <dt id="biblio-rfc8446">[RFC8446]
    <dd>E. Rescorla. <a href="https://www.rfc-editor.org/rfc/rfc8446"><cite>The Transport Layer Security (TLS) Protocol Version 1.3</cite></a>. August 2018. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>
-   <dt id="biblio-web-transport-http2">[WEB-TRANSPORT-HTTP2]
-   <dd>A. Frindell; et al. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/"><cite>WebTransport over HTTP/2</cite></a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/">https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/</a>
   </dl>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->), <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext"><c- g>SecureContext</c-></a>]
