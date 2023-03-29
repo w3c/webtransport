@@ -1280,6 +1280,7 @@ dictionary WebTransportStats {
   DOMHighResTimeStamp rttVariation;
   DOMHighResTimeStamp minRtt;
   WebTransportDatagramStats datagrams;
+  unsigned long long estimatedSendRate;
 };
 </pre>
 
@@ -1314,6 +1315,15 @@ The dictionary SHALL have the following attributes:
    [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
 : <dfn for="WebTransportStats" dict-member>minRtt</dfn>
 :: The minimum round-trip time observed on the entire connection.
+: <dfn for="WebTransportStats" dict-member>estimatedSendRate</dfn>
+:: The estimated rate at which queued data will be sent by the user agent, in bits per second.
+   This rate applies to all streams and datagrams that share a [=WebTransport session=]
+   and is calculated by the congestion control algorithm (potentially chosen by
+   {{WebTransport/congestionControl}}). If this [=WebTransport session=] is
+   pooled with others in a shared [=connection=], the value is undefined.
+   If the user agent does not have an estimate, the value is undefined.
+   The value change from defined to undefined or undefined to defined at any time.
+
 
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-stats}
 
