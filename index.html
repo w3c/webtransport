@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version d9bd89757, updated Thu Mar 23 10:06:53 2023 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="b20068df8eb5892fa4e522aa851be2ab061b9bbe" name="document-revision">
+  <meta content="b2b4b0779da4f3f992748de80d68ffea7bf44167" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -2936,6 +2936,13 @@ converted to an httpErrorCode, and vice versa, as specified in <a data-link-type
       <td>Network error<br> 
       <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed②">closed</a></code>) rejects, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑥">errors</a> open streams
    </table>
+   <p class="note" role="note"><span class="marker">Note:</span> As discussed in <a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> Section 3.2, receipt of a RESET_STREAM
+frame is not always indicated to the application. Receipt of the
+RESET_STREAM can be signaled immediately, interrupting delivery of
+stream data with any data not consumed being discarded. However,
+immediate signaling is not required. Also, if stream data
+is completely received but has not yet been read by the
+application, the RESET_STREAM signal can be suppressed.</p>
    <table class="data">
     <colgroup class="header">
      <col>
