@@ -2291,13 +2291,14 @@ Information about the network is available to the server either directly through
 its own networking stack, indirectly through the rate at which data is consumed
 or transmitted by the client, or as part of the statistics provided by the API
 (see [[#web-transport-stats]]).  Consequently, restrictions on information in
-user agents is unlikely to be the only way to manage privacy risks.
+user agents is not the only mechanism that might be needed to manage these
+privacy risks.
 
 ### Static Observations ### {#fp-static}
 
 A site can observe available network capacity or round trip time (RTT) between a
 user agent and a chosen server.  This information can be identifying when
-combined with other tracking vectors.  RTT can also reveal something of the
+combined with other tracking vectors.  RTT can also reveal something about the
 physical location of a user agent, especially if multiple measurements can be
 made from multiple vantage points.
 
@@ -2336,8 +2337,8 @@ session.  One session could infer information about the activity of another
 session, such as the rate at which another application is sending data.
 
 The use of a shared connection already allows the server to correlate sessions.
-Use of a [[fetch#network-partition-keys|network partition key]] disables pooling where use of a shared
-session might enable unwanted cross-site recognition.
+Use of a [[fetch#network-partition-keys|network partition key]] disables pooling
+where use of a shared session might enable unwanted cross-site recognition.
 
 
 # Examples #  {#examples}
