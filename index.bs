@@ -14,9 +14,9 @@ Former Editor: Robin Raymond, Optical Tone Ltd.
 Former Editor: Yutaka Hirano, Google
 Abstract:
   This document defines a set of ECMAScript APIs in WebIDL to allow data to be
-  sent and received between a browser and server, utilizing [[WEB-TRANSPORT-HTTP3]].
-  This specification is being developed in conjunction with a protocol
-  specification developed by the IETF WEBTRANS Working Group.
+  sent and received between a browser and server, utilizing [[!WEB-TRANSPORT-HTTP3]] 
+  and [[!WEB-TRANSPORT-HTTP2]]. This specification is being developed in conjunction 
+  with protocol specifications developed by the IETF WEBTRANS Working Group.
 Repository: w3c/webtransport
 Indent: 2
 Markup Shorthands: markdown yes
@@ -26,14 +26,14 @@ Boilerplate: omit conformance
 {
   "quic": {
     "authors": ["Jana Iyengar", "Martin Thomson"],
-    "href": "https://tools.ietf.org/html/draft-ietf-quic-transport",
+    "href": "https://www.rfc-editor.org/rfc/rfc9000",
     "title": "QUIC: A UDP-Based Multiplexed and Secure Transport",
     "status": "Internet-Draft",
     "publisher": "IETF"
   },
   "quic-datagram": {
     "authors": ["Tommy Pauly", "Eric Kinnear", "David Schinazi"],
-    "href": "https://datatracker.ietf.org/doc/html/draft-ietf-quic-datagram/",
+    "href": "https://www.rfc-editor.org/rfc/rfc9221",
     "title": "An Unreliable Datagram Extension to QUIC",
     "status": "Internet-Draft",
     "publisher": "IETF"
@@ -46,14 +46,14 @@ Boilerplate: omit conformance
     "publisher": "IETF"
   },
   "web-transport-http3": {
-    "authors": ["Victor Vasiliev"],
+    "authors": ["Alan Frindell", "Eric Kinnear", "Victor Vasiliev"],
     "href": "https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/",
     "title": "WebTransport over HTTP/3",
     "status": "Internet-Draft",
     "publisher": "IETF"
   },
-    "web-transport-http2": {
-    "authors": ["A. Frindell", "E. Kinnear", "T. Pauly", "M. Thomson", "V. Vasiliev", "G. Xie"],
+  "web-transport-http2": {
+    "authors": ["Alan Frindell", "Eric Kinnear", "Tommy Pauly", "Martin Thomson", "Victor Vasiliev", "Guowu Xie"],
     "href": "https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/",
     "title": "WebTransport over HTTP/2",
     "status": "Internet-Draft",
@@ -90,14 +90,14 @@ urlPrefix: https://heycam.github.io/webidl/; spec: WEBIDL
 
 *This section is non-normative.*
 
-This specification uses [[!WEB-TRANSPORT-HTTP3]] and [[WEB-TRANSPORT-HTTP2]] to
+This specification uses [[!WEB-TRANSPORT-HTTP3]] and [[!WEB-TRANSPORT-HTTP2]] to
 send data to and receive data from servers. It can be used like WebSockets but
 with support for multiple streams, unidirectional streams, out-of-order delivery,
 and reliable as well as unreliable transport.
 
 Note: The API presented in this specification represents a preliminary proposal
 based on work-in-progress within the IETF WEBTRANS WG. Since the [[!WEB-TRANSPORT-HTTP3]]
-and [[WEB-TRANSPORT-HTTP2]] specifications are a work-in-progress, both the protocol
+and [[!WEB-TRANSPORT-HTTP2]] specifications are a work-in-progress, both the protocol
 and API are likely to change significantly going forward.
 
 # Conformance #  {#conformance}
@@ -140,59 +140,65 @@ There may be multiple [=WebTransport sessions=] on one [=connection=], when pool
   <tr>
    <td><dfn>send a datagram</dfn>
    <td>[[!WEB-TRANSPORT-HTTP3]]
-   [section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
+   [Section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
   </tr>
   <tr>
    <td><dfn>receive a datagram</dfn>
    <td>[[!WEB-TRANSPORT-HTTP3]]
-   [section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
+   [Section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
   </tr>
   <tr>
    <td><dfn>create an [=stream/outgoing unidirectional=] stream</dfn>
    <td>[[!WEB-TRANSPORT-HTTP3]]
-   [section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
+   [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
   </tr>
   <tr>
    <td><dfn>create a [=stream/bidirectional=] stream</dfn>
    <td>[[!WEB-TRANSPORT-HTTP3]]
-   [section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2)
+   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2)
   </tr>
   <tr>
    <td><dfn>receive an [=stream/incoming unidirectional=] stream</dfn>
    <td>[[!WEB-TRANSPORT-HTTP3]]
-   [section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
+   [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
   </tr>
   <tr>
    <td><dfn>receive a [=stream/bidirectional=] stream</dfn>
    <td>[[!WEB-TRANSPORT-HTTP3]]
-   [section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2)
+   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2)
   </tr>
  </tbody>
 </table>
 
 To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=/origin=] |origin|,
 follow [[!WEB-TRANSPORT-HTTP3]]
-[section 3.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.3),
+[Section 3.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.3),
 with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomorphic encoded=],
 as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 
+A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
+HTTP/3 stream associated with the CONNECT request that initiated |session| receives an
+[=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when an HTTP/3
+[=session-signal/GOAWAY=] frame is received, as described in [[!WEB-TRANSPORT-HTTP3]]
+[Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6).
+
 To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an optional integer
 |code| and an optional [=byte sequence=] |reason|, follow [[!WEB-TRANSPORT-HTTP3]]
-[section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
+[Section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
 
 A [=WebTransport session=] |session| is <dfn for=session>terminated</dfn>, with optionally
 an integer |code| and a [=byte sequence=] |reason|, when the HTTP/3 stream associated with the
 CONNECT request that initiated |session| is closed by the server, as described at
 [[!WEB-TRANSPORT-HTTP3]]
-[section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
+[Section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
 
 <dfn>WebTransport stream</dfn> is a concept for HTTP/3 stream on a [=WebTransport session=].
 
 A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn>,
 <dfn for=stream>outgoing unidirectional</dfn> or <dfn for=stream>bidirectional</dfn>.
 
-[=WebTransport stream=] has the following capabilities:
+A [=WebTransport stream=] has the following capabilities:
 
 <table class="data" dfn-for="stream">
  <thead>
@@ -208,7 +214,7 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
   <tr>
    <td><dfn>send</dfn> bytes (potentially with FIN)
    <td>[[!QUIC]]
-   [section 2.2](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-2.2)
+   [Section 2.2](https://www.rfc-editor.org/rfc/rfc9000#section-2.2)
    <td>No
    <td>Yes
    <td>Yes
@@ -216,7 +222,7 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
   <tr>
    <td><dfn>receive</dfn> bytes (potentially with FIN)
    <td>[[!QUIC]]
-   [section 2.2](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-2.2)
+   [Section 2.2](https://www.rfc-editor.org/rfc/rfc9000#section-2.2)
    <td>Yes
    <td>No
    <td>Yes
@@ -224,7 +230,7 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
   <tr>
    <td><dfn>send STOP_SENDING</dfn>
    <td>[[!QUIC]]
-   [section 3.5](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-3.5)
+   [Section 3.5](https://www.rfc-editor.org/rfc/rfc9000#section-3.5)
    <td>Yes
    <td>No
    <td>Yes
@@ -232,7 +238,7 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
   <tr>
    <td><dfn>reset</dfn> a [=WebTransport stream=]
    <td>[[!QUIC]]
-   [section 19.4](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-19.4)
+   [Section 19.4](https://www.rfc-editor.org/rfc/rfc9000#section-19.4)
    <td>No
    <td>Yes
    <td>Yes
@@ -240,7 +246,30 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
  </tbody>
 </table>
 
-[=WebTransport stream=] has the following signals:
+A [=WebTransport session=] has the following signals:
+
+<table class="data" dfn-for="session-signal">
+ <thead>
+  <tr>
+   <th>event
+   <th>definition
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>DRAIN_WEBTRANSPORT_SESSION</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
+  </tr>
+  <tr>
+   <td><dfn>GOAWAY</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
+  </tr>
+ </tbody>
+</table>
+
+A [=WebTransport stream=] has the following signals:
 
 <table class="data" dfn-for="stream-signal">
  <thead>
@@ -256,7 +285,7 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
   <tr>
    <td><dfn>STOP_SENDING</dfn>
    <td>[[!QUIC]]
-   [section 3.5](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-3.5)
+   [Section 3.5](https://www.rfc-editor.org/rfc/rfc9000#section-3.5)
    <td>No
    <td>Yes
    <td>Yes
@@ -264,7 +293,7 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
   <tr>
    <td><dfn>RESET_STREAM</dfn>
    <td>[[!QUIC]]
-   [section 19.4](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-19.4)
+   [Section 19.4](https://www.rfc-editor.org/rfc/rfc9000#section-19.4)
    <td>Yes
    <td>No
    <td>Yes
@@ -272,7 +301,7 @@ A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn
   <tr>
    <td><dfn>flow control</dfn>
    <td>[[!QUIC]]
-   [section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport#section-4.1)
+   [Section 4.1](https://www.rfc-editor.org/rfc/rfc9000#section-4.1)
    <td>No
    <td>Yes
    <td>Yes
@@ -550,7 +579,7 @@ defined in [[!WEB-TRANSPORT-HTTP3]].
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
-interface WebTransport : EventTarget {
+interface WebTransport {
   constructor(USVString url, optional WebTransportOptions options = {});
 
   Promise&lt;WebTransportStats&gt; getStats();
@@ -558,6 +587,7 @@ interface WebTransport : EventTarget {
   readonly attribute WebTransportReliabilityMode reliability;
   readonly attribute WebTransportCongestionControl congestionControl;
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
+  readonly attribute Promise&lt;undefined&gt; draining;
   undefined close(optional WebTransportCloseInfo closeInfo = {});
 
   readonly attribute WebTransportDatagramDuplexStream datagrams;
@@ -571,10 +601,6 @@ interface WebTransport : EventTarget {
       optional WebTransportSendStreamOptions options = {});
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
-
-  attribute unsigned long rateControlFeedbackMinInterval;
-  attribute EventHandler onratecontrolfeedback;
-  [SameObject] readonly attribute WebTransportRateControlFeedback rateControlFeedback;
 };
 
 enum WebTransportReliabilityMode {
@@ -617,7 +643,7 @@ A {{WebTransport}} object has the following internal slots.
   <tr>
    <td><dfn>`[[State]]`</dfn>
    <td class="non-normative">An enum indicating the state of the transport. One of `"connecting"`,
-   `"connected"`, `"closed"`, and `"failed"`.
+   `"connected"`, `"draining"`, `"closed"`, and `"failed"`.
   </tr>
   <tr>
    <td><dfn>`[[Ready]]`</dfn>
@@ -640,19 +666,15 @@ A {{WebTransport}} object has the following internal slots.
    by the user agent, or `"default"`.
   </tr>
   <tr>
-   <td><dfn>`[[RateControlFeedbackMinInterval]]`</dfn>
-   <td class="non-normative">A {{long}} indicating the maximum frequency
-   that the {{WebTransport/ratecontrolfeedback}} will be fired.
-  </tr>
-  <tr>
-   <td><dfn>`[[RateControlFeedback]]`</dfn>
-   <td class="non-normative">A {{WebTransportRateControlFeedback}} providing
-    information about rate control.
-  </tr>
-  <tr>
    <td><dfn>`[[Closed]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated {{WebTransport}} object is
    closed gracefully, or rejected when it is closed abruptly or failed on initialization.
+  </tr>
+  <tr>
+   <td><dfn>`[[Draining]]`</dfn>
+   <td class="non-normative">A promise fulfilled when the associated [=WebTransport session=]
+   receives a [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule or a
+   [=session-signal/GOAWAY=] frame.
   </tr>
   <tr>
    <td><dfn>`[[Datagrams]]`</dfn>
@@ -687,10 +709,8 @@ agent MUST run the following steps:
    {{WebTransportOptions/congestionControl}}.
 1. If |congestionControl| is not `"default"`, and the user agent does not support any
    congestion control algorithms that optimize for |congestionControl|, as allowed by
-   [[!RFC9002]] [section 7](https://datatracker.ietf.org/doc/html/rfc9002#section-7),
+   [[!RFC9002]] [Section 7](https://www.rfc-editor.org/rfc/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
-1. Let |rateControlFeedbackMinInterval| be 1000 milliseconds.
-1. Let |rateControlFeedback| be a [=new=] {{WebTransportRateControlFeedback}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
@@ -713,11 +733,9 @@ agent MUST run the following steps:
     :: "pending"
     : {{[[CongestionControl]]}}
     :: |congestionControl|
-    : {{[[RateControlFeedbackMinInterval]]}}
-    :: |rateControlFeedbackMinInterval|
-    : {{[[RateControlFeedback]]}}
-    :: |rateControlFeedback|
     : {{[[Closed]]}}
+    :: a new promise
+    : {{[[Draining]]}}
     :: a new promise
     : {{[[Datagrams]]}}
     :: |datagrams|
@@ -807,7 +825,7 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
     1. Set |transport|.{{[[State]]}} to `"connected"`.
     1. Set |transport|.{{[[Session]]}} to |session|.
     1. If the connection is an HTTP/3 connection, set |transport|'s {{[[Reliability]]}} to `"supports-unreliable"`.
-    1. If the connection is an HTTP/2 connection [[WEB-TRANSPORT-HTTP2]], set |transport|'s {{[[Reliability]]}} to `"reliable-only"`.
+    1. If the connection is an HTTP/2 connection [[!WEB-TRANSPORT-HTTP2]], set |transport|'s {{[[Reliability]]}} to `"reliable-only"`.
     1. [=Resolve=] |transport|.{{[[Ready]]}} with undefined.
 
 </div>
@@ -862,6 +880,8 @@ these steps.
 :: On getting, it MUST return [=this=]'s {{[[Ready]]}}.
 : <dfn for="WebTransport" attribute>closed</dfn>
 :: On getting, it MUST return [=this=]'s {{[[Closed]]}}.
+: <dfn for="WebTransport" attribute>draining</dfn>
+:: On getting, it MUST return [=this=]'s {{[[Draining]]}}.
 : <dfn for="WebTransport" attribute>datagrams</dfn>
 :: A single duplex stream for sending and receiving datagrams over this session.
    The getter steps for the `datagrams` attribute SHALL be:
@@ -889,25 +909,6 @@ these steps.
    throughput or low latency for sending on this connection. If a preference was
    requested but not satisfied, then the value is `"default"`
    The getter steps are to return [=this=]'s {{[[CongestionControl]]}}.
-
-: <dfn for="WebTransport" attribute>rateControlFeedbackMinInterval</dfn>
-:: The minimum interval between any two times when
-   the {{WebTransport/ratecontrolfeedback}} event is fired.
-   This effectively allows the application
-   to control the maximum frequency of this event.
-
-: <dfn for="WebTransport" attribute>onratecontrolfeedback</dfn>
-:: An [=event handler IDL attribute=] whose [=event handler event type=] is
-    {{WebTransport/ratecontrolfeedback}}.
-
-: <dfn for="WebTransport" attribute>rateControlFeedback</dfn>
-:: Information useful for the application to control the rate at which it sends data.
-
-## Events ## {#webtransport-events}
-
-: <dfn event for=WebTransport>ratecontrolfeedback</dfn>
-:: Fired at the {{WebTransport}} when the {{WebTransport/rateControlFeedback}} has
-    changed.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -1279,6 +1280,7 @@ dictionary WebTransportStats {
   DOMHighResTimeStamp rttVariation;
   DOMHighResTimeStamp minRtt;
   WebTransportDatagramStats datagrams;
+  unsigned long long? estimatedSendRate;
 };
 </pre>
 
@@ -1313,6 +1315,15 @@ The dictionary SHALL have the following attributes:
    [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
 : <dfn for="WebTransportStats" dict-member>minRtt</dfn>
 :: The minimum round-trip time observed on the entire connection.
+: <dfn for="WebTransportStats" dict-member>estimatedSendRate</dfn>
+:: The estimated rate at which queued data will be sent by the user agent, in bits per second.
+   This rate applies to all streams and datagrams that share a [=WebTransport session=]
+   and is calculated by the congestion control algorithm (potentially chosen by
+   {{WebTransport/congestionControl}}). If this [=WebTransport session=] is
+   pooled with others in a shared [=connection=], or if the user agent does not
+   currently have an estimate, the member MUST be [=map/exist|absent=].
+   The member can be absent even if present in previous results.
+
 
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
 
@@ -1343,7 +1354,6 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportDatagramStats" dict-member>lostOutgoing</dfn>
 :: The number of sent datagrams that were declared lost, as defined in
    [[!RFC9002]] [Section 6.1](https://www.rfc-editor.org/rfc/rfc9002#section-6.1).
-
 
 # Interface `WebTransportSendStream` #  {#send-stream}
 
@@ -1526,7 +1536,7 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
 1. If |code| > 255, then set |code| to 255.
 
    Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
-         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[!WEB-TRANSPORT-HTTP3]].
 
 1. Run the following steps [=in parallel=]:
   1. [=stream/Reset=] |stream|.{{WebTransportSendStream/[[InternalStream]]}} with |code|.
@@ -1545,7 +1555,7 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportSendStream}} 
 1. Let |code| be the application protocol error code attached to the STOP_SENDING frame. [[!QUIC]]
 
    Note: Valid values of |code| are from 0 to 255 inclusive. The code has been decoded from a number in
-         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[!WEB-TRANSPORT-HTTP3]].
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
@@ -1751,7 +1761,7 @@ steps.
 1. If |code| > 255, then set |code| to 255.
 
    Note: Valid values of |code| are from 0 to 255 inclusive. The code will be encoded to a number in
-         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[!WEB-TRANSPORT-HTTP3]].
 
 1. [=set/Remove=] |stream| from |transport|.{{[[SendStreams]]}}.
 1. Run the following steps [=in parallel=]:
@@ -1777,7 +1787,7 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportReceiveStream
 1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
 
    Note: Valid values of |code| are from 0 to 255 inclusive. The code has been decoded from a number in
-         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[WEB-TRANSPORT-HTTP3]].
+         [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in [[!WEB-TRANSPORT-HTTP3]].
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
@@ -1887,77 +1897,6 @@ object |transport|, and a |sendOrder|, run these steps.
 
 </div>
 
-# Interface `WebTransportRateControlFeedback` #  {#rate-control-feedback}
-
-A {{WebTransportRateControlFeedback}} contains information
-useful for the application to adapt the rate at which it sends data.
-
-<pre class="idl">
-[Exposed=(Window,Worker), SecureContext]
-interface WebTransportRateControlFeedback {
-  readonly attribute unsigned long long? sendRate;
-};
-</pre>
-
-## Internal slots ## {#rate-control-feedback-internal-slots}
-
-A {{WebTransportRateControlFeedback}} has the following internal slots.
-
-<table class="data" dfn-for="WebTransportRateControlFeedback" dfn-type="attribute">
- <thead>
-  <tr>
-   <th>Internal Slot
-   <th>Description (<em>non-normative</em>)
-  </tr>
- </thead>
- <tbody>
-  <tr>
-   <td><dfn>`[[SendRate]]`</dfn>
-   <td class="non-normative">The rate at which the {{WebTransport}} dequeues and sends data,
-   which is the maximum rate the application can send at without inducing queue buildup.
-  </tr>
- </tbody>
-</table>
-
-## Attributes ##  {#rate-control-feedback-attributes}
-
-: <dfn for="WebTransportRateControlFeedback" attribute>sendRate</dfn>
-:: The getter steps are to return [=this=]'s {{WebTransportRateControlFeedback/[[SendRate]]}}.
-   This is the rate at which queued data will be dequeued and sent by the user agent, in bits per second.
-   If the application wishes to avoid queuing, it can send at a rate less than this value.
-   This rate applies to all streams and datagrams that share a [=WebTransport session=]
-   and is calculated by the congestion control algorithm (potentially chosen by
-   {{WebTransport/congestionControl}}). If this [=WebTransport session=] is
-   pooled with others in a shared [=connection=], it is the rate at which the user
-   agent will drain the queues for this [=WebTransport session=].  If the user agent cannot
-   determine a value (perhaps because of pooling), it may leave the value unset.
-
-## Procedures ## {#rate-control-feedback-procedures}
-
-<div algorithm="create a WebTransportRateControlFeedback">
-
-To <dfn for=WebTransportRateControlFeedback>create</dfn> a {{WebTransportRateControlFeedback}}, given a |sendRate|, run these steps:
-
-1. Let |feedback| be a [=new=] {{WebTransportRateControlFeedback}}, with:
-    : {{WebTransportRateControlFeedback/[[SendRate]]}}
-    :: |sendRate|
-1. Return |feedback|.
-
-</div>
-
-<div algorithm="updating a WebTransportRateControlFeedback">
-
-When the user agent changes the rate at which it dequeues bytes for sending on a
-{{WebTransport}} |transport|'s [=WebTransport session=],
-it MUST [=queue a network task=] with |transport| to run these steps:
-
-1. Set |transport|.{{WebTransport/rateControlFeedback}}.{{WebTransportRateControlFeedback/[[SendRate]]}}
-    to the new rate for [=WebTransport session=].
-1. [=Fire an event=] named {{WebTransport/ratecontrolfeedback}} at |transport|.
-
-</div>
-
-
 # `WebTransportError` Interface #  {#web-transport-error-interface}
 
 <dfn interface>WebTransportError</dfn> is a subclass of {{DOMException}} that represents
@@ -2056,11 +1995,11 @@ Their [=deserialization steps=], given |serialized| and |value|, are:
 *This section is non-normative.*
 
 This section describes the [[QUIC]] protocol behavior of methods defined
-in this specification, utilizing [[WEB-TRANSPORT-HTTP3]]. Cause and effect may
+in this specification, utilizing [[!WEB-TRANSPORT-HTTP3]]. Cause and effect may
 not be immediate due to buffering. The application
 {{WebTransportError/streamErrorCode}} in the {{WebTransportError}} error is
 converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-HTTP3]]
-[section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.3).
+[Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.3).
 
   <table class="data">
     <colgroup class="header"><col></colgroup>
@@ -2149,6 +2088,48 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
       </tr>
     </tbody>
   </table>
+  
+Note: As discussed in [[QUIC]] Section 3.2, receipt of a RESET_STREAM
+frame is not always indicated to the application. Receipt of the
+RESET_STREAM can be signaled immediately, interrupting delivery of
+stream data with any data not consumed being discarded. However,
+immediate signaling is not required. Also, if stream data
+is completely received but has not yet been read by the
+application, the RESET_STREAM signal can be suppressed.
+  
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>WebTransport Protocol Action</th>
+        <th>API Effect</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>received [=session-signal/DRAIN_WEBTRANSPORT_SESSION=]</td>
+        <td>await wt.{{WebTransport/draining}}</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>HTTP/3 Protocol Action</th>
+        <th>API Effect</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>received [=session-signal/GOAWAY=]</td>
+        <td>await wt.{{WebTransport/draining}}</td>
+      </tr>
+    </tbody>
+  </table>
 
 # Privacy and Security Considerations #  {#privacy-security}
 
@@ -2189,7 +2170,7 @@ WebTransport imposes a set of requirements as described in
 
 1. Ensuring that the remote server is aware that the WebTransport protocol is in
    use and confirming that the remote server is willing to use the WebTransport
-   protocol. [[WEB-TRANSPORT-HTTP3]] uses a combination of ALPN [[RFC7301]], an
+   protocol. [[!WEB-TRANSPORT-HTTP3]] uses a combination of ALPN [[RFC7301]], an
    HTTP/3 setting, and a `:protocol` pseudo-header to identify the WebTransport
    protocol.
 1. Allowing the server to filter connections based on the origin of the resource
@@ -2339,7 +2320,6 @@ session, such as the rate at which another application is sending data.
 The use of a shared connection already allows the server to correlate sessions.
 Use of a [[fetch#network-partition-keys|network partition key]] disables pooling
 where use of a shared session might enable unwanted cross-site recognition.
-
 
 # Examples #  {#examples}
 
