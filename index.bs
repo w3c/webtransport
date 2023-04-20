@@ -802,7 +802,9 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
      |serverCertificateHashes| returns false or the certificate does not satisfy [=custom certificate requirements=],
      then abort the remaining steps and [=queue a network task=] with |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-    1. [=Cleanup=] |transport| with a {{SecurityError}}.
+    1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+       {{WebTransportErrorOptions/source}} is `"session"`.
+    1. [=Cleanup=] |transport| with |error|.
   1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
      represents the SETTINGS frame.
   1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
