@@ -478,13 +478,13 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 1. If |queue| is empty, then:
   1. Set |datagrams|.{{[[IncomingDatagramsPullPromise]]}} to a new promise.
   1. Return |datagrams|.{{[[IncomingDatagramsPullPromise]]}}.
-1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
+1. Let |datagram| and |timestamp| be the result of [=dequeuing=] |queue|.
 1. Let |buffer|, |offset|, |maxBytes|, and |chunk| be null.
 1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
    [=ReadableStream/current BYOB request view=] is not null, then:
   1. Let |view| be |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
      [=ReadableStream/current BYOB request view=].
-  1. If |view|'s [=BufferSource/byte length=] is less than the size of |bytes|,
+  1. If |view|'s [=BufferSource/byte length=] is less than the size of |datagram|,
      [=ReadableStream/error=] |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}
      with a {{RangeError}}.
   1. Otherwise:
@@ -494,11 +494,11 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
     1. Set |chunk| to |view|.
 1. Otherwise:
   1. Set |offset| to 0.
-  1. Set |maxBytes| to the size of |bytes|.
+  1. Set |maxBytes| to the size of |datagram|.
   1. Set |buffer| be a [=new=] {{ArrayBuffer}} with |maxBytes| size. If allocating the
      {{ArrayBuffer}} fails, return [=a promise rejected with=] a {{RangeError}}.
   1. Set |chunk| to a new {{Uint8Array}} object with |buffer| and |offset|.
-1. Write |bytes| into |buffer| with offset |offset|, up to |maxBytes| bytes.
+1. Write |datagram| into |buffer| with offset |offset|, up to |maxBytes| bytes.
 1. [=ReadableStream/Enqueue=] |chunk| to |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 1. Return [=a promise resolved with=] undefined.
 
