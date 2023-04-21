@@ -484,14 +484,15 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
    [=ReadableStream/current BYOB request view=] is not null, then:
   1. Let |view| be |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
      [=ReadableStream/current BYOB request view=].
-  1. If |view|'s [=BufferSource/byte length=] is less than the size of |datagram|,
-     [=ReadableStream/error=] |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}
-     with a {{RangeError}}.
-  1. Otherwise:
-    1. Set |offset| to |view|.\[[ByteOffset]].
-    1. Set |maxBytes| to |view|'s [=BufferSource/byte length=].
-    1. Set |buffer| to |view|'s [=BufferSource/underlying buffer=].
-    1. Set |chunk| to |view|.
+  1. If |view|'s [=BufferSource/byte length=] is less than the size of |datagram|, then:
+    1. Let |error| be a new {{RangeError}} exception.
+    1. [=ReadableStream/Error=] |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}
+        with |error|.
+    1. Return [=a promise rejected with=] |error|.
+  1. Set |offset| to |view|.\[[ByteOffset]].
+  1. Set |maxBytes| to |view|'s [=BufferSource/byte length=].
+  1. Set |buffer| to |view|'s [=BufferSource/underlying buffer=].
+  1. Set |chunk| to |view|.
 1. Otherwise:
   1. Set |offset| to 0.
   1. Set |maxBytes| to the size of |datagram|.
