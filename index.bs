@@ -791,16 +791,12 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
   1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
      |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|. If the user agent
      supports more than one congestion control algorithm, choose one appropriate for
-     |congestionControl| for sending of data on this |connection|.
+     |congestionControl| for sending of data on this |connection|. When obtaining a connection, if
+     |serverCertificateHashes| is specified instead of the default certificate version algorithm,
+     validate the certificate against [=custom certificate requirements=], and then
+     [=verify a certificate hash|verify the certificate hash=] against |serverCertificateHashes|.
   1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
-    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-    1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
-       {{WebTransportErrorOptions/source}} is `"session"`.
-    1. [=Cleanup=] |transport| with |error|.
-  1. If [=verify a certificate hash|verifying the certificate hash=] from |connection| against
-     |serverCertificateHashes| returns false or the certificate does not satisfy [=custom certificate requirements=],
-     then abort the remaining steps and [=queue a network task=] with |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
     1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
        {{WebTransportErrorOptions/source}} is `"session"`.
