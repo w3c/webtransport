@@ -79,6 +79,7 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMA
     text: pending; url: sec-promise-objects
     text: resolved; url: sec-promise-objects
     text: settled; url: sec-promise-objects
+    text: the typed array constructors table; url: #table-49
 urlPrefix: https://heycam.github.io/webidl/; spec: WEBIDL
   type: dfn
     text: created; for:DOMException; url: dfn-create-exception
@@ -479,7 +480,6 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
   1. Set |datagrams|.{{[[IncomingDatagramsPullPromise]]}} to a new promise.
   1. Return |datagrams|.{{[[IncomingDatagramsPullPromise]]}}.
 1. Let |datagram| and |timestamp| be the result of [=dequeuing=] |queue|.
-1. Let |buffer|, |offset|, |maxBytes|, and |chunk| be null.
 1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
    [=ReadableStream/current BYOB request view=] is not null, then:
   1. Let |view| be |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
@@ -489,18 +489,15 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
     1. [=ReadableStream/Error=] |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}
         with |error|.
     1. Return [=a promise rejected with=] |error|.
-  1. Set |offset| to |view|.\[[ByteOffset]].
-  1. Set |maxBytes| to the size of |datagram|.
-  1. Set |buffer| to |view|'s [=BufferSource/underlying buffer=].
-  1. Set |chunk| to a new {{Uint8Array}} object with |buffer|, |offset|, and the size of |datagram|.
-1. Otherwise:
-  1. Set |offset| to 0.
-  1. Set |maxBytes| to the size of |datagram|.
-  1. Set |buffer| be a [=new=] {{ArrayBuffer}} with |maxBytes| size. If allocating the
-     {{ArrayBuffer}} fails, return [=a promise rejected with=] a {{RangeError}}.
-  1. Set |chunk| to a new {{Uint8Array}} object with |buffer| and |offset|.
-1. Write |datagram| into |buffer| with offset |offset|, up to |maxBytes| bytes.
-1. [=ReadableStream/Enqueue=] |chunk| to |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
+  1. Let |elementSize| be the element size specified in [=the typed array constructors table=] for
+     |view|.\[[TypedArrayName]]. If |view| does not have a [[TypedArrayName]] internal slot
+     (i.e. it is a {{DataView}}), let |elementSize| be 0.
+  1. If |elementSize| is not 1, then:
+    1. Let |error| be a new {{TypeError}} exception.
+    1. [=ReadableStream/Error=] |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}
+        with |error|.
+    1. Return [=a promise rejected with=] |error|.
+1. [=ReadableStream/Pull from bytes=] |datagram| into |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 1. Return [=a promise resolved with=] undefined.
 
 To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
