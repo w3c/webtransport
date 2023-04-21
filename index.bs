@@ -490,9 +490,9 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
         with |error|.
     1. Return [=a promise rejected with=] |error|.
   1. Set |offset| to |view|.\[[ByteOffset]].
-  1. Set |maxBytes| to |view|'s [=BufferSource/byte length=].
+  1. Set |maxBytes| to the size of |datagram|.
   1. Set |buffer| to |view|'s [=BufferSource/underlying buffer=].
-  1. Set |chunk| to |view|.
+  1. Set |chunk| to a new {{Uint8Array}} object with |buffer|, |offset|, and the size of |datagram|.
 1. Otherwise:
   1. Set |offset| to 0.
   1. Set |maxBytes| to the size of |datagram|.
