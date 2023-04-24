@@ -484,19 +484,12 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
    [=ReadableStream/current BYOB request view=] is not null, then:
   1. Let |view| be |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
      [=ReadableStream/current BYOB request view=].
-  1. If |view|'s [=BufferSource/byte length=] is less than the size of |datagram|, then:
-    1. Let |error| be a new {{RangeError}} exception.
-    1. [=ReadableStream/Error=] |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}
-        with |error|.
-    1. Return [=a promise rejected with=] |error|.
+  1. If |view|'s [=BufferSource/byte length=] is less than the size of |datagram|, return
+     [=a promise rejected with=] a {{RangeError}}.
   1. Let |elementSize| be the element size specified in [=the typed array constructors table=] for
      |view|.\[[TypedArrayName]]. If |view| does not have a \[[TypedArrayName]] internal slot
      (i.e. it is a {{DataView}}), let |elementSize| be 0.
-  1. If |elementSize| is not 1, then:
-    1. Let |error| be a new {{TypeError}} exception.
-    1. [=ReadableStream/Error=] |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}
-        with |error|.
-    1. Return [=a promise rejected with=] |error|.
+  1. If |elementSize| is not 1, return [=a promise rejected with=] a {{TypeError}}.
 1. [=ReadableStream/Pull from bytes=] |datagram| into |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 1. Return [=a promise resolved with=] undefined.
 
