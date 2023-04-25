@@ -1368,6 +1368,7 @@ data to the server.
 [Exposed=(Window,Worker), SecureContext, Transferable]
 interface WebTransportSendStream : WritableStream {
   Promise&lt;WebTransportSendStreamStats&gt; getStats();
+  WebTransportAtomicWriter getAtomicWriter();
 };
 </pre>
 
@@ -1394,6 +1395,20 @@ The {{WebTransportSendStream}}'s [=transfer steps=] and
               representing the gathered stats.
            1. [=Resolve=] |p| with |stats|.
      1. Return |p|.
+
+: <dfn for="WebTransportSendStream" method>getAtomicWriter()</dfn>
+:: For transactional applications where blocking on flow control can be an
+   issue, the following alternative writer API gives the application
+   additional control.
+
+   Implemented on top of the default writer, except any data the sink cannot
+   send atomically is dropped without erroring the stream, causing the
+    promise to settle with false.
+
+   When getAtomicWriter is called, the user agent MUST run the following steps:
+     1. Let |writer| be the result of calling [=WritableStream/getWriter()=] on super.
+     1. Set [=this=].{{WebTransportSendStream/[[AtomicWriting]]}} to true.
+     1. Return |writer|.
 
 ## Internal Slots ## {#send-stream-internal-slots}
 
@@ -1424,6 +1439,10 @@ A {{WebTransportSendStream}} has the following internal slots.
    <td><dfn>`[[SendOrder]]`</dfn>
    <td class="non-normative">An optional send order number, or null.
   </tr>
+  <tr>
+   <td><dfn>`[[AtomicWriting]]`</dfn>
+   <td class="non-normative">A boolean reflecting atomic writing mode.
+  </tr>
  <tbody>
 </table>
 
@@ -1444,6 +1463,8 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
     :: |transport|
     : {{WebTransportSendStream/[[SendOrder]]}}
     :: |sendOrder|
+    : {{WebTransportSendStream/[[AtomicWriting]]}}
+    :: false
 1. Let |writeAlgorithm| be an action that [=writes=] |chunk| to |stream|, given |chunk|.
 1. Let |closeAlgorithm| be an action that [=closes=] |stream|.
 1. Let |abortAlgorithm| be an action that [=aborts=] |stream| with |reason|, given |reason|.
@@ -1486,6 +1507,11 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
      sent.
 
+     If flow control blocks [=this=] stream before |bytes| could be sent in its
+     entirety, and [=this=].{{WebTransportSendStream/[[AtomicWriting]]}} is true,
+     then immediately skip sending the remainder of |bytes|, [=Resolve=]
+     |promise| with false, and abort these steps.
+
   1. If the previous step failed, abort the remaining steps.
 
     Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
@@ -1493,7 +1519,8 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 
   1. [=Queue a network task=] with |transport| to run these steps:
     1. Set |stream|.{{[[PendingOperation]]}} to null.
-    1. [=Resolve=] |promise| with undefined.
+    1. If [=this=].{{WebTransportSendStream/[[AtomicWriting]]}} is true, then
+       [=Resolve=] |promise| with true, otherwise [=Resolve=] |promise| with undefined.
 1. Return |promise|.
 
 Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
@@ -1896,6 +1923,17 @@ object |transport|, and a |sendOrder|, run these steps.
 1. Return |stream|.
 
 </div>
+
+# `WebTransportAtomicWriter` Interface #  {#web-transport-atomic-writer-interface}
+
+{{WebTransportAtomicWriter}} is a specialized version of {{WritableStreamDefaultWriter}}.
+
+<pre class="idl">
+[Exposed=*]
+interface WebTransportAtomicWriter : WritableStreamDefaultWriter {
+  Promise&lt;bool&gt; write(optional any chunk);
+};
+</pre>
 
 # `WebTransportError` Interface #  {#web-transport-error-interface}
 
@@ -2388,6 +2426,26 @@ async function receiveText(url, createWritableStreamForTextData) {
     } catch (e) {
       console.error(e);
     }
+  }
+}
+</pre>
+
+## Sending a transactional chunk on a stream ##  {#example-transactional-stream}
+
+*This section is non-normative.*
+
+Sending transactional pieces of data on a one-way stream can be achieved by using the
+{{WebTransportSendStream/getAtomicWriter}} function and the resulting writer.
+
+<pre class="example" highlight="js">
+async function sendTransactionalData(writable, bytes) {
+  const atomicWriter = writable.getAtomicWriter();
+  try {
+    await atomicWriter.ready;
+    const wasSent = await atomicWriter.write(bytes);
+    return wasSent; // false if bytes couldn't be written all-or-nothing
+  } finally {
+    atomicWriter.releaseLock();
   }
 }
 </pre>
