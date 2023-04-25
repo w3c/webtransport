@@ -2157,11 +2157,11 @@ ways to persistently store state, nor does it automatically expose any of
 the existing persistent state to the server. For instance, neither
 [[WEB-TRANSPORT-HTTP3]] nor [[WEB-TRANSPORT-HTTP2]] send cookies or support
 HTTP authentication or caching invalidation mechanisms.  Since they do use
-TLS, they may support TLS session tickets, which while not visible to
-passive network observers, could be used by the server to correlate different
-connections from the same client.
+TLS, they inherit TLS persistent state such as TLS session tickets,
+which while not visible to passive network observers, could be used by
+the server to correlate different connections from the same client.
   
-Since [[WEB-TRANSPORT-HTTP3]] utilizes [[QUIC]], it does rely on QUIC state
+Since [[WEB-TRANSPORT-HTTP3]] utilizes [[QUIC]], it relies on QUIC state
 persistence, which includes QUIC connection state and address validation tokens,
 defined in [[QUIC]] Section 8.
 
