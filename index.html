@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version bf22245b8, updated Tue Apr 18 15:53:37 2023 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="ef932269847de382b0b9b8c7153eadef9fedea29" name="document-revision">
+  <meta content="85fc448fccfa9c0f0cb185ddc3ce48e2311c8de8" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -3004,16 +3004,13 @@ infrastructure for authentication of the remote server. In WebTransport,
 certificate verification errors are fatal; no interstitial allowing bypassing
 certificate validation is available.</p>
    <h3 class="heading settled" data-level="11.2" id="state-persistence"><span class="secno">11.2. </span><span class="content">State Persistence</span><a class="self-link" href="#state-persistence"></a></h3>
-   <p>WebTransport by itself does not create any new unique identifiers or new ways
-to persistently store state, nor does it automatically expose any of the
-existing persistent state to the server. For instance, none of the transports
-defined in this document automatically send cookies, support HTTP
-authentication or caching invalidation mechanisms. Since they use TLS, they may
-support TLS session tickets, which could be used by the server (though not by
-passive network observers) to correlate different connections from the same
-client. This is not specific to WebTransport by itself, but rather an inherent
-property of all TLS-based protocols; thus, this is out-of-scope for this
-specification.</p>
+   <p>WebTransport does not by itself create any new unique identifiers or new
+ways to persistently store state, nor does it automatically expose any of
+the existing persistent state to the server. For instance, neither <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> nor <a data-link-type="biblio" href="#biblio-web-transport-http2" title="WebTransport over HTTP/2">[WEB-TRANSPORT-HTTP2]</a> send cookies or support
+HTTP authentication or caching invalidation mechanisms.  Since they do use
+TLS, they inherit TLS persistent state such as TLS session tickets,
+which while not visible to passive network observers, could be used by
+the server to correlate different connections from the same client.</p>
    <h3 class="heading settled" data-level="11.3" id="protocol-security"><span class="secno">11.3. </span><span class="content">Protocol Security</span><a class="self-link" href="#protocol-security"></a></h3>
    <p>WebTransport imposes a set of requirements as described in <a data-link-type="biblio" href="#biblio-web-transport-overview" title="WebTransport Protocol Framework">[WEB-TRANSPORT-OVERVIEW]</a>, including:</p>
    <ol>
