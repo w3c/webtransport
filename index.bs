@@ -2152,16 +2152,17 @@ certificate validation is available.
 
 ## State Persistence ##  {#state-persistence}
 
-WebTransport by itself does not create any new unique identifiers or new ways
-to persistently store state, nor does it automatically expose any of the
-existing persistent state to the server. For instance, none of the transports
-defined in this document automatically send cookies, support HTTP
-authentication or caching invalidation mechanisms. Since they use TLS, they may
-support TLS session tickets, which could be used by the server (though not by
-passive network observers) to correlate different connections from the same
-client. This is not specific to WebTransport by itself, but rather an inherent
-property of all TLS-based protocols; thus, this is out-of-scope for this
-specification.
+WebTransport does not by itself create any new unique identifiers or new
+ways to persistently store state, nor does it automatically expose any of
+the existing persistent state to the server. For instance, neither
+[[WEB-TRANSPORT-HTTP3]] nor [[WEB-TRANSPORT-HTTP2]] send cookies or support
+HTTP authentication or caching invalidation mechanisms.  Since they do use
+TLS, they may support TLS session tickets, which while not visible to
+passive network observers, could be used by the server to correlate different
+connections from the same client.
+  
+Since [[WEB-TRANSPORT-HTTP3]] utilizes [[QUIC]], it does rely on QUIC state
+persistence, which includes QUIC connection state and address validation tokens.
 
 ## Protocol Security ##  {#protocol-security}
 
