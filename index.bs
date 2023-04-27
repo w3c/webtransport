@@ -792,10 +792,11 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
      |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|. If the user agent
      supports more than one congestion control algorithm, choose one appropriate for
      |congestionControl| for sending of data on this |connection|. When obtaining a connection, if
-     |serverCertificateHashes| is specified instead of the default certificate verification algorithm,
-     validate the certificate against [=custom certificate requirements=], and then
-     [=verify a certificate hash|verify the certificate hash=] against |serverCertificateHashes|.
-     The certificate is considered valid if and only if both of those checks pass.
+     |serverCertificateHashes| is specified, instead of using the default certificate verification
+     algorithm, consider the certificate valid if it meets the [=custom certificate
+     requirements=] and if [=verify a certificate hash|verifying the certificate hash=] against
+     |serverCertificateHashes| returns true. If either condition is not met, let |connection| be
+     failure.
   1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
