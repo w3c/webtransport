@@ -1915,12 +1915,12 @@ interface WebTransportError : DOMException {
   constructor(optional DOMString message = "", optional WebTransportErrorOptions options = {});
 
   readonly attribute WebTransportErrorSource source;
-  readonly attribute octet? streamErrorCode;
+  readonly attribute unsigned long? streamErrorCode;
 };
 
 dictionary WebTransportErrorOptions {
   WebTransportErrorSource source = "stream";
-  [Clamp] octet? streamErrorCode = null;
+  [Clamp] unsigned long? streamErrorCode = null;
 };
 
 enum WebTransportErrorSource {
