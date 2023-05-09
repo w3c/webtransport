@@ -1372,6 +1372,7 @@ data to the server.
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext, Transferable]
 interface WebTransportSendStream : WritableStream {
+  attribute long long? sendOrder;
   Promise&lt;WebTransportSendStreamStats&gt; getStats();
 };
 </pre>
@@ -1382,6 +1383,14 @@ A {{WebTransportSendStream}} is always created by the
 The {{WebTransportSendStream}}'s [=transfer steps=] and
 [=transfer-receiving steps=] are
 [those of](https://streams.spec.whatwg.org/#ws-transfer) {{WritableStream}}.
+
+## Attributes ##  {#send-stream-attributes}
+
+: <dfn for="WebTransportSendStream" attribute>sendOrder</dfn>
+:: The getter steps are:
+     1. Return [=this=]'s {{WebTransportSendStream/[[SendOrder]]}}.
+:: The setter steps, given |value|, are:
+     1. Set [=this=].{{WebTransportSendStream/[[SendOrder]]}} to |value|.
 
 ## Methods ##  {#send-stream-methods}
 
@@ -1490,6 +1499,10 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      non-null and higher {{[[SendOrder]]}}, that are neither
      [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
      sent.
+
+    Note: We access |stream|.{{[[SendOrder]]}} [=in parallel=] here. User agents SHOULD
+    respond to live updates of these values during sending, though the details are
+    [=implementation-defined=].
 
   1. If the previous step failed, abort the remaining steps.
 
