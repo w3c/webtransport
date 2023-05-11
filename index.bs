@@ -79,6 +79,7 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMA
     text: pending; url: sec-promise-objects
     text: resolved; url: sec-promise-objects
     text: settled; url: sec-promise-objects
+    text: the typed array constructors table; url: #table-49
 urlPrefix: https://heycam.github.io/webidl/; spec: WEBIDL
   type: dfn
     text: created; for:DOMException; url: dfn-create-exception
@@ -478,9 +479,18 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 1. If |queue| is empty, then:
   1. Set |datagrams|.{{[[IncomingDatagramsPullPromise]]}} to a new promise.
   1. Return |datagrams|.{{[[IncomingDatagramsPullPromise]]}}.
-1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
-1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
-1. [=ReadableStream/Enqueue=] |chunk| to |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
+1. Let |datagram| and |timestamp| be the result of [=dequeuing=] |queue|.
+1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
+   [=ReadableStream/current BYOB request view=] is not null, then:
+  1. Let |view| be |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
+     [=ReadableStream/current BYOB request view=].
+  1. If |view|'s [=BufferSource/byte length=] is less than the size of |datagram|, return
+     [=a promise rejected with=] a {{RangeError}}.
+  1. Let |elementSize| be the element size specified in [=the typed array constructors table=] for
+     |view|.\[[TypedArrayName]]. If |view| does not have a \[[TypedArrayName]] internal slot
+     (i.e. it is a {{DataView}}), let |elementSize| be 0.
+  1. If |elementSize| is not 1, return [=a promise rejected with=] a {{TypeError}}.
+1. [=ReadableStream/Pull from bytes=] |datagram| into |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 1. Return [=a promise resolved with=] undefined.
 
 To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
@@ -743,8 +753,15 @@ agent MUST run the following steps:
     :: null
 1. Let |pullDatagramsAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
 1. Let |writeDatagramsAlgorithm| be an action that runs [=writeDatagrams=] with |transport|.
-1. [=ReadableStream/Set up=] |incomingDatagrams| with [=ReadableStream/set up/pullAlgorithm=]
-   set to |pullDatagramsAlgorithm|, and [=ReadableStream/set up/highWaterMark=] set to 0.
+
+Note: Using 64kB buffers with datagrams is recommended because the effective
+maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
+which is recommended to be 64kB (See [[!QUIC-DATAGRAM]] [Section 3](https://datatracker.ietf.org/doc/html/rfc9221#section-3)).
+This will ensure the stream is not errored due to a datagram being larger than the buffer.
+
+1. [=ReadableStream/Set up with byte reading support=] |incomingDatagrams| with
+   [=ReadableStream/set up with byte reading support/pullAlgorithm=] set to
+   |pullDatagramsAlgorithm|, and [=ReadableStream/set up/highWaterMark=] set to 0.
 1. [=WritableStream/Set up=] |outgoingDatagrams| with [=WritableStream/set up/writeAlgorithm=]
    set to |writeDatagramsAlgorithm|.
 1. Let |pullBidirectionalStreamAlgorithm| be an action that runs [=pullBidirectionalStream=]
