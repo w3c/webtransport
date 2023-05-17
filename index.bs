@@ -1090,8 +1090,10 @@ Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} 
   1. Let |closeInfo| be a [=new=] {{WebTransportCloseInfo}}.
   1. If |code| is given, set |closeInfo|'s {{WebTransportCloseInfo/closeCode}} to |code|.
   1. If |reasonBytes| is given, set |closeInfo|'s {{WebTransportCloseInfo/reason}} to |reasonBytes|,
-     [=UTF-8 decoded=]. Note that no language or direction metadata is available with |reasonBytes| and 
-     that first-strong heuristics should be used for direction when displaying the value.
+     [=UTF-8 decoded=].
+     
+     Note: no language or direction metadata is available with |reasonBytes|. 
+     First-strong heuristics can be used for direction when displaying the value.
   1. [=Cleanup=] |transport| with |error| and |closeInfo|.
 
 </div>
