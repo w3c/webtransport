@@ -1109,20 +1109,18 @@ run these steps:
 
 ## Context cleanup steps ##  {#web-transport-context-cleanup-steps}
 
-This specification defines [=unloading document cleanup steps=] as the following steps, given a
-{{Document}} document:
+This specification defines <dfn>context cleanup steps</dfn> as the following steps, given
+{{WebTransport}} |transport|:
 
-1. Let |window| be |document|'s [=relevant global object=].
-1. For each {{WebTransport}} |transport| whose [=relevant global object=] is |window|:
-  1. If |transport|.{{[[State]]}} is `"connected"`, then:
-    1. Set |transport|.{{[[State]]}} to `"failed"`.
-    1. [=In parallel=], [=session/terminate=] |transport|.{{[[Session]]}}.
-    1. [=Queue a network task=] with |transport| to run the following steps:
-      1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
-         {{WebTransportErrorOptions/source}} is `"session"`.
-      1. [=Cleanup=] |transport| with |error|.
-  1. If |transport|.{{[[State]]}} is `"connecting"`, set |transport|.{{[[State]]}} to
-     `"failed"`.
+1. If |transport|.{{[[State]]}} is `"connected"`, then:
+  1. Set |transport|.{{[[State]]}} to `"failed"`.
+  1. [=In parallel=], [=session/terminate=] |transport|.{{[[Session]]}}.
+  1. [=Queue a network task=] with |transport| to run the following steps:
+    1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+       {{WebTransportErrorOptions/source}} is `"session"`.
+    1. [=Cleanup=] |transport| with |error|.
+1. If |transport|.{{[[State]]}} is `"connecting"`, set |transport|.{{[[State]]}} to
+   `"failed"`.
 
   Issue: This needs to be done in workers too. See
   <a href="https://www.github.com/w3c/webtransport/issues/127">#127</a> and
