@@ -713,7 +713,7 @@ agent MUST run the following steps:
 1. Let |serverCertificateHashes| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/serverCertificateHashes}} if it exists, and null otherwise.
 1. If |dedicated| is false and |serverCertificateHashes| is non-null, then [=throw=] a
-   {{TypeError}}.
+   {{NotSupportedError}} exception.
 1. Let |requireUnreliable| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/requireUnreliable}}.
 1. Let |congestionControl| be {{WebTransport/constructor(url, options)/options}}'s
@@ -776,7 +776,7 @@ This will ensure the stream is not errored due to a datagram being larger than t
    [=ReadableStream/set up/pullAlgorithm=] set to |pullUnidirectionalStreamAlgorithm|, and
    [=ReadableStream/set up/highWaterMark=] set to 0.
 1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL|, |dedicated|,
-   |requireUnreliable|, and |congestionControl|.
+   |requireUnreliable|, |congestionControl|, and |serverCertificateHashes|.
 1. Return |transport|.
 
 </div>
@@ -784,7 +784,8 @@ This will ensure the stream is not errored due to a datagram being larger than t
 <div algorithm>
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 <var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, a boolean
-|http3Only|, and a {{WebTransportCongestionControl}} |congestionControl|, run these steps.
+|http3Only|, a {{WebTransportCongestionControl}} |congestionControl|, and a
+sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 
 1. Let |client| be |transport|'s [=relevant settings object=].
 1. Let |origin| be |client|'s [=environment settings object/origin=].
@@ -808,7 +809,12 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
   1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
      |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|. If the user agent
      supports more than one congestion control algorithm, choose one appropriate for
-     |congestionControl| for sending of data on this |connection|.
+     |congestionControl| for sending of data on this |connection|. When obtaining a connection, if
+     |serverCertificateHashes| is specified, instead of using the default certificate verification
+     algorithm, consider the certificate valid if it meets the [=custom certificate
+     requirements=] and if [=verify a certificate hash|verifying the certificate hash=] against
+     |serverCertificateHashes| returns true. If either condition is not met, let |connection| be
+     failure.
   1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
@@ -1194,22 +1200,22 @@ that determine how WebTransport connection is established and used.
    </div>
 
 <div algorithm>
-To <dfn>compute a certificate hash</dfn>, do the following:
-1. Let |cert| be the input certificate, represented as a DER encoding of
+To <dfn>compute a certificate hash</dfn>, given a |certificate|, perform the following steps:
+1. Let |cert| be |certificate|, represented as a DER encoding of
    Certificate message defined in [[!RFC5280]].
 1. Compute the SHA-256 hash of |cert| and return the computed value.
 
 </div>
 
 <div algorithm>
-To <dfn>verify a certificate hash</dfn>, do the following:
-1. Let |hashes| be the input array of hashes.
-1. Let |referenceHash| be the [=compute a certificate hash|computed hash=] of the input certificate.
+To <dfn>verify a certificate hash</dfn>, given a |certificate| and an array of hashes |hashes|,
+perform the following steps:
+1. Let |referenceHash| be the result of [=computing a certificate hash=] with |certificate|.
 1. For every hash |hash| in |hashes|:
-   1. If |hash|.{{WebTransportHash/value}} is not null:
+   1. If |hash|.{{WebTransportHash/value}} is not null and |hash|.{{WebTransportHash/algorithm}}
+      is an [=ASCII case-insensitive=] match with "sha-256":
      1. Let |hashValue| be the byte sequence which |hash|.{{WebTransportHash/value}} represents.
-     1. If {{WebTransportHash/algorithm}} of |hash| is an [=ASCII case-insensitive=] match with "sha-256", and |hashValue| is equal
-        to |referenceHash|, the certificate is valid. Return true.
+     1. If |hashValue| is equal to |referenceHash|, return true.
 1. Return false.
 
 </div>
