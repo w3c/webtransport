@@ -9,6 +9,12 @@ let latencyPref = "realtime", bitPref = "variable";
 let hw = "no-preference";
 let streamWorker;
 let inputStream, outputStream;
+let metrics = {
+   all: [],
+};
+let e2e = {
+   all: [],
+};
 const rate = document.querySelector('#rate');
 const connectButton = document.querySelector('#connect');
 const stopButton = document.querySelector('#stop');
@@ -17,9 +23,13 @@ const resButtons = document.querySelector('#resButtons');
 const modeButtons = document.querySelector('#modeButtons');
 const hwButtons = document.querySelector('#hwButtons');
 const chart_div = document.getElementById('chart_div');
+const chart2_div = document.getElementById('chart2_div');
 const videoSelect = document.querySelector('select#videoSource');
+const outputVideo = document.getElementById('outputVideo');
+const inputVideo  = document.getElementById('inputVideo');
 const selectors = [videoSelect];
 chart_div.style.display = "none";
+chart2_div.style.display = "none";
 connectButton.disabled = false;
 stopButton.disabled = true;
 
@@ -35,6 +45,34 @@ const tv4KConstraints   = {video: {width: {exact: 3840}, height: {exact: 2160}}}
 const cinema4KConstraints = {video: {width: {exact: 4096}, height: {exact: 2160}}};
 const eightKConstraints = {video: {width: {min: 7680}, height: {min: 4320}}};
 let constraints = qvgaConstraints;
+
+function metrics_update(data) {
+  metrics.all.push(data);
+}
+
+function metrics_report() {
+  metrics.all.sort((a, b) =>  {
+    return (100000 * (a.mediaTime - b.mediaTime) + a.output - b.output);
+  });
+  const len = metrics.all.length;
+  let j = 0;
+  for (let i = 0; i < len ; i++ ) {
+    if (metrics.all[i].output == 1) {
+      let frameno = metrics.all[i].presentedFrames;
+      let g2g = metrics.all[i].expectedDisplayTime - metrics.all[i-1].captureTime;
+      let mediaTime = metrics.all[i].mediaTime;
+      let captureTime = metrics.all[i-1].captureTime;
+      let expectedDisplayTime = metrics.all[i].expectedDisplayTime;
+      let delay = metrics.all[i].expectedDisplayTime - metrics.all[i-1].expectedDisplayTime;
+      let data = [frameno, g2g];
+      e2e.all.push(data);
+    }
+  }
+  // addToEventLog('Data dump: ' + JSON.stringify(e2e.all));
+  return {
+     count: e2e.all.length
+  };
+}
 
 function addToEventLog(text, severity = 'info') {
   let log = document.querySelector('textarea');
@@ -147,6 +185,7 @@ function stop() {
   stopButton.disabled = true;
   connectButton.disabled = true;
   chart_div.style.display = "initial";
+  chart2_div.style.display = "initial";
   streamWorker.postMessage({ type: "stop" });
   try {
     inputStream.cancel();
@@ -196,11 +235,11 @@ document.addEventListener('DOMContentLoaded', async function(event) {
     if (e.data.severity != 'chart'){
        addToEventLog('Worker msg: ' + e.data.text, e.data.severity);
     } else {
-      //draw chart
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(() => {
         let data = new google.visualization.DataTable();
-        //addToEventLog('Data dump: ' + e.data.text);
+        // draw rtt chart
+        // addToEventLog('Data dump: ' + e.data.text);
         data.addColumn('number', 'Length');
         data.addColumn('number', 'RTT');
         data.addRows(JSON.parse(e.data.text));
@@ -213,7 +252,27 @@ document.addEventListener('DOMContentLoaded', async function(event) {
           legend: 'none'
         };
         let chart = new google.visualization.ScatterChart(chart_div);
-        chart.draw(data, options);  
+        chart.draw(data, options);
+      });
+      // draw the glass-glass latency chart
+      metrics_report();
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(() => {
+        let data = new google.visualization.DataTable();
+        // addToEventLog('Data dump: ' + JSON.stringify(e2e.all));
+        data.addColumn('number', 'Frame Number');
+        data.addColumn('number', 'Glass-Glass Latency (ms)');
+        data.addRows(e2e.all);
+        let options = {
+          width:  900,
+          height: 500,
+          title: 'Glass-Glass Latency (ms) versus Frame Number',
+          haxis: {title: 'Frame Number'},
+          vaxis: {title: 'Glass-Glass Latency'},
+          legend: 'none'
+        };
+        let chart = new google.visualization.ScatterChart(chart2_div);
+        chart.draw(data, options);
       });
     }
   }, false);
@@ -258,7 +317,37 @@ document.addEventListener('DOMContentLoaded', async function(event) {
     // WritableStream of VideoFrames, using non-standard Chrome API
     const generator = new MediaStreamTrackGenerator({kind: 'video'});
     outputStream = generator.writable;
-    document.getElementById('outputVideo').srcObject = new MediaStream([generator]);
+    outputVideo.srcObject = new MediaStream([generator]);
+
+    // Initialize variables
+    let paint_count = 0;
+    let start_time = 0.0;
+
+    const doSomething = (now, metadata) => {
+      metadata.output = 1.;
+      metadata.time = now;
+      if( start_time == 0.0 ) start_time = now;
+      let elapsed = (now - start_time)/1000.;
+      let fps = (++paint_count / elapsed).toFixed(3);
+      metadata.fps = fps;
+      metrics_update(metadata);
+      outputVideo.requestVideoFrameCallback(doSomething);
+    };
+
+    outputVideo.requestVideoFrameCallback(doSomething);
+
+    const doSomeOtherthing = (now, metadata) => {
+      metadata.output = 0;
+      metadata.time = now;
+      if( start_time == 0.0 ) start_time = now;
+      let elapsed = (now - start_time)/1000.;
+      let fps = (++paint_count / elapsed).toFixed(3);
+      metadata.fps = fps;
+      metrics_update(metadata);
+      inputVideo.requestVideoFrameCallback(doSomeOtherthing);
+    };
+
+    inputVideo.requestVideoFrameCallback(doSomeOtherthing);
 
     //Create video Encoder configuration
     const vConfig = {
@@ -296,7 +385,10 @@ document.addEventListener('DOMContentLoaded', async function(event) {
         config.pt = 1;
         break;
       case "H265":
-        config.codec = "hvc1.1.6.L123.00"; // Main profile, level 4.1, main Tier
+        config.codec = "hev1.1.6.L120.B0";  // Main profile, level 4, up to 2048 x 1080@30
+       // config.codec = "hev1.1.4.L93.B0"  Main 10 
+       // config.codec = "hev1.2.4.L120.B0" Main 10, Level 4.0
+       // config.codec = "hev1.1.6.L93.B0"; // Main profile, level 3.1, up to 1280 x 720@33.7
         config.hevc = { format: "annexb" };
         config.pt = 2;
         break; 
