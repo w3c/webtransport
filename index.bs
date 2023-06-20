@@ -79,6 +79,7 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/index.html; spec: ECMA
     text: pending; url: sec-promise-objects
     text: resolved; url: sec-promise-objects
     text: settled; url: sec-promise-objects
+    text: the typed array constructors table; url: #table-49
 urlPrefix: https://heycam.github.io/webidl/; spec: WEBIDL
   type: dfn
     text: created; for:DOMException; url: dfn-create-exception
@@ -106,8 +107,9 @@ As well as sections marked as non-normative, all authoring guidelines,
 diagrams, examples, and notes in this specification are non-normative.
 Everything else in this specification is normative.
 
-The key words *MUST* and *SHOULD* are to be interpreted as described in
-[[!RFC2119]].
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+ "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" are to be interpreted as described in 
+[[!RFC2119]] and [[!RFC8174]] when, and only when, they appear in all capitals, as shown here.
 
 This specification defines conformance criteria that apply to a single product:
 the user agent that implements the interfaces that it contains.
@@ -478,9 +480,18 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 1. If |queue| is empty, then:
   1. Set |datagrams|.{{[[IncomingDatagramsPullPromise]]}} to a new promise.
   1. Return |datagrams|.{{[[IncomingDatagramsPullPromise]]}}.
-1. Let |bytes| and |timestamp| be the result of [=dequeuing=] |queue|.
-1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
-1. [=ReadableStream/Enqueue=] |chunk| to |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
+1. Let |datagram| and |timestamp| be the result of [=dequeuing=] |queue|.
+1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
+   [=ReadableStream/current BYOB request view=] is not null, then:
+  1. Let |view| be |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
+     [=ReadableStream/current BYOB request view=].
+  1. If |view|'s [=BufferSource/byte length=] is less than the size of |datagram|, return
+     [=a promise rejected with=] a {{RangeError}}.
+  1. Let |elementSize| be the element size specified in [=the typed array constructors table=] for
+     |view|.\[[TypedArrayName]]. If |view| does not have a \[[TypedArrayName]] internal slot
+     (i.e. it is a {{DataView}}), let |elementSize| be 0.
+  1. If |elementSize| is not 1, return [=a promise rejected with=] a {{TypeError}}.
+1. [=ReadableStream/Pull from bytes=] |datagram| into |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 1. Return [=a promise resolved with=] undefined.
 
 To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
@@ -702,7 +713,7 @@ agent MUST run the following steps:
 1. Let |serverCertificateHashes| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/serverCertificateHashes}} if it exists, and null otherwise.
 1. If |dedicated| is false and |serverCertificateHashes| is non-null, then [=throw=] a
-   {{TypeError}}.
+   {{NotSupportedError}} exception.
 1. Let |requireUnreliable| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/requireUnreliable}}.
 1. Let |congestionControl| be {{WebTransport/constructor(url, options)/options}}'s
@@ -743,8 +754,15 @@ agent MUST run the following steps:
     :: null
 1. Let |pullDatagramsAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
 1. Let |writeDatagramsAlgorithm| be an action that runs [=writeDatagrams=] with |transport|.
-1. [=ReadableStream/Set up=] |incomingDatagrams| with [=ReadableStream/set up/pullAlgorithm=]
-   set to |pullDatagramsAlgorithm|, and [=ReadableStream/set up/highWaterMark=] set to 0.
+
+Note: Using 64kB buffers with datagrams is recommended because the effective
+maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
+which is recommended to be 64kB (See [[!QUIC-DATAGRAM]] [Section 3](https://datatracker.ietf.org/doc/html/rfc9221#section-3)).
+This will ensure the stream is not errored due to a datagram being larger than the buffer.
+
+1. [=ReadableStream/Set up with byte reading support=] |incomingDatagrams| with
+   [=ReadableStream/set up with byte reading support/pullAlgorithm=] set to
+   |pullDatagramsAlgorithm|, and [=ReadableStream/set up/highWaterMark=] set to 0.
 1. [=WritableStream/Set up=] |outgoingDatagrams| with [=WritableStream/set up/writeAlgorithm=]
    set to |writeDatagramsAlgorithm|.
 1. Let |pullBidirectionalStreamAlgorithm| be an action that runs [=pullBidirectionalStream=]
@@ -758,7 +776,7 @@ agent MUST run the following steps:
    [=ReadableStream/set up/pullAlgorithm=] set to |pullUnidirectionalStreamAlgorithm|, and
    [=ReadableStream/set up/highWaterMark=] set to 0.
 1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL|, |dedicated|,
-   |requireUnreliable|, and |congestionControl|.
+   |requireUnreliable|, |congestionControl|, and |serverCertificateHashes|.
 1. Return |transport|.
 
 </div>
@@ -766,7 +784,8 @@ agent MUST run the following steps:
 <div algorithm>
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 <var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, a boolean
-|http3Only|, and a {{WebTransportCongestionControl}} |congestionControl|, run these steps.
+|http3Only|, a {{WebTransportCongestionControl}} |congestionControl|, and a
+sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 
 1. Let |client| be |transport|'s [=relevant settings object=].
 1. Let |origin| be |client|'s [=environment settings object/origin=].
@@ -790,7 +809,12 @@ To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
   1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
      |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|. If the user agent
      supports more than one congestion control algorithm, choose one appropriate for
-     |congestionControl| for sending of data on this |connection|.
+     |congestionControl| for sending of data on this |connection|. When obtaining a connection, if
+     |serverCertificateHashes| is specified, instead of using the default certificate verification
+     algorithm, consider the certificate valid if it meets the [=custom certificate
+     requirements=] and if [=verify a certificate hash|verifying the certificate hash=] against
+     |serverCertificateHashes| returns true. If either condition is not met, let |connection| be
+     failure.
   1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
@@ -1074,6 +1098,9 @@ Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} 
   1. If |code| is given, set |closeInfo|'s {{WebTransportCloseInfo/closeCode}} to |code|.
   1. If |reasonBytes| is given, set |closeInfo|'s {{WebTransportCloseInfo/reason}} to |reasonBytes|,
      [=UTF-8 decoded=].
+     
+     Note: No language or direction metadata is available with |reasonBytes|. 
+     First-strong heuristics can be used for direction when displaying the value.
   1. [=Cleanup=] |transport| with |error| and |closeInfo|.
 
 </div>
@@ -1092,15 +1119,18 @@ run these steps:
 
 ## Context cleanup steps ##  {#web-transport-context-cleanup-steps}
 
-This specification defines [=unloading document cleanup steps=] as the following steps, given a
-{{Document}} document:
+This specification defines <dfn>context cleanup steps</dfn> as the following steps, given
+{{WebTransport}} |transport|:
 
-1. Let |window| be |document|'s [=relevant global object=].
-1. For each {{WebTransport}} |transport| whose [=relevant global object=] is |window|:
-  1. If |transport|.{{[[State]]}} is `"connected"`, set |transport|.{{[[State]]}} to `"failed"`
-     and [=session/terminate=] |transport|.{{[[Session]]}} [=in parallel=].
-  1. If |transport|.{{[[State]]}} is `"connecting"`, set |transport|.{{[[State]]}} to
-     `"failed"`.
+1. If |transport|.{{[[State]]}} is `"connected"`, then:
+  1. Set |transport|.{{[[State]]}} to `"failed"`.
+  1. [=In parallel=], [=session/terminate=] |transport|.{{[[Session]]}}.
+  1. [=Queue a network task=] with |transport| to run the following steps:
+    1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+       {{WebTransportErrorOptions/source}} is `"session"`.
+    1. [=Cleanup=] |transport| with |error|.
+1. If |transport|.{{[[State]]}} is `"connecting"`, set |transport|.{{[[State]]}} to
+   `"failed"`.
 
   Issue: This needs to be done in workers too. See
   <a href="https://www.github.com/w3c/webtransport/issues/127">#127</a> and
@@ -1170,22 +1200,22 @@ that determine how WebTransport connection is established and used.
    </div>
 
 <div algorithm>
-To <dfn>compute a certificate hash</dfn>, do the following:
-1. Let |cert| be the input certificate, represented as a DER encoding of
+To <dfn>compute a certificate hash</dfn>, given a |certificate|, perform the following steps:
+1. Let |cert| be |certificate|, represented as a DER encoding of
    Certificate message defined in [[!RFC5280]].
 1. Compute the SHA-256 hash of |cert| and return the computed value.
 
 </div>
 
 <div algorithm>
-To <dfn>verify a certificate hash</dfn>, do the following:
-1. Let |hashes| be the input array of hashes.
-1. Let |referenceHash| be the [=compute a certificate hash|computed hash=] of the input certificate.
+To <dfn>verify a certificate hash</dfn>, given a |certificate| and an array of hashes |hashes|,
+perform the following steps:
+1. Let |referenceHash| be the result of [=computing a certificate hash=] with |certificate|.
 1. For every hash |hash| in |hashes|:
-   1. If |hash|.{{WebTransportHash/value}} is not null:
+   1. If |hash|.{{WebTransportHash/value}} is not null and |hash|.{{WebTransportHash/algorithm}}
+      is an [=ASCII case-insensitive=] match with "sha-256":
      1. Let |hashValue| be the byte sequence which |hash|.{{WebTransportHash/value}} represents.
-     1. If {{WebTransportHash/algorithm}} of |hash| is an [=ASCII case-insensitive=] match with "sha-256", and |hashValue| is equal
-        to |referenceHash|, the certificate is valid. Return true.
+     1. If |hashValue| is equal to |referenceHash|, return true.
 1. Return false.
 
 </div>
@@ -1319,13 +1349,12 @@ The dictionary SHALL have the following attributes:
 :: The estimated rate at which queued data will be sent by the user agent, in bits per second.
    This rate applies to all streams and datagrams that share a [=WebTransport session=]
    and is calculated by the congestion control algorithm (potentially chosen by
-   {{WebTransport/congestionControl}}). If this [=WebTransport session=] is
-   pooled with others in a shared [=connection=], or if the user agent does not
+   {{WebTransport/congestionControl}}). If the user agent does not
    currently have an estimate, the member MUST be [=map/exist|absent=].
    The member can be absent even if present in previous results.
 
 
-## `WebTransportDatagramStats` Dictionary ##  {#web-transport-stats}
+## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
 
 The <dfn dictionary>WebTransportDatagramStats</dfn> dictionary includes statistics
 on datagram transmission over the HTTP/3 connection.
@@ -1367,6 +1396,7 @@ data to the server.
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext, Transferable]
 interface WebTransportSendStream : WritableStream {
+  attribute long long? sendOrder;
   Promise&lt;WebTransportSendStreamStats&gt; getStats();
   WebTransportAtomicWriter getAtomicWriter();
 };
@@ -1378,6 +1408,14 @@ A {{WebTransportSendStream}} is always created by the
 The {{WebTransportSendStream}}'s [=transfer steps=] and
 [=transfer-receiving steps=] are
 [those of](https://streams.spec.whatwg.org/#ws-transfer) {{WritableStream}}.
+
+## Attributes ##  {#send-stream-attributes}
+
+: <dfn for="WebTransportSendStream" attribute>sendOrder</dfn>
+:: The getter steps are:
+     1. Return [=this=]'s {{WebTransportSendStream/[[SendOrder]]}}.
+:: The setter steps, given |value|, are:
+     1. Set [=this=].{{WebTransportSendStream/[[SendOrder]]}} to |value|.
 
 ## Methods ##  {#send-stream-methods}
 
@@ -1514,6 +1552,10 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
      sent.
 
+     Note: We access |stream|.{{[[SendOrder]]}} [=in parallel=] here. User agents SHOULD
+     respond to live updates of these values during sending, though the details are
+     [=implementation-defined=].
+
      If |atomicRequest| is not null, and [=flow control=] blocks |stream| before |bytes| could be sent
      in their entirety, proceed to the next step immediately without failing,
      after [=queue a network task|queueing a network task=] with |transport| to run the
@@ -1639,7 +1681,7 @@ The dictionary SHALL have the following attributes:
    {{WebTransportSendStream}} has been sent at least once. This
    number can only increase, and is always less than or equal to
    {{WebTransportSendStreamStats/bytesWritten}}.
-   
+
    Note: this is progress of app data sent on a single stream only, and does not
    include any network overhead.
 : <dfn for="WebTransportSendStreamStats" dict-member>bytesAcknowledged</dfn>
@@ -2020,12 +2062,12 @@ interface WebTransportError : DOMException {
   constructor(optional DOMString message = "", optional WebTransportErrorOptions options = {});
 
   readonly attribute WebTransportErrorSource source;
-  readonly attribute octet? streamErrorCode;
+  readonly attribute unsigned long? streamErrorCode;
 };
 
 dictionary WebTransportErrorOptions {
   WebTransportErrorSource source = "stream";
-  [Clamp] octet? streamErrorCode = null;
+  [Clamp] unsigned long? streamErrorCode = null;
 };
 
 enum WebTransportErrorSource {
@@ -2262,16 +2304,14 @@ certificate validation is available.
 
 ## State Persistence ##  {#state-persistence}
 
-WebTransport by itself does not create any new unique identifiers or new ways
-to persistently store state, nor does it automatically expose any of the
-existing persistent state to the server. For instance, none of the transports
-defined in this document automatically send cookies, support HTTP
-authentication or caching invalidation mechanisms. Since they use TLS, they may
-support TLS session tickets, which could be used by the server (though not by
-passive network observers) to correlate different connections from the same
-client. This is not specific to WebTransport by itself, but rather an inherent
-property of all TLS-based protocols; thus, this is out-of-scope for this
-specification.
+WebTransport does not by itself create any new unique identifiers or new
+ways to persistently store state, nor does it automatically expose any of
+the existing persistent state to the server. For instance, neither
+[[WEB-TRANSPORT-HTTP3]] nor [[WEB-TRANSPORT-HTTP2]] send cookies or support
+HTTP authentication or caching invalidation mechanisms.  Since they do use
+TLS, they inherit TLS persistent state such as TLS session tickets,
+which while not visible to passive network observers, could be used by
+the server to correlate different connections from the same client.
 
 ## Protocol Security ##  {#protocol-security}
 
@@ -2353,11 +2393,83 @@ The WebTransport API lets the application specify multiple certificate
 hashes at once, allowing the client to accept multiple certificates for a
 period in which a new certificate is being rolled out.
 
-Unlike a similar mechanism in WebRTC, the server certificate hash API in
+Unlike a similar mechanism in [=WebRTC=], the server certificate hash API in
 WebTransport does not provide any means of authenticating the client; the fact
 that the client knows what the server certificate is or how to contact it is
 not sufficient.  The application has to establish the identity of the client
 in-band if necessary.
+
+## Fingerprinting and Tracking ## {#fingerprinting}
+
+This API provides sites with the ability to generate network activity and
+closely observe the effect of this activity.  The information obtained in this
+way might be <a
+href="https://infra.spec.whatwg.org/#tracking-vector">identifying</a>.
+
+It is important to recognize that very similar networking capabilities are
+provided by other web platform APIs (such as [=fetch=] and [[webrtc]]).  The net
+adverse effect on privacy due to adding WebTransport is therefore minimal.  The
+considerations in this section applies equally to other networking capabilities.
+
+Measuring network characteristics requires that the network be used and that the
+effect of that usage be measured, both of which are enabled by this API.
+WebTransport provides sites with an ability to generate network activity toward
+a server of their choice and observe the effects.  Observations of both the
+stable properties of a network path and dynamic effect of network usage are
+possible.
+
+Information about the network is available to the server either directly through
+its own networking stack, indirectly through the rate at which data is consumed
+or transmitted by the client, or as part of the statistics provided by the API
+(see [[#web-transport-stats]]).  Consequently, restrictions on information in
+user agents is not the only mechanism that might be needed to manage these
+privacy risks.
+
+### Static Observations ### {#fp-static}
+
+A site can observe available network capacity or round trip time (RTT) between a
+user agent and a chosen server.  This information can be identifying when
+combined with other tracking vectors.  RTT can also reveal something about the
+physical location of a user agent, especially if multiple measurements can be
+made from multiple vantage points.
+
+Though networking is shared, network use is often sporadic, which means that
+sites are often able to observe the capacity and round trip times of an
+uncontested or lightly loaded network path.  These properties are stable for
+many people as their network location does not change and the position of
+network bottlenecks--which determine available capacity--can be close to a user
+agent.
+
+### Shared Networking ### {#fp-shared}
+
+Contested links present sites with opportunities to enable
+[[privacy-principles#dfn-cross-site-recognition|cross-site recognition]],
+which might be used to perform unsanctioned tracking [[UNSANCTIONED-TRACKING]].
+Network capacity is a finite shared resource, so a user agent that concurrently
+accesses different sites might reveal a connection between the identity
+presented to each site.
+
+The use of networking capabilities on one site reduces the capacity available to
+other sites, which can be observed using networking APIs.  Network usage and
+metrics can change dynamically, so any change can be observed in real time.
+This might allow sites to increase confidence that activity on different sites
+originates from the same user.
+
+A user agent could limit or degrade access to feedback mechanisms such as
+statistics ([[#web-transport-stats]]) for sites that are inactive or do not have
+focus ([[html/interaction#focus]]).  As noted, this does not prevent a server
+from making observations about changes in the network.
+
+### Pooled Sessions ### {#fp-pooled}
+
+Similar to shared networking scenarios, when sessions are pooled on a single
+connection, information from one session is affected by the activity of another
+session.  One session could infer information about the activity of another
+session, such as the rate at which another application is sending data.
+
+The use of a shared connection already allows the server to correlate sessions.
+Use of a [[fetch#network-partition-keys|network partition key]] disables pooling
+where use of a shared session might enable unwanted cross-site recognition.
 
 # Examples #  {#examples}
 
