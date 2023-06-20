@@ -58,13 +58,13 @@ function metrics_report() {
   let j = 0;
   for (let i = 0; i < len ; i++ ) {
     if (metrics.all[i].output == 1) {
-      let frameno = metrics.all[i].presentedFrames;
-      let g2g = metrics.all[i].expectedDisplayTime - metrics.all[i-1].captureTime;
-      let mediaTime = metrics.all[i].mediaTime;
-      let captureTime = metrics.all[i-1].captureTime;
-      let expectedDisplayTime = metrics.all[i].expectedDisplayTime;
-      let delay = metrics.all[i].expectedDisplayTime - metrics.all[i-1].expectedDisplayTime;
-      let data = [frameno, g2g];
+      const frameno = metrics.all[i].presentedFrames;
+      const g2g = metrics.all[i].expectedDisplayTime - metrics.all[i-1].captureTime;
+      const mediaTime = metrics.all[i].mediaTime;
+      const captureTime = metrics.all[i-1].captureTime;
+      const expectedDisplayTime = metrics.all[i].expectedDisplayTime;
+      const delay = metrics.all[i].expectedDisplayTime - metrics.all[i-1].expectedDisplayTime;
+      const data = [frameno, g2g];
       e2e.all.push(data);
     }
   }
@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', async function(event) {
     let paint_count = 0;
     let start_time = 0.0;
 
-    const doSomething = (now, metadata) => {
+    const recordOutputFrames = (now, metadata) => {
       metadata.output = 1.;
       metadata.time = now;
       if( start_time == 0.0 ) start_time = now;
@@ -331,12 +331,12 @@ document.addEventListener('DOMContentLoaded', async function(event) {
       let fps = (++paint_count / elapsed).toFixed(3);
       metadata.fps = fps;
       metrics_update(metadata);
-      outputVideo.requestVideoFrameCallback(doSomething);
+      outputVideo.requestVideoFrameCallback(recordOutputFrames);
     };
 
-    outputVideo.requestVideoFrameCallback(doSomething);
+    outputVideo.requestVideoFrameCallback(recordOutputFrames);
 
-    const doSomeOtherthing = (now, metadata) => {
+    const recordInputFrames = (now, metadata) => {
       metadata.output = 0;
       metadata.time = now;
       if( start_time == 0.0 ) start_time = now;
@@ -344,10 +344,10 @@ document.addEventListener('DOMContentLoaded', async function(event) {
       let fps = (++paint_count / elapsed).toFixed(3);
       metadata.fps = fps;
       metrics_update(metadata);
-      inputVideo.requestVideoFrameCallback(doSomeOtherthing);
+      inputVideo.requestVideoFrameCallback(recordInputFrames);
     };
 
-    inputVideo.requestVideoFrameCallback(doSomeOtherthing);
+    inputVideo.requestVideoFrameCallback(recordInputFrames);
 
     //Create video Encoder configuration
     const vConfig = {
