@@ -1275,13 +1275,15 @@ The dictionary SHALL have the following attributes:
 :: An send order number that, if provided, opts the created
    {{WebTransportSendStream}} in to participating in <dfn>strict ordering</dfn>.
    Bytes currently queued on [=strict ordering|strictly ordered=]
-   {{WebTransportSendStream}}s MUST be sent ahead of bytes currently queued on
+   {{WebTransportSendStream}}s will be sent ahead of bytes currently queued on
    other [=strict ordering|strictly ordered=] {{WebTransportSendStream}}s
    created with lower send order numbers.
 
    If no send order number is provided, then the order in which the
    user agent sends bytes from it relative to other {{WebTransportSendStream}}s
-   is [=implementation-defined=].
+   is [=implementation-defined=]. User agents are strongly encouraged however to
+   divide bandwidth fairly between all streams that aren't starved by lower send
+   order numbers.
 
    Note: This is sender-side data prioritization which does not guarantee
    reception order.
@@ -1523,6 +1525,8 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      non-null and higher {{[[SendOrder]]}}, that are neither
      [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
      sent.
+
+     The user agent SHOULD divide bandwidth fairly between all streams that aren't starved.
 
     Note: We access |stream|.{{[[SendOrder]]}} [=in parallel=] here. User agents SHOULD
     respond to live updates of these values during sending, though the details are
