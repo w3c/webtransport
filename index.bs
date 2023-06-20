@@ -1397,9 +1397,9 @@ The {{WebTransportSendStream}}'s [=transfer steps=] and
      1. Return |p|.
 
 : <dfn for="WebTransportSendStream" method>getAtomicWriter()</dfn>
-:: For transactional applications where blocking on [=flow control=] can be an
-   issue, the following alternative writer API gives the application
-   additional control.
+:: For transactional applications where [=flow control=] deadlocks can be an issue
+   (see [[RFC9308]] [Section 4.4](https://datatracker.ietf.org/doc/html/rfc9308#section-4.4)),
+   the following alternative writer API gives the application additional control.
 
    {{getAtomicWriter}} must be implemented the same as
    {{WritableStream/getWriter()}} inherited from {{WritableStream}}, except
@@ -1429,10 +1429,6 @@ A {{WebTransportSendStream}} has the following internal slots.
    <td class="non-normative">A promise representing a pending write or close operation, or null.
   </tr>
   <tr>
-   <td><dfn>`[[PendingOperationSentAtomicBytes]]`</dfn>
-   <td class="non-normative">the number of bytes sent by the pending atomic write, or zero.
-  </tr>
-  <tr>
    <td><dfn>`[[Transport]]`</dfn>
    <td class="non-normative">A {{WebTransport}} which owns this {{WebTransportSendStream}}.
   </tr>
@@ -1442,8 +1438,9 @@ A {{WebTransportSendStream}} has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[AtomicWriteRequests]]`</dfn>
-   <td class="non-normative">A [=list=] of promises representing atomic write requests
-   not yet processed by the underlying sink.
+   <td class="non-normative">A promise-keyed [=map=] of boolean values, where each promise
+   represents an atomic write request to be processed by the underlying sink, and the initial
+   value is false (to be modified to true upon success).
   </tr>
  <tbody>
 </table>
@@ -1465,8 +1462,8 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
     :: |transport|
     : {{WebTransportSendStream/[[SendOrder]]}}
     :: |sendOrder|
-    : {{WebTransportSendStream/[[AtomicWriting]]}}
-    :: null
+    : {{WebTransportSendStream/[[AtomicWriteRequests]]}}
+    :: An empty promise-keyed [=map=] of booleans.
 1. Let |writeAlgorithm| be an action that [=writes=] |chunk| to |stream|, given |chunk|.
 1. Let |closeAlgorithm| be an action that [=closes=] |stream|.
 1. Let |abortAlgorithm| be an action that [=aborts=] |stream| with |reason|, given |reason|.
@@ -1500,8 +1497,8 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
    Note: Find a [better way](https://streams.spec.whatwg.org/#other-specs) to integrate
    with the streams spec to identify the write request.
 
-1. Let |atomic| be true if |inFlightRequest| is found in
-   [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}, otherwise false.
+1. Let |atomicRequest| be |inFlightRequest| if |inFlightRequest| [=map/exists=] in
+   [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}, otherwise null.
 1. Run the following steps [=in parallel=]:
   1. [=stream/Send=] |bytes| on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the
      operation to complete.
@@ -1517,31 +1514,30 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
      sent.
 
-     If |atomic| is true, and [=flow control=] blocks |stream| before |bytes| could be sent
-     in its entirety, then let |numberOfBytesSent| be the number of bytes that were sent, or
-     0 if no bytes were sent, and proceed to the next step immediately without failing, just
+     If |atomicRequest| is not null, and [=flow control=] blocks |stream| before |bytes| could be sent
+     in their entirety, proceed to the next step immediately without failing,
      after [=queue a network task|queueing a network task=] with |transport| to run the
      following sub-steps:
-    1. Set |stream|.{{[[PendingOperationSentAtomicBytes]]}} to |numberOfBytesSent|.
-    1. [=Resolve=] |inFlightRequest| with undefined.
     1. [=For each=] |promise| in [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}},
-       [=resolve=] |promise| with undefined.
+       [=resolve=] |promise| with false.
+    1. [=map/clear=] [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
 
-     If |atomic| is false, then without giving up on sending, whenever [=flow control=] blocks
-     |stream| before |bytes| have been sent in its entirety,
-     [=queue a network task|queueing a network task=] with |transport| to run these steps:
-    1. Set |stream|.{{[[PendingOperationSentAtomicBytes]]}} to 0.
+     If |atomicRequest| is null, then without giving up on sending, whenever [=flow control=] blocks
+     |stream| before |bytes| have been sent in their entirety, and
+     [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}} is not empty, then
+     [=queue a network task=] with |transport| to run these steps:
     1. [=For each=] |promise| in [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}},
-       set |stream|.{{[[PendingOperationSentAtomicBytes]]}} to 0, and [=resolve=] |promise| with undefined.
+       [=resolve=] |promise| with false.
+    1. [=map/clear=] [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
   1. If the previous step failed, abort the remaining steps.
 
     Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
     error |stream| and reject the result of this write operation.
 
-  1. Set |numberOfBytesSent| to the number of bytes that were sent, or 0 if no bytes were sent.
   1. [=Queue a network task=] with |transport| to run these steps:
     1. Set |stream|.{{[[PendingOperation]]}} to null.
-    1. If |atomic| is true, set |stream|.{{[[PendingOperationSentAtomicBytes]]}} to |numberOfBytesSent|.
+    1. If |atomicRequest| is not null, then set
+       |stream|.{{[[AtomicWriteRequests]]}}[|atomicRequest|] to true.
     1. [=Resolve=] |promise| with undefined.
 1. Return |promise|.
 
@@ -1951,8 +1947,7 @@ object |transport|, and a |sendOrder|, run these steps.
 {{WebTransportAtomicWriter}} is a subclass of {{WritableStreamDefaultWriter}} that
 differs in that if a chunk given to its {{WritableStreamDefaultWriter/write}} method
 cannot be sent in its entirety without blocking on flow control, then the data is
-dropped without erroring the stream, and the promise is resolved with the number of
-bytes that were sent (which can be zero).
+dropped without erroring the stream, and the promise is resolved with false.
 
 A {{WebTransportAtomicWriter}} is always created by the
 [=WebTransportAtomicWriter/create=] procedure.
@@ -1960,7 +1955,7 @@ A {{WebTransportAtomicWriter}} is always created by the
 <pre class="idl">
 [Exposed=*]
 interface WebTransportAtomicWriter : WritableStreamDefaultWriter {
-  Promise&lt;unsigned long long&gt; write(optional any chunk);
+  Promise&lt;bool&gt; write(optional any chunk);
 };
 </pre>
 
@@ -1980,11 +1975,21 @@ Methods of {{WebTransportAtomicWriter}} inherited from
 :: When called, run the following steps:
      1. Let |p| be the result of {{WritableStreamDefaultWriter/write}}
         on {{WritableStreamDefaultWriter}} with |chunk|.
+     1. Set |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}[|p|] to false.
      1. Return the result of [=reacting=] to |p| with the following step:
-       1. Let |numberOfBytesSent| be
-          [=this=].{{WritableStream/[[stream]]}}.{{WebTransportAtomicWriter/[[PendingOperationSentAtomicBytes]]}}
-       1. Set [=this=].{{WritableStream/[[stream]]}}.{{WebTransportAtomicWriter/[[PendingOperationSentAtomicBytes]]}} to 0.
-       1. Return |numberOfBytesSent|.
+       1. If |p| was fulfilled, then:
+         1. Let |atomicSuccess| be
+            [=this=].{{WritableStream/[[stream]]}}.{{WebTransportSendStream/[[AtomicWriteRequests]]}}[|p|]
+            if |p| [=map/exists=] in
+            [=this=].{{WritableStream/[[stream]]}}.{{WebTransportSendStream/[[AtomicWriteRequests]]}},
+            otherwise false.
+         1. [=map/Remove=] |p| from
+            [=this=].{{WritableStream/[[stream]]}}.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
+         1. Return |atomicSuccess|.
+       1. If |p| was rejected with reason |r|, then:
+         1. [=map/Remove=] |p| from
+            [=this=].{{WritableStream/[[stream]]}}.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
+         1. Return a new promise rejected with |r|.
 
 ## Procedures ##  {#web-transport-atomic-writer-procedures}
 
@@ -1993,12 +1998,9 @@ Methods of {{WebTransportAtomicWriter}} inherited from
 To <dfn export for="WebTransportAtomicWriter" lt="create|creating">create</dfn> a
 {{WebTransportAtomicWriter}}, with a {{WebTransportSendStream}} |stream|, run these
 steps:
-1. Let |writer| be a [=new=] {{WebTransportAtomicWriter}} with:
-    : {{WebTransportAtomicWriter/[[PendingOperationSentAtomicBytes]]}}
-    :: 0.
+1. Let |writer| be a [=new=] {{WebTransportAtomicWriter}}.
 1. Run the [new WritableStreamDefaultWriter(stream)](https://streams.spec.whatwg.org/#default-writer-constructor)
    constructor steps passing |writer| as this, and |stream| as the constructor argument.
-1. Set |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} to |writer|.
 1. Return |writer|.
 
 </div>
