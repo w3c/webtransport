@@ -2022,7 +2022,7 @@ Methods of {{WebTransportAtomicWriter}} inherited from
 :: When called, run the following steps:
      1. Let |p| be the result of {{WritableStreamDefaultWriter/write}}
         on {{WritableStreamDefaultWriter}} with |chunk|.
-     1. Let |stream| be [=this=].{{WritableStreamDefaultWriter/[[stream]]}}.
+     1. Let |stream| be the {{WebTransportSendStream}} associated with [=this=].
      1. Set |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}[|p|] to false.
      1. Return the result of [=reacting=] to |p| with the following step:
        1. If |p| was fulfilled, then:
