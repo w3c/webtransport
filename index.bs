@@ -2022,24 +2022,22 @@ Methods of {{WebTransportAtomicWriter}} inherited from
 :: When called, run the following steps:
      1. Let |p| be the result of {{WritableStreamDefaultWriter/write}}
         on {{WritableStreamDefaultWriter}} with |chunk|.
+     1. Let |stream| be [=this=].{{WritableStreamDefaultWriter/[[stream]]}}.
      1. Set |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}[|p|] to false.
      1. Return the result of [=reacting=] to |p| with the following step:
        1. If |p| was fulfilled, then:
-         1. Let |atomicSuccess| be
-            [=this=].{{WritableStream/[[stream]]}}.{{WebTransportSendStream/[[AtomicWriteRequests]]}}[|p|]
-            if |p| [=map/exists=] in
-            [=this=].{{WritableStream/[[stream]]}}.{{WebTransportSendStream/[[AtomicWriteRequests]]}},
+         1. Let |atomicSuccess| be |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}[|p|]
+            if |p| [=map/exists=] in |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}},
             otherwise false.
-         1. [=map/Remove=] |p| from
-            [=this=].{{WritableStream/[[stream]]}}.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
+         1. [=map/Remove=] |p| from |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
          1. Return |atomicSuccess|.
        1. If |p| was rejected with reason |r|, then:
-         1. [=map/Remove=] |p| from
-            [=this=].{{WritableStream/[[stream]]}}.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
+         1. [=map/Remove=] |p| from |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
          1. Return a new promise rejected with |r|.
 
-         Note: This works around {{WritableStreamDefaultWriter/write}} always resolving with
-         `undefined` regardless of what the underlying sink's [=writes|write=] algorithm resolved with.
+         Note: This works around {{WritableStreamDefaultWriter/write}} on
+         {{WritableStreamDefaultWriter}} always resolving with `undefined` regardless of what
+         its underlying sink's [=writes|write=] algorithm resolved with.
 
 ## Procedures ##  {#web-transport-atomic-writer-procedures}
 
