@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version b3a4ecf2c, updated Tue Jul 18 14:02:54 2023 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="80e763789f9a6d1684fea4f9161c4167cfa9b1fa" name="document-revision">
+  <meta content="b6eef8f292a437fcd1a878389e1fb1dd3c0de92f" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -2532,9 +2532,9 @@ the chunk arrives at the server, use an application-level protocol.</p>
      <li data-md>
       <p>If <var>code</var> &lt; 0, then set <var>code</var> to 0.</p>
      <li data-md>
-      <p>If <var>code</var> > 255, then set <var>code</var> to 255.</p>
-      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 255 inclusive. The code will be encoded to a number in
-       [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
+      <p>If <var>code</var> > 4294967295, then set <var>code</var> to 4294967295.</p>
+      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. The code will be encoded to a
+ number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
       <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①③">in parallel</a>:</p>
       <ol>
@@ -2555,8 +2555,8 @@ the chunk arrives at the server, use an application-level protocol.</p>
       <p>Let <var>transport</var> be <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-transport-slot" id="ref-for-dom-webtransportsendstream-transport-slot④">[[Transport]]</a></code>.</p>
      <li data-md>
       <p>Let <var>code</var> be the application protocol error code attached to the STOP_SENDING frame. <a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a></p>
-      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 255 inclusive. The code has been decoded from a number in
-       [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
+      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. The code has been decoded from a
+number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in<a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task②②">Queue a network task</a> with <var>transport</var> to run these steps:</p>
       <ol>
@@ -2784,9 +2784,9 @@ steps.</p>
      <li data-md>
       <p>If <var>code</var> &lt; 0, then set <var>code</var> to 0.</p>
      <li data-md>
-      <p>If <var>code</var> > 255, then set <var>code</var> to 255.</p>
-      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 255 inclusive. The code will be encoded to a number in
-       [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
+      <p>If <var>code</var> > 4294967295, then set <var>code</var> to 4294967295.</p>
+      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. The code will be encoded to a
+ number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-remove" id="ref-for-list-remove④">Remove</a> <var>stream</var> from <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-sendstreams-slot" id="ref-for-dom-webtransport-sendstreams-slot⑧">[[SendStreams]]</a></code>.</p>
      <li data-md>
@@ -2817,8 +2817,8 @@ running, the following steps may run immediately.</p>
       <p>Let <var>transport</var> be <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportreceivestream-transport-slot" id="ref-for-dom-webtransportreceivestream-transport-slot③">[[Transport]]</a></code>.</p>
      <li data-md>
       <p>Let <var>code</var> be the application protocol error code attached to the RESET_STREAM frame. <a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a></p>
-      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 255 inclusive. The code has been decoded from a number in
-       [0x52e4a40fa8db, 0x52e4a40fa9e2] as decribed in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
+      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. The code has been decoded from a
+ number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task②⑥">Queue a network task</a> with <var>transport</var> to run these steps:</p>
       <ol>
