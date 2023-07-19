@@ -995,10 +995,11 @@ these steps.
    1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
       [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
+      1. Let |streamId| be a new stream ID that is valid and unique for
+         |transport|.{{[[Session]]}}. If one is not immediately available due to exhaustion,
+         [=reject=] |p| with a {{QuotaExceededError}} and abort these steps. [[!QUIC]]
       1. Let |internalStream| be the result of [=creating a bidirectional stream=] with
-         |transport|.{{[[Session]]}}.
-
-        Note: This operation may take time, for example when the stream ID is exhausted. [[!QUIC]]
+           |transport|.{{[[Session]]}} and |streamId|.
       1. [=Queue a network task=] with |transport| to run the following steps:
         1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
            [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
@@ -1024,10 +1025,11 @@ these steps.
      1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
         {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
         [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
+        1. Let |streamId| be a new stream ID that is valid and unique for
+           |transport|.{{[[Session]]}}. If one is not immediately available due to exhaustion,
+           [=reject=] |p| with a {{QuotaExceededError}} and abort these steps. [[!QUIC]]
         1. Let |internalStream| be the result of [=creating an outgoing unidirectional stream=] with
-           |transport|.{{[[Session]]}}.
-
-          Note: This operation may take time, for example when the stream ID is exhausted. [[!QUIC]]
+           |transport|.{{[[Session]]}} and |streamId|.
         1. [=Queue a network task=] with |transport| to run the following steps:
           1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
              [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
