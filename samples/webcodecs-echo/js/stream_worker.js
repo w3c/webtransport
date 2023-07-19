@@ -670,21 +670,21 @@ SSRC = this.config.ssrc
            }
          });
        },
-       transform(chunk, controller) {
+       async transform(chunk, controller) {
          if (this.decoder.state != "closed") {
            if (chunk.type == "config") {
-              let config = JSON.parse(chunk.config);
-              VideoDecoder.isConfigSupported(config).then((decoderSupport) => {
-                if(decoderSupport.supported) {
-                  this.decoder.configure(decoderSupport.config);
-                  self.postMessage({text: 'Decoder successfully configured:\n' + JSON.stringify(decoderSupport.config)});
-                 // self.postMessage({text: 'Decoder state: ' + JSON.stringify(this.decoder.state)});
-                } else {
-                  self.postMessage({severity: 'fatal', text: 'Config not supported:\n' + JSON.stringify(decoderSupport.config)});
-                }
-              }).catch((e) => {
-                 self.postMessage({severity: 'fatal', text: `Configuration error:  ${e.message}`});
-              })
+             let config = JSON.parse(chunk.config);
+             try {
+               const decoderSupport = await VideoDecoder.isConfigSupported(config);
+               if (decoderSupport.supported) {
+                 this.decoder.configure(decoderSupport.config);
+                 self.postMessage({text: 'Decoder successfully configured:\n' + JSON.stringify(decoderSupport.config)});
+               } else {
+                 self.postMessage({severity: 'fatal', text: 'Config not supported:\n' + JSON.stringify(decoderSupport.config)});
+               }
+             } catch (e) {
+               self.postMessage({severity: 'fatal', text: `Configuration error: ${e.message}`});
+             }
            } else {
              try {
               // self.postMessage({text: 'size: ' + chunk.byteLength + ' seq: ' + chunk.seqNo + ' dur: ' + chunk.duration + ' ts: ' + chunk.timestamp + ' ssrc: ' + chunk.ssrc + ' pt: ' + chunk.pt + ' tid: ' + chunk.temporalLayerId + ' type: ' + chunk.type});
@@ -707,7 +707,7 @@ SSRC = this.config.ssrc
 
    EncodeVideoStream(self, config) {
      return new TransformStream({
-       start(controller) {
+       async start(controller) {
          this.frameCounter = 0;
          this.seqNo = 0;
          this.keyframeIndex = 0;
@@ -752,18 +752,18 @@ SSRC = this.config.ssrc
              self.postMessage({severity: 'fatal', text: `Encoder error: ${e.message}`});
            }
          });
-         VideoEncoder.isConfigSupported(config).then((encoderSupport) => {
-           if(encoderSupport.supported) {
+         try {
+           const encoderSupport = await VideoEncoder.isConfigSupported(config);
+           if (encoderSupport.supported) {
              this.encoder.configure(encoderSupport.config);
              self.postMessage({text: 'Encoder successfully configured:\n' + JSON.stringify(encoderSupport.config)});
              // self.postMessage({text: 'Encoder state: ' + JSON.stringify(this.encoder.state)});
            } else {
-             self.postMessage({severity: 'fatal', text: 'Config not supported:\n' + JSON.stringify(encoderSupport.config)});
+           self.postMessage({severity: 'fatal', text: 'Config not supported:\n' + JSON.stringify(encoderSupport.config)});
            }
-         })
-         .catch((e) => {
-            self.postMessage({severity: 'fatal', text: `Configuration error: ${e.message}`});
-         })
+         } catch (e) {
+          self.postMessage({severity: 'fatal', text: `Configuration error: ${e.message}`});
+         }
        },
        transform(frame, controller) {
          if (this.pending_outputs <= 30) {
@@ -858,6 +858,12 @@ SSRC = this.config.ssrc
        } 
      });
    }
+
+// What should happen here....
+// On an incoming undirectional stream, {number: number, value: value, buffer: bnuffer} gets added to streams[].
+// get_frame(streams) is called.  The function iterates over stream[], reading from stream[i].value, with returned data
+// added to the frame buffer for that stream, stream[i].buffer.  If a stream is done, the stream is removed from the stream
+// pool and the length of the received frame is compared to the length initially provided. If they match, the frame is enqueued.
 
    createReceiveStream(self, transport) {
      return new ReadableStream({
