@@ -996,8 +996,10 @@ these steps.
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
       [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
       1. Let |streamId| be a new stream ID that is valid and unique for
-         |transport|.{{[[Session]]}}. If one is not immediately available due to exhaustion,
-         [=reject=] |p| with a {{QuotaExceededError}} and abort these steps. [[!QUIC]]
+         |transport|.{{[[Session]]}}, as defined in [[!QUIC]]
+         [Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11). If one is not
+         immediately available due to exhaustion, [=reject=] |p| with a {{QuotaExceededError}}
+         and abort these steps.
       1. Let |internalStream| be the result of [=creating a bidirectional stream=] with
            |transport|.{{[[Session]]}} and |streamId|.
       1. [=Queue a network task=] with |transport| to run the following steps:
@@ -1026,8 +1028,10 @@ these steps.
         {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
         [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
         1. Let |streamId| be a new stream ID that is valid and unique for
-           |transport|.{{[[Session]]}}. If one is not immediately available due to exhaustion,
-           [=reject=] |p| with a {{QuotaExceededError}} and abort these steps. [[!QUIC]]
+           |transport|.{{[[Session]]}}, as defined in [[!QUIC]]
+           [Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11). If one is not
+           immediately available due to exhaustion, [=reject=] |p| with a {{QuotaExceededError}}
+           and abort these steps.
         1. Let |internalStream| be the result of [=creating an outgoing unidirectional stream=] with
            |transport|.{{[[Session]]}} and |streamId|.
         1. [=Queue a network task=] with |transport| to run the following steps:
