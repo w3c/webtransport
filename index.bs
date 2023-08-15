@@ -126,10 +126,12 @@ specification uses that specification and terminology.
 
 # Protocol concepts # {#protocol-concepts}
 
+## WebTransport session ## {#webtransport-session}
+
 A <dfn for="protocol">WebTransport session</dfn> is a session of WebTransport over HTTP/3.
 There may be multiple [=WebTransport sessions=] on one [=connection=], when pooling is enabled.
 
-[=WebTransport session=] has the following capabilities defined in [[!WEB-TRANSPORT-HTTP3]].
+A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRANSPORT-HTTP3]]:
 
 <table class="data" dfn-for="session">
  <thead>
@@ -195,7 +197,33 @@ CONNECT request that initiated |session| is closed by the server, as described a
 [[!WEB-TRANSPORT-HTTP3]]
 [Section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
 
-<dfn>WebTransport stream</dfn> is a concept for HTTP/3 stream on a [=WebTransport session=].
+A [=WebTransport session=] has the following signals:
+
+<table class="data" dfn-for="session-signal">
+ <thead>
+  <tr>
+   <th>event
+   <th>definition
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>DRAIN_WEBTRANSPORT_SESSION</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
+  </tr>
+  <tr>
+   <td><dfn>GOAWAY</dfn>
+   <td>[[!WEB-TRANSPORT-HTTP3]]
+   [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
+  </tr>
+ </tbody>
+</table>
+
+## WebTransport stream ## {#webtransport-stream}
+
+A <dfn for="protocol">WebTransport stream</dfn> is a concept for an HTTP/3 stream on a
+[=WebTransport session=].
 
 A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn>,
 <dfn for=stream>outgoing unidirectional</dfn> or <dfn for=stream>bidirectional</dfn>.
@@ -244,29 +272,6 @@ A [=WebTransport stream=] has the following capabilities:
    <td>No
    <td>Yes
    <td>Yes
-  </tr>
- </tbody>
-</table>
-
-A [=WebTransport session=] has the following signals:
-
-<table class="data" dfn-for="session-signal">
- <thead>
-  <tr>
-   <th>event
-   <th>definition
-  </tr>
- </thead>
- <tbody>
-  <tr>
-   <td><dfn>DRAIN_WEBTRANSPORT_SESSION</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
-  </tr>
-  <tr>
-   <td><dfn>GOAWAY</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
   </tr>
  </tbody>
 </table>
