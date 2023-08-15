@@ -861,6 +861,8 @@ these steps.
 1. If |transport|.{{[[State]]}} is `"connecting"`, then return the result of performing the
    following steps [=upon fulfillment=] of |transport|.{{[[Ready]]}}:
   1. Return the result of [=pullBidirectionalStream=] with |transport|.
+1. If |transport|.{{[[State]]}} is not `"connected"`, then return a new [=rejected=] promise with
+   an {{InvalidStateError}}.
 1. Let |session| be |transport|.{{[[Session]]}}.
 1. Let |p| be a new promise.
 1. Run the following steps [=in parallel=]:
@@ -883,6 +885,8 @@ these steps.
 1. If |transport|.{{[[State]]}} is `"connecting"`, then return the result of performing the
    following steps [=upon fulfillment=] of |transport|.{{[[Ready]]}}:
   1. Return the result of [=pullUnidirectionalStream=] with |transport|.
+1. If |transport|.{{[[State]]}} is not `"connected"`, then return a new [=rejected=] promise with
+   an {{InvalidStateError}}.
 1. Let |session| be |transport|.{{[[Session]]}}.
 1. Let |p| be a new promise.
 1. Run the following steps [=in parallel=]:
