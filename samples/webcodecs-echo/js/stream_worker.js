@@ -170,6 +170,7 @@ function rtt_report() {
     return (a[1] - b[1]); 
   });
   const len = rtt_aggregate.all.length;
+  self.postMessage({text: 'Length: ' + len});
   const half = len >> 1;
   const f = (len + 1) >> 2;
   const t = (3 * (len + 1)) >> 2;
@@ -182,17 +183,17 @@ function rtt_report() {
   const std = Math.sqrt((rtt_aggregate.sumsq - len * avg  * avg) / (len - 1));
   //self.postMessage({text: 'Data dump: ' + JSON.stringify(rtt_aggregate.all)});
   return {
-     count: len,
-     min: rtt_aggregate.min,
-     fquart: fquart,
-     avg: avg,
-     median: median,
-     tquart: tquart,
-     max: rtt_aggregate.max,
-     stdev: std,
-     srtt: rtt_aggregate.srtt,
-     rttvar: rtt_aggregate.rttvar,
-     rto:  rtt_aggregate.rto,
+    count: len,
+    min: rtt_aggregate.min,
+    fquart: fquart,
+    avg: avg,
+    median: median,
+    tquart: tquart,
+    max: rtt_aggregate.max,
+    stdev: std,
+    srtt: rtt_aggregate.srtt,
+    rttvar: rtt_aggregate.rttvar,
+    rto:  rtt_aggregate.rto,
   };
 }
 
@@ -717,8 +718,9 @@ SSRC = this.config.ssrc
            output: (chunk, cfg) => {
              if (cfg.decoderConfig) {
                // self.postMessage({text: 'Decoder reconfig!'});
+               cfg.decoderConfig.hardwareAcceleration = config.decHwAcceleration;
                const decoderConfig = JSON.stringify(cfg.decoderConfig);
-               // self.postMessage({text: 'Configuration: ' + decoderConfig});
+               // self.postMessage({text: 'Decoder configuration: ' + decoderConfig});
                const configChunk =
                {
                   type: "config",
@@ -936,20 +938,6 @@ SSRC = this.config.ssrc
 
    stop() {
      end_time = performance.now();
-     const enc_stats = enc_report();
-     const encqueue_stats = encqueue_report();
-     const dec_stats = dec_report();
-     const decqueue_stats = decqueue_report();
-     const rtt_stats = rtt_report();
-     const bwe_stats = bwe_report();
-     self.postMessage({severity: 'chart', text: JSON.stringify(rtt_aggregate.all)});
-     self.postMessage({text: 'BWE report: ' + JSON.stringify(bwe_stats)});
-     self.postMessage({text: 'RTT report: ' + JSON.stringify(rtt_stats)});
-     self.postMessage({text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});
-     self.postMessage({text: 'Encoder Queue report: ' + JSON.stringify(encqueue_stats)});
-     self.postMessage({text: 'Decoder Time report: ' + JSON.stringify(dec_stats)});
-     self.postMessage({text: 'Decoder Queue report: ' + JSON.stringify(decqueue_stats)});
-     if (stopped) return;
      // TODO: There might be a more elegant way of closing a stream, or other
      // events to listen for.
      if (encoder.state != "closed") encoder.close();
@@ -957,6 +945,22 @@ SSRC = this.config.ssrc
      stopped = true;
      this.stopped = true;
      self.postMessage({text: 'stop(): encoder and decoder closed'});
+     const len = rtt_aggregate.all.length;
+     if (len > 1) {
+       const enc_stats = enc_report();
+       const encqueue_stats = encqueue_report();
+       const dec_stats = dec_report();
+       const decqueue_stats = decqueue_report();
+       const rtt_stats = rtt_report();
+       const bwe_stats = bwe_report();
+       self.postMessage({severity: 'chart', text: JSON.stringify(rtt_aggregate.all)});
+       self.postMessage({text: 'BWE report: ' + JSON.stringify(bwe_stats)});
+       self.postMessage({text: 'RTT report: ' + JSON.stringify(rtt_stats)});
+       self.postMessage({text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});
+       self.postMessage({text: 'Encoder Queue report: ' + JSON.stringify(encqueue_stats)});
+       self.postMessage({text: 'Decoder Time report: ' + JSON.stringify(dec_stats)});
+       self.postMessage({text: 'Decoder Queue report: ' + JSON.stringify(decqueue_stats)});
+     }
      return;
    }
 }

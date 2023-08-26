@@ -6,7 +6,7 @@ let stopped = false;
 let preferredCodec ="VP8";
 let mode = "L1T3";
 let latencyPref = "realtime", bitPref = "variable";
-let hw = "no-preference";
+let encHw = "no-preference", decHw = "no-preference";
 let streamWorker;
 let inputStream, outputStream;
 let metrics = {
@@ -15,13 +15,17 @@ let metrics = {
 let e2e = {
    all: [],
 };
+let display_metrics = {
+   all: [],
+};
 const rate = document.querySelector('#rate');
 const connectButton = document.querySelector('#connect');
 const stopButton = document.querySelector('#stop');
 const codecButtons = document.querySelector('#codecButtons');
 const resButtons = document.querySelector('#resButtons');
 const modeButtons = document.querySelector('#modeButtons');
-const hwButtons = document.querySelector('#hwButtons');
+const decHwButtons = document.querySelector('#decHwButtons');
+const encHwButtons = document.querySelector('#encHwButtons');
 const chart_div = document.getElementById('chart_div');
 const chart2_div = document.getElementById('chart2_div');
 const videoSelect = document.querySelector('select#videoSource');
@@ -34,7 +38,7 @@ connectButton.disabled = false;
 stopButton.disabled = true;
 
 videoSelect.onchange = function () {
-  videoSource = videoSelect.value; 
+  videoSource = videoSelect.value;
 };
 
 const qvgaConstraints   = {video: {width: 320,  height: 240}};
@@ -55,7 +59,6 @@ function metrics_report() {
     return (100000 * (a.mediaTime - b.mediaTime) + a.output - b.output);
   });
   const len = metrics.all.length;
-  let j = 0;
   for (let i = 0; i < len ; i++ ) {
     if (metrics.all[i].output == 1) {
       const frameno = metrics.all[i].presentedFrames;
@@ -65,7 +68,9 @@ function metrics_report() {
       const expectedDisplayTime = metrics.all[i].expectedDisplayTime;
       const delay = metrics.all[i].expectedDisplayTime - metrics.all[i-1].expectedDisplayTime;
       const data = [frameno, g2g];
+      const info = {frameno: frameno, g2g: g2g, mediaTime: mediaTime, captureTime: captureTime, expectedDisplayTime: expectedDisplayTime, delay: delay};
       e2e.all.push(data);
+      display_metrics.all.push(info);
     }
   }
   // addToEventLog('Data dump: ' + JSON.stringify(e2e.all));
@@ -95,7 +100,7 @@ function gotDevices(deviceInfos) {
     if (deviceInfo.kind === 'videoinput') {
       option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
       videoSelect.appendChild(option);
-    } 
+    }
   }
   selectors.forEach((select, selectorIndex) => {
     if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
@@ -175,9 +180,14 @@ function getModeValue(radio) {
   addToEventLog('Mode selected: ' + mode);
 }
 
-function getHwValue(radio) {
-  hw = radio.value;
-  addToEventLog('Hardware Acceleration preference: ' + hw);
+function getDecHwValue(radio) {
+  decHw = radio.value;
+  addToEventLog('Decoder Hardware Acceleration preference: ' + decHw);
+}
+
+function getEncHwValue(radio) {
+  encHw = radio.value;
+  addToEventLog('Encoder Hardware Acceleration preference: ' + encHw);
 }
 
 function stop() {
@@ -205,14 +215,16 @@ document.addEventListener('DOMContentLoaded', async function(event) {
   if (stopped) return;
   addToEventLog('DOM Content Loaded');
 
-  if (typeof MediaStreamTrackProcessor === 'undefined' ||
-      typeof MediaStreamTrackGenerator === 'undefined') {
-    addToEventLog('Your browser does not support the WebCodecs and Mediacapture-transform APIs.', 'fatal');
+  if (typeof WebTransport === 'undefined') {
+    addToEventLog('Your browser does not support the WebTransport API.', 'fatal');
     return;
   }
 
-  if (typeof WebTransport === 'undefined') {
-    addToEventLog('Your browser does not support the WebTransport API.', 'fatal');
+  // Need to support standard mediacapture-transform implementations
+
+  if (typeof MediaStreamTrackProcessor === 'undefined' ||
+      typeof MediaStreamTrackGenerator === 'undefined') {
+    addToEventLog('Your browser does not support the MSTP and MSTG APIs.', 'fatal');
     return;
   }
 
@@ -235,44 +247,55 @@ document.addEventListener('DOMContentLoaded', async function(event) {
     if (e.data.severity != 'chart'){
        addToEventLog('Worker msg: ' + e.data.text, e.data.severity);
     } else {
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(() => {
-        let data = new google.visualization.DataTable();
-        // draw rtt chart
-        // addToEventLog('Data dump: ' + e.data.text);
-        data.addColumn('number', 'Length');
-        data.addColumn('number', 'RTT');
-        data.addRows(JSON.parse(e.data.text));
-        let options = {
-          width:  900,
-          height: 500,
-          title: 'RTT (ms) versus Frame length',
-          haxis: {title: 'Length'},
-          vaxis: {title: 'RTT'},
-          legend: 'none'
-        };
-        let chart = new google.visualization.ScatterChart(chart_div);
-        chart.draw(data, options);
+      const parsed = JSON.parse(e.data.text);
+      const x = parsed.map(item => item[0]);
+      const y = parsed.map(item => item[1]);
+      // TODO: more options needed from https://plotly.com/javascript/line-and-scatter
+      Plotly.newPlot(chart_div, [{
+          x,
+          y,
+          mode: 'markers',
+          type: 'scatter',
+      }], {
+        xaxis: {
+          title: 'Length', // Frame size (bytes)?
+          autorange: false,
+          range: [0, Math.max.apply(null, x) + 100 /* + a bit, 10%-ish to make it look good */],
+        },
+        yaxis: {
+          title: 'RTT',
+          //autorange: false,
+          //range: [0, Math.max.apply(null, y) /* + a bit, 10%-ish to make it look good */],
+        },
+        title: 'RTT (ms) versus Frame length',
       });
       // draw the glass-glass latency chart
-      metrics_report();
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(() => {
-        let data = new google.visualization.DataTable();
-        // addToEventLog('Data dump: ' + JSON.stringify(e2e.all));
-        data.addColumn('number', 'Frame Number');
-        data.addColumn('number', 'Glass-Glass Latency (ms)');
-        data.addRows(e2e.all);
-        let options = {
-          width:  900,
-          height: 500,
-          title: 'Glass-Glass Latency (ms) versus Frame Number',
-          haxis: {title: 'Frame Number'},
-          vaxis: {title: 'Glass-Glass Latency'},
-          legend: 'none'
-        };
-        let chart = new google.visualization.ScatterChart(chart2_div);
-        chart.draw(data, options);
+      metrics_report(); // sets e2e.all and display_metrics
+      const e2eX = e2e.all.map(item => item[0]);
+      const e2eY = e2e.all.map(item => item[1]);
+      const labels = e2e.all.map((item, index) => {
+        return Object.keys(display_metrics.all[index]).map(key => {
+          return `${key}: ${display_metrics.all[index][key]}`;
+        }).join('<br>');
+      });
+      Plotly.newPlot(chart2_div, [{
+        x: e2eX,
+        y: e2eY,
+        text: labels,
+        mode: 'markers',
+        type: 'scatter',
+      }], {
+        xaxis: {
+          title: 'Frame Number',
+          autorange: false,
+          range: [0, Math.max.apply(null, e2eX) + 100 /* + a bit, 10%-ish to make it look good */],
+        },
+        yaxis: {
+          title: 'Glass-Glass Latency',
+          //autorange: false,
+          //range: [0, Math.max.apply(null, e2eY) /* + a bit, 10%-ish to make it look good */],
+        },
+        title: 'Glass-Glass Latency (ms) versus Frame Number',
       });
     }
   }, false);
@@ -285,7 +308,8 @@ document.addEventListener('DOMContentLoaded', async function(event) {
   connectButton.onclick = () => {
     connectButton.disabled = true;
     stopButton.disabled = false;
-    hwButtons.style.display = "none";
+    decHwButtons.style.display = "none";
+    encHwButtons.style.display = "none";
     prefButtons.style.display = "none";
     bitButtons.style.display = "none";
     codecButtons.style.display = "none";
@@ -298,7 +322,7 @@ document.addEventListener('DOMContentLoaded', async function(event) {
 
   async function startMedia() {
     if (stopped) return;
-    addToEventLog('startMedia called'); 
+    addToEventLog('startMedia called');
     // Collect the bitrate
     const rate = document.getElementById('rate').value;
 
@@ -355,11 +379,11 @@ document.addEventListener('DOMContentLoaded', async function(event) {
       resolutionScale: 1,
       framerateScale: 1.0,
     };
-   
+
     let ssrcArr = new Uint32Array(1);
     window.crypto.getRandomValues(ssrcArr);
     const ssrc = ssrcArr[0];
-  
+
     const config = {
       alpha: "discard",
       latencyMode: latencyPref,
@@ -367,8 +391,9 @@ document.addEventListener('DOMContentLoaded', async function(event) {
       codec: preferredCodec,
       width: ts.width/vConfig.resolutionScale,
       height: ts.height/vConfig.resolutionScale,
-      hardwareAcceleration: hw,
-      bitrate: rate, 
+      hardwareAcceleration: encHw,
+      decHwAcceleration: decHw,
+      bitrate: rate,
       framerate: ts.frameRate/vConfig.framerateScale,
       keyInterval: vConfig.keyInterval,
       ssrc:  ssrc
@@ -386,12 +411,12 @@ document.addEventListener('DOMContentLoaded', async function(event) {
         break;
       case "H265":
         config.codec = "hev1.1.6.L120.B0";  // Main profile, level 4, up to 2048 x 1080@30
-       // config.codec = "hev1.1.4.L93.B0"  Main 10 
+       // config.codec = "hev1.1.4.L93.B0"  Main 10
        // config.codec = "hev1.2.4.L120.B0" Main 10, Level 4.0
        // config.codec = "hev1.1.6.L93.B0"; // Main profile, level 3.1, up to 1280 x 720@33.7
         config.hevc = { format: "annexb" };
         config.pt = 2;
-        break; 
+        break;
       case "VP8":
         config.codec = "vp8";
         config.pt = 3;
