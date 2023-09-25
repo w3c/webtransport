@@ -131,7 +131,8 @@ session=] can contain multiple [=WebTransport streams=].
 
 ## WebTransport session ## {#webtransport-session}
 
-A <dfn for="protocol">WebTransport session</dfn> is a session of WebTransport over HTTP/3.
+A <dfn for="protocol">WebTransport session</dfn> is a session of WebTransport over an HTTP/3
+or HTTP/2 <dfn>underlying [=connection=]</dfn>.
 There may be multiple [=WebTransport sessions=] on one [=connection=], when pooling is enabled.
 
 A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRANSPORT-HTTP3]]:
@@ -601,7 +602,7 @@ defined in [[!WEB-TRANSPORT-HTTP3]].
 interface WebTransport {
   constructor(USVString url, optional WebTransportOptions options = {});
 
-  Promise&lt;WebTransportStats&gt; getStats();
+  Promise&lt;WebTransportConnectionStats&gt; getStats();
   readonly attribute Promise&lt;undefined&gt; ready;
   readonly attribute WebTransportReliabilityMode reliability;
   readonly attribute WebTransportCongestionControl congestionControl;
@@ -983,10 +984,10 @@ these steps.
      1. Let |transport| be [=this=].
      1. Let |p| be a new promise.
      1. Run the following steps [=in parallel=]:
-         1. Gather the stats from the underlying QUIC connection, including stats on datagrams.
+         1. Gather the stats from the [=underlying connection=], including stats on datagrams.
          1. Wait for the stats to be ready.
          1. [=Queue a network task=] with |transport| to run the following steps:
-           1. Let |stats| be a [=new=] {{WebTransportStats}} object representing the gathered stats.
+           1. Let |stats| be a [=new=] {{WebTransportConnectionStats}} object representing the gathered stats.
            1. [=Resolve=] |p| with |stats|.
      1. Return |p|.
 
@@ -1310,18 +1311,18 @@ The dictionary SHALL have the following attributes:
    Note: This is sender-side data prioritization which does not guarantee
    reception order.
 
-## `WebTransportStats` Dictionary ##  {#web-transport-stats}
+## `WebTransportConnectionStats` Dictionary ##  {#web-transport-stats}
 
-The <dfn dictionary>WebTransportStats</dfn> dictionary includes information
-on HTTP/3 connection stats.
+The <dfn dictionary>WebTransportConnectionStats</dfn> dictionary includes information
+on WebTransport-specific stats about the [=WebTransport session=]'s [=underlying connection=].
 
-Issue: Now that quic-transport has been removed, this section needs to be
-revised. Some of those are safe to expose for HTTP/2 and HTTP/3 connections
-(like min-RTT), while most would either result in information disclosure
-or are impossible to define for pooled connections.
+Note: When pooling is used, multiple [=WebTransport sessions=] pooled
+on the same [=connection=] all receive the same information, i.e. the information
+is disclosed across pooled [=WebTransport sessions | sessions=] holding the
+same [[fetch#network-partition-keys|network partition key]].
 
 <pre class="idl">
-dictionary WebTransportStats {
+dictionary WebTransportConnectionStats {
   DOMHighResTimeStamp timestamp;
   unsigned long long bytesSent;
   unsigned long long packetsSent;
@@ -1340,36 +1341,36 @@ dictionary WebTransportStats {
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportStats" dict-member>timestamp</dfn>
+: <dfn for="WebTransportConnectionStats" dict-member>timestamp</dfn>
 :: The `timestamp` for when the stats are gathered, relative to the
    UNIX epoch (Jan 1, 1970, UTC).
-: <dfn for="WebTransportStats" dict-member>bytesSent</dfn>
-:: The number of bytes sent on the QUIC connection, including retransmissions.
+: <dfn for="WebTransportConnectionStats" dict-member>bytesSent</dfn>
+:: The number of bytes sent on the [=underlying connection=], including retransmissions.
    Does not include UDP or any other outer framing.
-: <dfn for="WebTransportStats" dict-member>packetsSent</dfn>
-:: The number of packets sent on the QUIC connection, including those that are determined to have been lost.
-: <dfn for="WebTransportStats" dict-member>packetsLost</dfn>
-:: The number of packets lost on the QUIC connection (does not monotonically increase, because packets that are declared lost can subsequently be received).
-: <dfn for="WebTransportStats" dict-member>numOutgoingStreamsCreated</dfn>
-:: The number of outgoing QUIC streams created on the QUIC connection.
-: <dfn for="WebTransportStats" dict-member>numIncomingStreamsCreated</dfn>
-:: The number of incoming QUIC streams created on the QUIC connection.
-: <dfn for="WebTransportStats" dict-member>bytesReceived</dfn>
-:: The number of total bytes received on the QUIC connection, including
+: <dfn for="WebTransportConnectionStats" dict-member>packetsSent</dfn>
+:: The number of packets sent on the [=underlying connection=], including those that are determined to have been lost.
+: <dfn for="WebTransportConnectionStats" dict-member>packetsLost</dfn>
+:: The number of packets lost on the [=underlying connection=] (does not monotonically increase, because packets that are declared lost can subsequently be received).
+: <dfn for="WebTransportConnectionStats" dict-member>numOutgoingStreamsCreated</dfn>
+:: The number of outgoing QUIC streams created on the [=underlying connection=].
+: <dfn for="WebTransportConnectionStats" dict-member>numIncomingStreamsCreated</dfn>
+:: The number of incoming QUIC streams created on the [=underlying connection=].
+: <dfn for="WebTransportConnectionStats" dict-member>bytesReceived</dfn>
+:: The number of total bytes received on the [=underlying connection=], including
    duplicate data for streams. Does not include UDP or any other outer framing.
-: <dfn for="WebTransportStats" dict-member>packetsReceived</dfn>
-:: The number of total packets received on the QUIC connection, including
+: <dfn for="WebTransportConnectionStats" dict-member>packetsReceived</dfn>
+:: The number of total packets received on the [=underlying connection=], including
    packets that were not processable.
-: <dfn for="WebTransportStats" dict-member>smoothedRtt</dfn>
+: <dfn for="WebTransportConnectionStats" dict-member>smoothedRtt</dfn>
 :: The smoothed round-trip time (RTT) currently observed on the connection, as defined
    in [[!RFC9002]] [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
-: <dfn for="WebTransportStats" dict-member>rttVariation</dfn>
+: <dfn for="WebTransportConnectionStats" dict-member>rttVariation</dfn>
 :: The mean variation in round-trip time samples currently observed on the
    connection, as defined in [[!RFC9002]]
    [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
-: <dfn for="WebTransportStats" dict-member>minRtt</dfn>
+: <dfn for="WebTransportConnectionStats" dict-member>minRtt</dfn>
 :: The minimum round-trip time observed on the entire connection.
-: <dfn for="WebTransportStats" dict-member>estimatedSendRate</dfn>
+: <dfn for="WebTransportConnectionStats" dict-member>estimatedSendRate</dfn>
 :: The estimated rate at which queued data will be sent by the user agent, in bits per second.
    This rate applies to all streams and datagrams that share a [=WebTransport session=]
    and is calculated by the congestion control algorithm (potentially chosen by
