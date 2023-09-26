@@ -985,7 +985,6 @@ these steps.
      1. Let |p| be a new promise.
      1. Run the following steps [=in parallel=]:
          1. Gather the stats from the [=underlying connection=], including stats on datagrams.
-         1. Wait for the stats to be ready.
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportConnectionStats}} object representing the gathered stats.
            1. [=Resolve=] |p| with |stats|.
@@ -1129,7 +1128,7 @@ Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} 
 </div>
 
 <div algorithm="termination-caused-by-connection-error">
-Whenever a [=connection=] associated with a {{WebTransport}} |transport| gets a connection error,
+Whenever a {{WebTransport}} |transport|'s [=underlying connection=] gets a connection error,
 run these steps:
 
 1. [=Queue a network task=] with |transport| to run these steps:
@@ -1311,7 +1310,7 @@ The dictionary SHALL have the following attributes:
    Note: This is sender-side data prioritization which does not guarantee
    reception order.
 
-## `WebTransportConnectionStats` Dictionary ##  {#web-transport-stats}
+## `WebTransportConnectionStats` Dictionary ##  {#web-transport-connection-stats}
 
 The <dfn dictionary>WebTransportConnectionStats</dfn> dictionary includes information
 on WebTransport-specific stats about the [=WebTransport session=]'s [=underlying connection=].
@@ -1713,7 +1712,6 @@ The {{WebTransportReceiveStream}}'s [=transfer steps=] and
      1. Let |p| be a new promise.
      1. Run the following steps [=in parallel=]:
          1. Gather the stats specific to this {{WebTransportReceiveStream}}.
-         1. Wait for the stats to be ready.
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportReceiveStreamStats}} object
               representing the gathered stats.
@@ -2340,7 +2338,7 @@ possible.
 Information about the network is available to the server either directly through
 its own networking stack, indirectly through the rate at which data is consumed
 or transmitted by the client, or as part of the statistics provided by the API
-(see [[#web-transport-stats]]).  Consequently, restrictions on information in
+(see [[#web-transport-connection-stats]]).  Consequently, restrictions on information in
 user agents is not the only mechanism that might be needed to manage these
 privacy risks.
 
@@ -2375,7 +2373,7 @@ This might allow sites to increase confidence that activity on different sites
 originates from the same user.
 
 A user agent could limit or degrade access to feedback mechanisms such as
-statistics ([[#web-transport-stats]]) for sites that are inactive or do not have
+statistics ([[#web-transport-connection-stats]]) for sites that are inactive or do not have
 focus ([[html/interaction#focus]]).  As noted, this does not prevent a server
 from making observations about changes in the network.
 
