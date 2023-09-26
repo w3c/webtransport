@@ -1007,10 +1007,13 @@ these steps.
    1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
       [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
+      1. Let |streamId| be a new stream ID that is valid and unique for
+         |transport|.{{[[Session]]}}, as defined in [[!QUIC]]
+         [Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11). If one is not
+         immediately available due to exhaustion, [=reject=] |p| with a {{QuotaExceededError}}
+         and abort these steps.
       1. Let |internalStream| be the result of [=creating a bidirectional stream=] with
-         |transport|.{{[[Session]]}}.
-
-        Note: This operation may take time, for example when the stream ID is exhausted. [[!QUIC]]
+           |transport|.{{[[Session]]}} and |streamId|.
       1. [=Queue a network task=] with |transport| to run the following steps:
         1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
            [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
@@ -1036,10 +1039,13 @@ these steps.
      1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
         {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
         [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
+        1. Let |streamId| be a new stream ID that is valid and unique for
+           |transport|.{{[[Session]]}}, as defined in [[!QUIC]]
+           [Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11). If one is not
+           immediately available due to exhaustion, [=reject=] |p| with a {{QuotaExceededError}}
+           and abort these steps.
         1. Let |internalStream| be the result of [=creating an outgoing unidirectional stream=] with
-           |transport|.{{[[Session]]}}.
-
-          Note: This operation may take time, for example when the stream ID is exhausted. [[!QUIC]]
+           |transport|.{{[[Session]]}} and |streamId|.
         1. [=Queue a network task=] with |transport| to run the following steps:
           1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
              [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
@@ -1325,9 +1331,8 @@ dictionary WebTransportConnectionStats {
   DOMHighResTimeStamp timestamp;
   unsigned long long bytesSent;
   unsigned long long packetsSent;
+  unsigned long long bytesLost;
   unsigned long long packetsLost;
-  unsigned long numOutgoingStreamsCreated;
-  unsigned long numIncomingStreamsCreated;
   unsigned long long bytesReceived;
   unsigned long long packetsReceived;
   DOMHighResTimeStamp smoothedRtt;
@@ -1348,12 +1353,11 @@ The dictionary SHALL have the following attributes:
    Does not include UDP or any other outer framing.
 : <dfn for="WebTransportConnectionStats" dict-member>packetsSent</dfn>
 :: The number of packets sent on the [=underlying connection=], including those that are determined to have been lost.
+: <dfn for="WebTransportConnectionStats" dict-member>bytesLost</dfn>
+:: The number of bytes lost on the [=underlying connection=] (does not monotonically increase, because packets that are declared lost can subsequently be received).
+   Does not include UDP or any other outer framing.
 : <dfn for="WebTransportConnectionStats" dict-member>packetsLost</dfn>
 :: The number of packets lost on the [=underlying connection=] (does not monotonically increase, because packets that are declared lost can subsequently be received).
-: <dfn for="WebTransportConnectionStats" dict-member>numOutgoingStreamsCreated</dfn>
-:: The number of outgoing QUIC streams created on the [=underlying connection=].
-: <dfn for="WebTransportConnectionStats" dict-member>numIncomingStreamsCreated</dfn>
-:: The number of incoming QUIC streams created on the [=underlying connection=].
 : <dfn for="WebTransportConnectionStats" dict-member>bytesReceived</dfn>
 :: The number of total bytes received on the [=underlying connection=], including
    duplicate data for streams. Does not include UDP or any other outer framing.
