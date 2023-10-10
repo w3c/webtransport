@@ -1501,7 +1501,7 @@ A {{WebTransportSendStream}} has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[AtomicWriteRequests]]`</dfn>
-   <td class="non-normative">A [=list=] of promises, each representing an in-flight atomic
+   <td class="non-normative">An [=ordered set=] of promises, each representing an in-flight atomic
     write request to be processed by the underlying sink.
   </tr>
  <tbody>
@@ -2072,7 +2072,7 @@ To <dfn export for="WebTransportWriter" lt="write atomically">write atomically</
 on a {{WebTransportSendStream}} |stream|, given |chunk|, run these steps:
 1. Let |p| be the result of {{WritableStreamDefaultWriter/write(chunk)}}
     on {{WritableStreamDefaultWriter}} with |chunk|.
-1. Set |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} to |p|.
+1. [=set/Append=] |p| to |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
 1. Return the result of [=reacting=] to |p| with the following steps:
    1. [=map/Remove=] |p| from |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} if it exists.
    1. If |p| was rejected with reason |r|, then return [=a promise rejected with=] |r|.
