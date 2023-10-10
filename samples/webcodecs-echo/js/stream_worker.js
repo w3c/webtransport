@@ -719,6 +719,7 @@ SSRC = this.config.ssrc
              if (cfg.decoderConfig) {
                // self.postMessage({text: 'Decoder reconfig!'});
                cfg.decoderConfig.hardwareAcceleration = config.decHwAcceleration;
+               cfg.decoderConfig.optimizeForLatency = (config.latencyMode == "realtime");
                const decoderConfig = JSON.stringify(cfg.decoderConfig);
                // self.postMessage({text: 'Decoder configuration: ' + decoderConfig});
                const configChunk =
