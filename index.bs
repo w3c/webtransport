@@ -1598,7 +1598,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
   1. [=Queue a network task=] with |transport| to run these steps:
     1. Set |stream|.{{[[PendingOperation]]}} to null.
     1. If |atomic| is true, [=map/remove=] |inFlightWriteRequest| from
-       |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
+       |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} if it exists.
     1. [=Resolve=] |promise| with undefined.
 1. Return |promise|.
 
@@ -2073,7 +2073,10 @@ on a {{WebTransportSendStream}} |stream|, given |chunk|, run these steps:
 1. Let |p| be the result of {{WritableStreamDefaultWriter/write(chunk)}}
     on {{WritableStreamDefaultWriter}} with |chunk|.
 1. Set |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} to |p|.
-1. Return |p|.
+1. Return the result of [=reacting=] to |p| with the following steps:
+   1. [=map/Remove=] |p| from |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} if it exists.
+   1. If |p| was rejected with reason |r|, then return [=a promise rejected with=] |r|.
+   1. Return undefined.
 
 </div>
 
