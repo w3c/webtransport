@@ -1501,8 +1501,8 @@ A {{WebTransportSendStream}} has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[AtomicWriteRequests]]`</dfn>
-   <td class="non-normative">An [=ordered set=] of promises, each representing an in-flight atomic
-    write request to be processed by the underlying sink.
+   <td class="non-normative">An [=ordered set=] of promises, keeping track of the subset of
+    write requests that are atomic among those queued be processed by the underlying sink.
   </tr>
  <tbody>
 </table>
@@ -1525,7 +1525,7 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
     : {{WebTransportSendStream/[[SendOrder]]}}
     :: |sendOrder|
     : {{WebTransportSendStream/[[AtomicWriteRequests]]}}
-    :: An empty [=list=] of promises.
+    :: An empty [=ordered set=] of promises.
 1. Let |writeAlgorithm| be an action that [=writes=] |chunk| to |stream|, given |chunk|.
 1. Let |closeAlgorithm| be an action that [=closes=] |stream|.
 1. Let |abortAlgorithm| be an action that [=aborts=] |stream| with |reason|, given |reason|.
@@ -1576,11 +1576,10 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
      sent.
 
-     Whenever the sending of |bytes| becomes blocked by [=flow control=],
-     [=queue a network task=] with |transport| to [=abort all atomic write requests=] on |stream|.
-
-     If the sending of |bytes| becomes blocked by [=flow control=] and |atomic| is true,
-     then give up on sending |bytes| and proceed immediately to the next step without failing.
+     If the sending of |bytes| cannot be completed within the current [=flow control=]
+     window, and |atomic| is true, then give up on sending |bytes| and
+     [=queue a network task=] with |transport| to [=abort all atomic write requests=]
+     on |stream|, before proceeding immediately to the next step without failing.
 
      The user agent SHOULD divide bandwidth fairly between all streams that aren't starved.
 
@@ -1655,7 +1654,7 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
 To <dfn for="WebTransportSendStream">abort all atomic write requests</dfn> on a {{WebTransportSendStream}} |stream|, run these steps:
   1. Let |requestsToAbort| be [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
   1. [=map/Clear=] [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
-  1. [=For each=] |promise| in |requestsToAbort|, [=reject=] |promise| with {{TransactionInactiveError}}.
+  1. [=For each=] |promise| in |requestsToAbort|, [=reject=] |promise| with {{AbortError}}.
   1. [=In parallel=], [=for each=] |promise| in |requestsToAbort|, abort the sending of data
      associated with |promise|.
 
