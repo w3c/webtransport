@@ -1655,8 +1655,8 @@ To <dfn for="WebTransportSendStream">abort all atomic write requests</dfn> on a 
   1. Let |requestsToAbort| be [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
   1. [=map/Clear=] [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
   1. [=For each=] |promise| in |requestsToAbort|, [=reject=] |promise| with {{AbortError}}.
-  1. [=In parallel=], [=for each=] |promise| in |requestsToAbort|, abort the sending of data
-     associated with |promise|.
+  1. [=In parallel=], [=for each=] |promise| in |requestsToAbort|, abort the
+     [=stream/send|sending=] of bytes associated with |promise|.
 
 </div>
 
