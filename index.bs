@@ -620,7 +620,7 @@ interface WebTransport {
       optional WebTransportSendStreamOptions options = {});
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
-  WebTransportSender createSender();
+  WebTransportSendGroup createSendGroup();
 };
 
 enum WebTransportReliabilityMode {
@@ -1002,8 +1002,8 @@ these steps.
    1. Let |transport| be [=this=].
    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
       return a new [=rejected=] promise with an {{InvalidStateError}}.
-   1. Let |sender| be {{WebTransport/createBidirectionalStream(options)/options}}'s
-      {{WebTransportSendStreamOptions/sender}}.
+   1. Let |sendGroup| be {{WebTransport/createBidirectionalStream(options)/options}}'s
+      {{WebTransportSendStreamOptions/sendGroup}}.
    1. Let |sendOrder| be {{WebTransport/createBidirectionalStream(options)/options}}'s
       {{WebTransportSendStreamOptions/sendOrder}}.
    1. Let |p| be a new promise.
@@ -1018,7 +1018,7 @@ these steps.
         1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
            [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
         1. Let |stream| be the result of [=BidirectionalStream/creating=] a
-           {{WebTransportBidirectionalStream}} with |internalStream|, |transport|, |sender|, and |sendOrder|.
+           {{WebTransportBidirectionalStream}} with |internalStream|, |transport|, |sendGroup|, and |sendOrder|.
         1. [=Resolve=] |p| with |stream|.
    1. Return |p|.
 
@@ -1033,8 +1033,8 @@ these steps.
      1. Let |transport| be [=this=].
      1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
         return a new [=rejected=] promise with an {{InvalidStateError}}.
-     1. Let |sender| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
-        {{WebTransportSendStreamOptions/sender}}.
+     1. Let |sendGroup| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
+        {{WebTransportSendStreamOptions/sendGroup}}.
      1. Let |sendOrder| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
         {{WebTransportSendStreamOptions/sendOrder}}.
      1. Let |p| be a new promise.
@@ -1049,20 +1049,20 @@ these steps.
           1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
              [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
           1. Let |stream| be the result of [=WebTransportSendStream/creating=] a {{WebTransportSendStream}} with
-             |internalStream|, |transport|, |sender|, and |sendOrder|.
+             |internalStream|, |transport|, |sendGroup|, and |sendOrder|.
           1. [=Resolve=] |p| with |stream|.
      1. return |p|.
 
-: <dfn for="WebTransport" method>createSender()</dfn>
+: <dfn for="WebTransport" method>createSendGroup()</dfn>
 
-:: Creates a {{WebTransportSender}}.
+:: Creates a {{WebTransportSendGroup}}.
 
-   When `createSender()` method is called, the user agent MUST
+   When `createSendGroup()` method is called, the user agent MUST
    run the following steps:
      1. Let |transport| be [=this=].
      1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
         [=throw=] an {{InvalidStateError}}.
-     1. Return the result of [=WebTransportSender/creating=] a {{WebTransportSender}} with |transport|.
+     1. Return the result of [=WebTransportSendGroup/creating=] a {{WebTransportSendGroup}} with |transport|.
 
 ## Procedures ##  {#webtransport-procedures}
 
@@ -1303,15 +1303,15 @@ dictionary of parameters that affect how {{WebTransportSendStream}}s created by
 
 <pre class="idl">
 dictionary WebTransportSendStreamOptions {
-  WebTransportSender? sender = null;
+  WebTransportSendGroup? sendGroup = null;
   long long sendOrder = 0;
 };
 </pre>
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportSendStreamOptions" dict-member>sender</dfn>
-:: An optional {{WebTransportSender}} to [=group=] this
+: <dfn for="WebTransportSendStreamOptions" dict-member>sendGroup</dfn>
+:: An optional {{WebTransportSendGroup}} to [=group=] this
    {{WebTransportSendStream}} under, or null.
 
 : <dfn for="WebTransportSendStreamOptions" dict-member>sendOrder</dfn>
@@ -1328,7 +1328,7 @@ The dictionary SHALL have the following attributes:
    divide bandwidth fairly between all streams that aren't starved by lower send
    order numbers.
 
-   Note: This is sender-side data prioritization which does not guarantee
+   Note: This is sendGroup-side data prioritization which does not guarantee
    reception order.
 
 ## `WebTransportStats` Dictionary ##  {#web-transport-stats}
@@ -1441,7 +1441,7 @@ data to the server.
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext, Transferable]
 interface WebTransportSendStream : WritableStream {
-  attribute WebTransportSender? sender;
+  attribute WebTransportSendGroup? sendGroup;
   attribute long long sendOrder;
   Promise&lt;WebTransportSendStreamStats&gt; getStats();
 };
@@ -1456,15 +1456,15 @@ The {{WebTransportSendStream}}'s [=transfer steps=] and
 
 ## Attributes ##  {#send-stream-attributes}
 
-: <dfn for="WebTransportSendStream" attribute>sender</dfn>
+: <dfn for="WebTransportSendStream" attribute>sendGroup</dfn>
 :: The getter steps are:
-     1. Return [=this=]'s {{WebTransportSendStream/[[Sender]]}}.
+     1. Return [=this=]'s {{WebTransportSendStream/[[SendGroup]]}}.
 :: The setter steps, given |value|, are:
      1. If |value| is non-null, and
-        |value|.{{WebTransportSender/[[Transport]]}} is not
+        |value|.{{WebTransportSendGroup/[[Transport]]}} is not
         [=this=].{{WebTransportSendStream/[[Transport]]}}, [=throw=]
         an {{InvalidStateError}}.
-     1. Set [=this=].{{WebTransportSendStream/[[Sender]]}} to |value|.
+     1. Set [=this=].{{WebTransportSendStream/[[SendGroup]]}} to |value|.
 
 : <dfn for="WebTransportSendStream" attribute>sendOrder</dfn>
 :: The getter steps are:
@@ -1515,8 +1515,8 @@ A {{WebTransportSendStream}} has the following internal slots.
    <td class="non-normative">A {{WebTransport}} which owns this {{WebTransportSendStream}}.
   </tr>
   <tr>
-   <td><dfn>`[[Sender]]`</dfn>
-   <td class="non-normative">An optional {{WebTransportSender}}, or null.
+   <td><dfn>`[[SendGroup]]`</dfn>
+   <td class="non-normative">An optional {{WebTransportSendGroup}}, or null.
   </tr>
   <tr>
    <td><dfn>`[[SendOrder]]`</dfn>
@@ -1531,7 +1531,7 @@ A {{WebTransportSendStream}} has the following internal slots.
 
 To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
 {{WebTransportSendStream}}, with an [=outgoing unidirectional=] or [=bidirectional=] [=WebTransport stream=]
-|internalStream|, a {{WebTransport}} |transport|, |sender|, and a
+|internalStream|, a {{WebTransport}} |transport|, |sendGroup|, and a
 |sendOrder|, run these steps:
 
 1. Let |stream| be a [=new=] {{WebTransportSendStream}}, with:
@@ -1541,8 +1541,8 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
     :: null
     : {{WebTransportSendStream/[[Transport]]}}
     :: |transport|
-    : {{WebTransportSendStream/[[Sender]]}}
-    :: |sender|
+    : {{WebTransportSendStream/[[SendGroup]]}}
+    :: |sendGroup|
     : {{WebTransportSendStream/[[SendOrder]]}}
     :: |sendOrder|
 1. Let |writeAlgorithm| be an action that [=writes=] |chunk| to |stream|, given |chunk|.
@@ -1580,7 +1580,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 
      This sending MUST starve
      until all bytes queued for sending on {{WebTransportSendStream}}s with the
-     same {{[[Sender]]}} and a higher {{[[SendOrder]]}}, that are neither
+     same {{[[SendGroup]]}} and a higher {{[[SendOrder]]}}, that are neither
      [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
      sent.
 
@@ -1716,44 +1716,44 @@ The dictionary SHALL have the following attributes:
    Note: This value will match {{WebTransportSendStreamStats/bytesSent}} when
    the connection is over HTTP/2.
 
-# Interface `WebTransportSender` #  {#sender}
+# Interface `WebTransportSendGroup` #  {#sendGroup}
 
-A {{WebTransportSender}} is an optional organizational object that tracks
+A {{WebTransportSendGroup}} is an optional organizational object that tracks
 transmission of data spread across many individual
 (typically [=strict ordering|strictly ordered=])
 {{WebTransportSendStream}}s.
 
 {{WebTransportSendStream}}s can, at their creation or through assignment of
-their `sender` attribute, be <dfn>grouped</dfn> under at most one
-{{WebTransportSender}} at any time. By default, they are
+their `sendGroup` attribute, be <dfn>grouped</dfn> under at most one
+{{WebTransportSendGroup}} at any time. By default, they are
 <dfn>ungrouped</dfn>.
 
-The user agent considers {{WebTransportSender}}s as equals when allocating
-bandwidth for sending {{WebTransportSendStream}}s. Each {{WebTransportSender}}
+The user agent considers {{WebTransportSendGroup}}s as equals when allocating
+bandwidth for sending {{WebTransportSendStream}}s. Each {{WebTransportSendGroup}}
 also establishes a separate numberspace for evaluating
 {{WebTransportSendStreamOptions/sendOrder}} numbers.
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
-interface WebTransportSender {
+interface WebTransportSendGroup {
   Promise&lt;WebTransportSendStreamStats&gt; getStats();
 };
 </pre>
 
-A {{WebTransportSender}} is always created by the
-[=WebTransportSender/create=] procedure.
+A {{WebTransportSendGroup}} is always created by the
+[=WebTransportSendGroup/create=] procedure.
 
-## Methods ##  {#sender-methods}
+## Methods ##  {#sendGroup-methods}
 
-: <dfn for="WebTransportSender" method>getStats()</dfn>
+: <dfn for="WebTransportSendGroup" method>getStats()</dfn>
 :: Aggregates stats from all {{WebTransportSendStream}}s
-   [=grouped=] under [=this=] sender, and reports the result
+   [=grouped=] under [=this=] sendGroup, and reports the result
     asynchronously.</p>
 
    When getStats is called, the user agent MUST run the following steps:
      1. Let |p| be a new promise.
      1. Let |streams| be all {{WebTransportSendStream}}s whose
-       {{WebTransportSendStream/[[Sender]]}} is [=this=].
+       {{WebTransportSendStream/[[SendGroup]]}} is [=this=].
      1. Run the following steps [=in parallel=]:
          1. Gather stream statistics from all streams in |streams|.
          1. [=Queue a network task=] with |transport| to run the following steps:
@@ -1762,11 +1762,11 @@ A {{WebTransportSender}} is always created by the
            1. [=Resolve=] |p| with |stats|.
      1. Return |p|.
 
-## Internal Slots ## {#sender-internal-slots}
+## Internal Slots ## {#sendGroup-internal-slots}
 
-A {{WebTransportSender}} has the following internal slots.
+A {{WebTransportSendGroup}} has the following internal slots.
 
-<table class="data" dfn-for="WebTransportSender" dfn-type="attribute">
+<table class="data" dfn-for="WebTransportSendGroup" dfn-type="attribute">
  <thead>
   <tr>
    <th>Internal Slot
@@ -1776,22 +1776,22 @@ A {{WebTransportSender}} has the following internal slots.
  <tbody>
   <tr>
    <td><dfn>`[[Transport]]`</dfn>
-   <td class="non-normative">The {{WebTransport}} object owning this {{WebTransportSender}}.
+   <td class="non-normative">The {{WebTransport}} object owning this {{WebTransportSendGroup}}.
   </tr>
  <tbody>
 </table>
 
-## Procedures ##  {#sender-procedures}
+## Procedures ##  {#sendGroup-procedures}
 
-<div algorithm="create a Sender">
+<div algorithm="create a SendGroup">
 
-To <dfn export for="WebTransportSender" lt="create|creating">create</dfn> a
-{{WebTransportSender}}, with a {{WebTransport}} |transport|, run these steps:
+To <dfn export for="WebTransportSendGroup" lt="create|creating">create</dfn> a
+{{WebTransportSendGroup}}, with a {{WebTransport}} |transport|, run these steps:
 
-1. Let |sender| be a [=new=] {{WebTransportSender}}, with:
-    : {{WebTransportSender/[[Transport]]}}
+1. Let |sendGroup| be a [=new=] {{WebTransportSendGroup}}, with:
+    : {{WebTransportSendGroup/[[Transport]]}}
     :: |transport|
-1. Return |sender|.
+1. Return |sendGroup|.
 
 </div>
 
