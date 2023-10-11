@@ -2037,17 +2037,23 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
    When called, run the following steps:
    1. Let |stream| be the {{WebTransportSendStream}} associated with [=this=].
    1. If |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} is not empty,
-      return the result of [=writing atomically=] on |stream| with |chunk|.
+      then return the result of [=writing atomically=] on |stream| with |chunk|.
    1. Return the result of {{WritableStreamDefaultWriter/write(chunk)}}
       on {{WritableStreamDefaultWriter}} with |chunk|.
 
 : <dfn for="WebTransportWriter" method>atomicWrite(chunk)</dfn>
-:: The {{atomicWrite}} method will reject if the chunk given to it
-   cannot be sent in its entirety without blocking on [=flow control=].
-   This behavior is designed to satisfy niche transactional applications
-   sensitive to [=flow control=] deadlocks ([[RFC9308]]
+:: The {{atomicWrite}} method will reject if the |chunk| given to it
+   cannot be sent in its entirety within the [=flow control=] window that
+   is current at the time of sending. In other words, the sending of |chunk|
+   is all or nothing. This behavior is designed to satisfy niche transactional
+   applications sensitive to [=flow control=] deadlocks ([[RFC9308]]
    [Section 4.4](https://datatracker.ietf.org/doc/html/rfc9308#section-4.4)).
-   
+
+   Note: Atomic writes can still block if queued behind non-atomic writes. If
+   the write is rejected, everything queued behind it will be rejected as well,
+   including non-atomic writes. Applications are therefore encouraged to always
+   await atomic writes.
+
    When called, return the result of [=writing atomically=] on the
    {{WebTransportSendStream}} associated with [=this=], with |chunk|.
 
