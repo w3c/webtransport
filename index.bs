@@ -2787,7 +2787,7 @@ async function sendTransactionalData(wt, bytes) {
   try {
     await writer.atomicWrite(bytes);
   } catch (e) {
-    if (e.name != "TransactionInactiveError") throw e;
+    if (e.name != "AbortError") throw e;
     // rejected to avoid blocking on flow control
     // The writable remains un-errored unlike with regular writes
   } finally {
