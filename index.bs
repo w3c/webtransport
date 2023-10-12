@@ -2170,7 +2170,8 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
 
    Note: Atomic writes can still block if queued behind non-atomic writes. If
    the write is rejected, everything queued behind it will be rejected as well,
-   including non-atomic writes. Applications are therefore encouraged to always
+   including non-atomic writes, which are enqueued as atomic writes when an
+   atomic write is outstanding. Applications are therefore encouraged to always
    await atomic writes.
 
    When called, return the result of [=writing atomically=] on the
