@@ -1594,10 +1594,6 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 1. Set |stream|.{{[[PendingOperation]]}} to |promise|.
 1. Let |inFlightWriteRequest| be
    |stream|.<a href="https://streams.spec.whatwg.org/#writablestream-inflightwriterequest">inFlightWriteRequest</a>.
-
-   Note: Find a [better way](https://streams.spec.whatwg.org/#other-specs) to integrate
-   with the streams spec to identify the write request in flight.
-
 1. Let |atomic| be true if |inFlightWriteRequest| [=list/exists=]
    in [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}, otherwise false.
 1. Run the following steps [=in parallel=]:
@@ -1616,7 +1612,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      except for [=flow control=] reasons or [=WritableStream/Error | error=].
 
      If the sending of |bytes| cannot be completed in its entirety within the current
-     [=flow control=] window, and |atomic| is true, then give up on sending |bytes| and
+     [=flow control=] window, and |atomic| is true, then stop sending |bytes| and
      [=queue a network task=] with |transport| to [=abort all atomic write requests=]
      on |stream|, before proceeding immediately to the next step without failing.
 
