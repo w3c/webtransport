@@ -1349,7 +1349,6 @@ same [[fetch#network-partition-keys|network partition key]].
 
 <pre class="idl">
 dictionary WebTransportConnectionStats {
-  DOMHighResTimeStamp timestamp;
   unsigned long long bytesSent;
   unsigned long long packetsSent;
   unsigned long long bytesLost;
@@ -1366,9 +1365,6 @@ dictionary WebTransportConnectionStats {
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportConnectionStats" dict-member>timestamp</dfn>
-:: The `timestamp` for when the stats are gathered, relative to the
-   UNIX epoch (Jan 1, 1970, UTC).
 : <dfn for="WebTransportConnectionStats" dict-member>bytesSent</dfn>
 :: The number of bytes sent on the [=underlying connection=], including retransmissions.
    Does not include UDP or any other outer framing.
@@ -1410,7 +1406,6 @@ on datagram transmission over the HTTP/3 connection.
 
 <pre class="idl">
 dictionary WebTransportDatagramStats {
-  DOMHighResTimeStamp timestamp;
   unsigned long long expiredOutgoing;
   unsigned long long droppedIncoming;
   unsigned long long lostOutgoing;
@@ -1419,9 +1414,6 @@ dictionary WebTransportDatagramStats {
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportDatagramStats" dict-member>timestamp</dfn>
-:: The `timestamp` for when the stats are gathered, relative to the
-   UNIX epoch (Jan 1, 1970, UTC).
 : <dfn for="WebTransportDatagramStats" dict-member>expiredOutgoing</dfn>
 :: The number of datagrams queued for sending that were dropped, due to being
    older than {{outgoingMaxAge}} before they were able to be sent.
@@ -1687,7 +1679,6 @@ on stats specific to one {{WebTransportSendStream}}.
 
 <pre class="idl">
 dictionary WebTransportSendStreamStats {
-  DOMHighResTimeStamp timestamp;
   unsigned long long bytesWritten;
   unsigned long long bytesSent;
   unsigned long long bytesAcknowledged;
@@ -1696,9 +1687,6 @@ dictionary WebTransportSendStreamStats {
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportSendStreamStats" dict-member>timestamp</dfn>
-:: The `timestamp` for when the stats are gathered, relative to the
-   UNIX epoch (Jan 1, 1970, UTC).
 : <dfn for="WebTransportSendStreamStats" dict-member>bytesWritten</dfn>
 :: The total number of bytes the application has successfully written to this
    {{WebTransportSendStream}}. This number can only increase.
@@ -1998,7 +1986,6 @@ information on stats specific to one {{WebTransportReceiveStream}}.
 
 <pre class="idl">
 dictionary WebTransportReceiveStreamStats {
-  DOMHighResTimeStamp timestamp;
   unsigned long long bytesReceived;
   unsigned long long bytesRead;
 };
@@ -2006,9 +1993,6 @@ dictionary WebTransportReceiveStreamStats {
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportReceiveStreamStats" dict-member>timestamp</dfn>
-:: The `timestamp` for when the stats are gathered, relative to the
-   UNIX epoch (Jan 1, 1970, UTC).
 : <dfn for="WebTransportReceiveStreamStats" dict-member>bytesReceived</dfn>
 :: An indicator of progress on how many of the server application's bytes
    intended for this {{WebTransportReceiveStream}} have been received so far.
