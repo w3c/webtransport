@@ -331,8 +331,8 @@ interface WebTransportDatagramDuplexStream {
   readonly attribute WritableStream writable;
 
   readonly attribute unsigned long maxDatagramSize;
-  attribute unrestricted double incomingMaxAge;
-  attribute unrestricted double outgoingMaxAge;
+  attribute unrestricted double? incomingMaxAge;
+  attribute unrestricted double? outgoingMaxAge;
   attribute unrestricted double incomingHighWaterMark;
   attribute unrestricted double outgoingHighWaterMark;
 };
@@ -374,7 +374,7 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>`[[IncomingDatagramsExpirationDuration]]`</dfn>
    <td class="non-normative">An {{unrestricted double}} representing the
-   expiration duration for incoming datagrams (in milliseconds).
+   expiration duration for incoming datagrams (in milliseconds), or null.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
@@ -389,7 +389,7 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>`[[OutgoingDatagramsExpirationDuration]]`</dfn>
    <td class="non-normative">An {{unrestricted double}} value representing the
-   expiration duration for outgoing datagrams (in milliseconds).
+   expiration duration for outgoing datagrams (in milliseconds), or null.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingMaxDatagramSize]]`</dfn>
@@ -419,7 +419,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     : {{[[IncomingDatagramsHighWaterMark]]}}
     :: an [=implementation-defined=] value
     : {{[[IncomingDatagramsExpirationDuration]]}}
-    :: +∞
+    :: null
     : {{[[OutgoingDatagramsQueue]]}}
     :: an empty queue
     : {{[[OutgoingDatagramsHighWaterMark]]}}
@@ -429,7 +429,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
            jeopardizing the timeliness of transmitted data.</p>
        </div>
     : {{[[OutgoingDatagramsExpirationDuration]]}}
-    :: +∞
+    :: null
     : {{[[OutgoingMaxDatagramSize]]}}
     :: an [=implementation-defined=] integer.
  1. Return |stream|.
@@ -449,7 +449,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. Return [=this=].{{[[IncomingDatagramsExpirationDuration]]}}.
 :: The setter steps, given |value|, are:
      1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
-     1. If |value| is `0`, set |value| to +∞.
+     1. If |value| is `0`, set |value| to null.
      1. Set [=this=].{{[[IncomingDatagramsExpirationDuration]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>maxDatagramSize</dfn>
@@ -461,7 +461,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. Return [=this=]'s {{[[OutgoingDatagramsExpirationDuration]]}}.
 :: The setter steps, given |value|, are:
      1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
-     1. If |value| is `0`, set |value| to +∞.
+     1. If |value| is `0`, set |value| to null.
      1. Set [=this=].{{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingHighWaterMark</dfn>
