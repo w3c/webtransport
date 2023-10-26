@@ -135,7 +135,7 @@ A <dfn for="protocol">WebTransport session</dfn> is a session of WebTransport ov
 or HTTP/2 <dfn>underlying [=connection=]</dfn>.
 There may be multiple [=WebTransport sessions=] on one [=connection=], when pooling is enabled.
 
-A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRANSPORT-HTTP3]]:
+A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRANSPORT-OVERVIEW]]:
 
 <table class="data" dfn-for="session">
  <thead>
@@ -147,59 +147,59 @@ A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRAN
  <tbody>
   <tr>
    <td><dfn>send a datagram</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.2-6.2.1)
   </tr>
   <tr>
    <td><dfn>receive a datagram</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.2-6.4.1)
   </tr>
   <tr>
    <td><dfn>create an [=stream/outgoing unidirectional=] stream</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-7.2.1)
   </tr>
   <tr>
    <td><dfn>create a [=stream/bidirectional=] stream</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-7.4.1)
   </tr>
   <tr>
    <td><dfn>receive an [=stream/incoming unidirectional=] stream</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-7.6.1)
   </tr>
   <tr>
    <td><dfn>receive a [=stream/bidirectional=] stream</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-7.8.1)
   </tr>
  </tbody>
 </table>
 
 To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=/origin=] |origin|,
-follow [[!WEB-TRANSPORT-HTTP3]]
-[Section 3.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.3),
+follow [[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-2.2.1),
 with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomorphic encoded=],
 as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
-HTTP/3 stream associated with the CONNECT request that initiated |session| receives an
-[=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when an HTTP/3
+underlying stream associated with the CONNECT request that initiated |session| receives an
+[=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when a
 [=session-signal/GOAWAY=] frame is received, as described in [[!WEB-TRANSPORT-HTTP3]]
 [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6).
 
 To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an optional integer
-|code| and an optional [=byte sequence=] |reason|, follow [[!WEB-TRANSPORT-HTTP3]]
-[Section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
+|code| and an optional [=byte sequence=] |reason|, follow [[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-2.2.1).
 
 A [=WebTransport session=] |session| is <dfn for=session>terminated</dfn>, with optionally
-an integer |code| and a [=byte sequence=] |reason|, when the HTTP/3 stream associated with the
+an integer |code| and a [=byte sequence=] |reason|, when the underlying stream associated with the
 CONNECT request that initiated |session| is closed by the server, as described at
-[[!WEB-TRANSPORT-HTTP3]]
-[Section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
+[[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-4.2.1).
 
 A [=WebTransport session=] has the following signals:
 
@@ -226,8 +226,9 @@ A [=WebTransport session=] has the following signals:
 
 ## WebTransport stream ## {#webtransport-stream}
 
-A <dfn for="protocol">WebTransport stream</dfn> is a concept for an HTTP/3 stream on a
-[=WebTransport session=].
+A <dfn for="protocol">WebTransport stream</dfn> is a concept for a reliable in-order stream of
+bytes on a [=WebTransport session=], as described in [[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3).
 
 A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn>,
 <dfn for=stream>outgoing unidirectional</dfn> or <dfn for=stream>bidirectional</dfn>.
@@ -594,8 +595,8 @@ in the same manner as when in the `"connected"` state. Once the transport's {{[[
 
 # `WebTransport` Interface #  {#web-transport}
 
-`WebTransport` provides an API to the HTTP/3 transport functionality
-defined in [[!WEB-TRANSPORT-HTTP3]].
+`WebTransport` provides an API to the underlying transport functionality
+defined in [[!WEB-TRANSPORT-OVERVIEW]].
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
@@ -978,7 +979,7 @@ these steps.
 </div>
 
 : <dfn for="WebTransport" method>getStats()</dfn>
-:: Gathers stats for this {{WebTransport}}'s HTTP/3
+:: Gathers stats for this {{WebTransport}}'s underlying transport
    connection and reports the result asynchronously.</p>
 
    When getStats is called, the user agent MUST run the following steps:
@@ -1131,8 +1132,8 @@ series of steps |steps|, run these steps:
 Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} |transport| is
 [=session/terminated=] with optionally |code| and |reasonBytes|, run these steps:
 
-1. Let |cleanly| be a boolean representing whether the HTTP/3 stream associated with the CONNECT
-   request that initiated |transport|.{{[[Session]]}} is in the "Data Recvd" state. [[!QUIC]]
+1. Let |cleanly| be a boolean representing whether the underlying transport stream associated with
+   the CONNECT request that initiated |transport|.{{[[Session]]}} is in the "Data Recvd" state. [[!QUIC]]
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
@@ -1212,7 +1213,7 @@ that determine how the [=WebTransport session=] is established and used.
 
 : <dfn for="WebTransportOptions" dict-member>allowPooling</dfn>
 :: When set to true, the [=WebTransport session=] can be pooled, that is, its [=underlying connection=]
-   can be shared with other HTTP/3 sessions.
+   can be shared with other WebTransport sessions.
 
 : <dfn for="WebTransportOptions" dict-member>requireUnreliable</dfn>
 :: When set to true, the [=WebTransport session=] cannot be established over an
@@ -1402,7 +1403,7 @@ The dictionary SHALL have the following attributes:
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
 
 The <dfn dictionary>WebTransportDatagramStats</dfn> dictionary includes statistics
-on datagram transmission over the HTTP/3 connection.
+on datagram transmission over the [=underlying connection=].
 
 <pre class="idl">
 dictionary WebTransportDatagramStats {
@@ -2346,13 +2347,15 @@ WebTransport imposes a set of requirements as described in
    use and confirming that the remote server is willing to use the WebTransport
    protocol. [[!WEB-TRANSPORT-HTTP3]] uses a combination of ALPN [[RFC7301]], an
    HTTP/3 setting, and a `:protocol` pseudo-header to identify the WebTransport
-   protocol.
+   protocol. [[!WEB-TRANSPORT-HTTP2]] uses a combination of ALPN, an HTTP/2 setting,
+   and a `:protocol` pseudo-header to identify the WebTransport protocol.
 1. Allowing the server to filter connections based on the origin of the resource
    originating the transport session.  The <a http-header><code>Origin</code></a> header
    field on the session establishment request carries this information.
 
-Protocol security considerations related are described in the
-*Security Considerations* sections of [[!WEB-TRANSPORT-HTTP3]].
+Protocol security related considerations are described in the
+*Security Considerations* sections of [[!WEB-TRANSPORT-HTTP3]] and
+[[!WEB-TRANSPORT-HTTP2]].
 
 Networking APIs can be commonly used to scan the local network for available
 hosts, and thus be used for fingerprinting and other forms of attacks.
