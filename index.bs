@@ -1641,8 +1641,9 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 4294967295, then set |code| to 4294967295.
 
-   Note: Valid values of |code| are from 0 to 4294967295 inclusive. The code will be encoded to a
-   number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in [[!WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
+   using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
+   [[!WEB-TRANSPORT-HTTP3]].
 
 1. Run the following steps [=in parallel=]:
   1. [=stream/Reset=] |stream|.{{WebTransportSendStream/[[InternalStream]]}} with |code|.
@@ -1660,8 +1661,9 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportSendStream}} 
 1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
 1. Let |code| be the application protocol error code attached to the STOP_SENDING frame. [[!QUIC]]
 
-   Note: Valid values of |code| are from 0 to 4294967295 inclusive. The code has been decoded from a
-  number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in[[!WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
+   using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
+   [[!WEB-TRANSPORT-HTTP3]].
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
@@ -1941,8 +1943,9 @@ steps.
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 4294967295, then set |code| to 4294967295.
 
-   Note: Valid values of |code| are from 0 to 4294967295 inclusive. The code will be encoded to a
-   number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in [[!WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
+   using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
+   [[!WEB-TRANSPORT-HTTP3]].
 
 1. [=set/Remove=] |stream| from |transport|.{{[[SendStreams]]}}.
 1. Run the following steps [=in parallel=]:
@@ -1967,8 +1970,9 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportReceiveStream
 1. Let |transport| be |stream|.{{WebTransportReceiveStream/[[Transport]]}}.
 1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
 
-   Note: Valid values of |code| are from 0 to 4294967295 inclusive. The code has been decoded from a
-   number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in [[!WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
+   using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
+   [[!WEB-TRANSPORT-HTTP3]].
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
@@ -2171,9 +2175,31 @@ Their [=deserialization steps=], given |serialized| and |value|, are:
 
 *This section is non-normative.*
 
-This section describes the [[QUIC]] protocol behavior of methods defined
-in this specification, utilizing [[!WEB-TRANSPORT-HTTP3]]. Cause and effect may
-not be immediate due to buffering. The application
+This section describes the underlying protocol behavior of methods defined
+in this specification, utilizing [[!WEB-TRANSPORT-OVERVIEW]]. Cause and effect may
+not be immediate due to buffering.
+
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>WebTransport Protocol Action</th>
+        <th>API Effect</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>received [=session-signal/DRAIN_WEBTRANSPORT_SESSION=]</td>
+        <td>await wt.{{WebTransport/draining}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+If the [=underlying connection=] is using HTTP/3, the following protocol behaviors
+from [[!WEB-TRANSPORT-HTTP3]] apply.
+
+The application
 {{WebTransportError/streamErrorCode}} in the {{WebTransportError}} error is
 converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-HTTP3]]
 [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.3).
@@ -2273,24 +2299,7 @@ stream data with any data not consumed being discarded. However,
 immediate signaling is not required. Also, if stream data
 is completely received but has not yet been read by the
 application, the RESET_STREAM signal can be suppressed.
-  
-  <table class="data">
-    <colgroup class="header"><col></colgroup>
-    <colgroup><col></colgroup>
-    <thead>
-      <tr>
-        <th>WebTransport Protocol Action</th>
-        <th>API Effect</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>received [=session-signal/DRAIN_WEBTRANSPORT_SESSION=]</td>
-        <td>await wt.{{WebTransport/draining}}</td>
-      </tr>
-    </tbody>
-  </table>
-  
+
   <table class="data">
     <colgroup class="header"><col></colgroup>
     <colgroup><col></colgroup>
@@ -2301,6 +2310,102 @@ application, the RESET_STREAM signal can be suppressed.
       </tr>
     </thead>
     <tbody>
+      <tr>
+        <td>received [=session-signal/GOAWAY=]</td>
+        <td>await wt.{{WebTransport/draining}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+If the [=underlying connection=] is using HTTP/2, the following protocol behaviors
+from [[!WEB-TRANSPORT-HTTP2]] apply.
+
+
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>API Method</th>
+        <th>HTTP/2 Protocol Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(error)</td>
+        <td>[=stream/Reset|sends WT_RESET_STREAM=] with error</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/close}}()</td>
+        <td>[=stream/Send|sends=] WT_STREAM with FIN bit set</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/write}}()</td>
+        <td>[=stream/Send|sends=] WT_STREAM</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/close}}()</td>
+        <td>[=stream/Send|sends=] WT_STREAM with FIN bit set</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(error)</td>
+        <td>[=stream/Reset|sends WT_RESET_STREAM=] with error</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(error)</td>
+        <td>[=send STOP_SENDING|sends WT_STOP_SENDING=] with error</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(error)</td>
+        <td>[=send STOP_SENDING|sends WT_STOP_SENDING=] with error</td>
+      </tr>
+      <tr>
+        <td>wt.{{WebTransport/close}}(closeInfo)</td>
+        <td>[=session/terminate|terminates=] session with closeInfo<br>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>HTTP/2 Protocol Action</th>
+        <th>API Effect</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>received [=stream-signal/STOP_SENDING|WT_STOP_SENDING=] with error</td>
+        <td>[=WritableStream/Error|errors=] {{WebTransportBidirectionalStream/writable}}
+        with {{WebTransportError/streamErrorCode}}</td>
+      </tr>
+      <tr>
+        <td>[=stream/Receive|received=] WT_STREAM</td>
+        <td>(await
+          {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).value</td>
+      </tr>
+      <tr>
+        <td>[=stream/Receive|received=] WT_STREAM with FIN bit set</td>
+        <td>(await
+          {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).done</td>
+      </tr>
+      <tr>
+        <td>received [=stream-signal/RESET_STREAM|WT_RESET_STREAM=] with error</td>
+        <td>[=ReadableStream/Error|errors=] {{WebTransportBidirectionalStream/readable}}
+        with {{WebTransportError/streamErrorCode}}</td>
+      </tr>
+      <tr>
+        <td>Session cleanly [=session/terminated|terminated=] with closeInfo<br>
+        <td>(await wt.{{WebTransport/closed}}).closeInfo, and
+         [=ReadableStream/error|errors=] open streams</td>
+      </tr>
+      <tr>
+        <td>Network error<br>
+        <td>(await wt.{{WebTransport/closed}}) rejects, and
+          [=ReadableStream/error|errors=] open streams</td>
+      </tr>
       <tr>
         <td>received [=session-signal/GOAWAY=]</td>
         <td>await wt.{{WebTransport/draining}}</td>
