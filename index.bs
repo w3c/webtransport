@@ -186,7 +186,7 @@ as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
-underlying stream associated with the CONNECT request that initiated |session| receives an
+underlying transport stream associated with the CONNECT request that initiated |session| receives an
 [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when a
 [=session-signal/GOAWAY=] frame is received, as described in [[!WEB-TRANSPORT-HTTP3]]
 [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6).
@@ -196,7 +196,7 @@ To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an
 [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-2.2.1).
 
 A [=WebTransport session=] |session| is <dfn for=session>terminated</dfn>, with optionally
-an integer |code| and a [=byte sequence=] |reason|, when the underlying stream associated with the
+an integer |code| and a [=byte sequence=] |reason|, when the underlying transport stream associated with the
 CONNECT request that initiated |session| is closed by the server, as described at
 [[!WEB-TRANSPORT-OVERVIEW]]
 [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-4.2.1).
@@ -979,8 +979,8 @@ these steps.
 </div>
 
 : <dfn for="WebTransport" method>getStats()</dfn>
-:: Gathers stats for this {{WebTransport}}'s underlying transport
-   connection and reports the result asynchronously.</p>
+:: Gathers stats for this {{WebTransport}}'s [=underlying connection=]
+   and reports the result asynchronously.</p>
 
    When getStats is called, the user agent MUST run the following steps:
      1. Let |transport| be [=this=].
