@@ -1611,11 +1611,6 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      This sending MUST NOT starve otherwise,
      except for [=flow control=] reasons or [=WritableStream/Error | error=].
 
-     If the sending of |bytes| cannot be completed in its entirety within the current
-     [=flow control=] window, and |atomic| is true, then stop sending |bytes| and
-     [=queue a network task=] with |transport| to [=abort all atomic write requests=]
-     on |stream|, before proceeding immediately to the next step without failing.
-
      The user agent SHOULD divide bandwidth fairly between all streams that aren't starved.
 
      Note: The definition of fairness here is [=implementation-defined=].
@@ -1624,14 +1619,22 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
     respond to live updates of these values during sending, though the details are
     [=implementation-defined=].
 
-  1. If the previous step failed, abort the remaining steps.
+     If the the current [=flow control=] window ends before |bytes| can be sent in
+     their entirety, and |atomic| is true, then stop sending |bytes|.
+
+  1. If the previous step failed due to a network error, abort the remaining steps.
 
     Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
     error |stream| and reject the result of this write operation.
 
-  1. [=Queue a network task=] with |transport| to run these steps:
+  1. If |bytes| were not sent in their entirety, [=queue a network task=] with |transport|
+     to run these steps:
     1. Set |stream|.{{[[PendingOperation]]}} to null.
-    1. If |atomic| is true, [=map/remove=] |inFlightWriteRequest| from
+    1. [=Abort all atomic write requests=] on |stream|.
+  1. Otherwise, [=queue a network task=] with |transport|
+     to run these steps:
+    1. Set |stream|.{{[[PendingOperation]]}} to null.
+    1. [=map/Remove=] |inFlightWriteRequest| from
        |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} if it exists.
     1. [=Resolve=] |promise| with undefined.
 1. Return |promise|.
