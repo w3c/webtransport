@@ -1594,8 +1594,8 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 1. Set |stream|.{{[[PendingOperation]]}} to |promise|.
 1. Let |inFlightWriteRequest| be
    |stream|.<a href="https://streams.spec.whatwg.org/#writablestream-inflightwriterequest">inFlightWriteRequest</a>.
-1. Let |atomic| be true if |inFlightWriteRequest| [=list/exists=]
-   in [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}, otherwise false.
+1. Let |atomic| be true if [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}
+   [=list/contains=] |inFlightWriteRequest|, otherwise false.
 1. Run the following steps [=in parallel=]:
   1. [=stream/Send=] |bytes| on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the
      operation to complete.
@@ -1634,8 +1634,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
   1. Otherwise, [=queue a network task=] with |transport|
      to run these steps:
     1. Set |stream|.{{[[PendingOperation]]}} to null.
-    1. [=map/Remove=] |inFlightWriteRequest| from
-       |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} if it exists.
+    1. If |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} [=list/contains=] |inFlightWriteRequest|, [=list/remove=] |inFlightWriteRequest|.
     1. [=Resolve=] |promise| with undefined.
 1. Return |promise|.
 
@@ -1691,7 +1690,7 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
 <div algorithm>
 To <dfn for="WebTransportSendStream">abort all atomic write requests</dfn> on a {{WebTransportSendStream}} |stream|, run these steps:
   1. Let |requestsToAbort| be [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
-  1. [=map/Clear=] [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
+  1. [=list/Empty=] [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
   1. [=For each=] |promise| in |requestsToAbort|, [=reject=] |promise| with {{AbortError}}.
   1. [=In parallel=], [=for each=] |promise| in |requestsToAbort|, abort the
      [=stream/send|sending=] of bytes associated with |promise|.
@@ -2202,7 +2201,8 @@ on a {{WebTransportSendStream}} |stream|, given |chunk|, run these steps:
     on {{WritableStreamDefaultWriter}} with |chunk|.
 1. [=set/Append=] |p| to |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
 1. Return the result of [=reacting=] to |p| with the following steps:
-   1. [=map/Remove=] |p| from |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} if it exists.
+   1. If |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} [=list/contains=] |p|,
+      [=list/remove=] |p|.
    1. If |p| was rejected with reason |r|, then return [=a promise rejected with=] |r|.
    1. Return undefined.
 
