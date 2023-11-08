@@ -2167,8 +2167,8 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
    [Section 4.4](https://datatracker.ietf.org/doc/html/rfc9308#section-4.4)).
 
    Note: {{atomicWrite}} does not guarantee atomicity on the wire (e.g. MTU) or
-   at the receiver, nor does it prevent interleaving of data with other send
-   requests. Only the sender will know if it failed.
+   at the server, nor does it prevent interleaving of data with other send
+   requests. Only the client will know if it failed.
 
    Note: Atomic writes can still block if queued behind non-atomic writes. If
    the write is rejected, everything queued behind it will be rejected as well,
