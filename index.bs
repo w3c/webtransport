@@ -828,6 +828,12 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
   1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
+    1. If the user agent supports [=WebTransport sessions=] over HTTP/2 [=connections=], set
+       |transport|'s {{[[Reliability]]}} to `"reliable-only"`, otherwise set it to
+       `"supports-unreliable"`.
+
+       Note: This allows applications to feature-detect HTTP/2 fallback.
+
     1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
        {{WebTransportErrorOptions/source}} is `"session"`.
     1. [=Cleanup=] |transport| with |error|.
