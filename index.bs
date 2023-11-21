@@ -1006,6 +1006,8 @@ these steps.
       {{WebTransportSendStreamOptions/sendGroup}}.
    1. Let |sendOrder| be {{WebTransport/createBidirectionalStream(options)/options}}'s
       {{WebTransportSendStreamOptions/sendOrder}}.
+   1. Let |waitUntilAvailable| be {{WebTransport/createBidirectionalStream(options)/options}}'s
+      {{WebTransportSendStreamOptions/waitUntilAvailable}}.
    1. Let |p| be a new promise.
    1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
@@ -1013,8 +1015,9 @@ these steps.
       1. Let |streamId| be a new stream ID that is valid and unique for
          |transport|.{{[[Session]]}}, as defined in [[!QUIC]]
          [Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11). If one is not
-         immediately available due to exhaustion, [=reject=] |p| with a {{QuotaExceededError}}
-         and abort these steps.
+         immediately available due to exhaustion, wait for it to become
+         available if |waitUntilAvailable| is true, [=reject=] |p| with a
+         {{QuotaExceededError}} and abort these steps otherwise.
       1. Let |internalStream| be the result of [=creating a bidirectional stream=] with
            |transport|.{{[[Session]]}} and |streamId|.
       1. [=Queue a network task=] with |transport| to run the following steps:
@@ -1040,6 +1043,8 @@ these steps.
         {{WebTransportSendStreamOptions/sendGroup}}.
      1. Let |sendOrder| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
         {{WebTransportSendStreamOptions/sendOrder}}.
+     1. Let |waitUntilAvailable| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
+        {{WebTransportSendStreamOptions/waitUntilAvailable}}.
      1. Let |p| be a new promise.
      1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
         {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
@@ -1047,8 +1052,9 @@ these steps.
         1. Let |streamId| be a new stream ID that is valid and unique for
            |transport|.{{[[Session]]}}, as defined in [[!QUIC]]
            [Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11). If one is not
-           immediately available due to exhaustion, [=reject=] |p| with a {{QuotaExceededError}}
-           and abort these steps.
+           immediately available due to exhaustion, wait for it to become
+           available if |waitUntilAvailable| is true, [=reject=] |p| with a
+           {{QuotaExceededError}} and abort these steps otherwise.
         1. Let |internalStream| be the result of [=creating an outgoing unidirectional stream=] with
            |transport|.{{[[Session]]}} and |streamId|.
         1. [=Queue a network task=] with |transport| to run the following steps:
@@ -1311,6 +1317,7 @@ dictionary of parameters that affect how {{WebTransportSendStream}}s created by
 dictionary WebTransportSendStreamOptions {
   WebTransportSendGroup? sendGroup = null;
   long long sendOrder = 0;
+  bool waitUntilAvailable = false;
 };
 </pre>
 
@@ -1336,6 +1343,15 @@ The dictionary SHALL have the following attributes:
 
    Note: This is sender-side data prioritization which does not guarantee
    reception order.
+
+: <dfn for="WebTransportSendStreamOptions" dict-member>waitUntilAvailable</dfn>
+:: If true, the promise returned by the
+   {{WebTransport/createUnidirectionalStream}} or
+   {{WebTransport/createBidirectionalStream}} call will not be [=settled=]
+   until either the [=underlying connection=] has sufficient flow control
+   credit to create the stream, or the connection reaches a state in which no
+   further outgoing streams are possible.  If false, the promise will be
+   [=rejected=] if no flow control window is available at the time of the call.
 
 ## `WebTransportConnectionStats` Dictionary ##  {#web-transport-connection-stats}
 
