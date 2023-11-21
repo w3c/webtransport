@@ -984,8 +984,17 @@ these steps.
    When getStats is called, the user agent MUST run the following steps:
      1. Let |transport| be [=this=].
      1. Let |p| be a new promise.
+     1. If |transport|.{{[[State]]}} is `"failed"`, [=reject=] |p| with an
+        {{InvalidStateError}} and abort these steps.
      1. Run the following steps [=in parallel=]:
-         1. Gather the stats from the [=underlying connection=], including stats on datagrams.
+         1. If |transport|.{{[[State]]}} is `"connecting"`, wait until it changes.
+         1. If |transport|.{{[[State]]}} is `"failed"`, [=reject=] |p| with an
+            {{InvalidStateError}} and abort these steps.
+	 1. If |transport|.{{[[State]]}} is `"closed"`, [=resolve=] |p| with
+	    the most recent stats available for the connection and abort these
+	    steps. The exact point at which those stats are collected is
+	    [=implementation-defined=].
+	 1. Gather the stats from the [=underlying connection=], including stats on datagrams.
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportConnectionStats}} object representing the gathered stats.
            1. [=Resolve=] |p| with |stats|.
