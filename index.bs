@@ -1583,11 +1583,19 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      This sending MAY be interleaved with sending of previously queued streams and datagrams,
      as well as streams and datagrams yet to be queued to be sent over this transport.
 
+     The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
+     SHOULD have a fixed upper limit, to carry the backpressure information to the user of the
+     {{WebTransportSendStream}}.
+
      This sending MUST starve
      until all bytes queued for sending on {{WebTransportSendStream}}s with the
      same {{[[SendGroup]]}} and a higher {{[[SendOrder]]}}, that are neither
      [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
      sent.
+
+     We access |stream|.{{[[SendOrder]]}} [=in parallel=] here. User agents SHOULD
+     respond to live updates of these values during sending, though the details are
+     [=implementation-defined=].
 
      This sending MUST NOT starve otherwise,
      except for [=flow control=] reasons or [=WritableStream/Error | error=].
@@ -1595,10 +1603,6 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      The user agent SHOULD divide bandwidth fairly between all streams that aren't starved.
 
      Note: The definition of fairness here is [=implementation-defined=].
-
-    Note: We access |stream|.{{[[SendOrder]]}} [=in parallel=] here. User agents SHOULD
-    respond to live updates of these values during sending, though the details are
-    [=implementation-defined=].
 
   1. If the previous step failed, abort the remaining steps.
 
@@ -1610,9 +1614,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
     1. [=Resolve=] |promise| with undefined.
 1. Return |promise|.
 
-Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
-SHOULD have a fixed upper limit, to carry the backpressure information to the user of
-{{WebTransportSendStream}}. This also means the [=fulfilled|fulfillment=] of the promise returned from this algorithm (or,
+Note: The [=fulfilled|fulfillment=] of the promise returned from this algorithm (or,
 {{WritableStreamDefaultWriter/write|WritableStreamDefaultWriter.write}}) does **NOT** necessarily mean that the chunk is acked by
 the server [[!QUIC]]. It may just mean that the chunk is appended to the buffer. To make sure that
 the chunk arrives at the server, use an application-level protocol.
@@ -1909,7 +1911,8 @@ To <dfn for="WebTransportReceiveStream">pull bytes</dfn> from a {{WebTransportRe
      |buffer| with offset |offset|, up to |maxBytes| bytes. Wait until either at least one byte is
      read or FIN is received. Let |read| be the number of read bytes, and let |hasReceivedFIN| be
      whether FIN was accompanied.
-     Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
+
+     The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
      SHOULD have a fixed upper limit, to carry the backpressure information to the server.
 
      Note: This operation may return before filling up all of |bytes|.
