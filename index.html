@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="6ab06d2b4b550550d2c6e4876d18451d87e8af05" name="document-revision">
+  <meta content="af7ea019b78bce97d48b608f6a009cc9d5d3471b" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -2331,8 +2331,8 @@ same <a href="https://fetch.spec.whatwg.org/#network-partition-keys">network par
     <dd data-md>
      <p>The estimated rate at which queued data will be sent by the user agent, in bits per second.
  This rate applies to all streams and datagrams that share a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session②②">WebTransport session</a> and is calculated by the congestion control algorithm (potentially chosen by <code class="idl"><a data-link-type="idl" href="#dom-webtransport-congestioncontrol" id="ref-for-dom-webtransport-congestioncontrol①">congestionControl</a></code>). If the user agent does not
- currently have an estimate, the member MUST be <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists">absent</a>.
- The member can be absent even if present in previous results.</p>
+ currently have an estimate, the member MUST be the <code>null</code> value.
+ The member can be <code>null</code> even if it was not <code>null</code> in previous results.</p>
    </dl>
    <h3 class="heading settled" data-level="5.13" id="web-transport-datagram-stats"><span class="secno">5.13. </span><span class="content"><code>WebTransportDatagramStats</code> Dictionary</span><a class="self-link" href="#web-transport-datagram-stats"></a></h3>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-webtransportdatagramstats"><code>WebTransportDatagramStats</code></dfn> dictionary includes statistics
@@ -4005,7 +4005,6 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="4943545e">code unit prefix</span>
      <li><span class="dfn-paneled" id="9a9b558b">dequeue</span>
      <li><span class="dfn-paneled" id="06a6db54">enqueue</span>
-     <li><span class="dfn-paneled" id="1243a891">exist</span>
      <li><span class="dfn-paneled" id="16d07e10">for each</span>
      <li><span class="dfn-paneled" id="860300d4">implementation-defined</span>
      <li><span class="dfn-paneled" id="16b1470a">isomorphic encode</span>
@@ -4683,7 +4682,6 @@ window.dfnpanelData['3de9e659'] = {"dfnID": "3de9e659", "url": "https://infra.sp
 window.dfnpanelData['4943545e'] = {"dfnID": "4943545e", "url": "https://infra.spec.whatwg.org/#code-unit-prefix", "dfnText": "code unit prefix", "refSections": [{"refs": [{"id": "ref-for-code-unit-prefix"}], "title": "5.4. Methods"}], "external": true};
 window.dfnpanelData['9a9b558b'] = {"dfnID": "9a9b558b", "url": "https://infra.spec.whatwg.org/#queue-dequeue", "dfnText": "dequeue", "refSections": [{"refs": [{"id": "ref-for-queue-dequeue"}, {"id": "ref-for-queue-dequeue\u2460"}, {"id": "ref-for-queue-dequeue\u2461"}, {"id": "ref-for-queue-dequeue\u2462"}], "title": "4.3. Procedures"}], "external": true};
 window.dfnpanelData['06a6db54'] = {"dfnID": "06a6db54", "url": "https://infra.spec.whatwg.org/#queue-enqueue", "dfnText": "enqueue", "refSections": [{"refs": [{"id": "ref-for-queue-enqueue"}], "title": "4.3. Procedures"}], "external": true};
-window.dfnpanelData['1243a891'] = {"dfnID": "1243a891", "url": "https://infra.spec.whatwg.org/#map-exists", "dfnText": "exist", "refSections": [{"refs": [{"id": "ref-for-map-exists"}], "title": "5.12. WebTransportConnectionStats Dictionary"}], "external": true};
 window.dfnpanelData['16d07e10'] = {"dfnID": "16d07e10", "url": "https://infra.spec.whatwg.org/#list-iterate", "dfnText": "for each", "refSections": [{"refs": [{"id": "ref-for-list-iterate"}, {"id": "ref-for-list-iterate\u2460"}], "title": "5.5. Procedures"}], "external": true};
 window.dfnpanelData['860300d4'] = {"dfnID": "860300d4", "url": "https://infra.spec.whatwg.org/#implementation-defined", "dfnText": "implementation-defined", "refSections": [{"refs": [{"id": "ref-for-implementation-defined"}, {"id": "ref-for-implementation-defined\u2460"}, {"id": "ref-for-implementation-defined\u2461"}], "title": "4.1. Internal slots"}, {"refs": [{"id": "ref-for-implementation-defined\u2462"}, {"id": "ref-for-implementation-defined\u2463"}], "title": "4.3. Procedures"}, {"refs": [{"id": "ref-for-implementation-defined\u2464"}], "title": "5.4. Methods"}, {"refs": [{"id": "ref-for-implementation-defined\u2465"}, {"id": "ref-for-implementation-defined\u2466"}], "title": "5.9. Configuration"}, {"refs": [{"id": "ref-for-implementation-defined\u2467"}], "title": "5.11. WebTransportSendStreamOptions Dictionary"}, {"refs": [{"id": "ref-for-implementation-defined\u2468"}, {"id": "ref-for-implementation-defined\u2460\u24ea"}], "title": "6.4. Procedures"}, {"refs": [{"id": "ref-for-implementation-defined\u2460\u2460"}], "title": "8.3. Procedures"}], "external": true};
 window.dfnpanelData['16b1470a'] = {"dfnID": "16b1470a", "url": "https://infra.spec.whatwg.org/#isomorphic-encode", "dfnText": "isomorphic encode", "refSections": [{"refs": [{"id": "ref-for-isomorphic-encode"}], "title": "3.1. WebTransport session"}], "external": true};
