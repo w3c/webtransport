@@ -1556,14 +1556,14 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
 1. [=WritableStream/Set up=] |stream| with [=WritableStream/set up/writeAlgorithm=] set to
    |writeAlgorithm|, [=WritableStream/set up/closeAlgorithm=] set to |closeAlgorithm|,
    [=WritableStream/set up/abortAlgorithm=] set to |abortAlgorithm|.
-1. [=AbortSignal/Add=] the following steps to |stream|'s \[[controller]]'s \[[signal]].
-  1. If |stream|.{{[[PendingOperation]]}} is null, then abort these steps.
-  1. Let |reason| be |stream|'s \[[controller]]'s \[[signal]]'s [=AbortSignal/abort reason=].
-  1. Let |abortPromise| be the result of [=aborting=] stream with |reason|.
-  1. [=Upon fulfillment=] of |abortPromise|, [=reject=] |promise| with |reason|.
+1. Let |abortSignal| be |stream|'s \[[controller]].\[[abortController]].\[[signal]].
+1. [=AbortSignal/Add=] the following steps to |abortSignal|.
   1. Let |pendingOperation| be |stream|.{{[[PendingOperation]]}}.
+  1. If |pendingOperation| is null, then abort these steps.
   1. Set |stream|.{{[[PendingOperation]]}} to null.
-  1. [=Resolve=] |pendingOperation| with |promise|.
+  1. Let |reason| be |abortSignal|'s [=AbortSignal/abort reason=].
+  1. Let |promise| be the result of [=aborting=] stream with |reason|.
+  1. [=Upon fulfillment=] of |promise|, [=reject=] |pendingOperation| with |reason|.
 1. [=set/Append=] |stream| to |transport|.{{[[SendStreams]]}}.
 1. Return |stream|.
 
