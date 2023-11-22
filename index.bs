@@ -333,8 +333,8 @@ interface WebTransportDatagramDuplexStream {
   readonly attribute WritableStream writable;
 
   readonly attribute unsigned long maxDatagramSize;
-  attribute unrestricted double incomingMaxAge;
-  attribute unrestricted double outgoingMaxAge;
+  attribute unrestricted double? incomingMaxAge;
+  attribute unrestricted double? outgoingMaxAge;
   attribute unrestricted double incomingHighWaterMark;
   attribute unrestricted double outgoingHighWaterMark;
 };
@@ -376,7 +376,7 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>`[[IncomingDatagramsExpirationDuration]]`</dfn>
    <td class="non-normative">An {{unrestricted double}} representing the
-   expiration duration for incoming datagrams (in milliseconds).
+   expiration duration for incoming datagrams (in milliseconds), or null.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
@@ -391,7 +391,7 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>`[[OutgoingDatagramsExpirationDuration]]`</dfn>
    <td class="non-normative">An {{unrestricted double}} value representing the
-   expiration duration for outgoing datagrams (in milliseconds).
+   expiration duration for outgoing datagrams (in milliseconds), or null.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingMaxDatagramSize]]`</dfn>
@@ -421,7 +421,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     : {{[[IncomingDatagramsHighWaterMark]]}}
     :: an [=implementation-defined=] value
     : {{[[IncomingDatagramsExpirationDuration]]}}
-    :: +∞
+    :: null
     : {{[[OutgoingDatagramsQueue]]}}
     :: an empty queue
     : {{[[OutgoingDatagramsHighWaterMark]]}}
@@ -431,7 +431,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
            jeopardizing the timeliness of transmitted data.</p>
        </div>
     : {{[[OutgoingDatagramsExpirationDuration]]}}
-    :: +∞
+    :: null
     : {{[[OutgoingMaxDatagramSize]]}}
     :: an [=implementation-defined=] integer.
  1. Return |stream|.
@@ -451,7 +451,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. Return [=this=].{{[[IncomingDatagramsExpirationDuration]]}}.
 :: The setter steps, given |value|, are:
      1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
-     1. If |value| is `0`, set |value| to +∞.
+     1. If |value| is `0`, set |value| to null.
      1. Set [=this=].{{[[IncomingDatagramsExpirationDuration]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>maxDatagramSize</dfn>
@@ -463,7 +463,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. Return [=this=]'s {{[[OutgoingDatagramsExpirationDuration]]}}.
 :: The setter steps, given |value|, are:
      1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
-     1. If |value| is `0`, set |value| to +∞.
+     1. If |value| is `0`, set |value| to null.
      1. Set [=this=].{{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingHighWaterMark</dfn>
@@ -590,9 +590,9 @@ The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whos
 algorithm can make progress.
 
 Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
-datagrams are stored in {{[[OutgoingDatagramsExpirationDuration]]}}, and they can be discarded
-in the same manner as the `"connected"` case. Once the transport's {{[[State]]}} becomes
-`"connected"`, it will start sending stored datagrams.
+datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
+in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
+`"connected"`, it will start sending the queued datagrams.
 
 # `WebTransport` Interface #  {#web-transport}
 
@@ -986,8 +986,17 @@ these steps.
    When getStats is called, the user agent MUST run the following steps:
      1. Let |transport| be [=this=].
      1. Let |p| be a new promise.
+     1. If |transport|.{{[[State]]}} is `"failed"`, [=reject=] |p| with an
+        {{InvalidStateError}} and abort these steps.
      1. Run the following steps [=in parallel=]:
-         1. Gather the stats from the [=underlying connection=], including stats on datagrams.
+         1. If |transport|.{{[[State]]}} is `"connecting"`, wait until it changes.
+         1. If |transport|.{{[[State]]}} is `"failed"`, [=reject=] |p| with an
+            {{InvalidStateError}} and abort these steps.
+	 1. If |transport|.{{[[State]]}} is `"closed"`, [=resolve=] |p| with
+	    the most recent stats available for the connection and abort these
+	    steps. The exact point at which those stats are collected is
+	    [=implementation-defined=].
+	 1. Gather the stats from the [=underlying connection=], including stats on datagrams.
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportConnectionStats}} object representing the gathered stats.
            1. [=Resolve=] |p| with |stats|.
@@ -1008,6 +1017,8 @@ these steps.
       {{WebTransportSendStreamOptions/sendGroup}}.
    1. Let |sendOrder| be {{WebTransport/createBidirectionalStream(options)/options}}'s
       {{WebTransportSendStreamOptions/sendOrder}}.
+   1. Let |waitUntilAvailable| be {{WebTransport/createBidirectionalStream(options)/options}}'s
+      {{WebTransportSendStreamOptions/waitUntilAvailable}}.
    1. Let |p| be a new promise.
    1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
@@ -1015,8 +1026,9 @@ these steps.
       1. Let |streamId| be a new stream ID that is valid and unique for
          |transport|.{{[[Session]]}}, as defined in [[!QUIC]]
          [Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11). If one is not
-         immediately available due to exhaustion, [=reject=] |p| with a {{QuotaExceededError}}
-         and abort these steps.
+         immediately available due to exhaustion, wait for it to become
+         available if |waitUntilAvailable| is true, [=reject=] |p| with a
+         {{QuotaExceededError}} and abort these steps otherwise.
       1. Let |internalStream| be the result of [=creating a bidirectional stream=] with
            |transport|.{{[[Session]]}} and |streamId|.
       1. [=Queue a network task=] with |transport| to run the following steps:
@@ -1042,6 +1054,8 @@ these steps.
         {{WebTransportSendStreamOptions/sendGroup}}.
      1. Let |sendOrder| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
         {{WebTransportSendStreamOptions/sendOrder}}.
+     1. Let |waitUntilAvailable| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
+        {{WebTransportSendStreamOptions/waitUntilAvailable}}.
      1. Let |p| be a new promise.
      1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
         {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
@@ -1049,8 +1063,9 @@ these steps.
         1. Let |streamId| be a new stream ID that is valid and unique for
            |transport|.{{[[Session]]}}, as defined in [[!QUIC]]
            [Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11). If one is not
-           immediately available due to exhaustion, [=reject=] |p| with a {{QuotaExceededError}}
-           and abort these steps.
+           immediately available due to exhaustion, wait for it to become
+           available if |waitUntilAvailable| is true, [=reject=] |p| with a
+           {{QuotaExceededError}} and abort these steps otherwise.
         1. Let |internalStream| be the result of [=creating an outgoing unidirectional stream=] with
            |transport|.{{[[Session]]}} and |streamId|.
         1. [=Queue a network task=] with |transport| to run the following steps:
@@ -1313,6 +1328,7 @@ dictionary of parameters that affect how {{WebTransportSendStream}}s created by
 dictionary WebTransportSendStreamOptions {
   WebTransportSendGroup? sendGroup = null;
   long long sendOrder = 0;
+  boolean waitUntilAvailable = false;
 };
 </pre>
 
@@ -1339,6 +1355,15 @@ The dictionary SHALL have the following attributes:
    Note: This is sender-side data prioritization which does not guarantee
    reception order.
 
+: <dfn for="WebTransportSendStreamOptions" dict-member>waitUntilAvailable</dfn>
+:: If true, the promise returned by the
+   {{WebTransport/createUnidirectionalStream}} or
+   {{WebTransport/createBidirectionalStream}} call will not be [=settled=]
+   until either the [=underlying connection=] has sufficient flow control
+   credit to create the stream, or the connection reaches a state in which no
+   further outgoing streams are possible.  If false, the promise will be
+   [=rejected=] if no flow control window is available at the time of the call.
+
 ## `WebTransportConnectionStats` Dictionary ##  {#web-transport-connection-stats}
 
 The <dfn dictionary>WebTransportConnectionStats</dfn> dictionary includes information
@@ -1351,7 +1376,6 @@ same [[fetch#network-partition-keys|network partition key]].
 
 <pre class="idl">
 dictionary WebTransportConnectionStats {
-  DOMHighResTimeStamp timestamp;
   unsigned long long bytesSent;
   unsigned long long packetsSent;
   unsigned long long bytesLost;
@@ -1368,9 +1392,6 @@ dictionary WebTransportConnectionStats {
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportConnectionStats" dict-member>timestamp</dfn>
-:: The `timestamp` for when the stats are gathered, relative to the
-   UNIX epoch (Jan 1, 1970, UTC).
 : <dfn for="WebTransportConnectionStats" dict-member>bytesSent</dfn>
 :: The number of bytes sent on the [=underlying connection=], including retransmissions.
    Does not include UDP or any other outer framing.
@@ -1401,8 +1422,8 @@ The dictionary SHALL have the following attributes:
    This rate applies to all streams and datagrams that share a [=WebTransport session=]
    and is calculated by the congestion control algorithm (potentially chosen by
    {{WebTransport/congestionControl}}). If the user agent does not
-   currently have an estimate, the member MUST be [=map/exist|absent=].
-   The member can be absent even if present in previous results.
+   currently have an estimate, the member MUST be the `null` value.
+   The member can be `null` even if it was not `null` in previous results.
 
 
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
@@ -1412,7 +1433,6 @@ on datagram transmission over the HTTP/3 connection.
 
 <pre class="idl">
 dictionary WebTransportDatagramStats {
-  DOMHighResTimeStamp timestamp;
   unsigned long long expiredOutgoing;
   unsigned long long droppedIncoming;
   unsigned long long lostOutgoing;
@@ -1421,9 +1441,6 @@ dictionary WebTransportDatagramStats {
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportDatagramStats" dict-member>timestamp</dfn>
-:: The `timestamp` for when the stats are gathered, relative to the
-   UNIX epoch (Jan 1, 1970, UTC).
 : <dfn for="WebTransportDatagramStats" dict-member>expiredOutgoing</dfn>
 :: The number of datagrams queued for sending that were dropped, due to being
    older than {{outgoingMaxAge}} before they were able to be sent.
@@ -1571,14 +1588,14 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
 1. [=WritableStream/Set up=] |stream| with [=WritableStream/set up/writeAlgorithm=] set to
    |writeAlgorithm|, [=WritableStream/set up/closeAlgorithm=] set to |closeAlgorithm|,
    [=WritableStream/set up/abortAlgorithm=] set to |abortAlgorithm|.
-1. [=AbortSignal/Add=] the following steps to |stream|'s \[[controller]]'s \[[signal]].
-  1. If |stream|.{{[[PendingOperation]]}} is null, then abort these steps.
-  1. Let |reason| be |stream|'s \[[controller]]'s \[[signal]]'s [=AbortSignal/abort reason=].
-  1. Let |abortPromise| be the result of [=aborting=] stream with |reason|.
-  1. [=Upon fulfillment=] of |abortPromise|, [=reject=] |promise| with |reason|.
+1. Let |abortSignal| be |stream|'s \[[controller]].\[[abortController]].\[[signal]].
+1. [=AbortSignal/Add=] the following steps to |abortSignal|.
   1. Let |pendingOperation| be |stream|.{{[[PendingOperation]]}}.
+  1. If |pendingOperation| is null, then abort these steps.
   1. Set |stream|.{{[[PendingOperation]]}} to null.
-  1. [=Resolve=] |pendingOperation| with |promise|.
+  1. Let |reason| be |abortSignal|'s [=AbortSignal/abort reason=].
+  1. Let |promise| be the result of [=aborting=] stream with |reason|.
+  1. [=Upon fulfillment=] of |promise|, [=reject=] |pendingOperation| with |reason|.
 1. [=set/Append=] |stream| to |transport|.{{[[SendStreams]]}}.
 1. Return |stream|.
 
@@ -1602,11 +1619,19 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      This sending MAY be interleaved with sending of previously queued streams and datagrams,
      as well as streams and datagrams yet to be queued to be sent over this transport.
 
+     The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
+     SHOULD have a fixed upper limit, to carry the backpressure information to the user of the
+     {{WebTransportSendStream}}.
+
      This sending MUST starve
      until all bytes queued for sending on {{WebTransportSendStream}}s with the
      same {{[[SendGroup]]}} and a higher {{[[SendOrder]]}}, that are neither
      [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
      sent.
+
+     We access |stream|.{{[[SendOrder]]}} [=in parallel=] here. User agents SHOULD
+     respond to live updates of these values during sending, though the details are
+     [=implementation-defined=].
 
      This sending MUST NOT starve otherwise,
      except for [=flow control=] reasons or [=WritableStream/Error | error=].
@@ -1614,10 +1639,6 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      The user agent SHOULD divide bandwidth fairly between all streams that aren't starved.
 
      Note: The definition of fairness here is [=implementation-defined=].
-
-    Note: We access |stream|.{{[[SendOrder]]}} [=in parallel=] here. User agents SHOULD
-    respond to live updates of these values during sending, though the details are
-    [=implementation-defined=].
 
      Stop sending |bytes| if |atomic| is true and the current [=flow control=] window
      ends before |bytes| can be sent in their entirety.
@@ -1638,9 +1659,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
     1. [=Resolve=] |promise| with undefined.
 1. Return |promise|.
 
-Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
-SHOULD have a fixed upper limit, to carry the backpressure information to the user of
-{{WebTransportSendStream}}. This also means the [=fulfilled|fulfillment=] of the promise returned from this algorithm (or,
+Note: The [=fulfilled|fulfillment=] of the promise returned from this algorithm (or,
 {{WritableStreamDefaultWriter/write(chunk)}}) does **NOT** necessarily mean that the chunk is acked by
 the server [[!QUIC]]. It may just mean that the chunk is appended to the buffer. To make sure that
 the chunk arrives at the server, use an application-level protocol.
@@ -1726,7 +1745,6 @@ on stats specific to one {{WebTransportSendStream}}.
 
 <pre class="idl">
 dictionary WebTransportSendStreamStats {
-  DOMHighResTimeStamp timestamp;
   unsigned long long bytesWritten;
   unsigned long long bytesSent;
   unsigned long long bytesAcknowledged;
@@ -1735,9 +1753,6 @@ dictionary WebTransportSendStreamStats {
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportSendStreamStats" dict-member>timestamp</dfn>
-:: The `timestamp` for when the stats are gathered, relative to the
-   UNIX epoch (Jan 1, 1970, UTC).
 : <dfn for="WebTransportSendStreamStats" dict-member>bytesWritten</dfn>
 :: The total number of bytes the application has successfully written to this
    {{WebTransportSendStream}}. This number can only increase.
@@ -1951,7 +1966,8 @@ To <dfn for="WebTransportReceiveStream">pull bytes</dfn> from a {{WebTransportRe
      |buffer| with offset |offset|, up to |maxBytes| bytes. Wait until either at least one byte is
      read or FIN is received. Let |read| be the number of read bytes, and let |hasReceivedFIN| be
      whether FIN was accompanied.
-     Note: The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
+
+     The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
      SHOULD have a fixed upper limit, to carry the backpressure information to the server.
 
      Note: This operation may return before filling up all of |bytes|.
@@ -2037,7 +2053,6 @@ information on stats specific to one {{WebTransportReceiveStream}}.
 
 <pre class="idl">
 dictionary WebTransportReceiveStreamStats {
-  DOMHighResTimeStamp timestamp;
   unsigned long long bytesReceived;
   unsigned long long bytesRead;
 };
@@ -2045,9 +2060,6 @@ dictionary WebTransportReceiveStreamStats {
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportReceiveStreamStats" dict-member>timestamp</dfn>
-:: The `timestamp` for when the stats are gathered, relative to the
-   UNIX epoch (Jan 1, 1970, UTC).
 : <dfn for="WebTransportReceiveStreamStats" dict-member>bytesReceived</dfn>
 :: An indicator of progress on how many of the server application's bytes
    intended for this {{WebTransportReceiveStream}} have been received so far.
