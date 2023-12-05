@@ -184,10 +184,10 @@ follow [[!WEB-TRANSPORT-OVERVIEW]]
 with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomorphic encoded=],
 as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
+The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
-underlying transport stream associated with the CONNECT request that initiated |session| receives an
-[=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when a
+[=CONNECT stream=] receives an [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when a
 [=session-signal/GOAWAY=] frame is received, as described in [[!WEB-TRANSPORT-HTTP3]]
 [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6).
 
@@ -196,9 +196,8 @@ To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an
 [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-2.2.1).
 
 A [=WebTransport session=] |session| is <dfn for=session>terminated</dfn>, with optionally
-an integer |code| and a [=byte sequence=] |reason|, when the underlying transport stream associated with the
-CONNECT request that initiated |session| is closed by the server, as described at
-[[!WEB-TRANSPORT-OVERVIEW]]
+an integer |code| and a [=byte sequence=] |reason|, when the [=CONNECT stream=] is closed by the server,
+as described at [[!WEB-TRANSPORT-OVERVIEW]]
 [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-4.2.1).
 
 A [=WebTransport session=] has the following signals:
@@ -1147,8 +1146,8 @@ series of steps |steps|, run these steps:
 Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} |transport| is
 [=session/terminated=] with optionally |code| and |reasonBytes|, run these steps:
 
-1. Let |cleanly| be a boolean representing whether the underlying transport stream associated with
-   the CONNECT request that initiated |transport|.{{[[Session]]}} is in the "Data Recvd" state. [[!QUIC]]
+1. Let |cleanly| be a boolean representing whether |transport|.{{[[Session]]}}'s [=CONNECT stream=]
+   is in the "Data Recvd" state. [[!QUIC]]
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
@@ -2345,7 +2344,8 @@ application, the RESET_STREAM signal can be suppressed.
   </table>
 
 If the [=underlying connection=] is using HTTP/2, the following protocol behaviors
-from [[!WEB-TRANSPORT-HTTP2]] apply.
+from [[!WEB-TRANSPORT-HTTP2]] apply. Note that, unlike for HTTP/3, the stream error
+code does not need to be converted to an HTTP error code, and vice versa.
 
 
   <table class="data">
