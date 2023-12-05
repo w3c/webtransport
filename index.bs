@@ -622,6 +622,8 @@ interface WebTransport {
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
   WebTransportSendGroup createSendGroup();
+
+  static readonly attribute boolean supportsReliableOnly;
 };
 
 enum WebTransportReliabilityMode {
@@ -947,6 +949,10 @@ these steps.
    throughput or low latency for sending on this connection. If a preference was
    requested but not satisfied, then the value is `"default"`
    The getter steps are to return [=this=]'s {{[[CongestionControl]]}}.
+
+: <dfn for="WebTransport" attribute>supportsReliableOnly</dfn>
+:: Returns true if the user agent supports [=WebTransport sessions=] over HTTP/2
+   [=connections=], otherwise false.
 
 ## Methods ##  {#webtransport-methods}
 
