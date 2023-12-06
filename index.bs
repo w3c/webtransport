@@ -135,7 +135,7 @@ A <dfn for="protocol">WebTransport session</dfn> is a session of WebTransport ov
 or HTTP/2 <dfn>underlying [=connection=]</dfn>.
 There may be multiple [=WebTransport sessions=] on one [=connection=], when pooling is enabled.
 
-A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRANSPORT-HTTP3]]:
+A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRANSPORT-OVERVIEW]]:
 
 <table class="data" dfn-for="session">
  <thead>
@@ -147,59 +147,58 @@ A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRAN
  <tbody>
   <tr>
    <td><dfn>send a datagram</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.2-6.2.1)
   </tr>
   <tr>
    <td><dfn>receive a datagram</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.4)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.2-6.4.1)
   </tr>
   <tr>
    <td><dfn>create an [=stream/outgoing unidirectional=] stream</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-7.2.1)
   </tr>
   <tr>
    <td><dfn>create a [=stream/bidirectional=] stream</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-7.4.1)
   </tr>
   <tr>
    <td><dfn>receive an [=stream/incoming unidirectional=] stream</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.1)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-7.6.1)
   </tr>
   <tr>
    <td><dfn>receive a [=stream/bidirectional=] stream</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.2)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-7.8.1)
   </tr>
  </tbody>
 </table>
 
 To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=/origin=] |origin|,
-follow [[!WEB-TRANSPORT-HTTP3]]
-[Section 3.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.3),
+follow [[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-2.2.1),
 with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomorphic encoded=],
 as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
+The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
-HTTP/3 stream associated with the CONNECT request that initiated |session| receives an
-[=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when an HTTP/3
+[=CONNECT stream=] receives an [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when a
 [=session-signal/GOAWAY=] frame is received, as described in [[!WEB-TRANSPORT-HTTP3]]
 [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6).
 
 To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an optional integer
-|code| and an optional [=byte sequence=] |reason|, follow [[!WEB-TRANSPORT-HTTP3]]
-[Section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
+|code| and an optional [=byte sequence=] |reason|, follow [[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-2.2.1).
 
 A [=WebTransport session=] |session| is <dfn for=session>terminated</dfn>, with optionally
-an integer |code| and a [=byte sequence=] |reason|, when the HTTP/3 stream associated with the
-CONNECT request that initiated |session| is closed by the server, as described at
-[[!WEB-TRANSPORT-HTTP3]]
-[Section 5](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-5).
+an integer |code| and a [=byte sequence=] |reason|, when the [=CONNECT stream=] is closed by the server,
+as described at [[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-4.2.1).
 
 A [=WebTransport session=] has the following signals:
 
@@ -226,8 +225,9 @@ A [=WebTransport session=] has the following signals:
 
 ## WebTransport stream ## {#webtransport-stream}
 
-A <dfn for="protocol">WebTransport stream</dfn> is a concept for an HTTP/3 stream on a
-[=WebTransport session=].
+A <dfn for="protocol">WebTransport stream</dfn> is a concept for a reliable in-order stream of
+bytes on a [=WebTransport session=], as described in [[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3).
 
 A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn>,
 <dfn for=stream>outgoing unidirectional</dfn> or <dfn for=stream>bidirectional</dfn>.
@@ -247,32 +247,32 @@ A [=WebTransport stream=] has the following capabilities:
  <tbody>
   <tr>
    <td><dfn>send</dfn> bytes (potentially with FIN)
-   <td>[[!QUIC]]
-   [Section 2.2](https://www.rfc-editor.org/rfc/rfc9000#section-2.2)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-9.2.1)
    <td>No
    <td>Yes
    <td>Yes
   </tr>
   <tr>
    <td><dfn>receive</dfn> bytes (potentially with FIN)
-   <td>[[!QUIC]]
-   [Section 2.2](https://www.rfc-editor.org/rfc/rfc9000#section-2.2)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-9.4.1)
    <td>Yes
    <td>No
    <td>Yes
   </tr>
   <tr>
    <td><dfn>send STOP_SENDING</dfn>
-   <td>[[!QUIC]]
-   [Section 3.5](https://www.rfc-editor.org/rfc/rfc9000#section-3.5)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-9.8.1)
    <td>Yes
    <td>No
    <td>Yes
   </tr>
   <tr>
    <td><dfn>reset</dfn> a [=WebTransport stream=]
-   <td>[[!QUIC]]
-   [Section 19.4](https://www.rfc-editor.org/rfc/rfc9000#section-19.4)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-9.6.1)
    <td>No
    <td>Yes
    <td>Yes
@@ -295,24 +295,24 @@ A [=WebTransport stream=] has the following signals:
  <tbody>
   <tr>
    <td><dfn>STOP_SENDING</dfn>
-   <td>[[!QUIC]]
-   [Section 3.5](https://www.rfc-editor.org/rfc/rfc9000#section-3.5)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-9.8.1)
    <td>No
    <td>Yes
    <td>Yes
   </tr>
   <tr>
    <td><dfn>RESET_STREAM</dfn>
-   <td>[[!QUIC]]
-   [Section 19.4](https://www.rfc-editor.org/rfc/rfc9000#section-19.4)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-9.6.1)
    <td>Yes
    <td>No
    <td>Yes
   </tr>
   <tr>
    <td><dfn>flow control</dfn>
-   <td>[[!QUIC]]
-   [Section 4.1](https://www.rfc-editor.org/rfc/rfc9000#section-4.1)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-5)
    <td>No
    <td>Yes
    <td>Yes
@@ -594,8 +594,8 @@ in the same manner as when in the `"connected"` state. Once the transport's {{[[
 
 # `WebTransport` Interface #  {#web-transport}
 
-`WebTransport` provides an API to the HTTP/3 transport functionality
-defined in [[!WEB-TRANSPORT-HTTP3]].
+`WebTransport` provides an API to the underlying transport functionality
+defined in [[!WEB-TRANSPORT-OVERVIEW]].
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
@@ -978,8 +978,8 @@ these steps.
 </div>
 
 : <dfn for="WebTransport" method>getStats()</dfn>
-:: Gathers stats for this {{WebTransport}}'s HTTP/3
-   connection and reports the result asynchronously.</p>
+:: Gathers stats for this {{WebTransport}}'s [=underlying connection=]
+   and reports the result asynchronously.</p>
 
    When getStats is called, the user agent MUST run the following steps:
      1. Let |transport| be [=this=].
@@ -1146,8 +1146,8 @@ series of steps |steps|, run these steps:
 Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} |transport| is
 [=session/terminated=] with optionally |code| and |reasonBytes|, run these steps:
 
-1. Let |cleanly| be a boolean representing whether the HTTP/3 stream associated with the CONNECT
-   request that initiated |transport|.{{[[Session]]}} is in the "Data Recvd" state. [[!QUIC]]
+1. Let |cleanly| be a boolean representing whether |transport|.{{[[Session]]}}'s [=CONNECT stream=]
+   is in the "Data Recvd" state. [[!QUIC]]
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
@@ -1227,7 +1227,7 @@ that determine how the [=WebTransport session=] is established and used.
 
 : <dfn for="WebTransportOptions" dict-member>allowPooling</dfn>
 :: When set to true, the [=WebTransport session=] can be pooled, that is, its [=underlying connection=]
-   can be shared with other HTTP/3 sessions.
+   can be shared with other WebTransport sessions.
 
 : <dfn for="WebTransportOptions" dict-member>requireUnreliable</dfn>
 :: When set to true, the [=WebTransport session=] cannot be established over an
@@ -1427,7 +1427,7 @@ The dictionary SHALL have the following attributes:
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
 
 The <dfn dictionary>WebTransportDatagramStats</dfn> dictionary includes statistics
-on datagram transmission over the HTTP/3 connection.
+on datagram transmission over the [=underlying connection=].
 
 <pre class="idl">
 dictionary WebTransportDatagramStats {
@@ -1667,8 +1667,9 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 4294967295, then set |code| to 4294967295.
 
-   Note: Valid values of |code| are from 0 to 4294967295 inclusive. The code will be encoded to a
-   number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in [[!WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
+   using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
+   [[!WEB-TRANSPORT-HTTP3]].
 
 1. Run the following steps [=in parallel=]:
   1. [=stream/Reset=] |stream|.{{WebTransportSendStream/[[InternalStream]]}} with |code|.
@@ -1686,8 +1687,9 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportSendStream}} 
 1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
 1. Let |code| be the application protocol error code attached to the STOP_SENDING frame. [[!QUIC]]
 
-   Note: Valid values of |code| are from 0 to 4294967295 inclusive. The code has been decoded from a
-  number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in[[!WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
+   using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
+   [[!WEB-TRANSPORT-HTTP3]].
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
@@ -1968,8 +1970,9 @@ steps.
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 4294967295, then set |code| to 4294967295.
 
-   Note: Valid values of |code| are from 0 to 4294967295 inclusive. The code will be encoded to a
-   number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in [[!WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
+   using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
+   [[!WEB-TRANSPORT-HTTP3]].
 
 1. [=set/Remove=] |stream| from |transport|.{{[[SendStreams]]}}.
 1. Run the following steps [=in parallel=]:
@@ -1994,8 +1997,9 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportReceiveStream
 1. Let |transport| be |stream|.{{WebTransportReceiveStream/[[Transport]]}}.
 1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
 
-   Note: Valid values of |code| are from 0 to 4294967295 inclusive. The code has been decoded from a
-   number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in [[!WEB-TRANSPORT-HTTP3]].
+   Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
+   using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
+   [[!WEB-TRANSPORT-HTTP3]].
 
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
@@ -2198,10 +2202,31 @@ Their [=deserialization steps=], given |serialized| and |value|, are:
 
 *This section is non-normative.*
 
-This section describes the [[QUIC]] protocol behavior of methods defined
-in this specification, utilizing [[!WEB-TRANSPORT-HTTP3]]. Cause and effect may
-not be immediate due to buffering. The application
-{{WebTransportError/streamErrorCode}} in the {{WebTransportError}} error is
+This section describes the underlying protocol behavior of methods defined
+in this specification, utilizing [[!WEB-TRANSPORT-OVERVIEW]]. Cause and effect may
+not be immediate due to buffering.
+
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>WebTransport Protocol Action</th>
+        <th>API Effect</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>received [=session-signal/DRAIN_WEBTRANSPORT_SESSION=]</td>
+        <td>await wt.{{WebTransport/draining}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+If the [=underlying connection=] is using HTTP/3, the following protocol behaviors
+from [[!WEB-TRANSPORT-HTTP3]] apply.
+
+The application {{WebTransportError/streamErrorCode}} in the {{WebTransportError}} error is
 converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-HTTP3]]
 [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.3).
 
@@ -2300,24 +2325,7 @@ stream data with any data not consumed being discarded. However,
 immediate signaling is not required. Also, if stream data
 is completely received but has not yet been read by the
 application, the RESET_STREAM signal can be suppressed.
-  
-  <table class="data">
-    <colgroup class="header"><col></colgroup>
-    <colgroup><col></colgroup>
-    <thead>
-      <tr>
-        <th>WebTransport Protocol Action</th>
-        <th>API Effect</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>received [=session-signal/DRAIN_WEBTRANSPORT_SESSION=]</td>
-        <td>await wt.{{WebTransport/draining}}</td>
-      </tr>
-    </tbody>
-  </table>
-  
+
   <table class="data">
     <colgroup class="header"><col></colgroup>
     <colgroup><col></colgroup>
@@ -2328,6 +2336,103 @@ application, the RESET_STREAM signal can be suppressed.
       </tr>
     </thead>
     <tbody>
+      <tr>
+        <td>received [=session-signal/GOAWAY=]</td>
+        <td>await wt.{{WebTransport/draining}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+If the [=underlying connection=] is using HTTP/2, the following protocol behaviors
+from [[!WEB-TRANSPORT-HTTP2]] apply. Note that, unlike for HTTP/3, the stream error
+code does not need to be converted to an HTTP error code, and vice versa.
+
+
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>API Method</th>
+        <th>HTTP/2 Protocol Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(error)</td>
+        <td>[=stream/Reset|sends WT_RESET_STREAM=] with error</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/close}}()</td>
+        <td>[=stream/Send|sends=] WT_STREAM with FIN bit set</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/write}}()</td>
+        <td>[=stream/Send|sends=] WT_STREAM</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/close}}()</td>
+        <td>[=stream/Send|sends=] WT_STREAM with FIN bit set</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(error)</td>
+        <td>[=stream/Reset|sends WT_RESET_STREAM=] with error</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(error)</td>
+        <td>[=send STOP_SENDING|sends WT_STOP_SENDING=] with error</td>
+      </tr>
+      <tr>
+        <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(error)</td>
+        <td>[=send STOP_SENDING|sends WT_STOP_SENDING=] with error</td>
+      </tr>
+      <tr>
+        <td>wt.{{WebTransport/close}}(closeInfo)</td>
+        <td>[=session/terminate|terminates=] session with closeInfo<br>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="data">
+    <colgroup class="header"><col></colgroup>
+    <colgroup><col></colgroup>
+    <thead>
+      <tr>
+        <th>HTTP/2 Protocol Action</th>
+        <th>API Effect</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>received [=stream-signal/STOP_SENDING|WT_STOP_SENDING=] with error</td>
+        <td>[=WritableStream/Error|errors=] {{WebTransportBidirectionalStream/writable}}
+        with {{WebTransportError/streamErrorCode}}</td>
+      </tr>
+      <tr>
+        <td>[=stream/Receive|received=] WT_STREAM</td>
+        <td>(await
+          {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).value</td>
+      </tr>
+      <tr>
+        <td>[=stream/Receive|received=] WT_STREAM with FIN bit set</td>
+        <td>(await
+          {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).done</td>
+      </tr>
+      <tr>
+        <td>received [=stream-signal/RESET_STREAM|WT_RESET_STREAM=] with error</td>
+        <td>[=ReadableStream/Error|errors=] {{WebTransportBidirectionalStream/readable}}
+        with {{WebTransportError/streamErrorCode}}</td>
+      </tr>
+      <tr>
+        <td>Session cleanly [=session/terminated|terminated=] with closeInfo<br>
+        <td>(await wt.{{WebTransport/closed}}).closeInfo, and
+         [=ReadableStream/error|errors=] open streams</td>
+      </tr>
+      <tr>
+        <td>Network error<br>
+        <td>(await wt.{{WebTransport/closed}}) rejects, and
+          [=ReadableStream/error|errors=] open streams</td>
+      </tr>
       <tr>
         <td>received [=session-signal/GOAWAY=]</td>
         <td>await wt.{{WebTransport/draining}}</td>
@@ -2374,13 +2479,15 @@ WebTransport imposes a set of requirements as described in
    use and confirming that the remote server is willing to use the WebTransport
    protocol. [[!WEB-TRANSPORT-HTTP3]] uses a combination of ALPN [[RFC7301]], an
    HTTP/3 setting, and a `:protocol` pseudo-header to identify the WebTransport
-   protocol.
+   protocol. [[!WEB-TRANSPORT-HTTP2]] uses a combination of ALPN, an HTTP/2 setting,
+   and a `:protocol` pseudo-header to identify the WebTransport protocol.
 1. Allowing the server to filter connections based on the origin of the resource
    originating the transport session.  The <a http-header><code>Origin</code></a> header
    field on the session establishment request carries this information.
 
-Protocol security considerations related are described in the
-*Security Considerations* sections of [[!WEB-TRANSPORT-HTTP3]].
+Protocol security related considerations are described in the
+*Security Considerations* sections of [[!WEB-TRANSPORT-HTTP3]] and
+[[!WEB-TRANSPORT-HTTP2]].
 
 Networking APIs can be commonly used to scan the local network for available
 hosts, and thus be used for fingerprinting and other forms of attacks.
@@ -2395,7 +2502,7 @@ willing to accept connections from the Web.
 
 Normally, a user agent authenticates a TLS connection between itself and a
 remote endpoint by verifying the validity of the TLS server certificate
-provided against the server name in the URL [[!RFC6125]].  This is accomplished
+provided against the server name in the URL [[!RFC9525]].  This is accomplished
 by chaining server certificates to one of the trust anchors maintained by the
 user agent; the trust anchors in question are responsible for authenticating
 the server names in the certificates.  We will refer to this system as Web PKI.
