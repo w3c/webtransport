@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="f54942277442b36cc0b259b16cc499fb9eee9790" name="document-revision">
+  <meta content="8e8f3a79dd3b94b3b2331456cd5f04593508559d" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -2003,9 +2003,15 @@ optionally <var>closeInfo</var>, run these steps:
       <p>If <var>closeInfo</var> is given, then set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③①">[[State]]</a></code> to <code>"closed"</code>.
  Otherwise, set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③②">[[State]]</a></code> to <code>"failed"</code>.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate">For each</a> <var>sendStream</var> in <var>sendStreams</var>, <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-error" id="ref-for-writablestream-error">error</a> <var>sendStream</var> with <var>error</var>.</p>
+      <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate">For each</a> <var>stream</var> in <var>sendStreams</var>, run the following steps:</p>
+      <ol>
+       <li data-md>
+        <p>If <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot">[[PendingOperation]]</a></code> is not null, reject <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot①">[[PendingOperation]]</a></code> with <var>error</var>.</p>
+       <li data-md>
+        <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-error" id="ref-for-writablestream-error">Error</a> <var>stream</var> with <var>error</var>.</p>
+      </ol>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate①">For each</a> <var>receiveStream</var> in <var>receiveStreams</var>, <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error">error</a> <var>receiveStream</var> with <var>error</var>.</p>
+      <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate①">For each</a> <var>stream</var> in <var>receiveStreams</var>, <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error">error</a> <var>stream</var> with <var>error</var>.</p>
       <p class="note" role="note"><span class="marker">Note:</span> Script authors can inject code which runs in Promise resolution synchronously. Hence
 from here, do not touch <var>transport</var> as it may be mutated by scripts in an unpredictable way.
 This applies to logic calling this procedure, too.</p>
@@ -2468,7 +2474,7 @@ data to the server.</p>
        <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-internalstream-slot" id="ref-for-dom-webtransportsendstream-internalstream-slot">[[InternalStream]]</a></code>
        <dd data-md>
         <p><var>internalStream</var></p>
-       <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot">[[PendingOperation]]</a></code>
+       <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot②">[[PendingOperation]]</a></code>
        <dd data-md>
         <p>null</p>
        <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-transport-slot" id="ref-for-dom-webtransportsendstream-transport-slot①">[[Transport]]</a></code>
@@ -2495,11 +2501,11 @@ data to the server.</p>
       <p><a data-link-type="dfn" href="https://dom.spec.whatwg.org/#abortsignal-add" id="ref-for-abortsignal-add">Add</a> the following steps to <var>abortSignal</var>.</p>
       <ol>
        <li data-md>
-        <p>Let <var>pendingOperation</var> be <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot①">[[PendingOperation]]</a></code>.</p>
+        <p>Let <var>pendingOperation</var> be <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot③">[[PendingOperation]]</a></code>.</p>
        <li data-md>
         <p>If <var>pendingOperation</var> is null, then abort these steps.</p>
        <li data-md>
-        <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot②">[[PendingOperation]]</a></code> to null.</p>
+        <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot④">[[PendingOperation]]</a></code> to null.</p>
        <li data-md>
         <p>Let <var>reason</var> be <var>abortSignal</var>’s <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#abortsignal-abort-reason" id="ref-for-abortsignal-abort-reason">abort reason</a>.</p>
        <li data-md>
@@ -2525,7 +2531,7 @@ data to the server.</p>
      <li data-md>
       <p>Let <var>bytes</var> be a copy of the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence②">byte sequence</a> which <var>chunk</var> represents.</p>
      <li data-md>
-      <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot③">[[PendingOperation]]</a></code> to <var>promise</var>.</p>
+      <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot⑤">[[PendingOperation]]</a></code> to <var>promise</var>.</p>
      <li data-md>
       <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⓪">in parallel</a>:</p>
       <ol>
@@ -2549,12 +2555,12 @@ data to the server.</p>
        <li data-md>
         <p>If the previous step failed, abort the remaining steps.</p>
         <p class="note" role="note"><span class="marker">Note:</span> We don’t reject <var>promise</var> here because we handle network errors elsewhere, and those steps
-error <var>stream</var> and reject the result of this write operation.</p>
+reject <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot⑥">[[PendingOperation]]</a></code>.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①⑨">Queue a network task</a> with <var>transport</var> to run these steps:</p>
         <ol>
          <li data-md>
-          <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot④">[[PendingOperation]]</a></code> to null.</p>
+          <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot⑦">[[PendingOperation]]</a></code> to null.</p>
          <li data-md>
           <p><a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③①">Resolve</a> <var>promise</var> with undefined.</p>
         </ol>
@@ -2576,7 +2582,7 @@ the chunk arrives at the server, use an application-level protocol.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-remove" id="ref-for-list-remove">Remove</a> <var>stream</var> from <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-sendstreams-slot" id="ref-for-dom-webtransport-sendstreams-slot⑤">[[SendStreams]]</a></code>.</p>
      <li data-md>
-      <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot⑤">[[PendingOperation]]</a></code> to <var>promise</var>.</p>
+      <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot⑧">[[PendingOperation]]</a></code> to <var>promise</var>.</p>
      <li data-md>
       <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①②">in parallel</a>:</p>
       <ol>
@@ -2589,7 +2595,7 @@ the chunk arrives at the server, use an application-level protocol.</p>
         <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task②⓪">Queue a network task</a> with <var>transport</var> to run these steps:</p>
         <ol>
          <li data-md>
-          <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot⑥">[[PendingOperation]]</a></code> to null.</p>
+          <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot⑨">[[PendingOperation]]</a></code> to null.</p>
          <li data-md>
           <p><a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③③">Resolve</a> <var>promise</var> with undefined.</p>
         </ol>
@@ -2649,6 +2655,8 @@ the chunk arrives at the server, use an application-level protocol.</p>
         <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-remove" id="ref-for-list-remove②">Remove</a> <var>stream</var> from <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-sendstreams-slot" id="ref-for-dom-webtransport-sendstreams-slot⑦">[[SendStreams]]</a></code>.</p>
        <li data-md>
         <p>Let <var>error</var> be a newly <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-create-exception" id="ref-for-dfn-create-exception⑧">created</a> <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑨">WebTransportError</a></code> whose <code class="idl"><a data-link-type="idl" href="#dom-webtransporterroroptions-source" id="ref-for-dom-webtransporterroroptions-source⑧">source</a></code> is <code>"stream"</code> and <code class="idl"><a data-link-type="idl" href="#dom-webtransporterroroptions-streamerrorcode" id="ref-for-dom-webtransporterroroptions-streamerrorcode">streamErrorCode</a></code> is <var>code</var>.</p>
+       <li data-md>
+        <p>If <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot①⓪">[[PendingOperation]]</a></code> is not null, reject <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot①①">[[PendingOperation]]</a></code> with <var>error</var>.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-error" id="ref-for-writablestream-error④">Error</a> <var>stream</var> with <var>error</var>.</p>
       </ol>
@@ -2885,8 +2893,7 @@ its consumers to use a <a data-link-type="dfn" href="https://streams.spec.whatwg
         <p class="note" role="note"><span class="marker">Note:</span> This operation may return before filling up all of <var>bytes</var>.</p>
        <li data-md>
         <p>If the previous step failed, abort the remaining steps.</p>
-        <p class="note" role="note"><span class="marker">Note:</span> We don’t reject <var>promise</var> here because we handle network errors elsewhere, and those steps
-error <var>stream</var> and reject the result of this read operation.</p>
+        <p class="note" role="note"><span class="marker">Note:</span> We don’t reject <var>promise</var> here because we handle network errors elsewhere, and those steps <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error④">error</a> <var>stream</var>, which rejects any read requests awaiting this pull.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task②⑤">Queue a network task</a> with <var>transport</var> to run these steps:</p>
         <p class="note" role="note"><span class="marker">Note:</span> If the buffer described above is available in the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-agent-event-loop" id="ref-for-concept-agent-event-loop">event loop</a> where this procedure is
@@ -2979,7 +2986,7 @@ running, the following steps may run immediately.</p>
        <li data-md>
         <p>Let <var>error</var> be a newly <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-create-exception" id="ref-for-dfn-create-exception⑨">created</a> <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror①①">WebTransportError</a></code> whose <code class="idl"><a data-link-type="idl" href="#dom-webtransporterroroptions-source" id="ref-for-dom-webtransporterroroptions-source⑨">source</a></code> is <code>"stream"</code> and <code class="idl"><a data-link-type="idl" href="#dom-webtransporterroroptions-streamerrorcode" id="ref-for-dom-webtransporterroroptions-streamerrorcode①">streamErrorCode</a></code> is <var>code</var>.</p>
        <li data-md>
-        <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error④">Error</a> <var>stream</var> with <var>error</var>.</p>
+        <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑤">Error</a> <var>stream</var> with <var>error</var>.</p>
       </ol>
     </ol>
    </div>
@@ -3235,13 +3242,13 @@ converted to an httpErrorCode, and vice versa, as specified in <a data-link-type
       <td>(await <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable④">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-reader-read" id="ref-for-default-reader-read①">read</a></code>()).done
      <tr>
       <td>received <a data-link-type="dfn" href="#stream-signal-reset_stream" id="ref-for-stream-signal-reset_stream①">RESET_STREAM</a> with httpErrorCode
-      <td><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑤">errors</a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable⑤">readable</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode③">streamErrorCode</a></code>
+      <td><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑥">errors</a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable⑤">readable</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode③">streamErrorCode</a></code>
      <tr>
       <td>Session cleanly <a data-link-type="dfn" href="#session-terminated" id="ref-for-session-terminated①">terminated</a> with closeInfo<br> 
-      <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed①">closed</a></code>).closeInfo, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑥">errors</a> open streams
+      <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed①">closed</a></code>).closeInfo, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑦">errors</a> open streams
      <tr>
       <td>Network error<br> 
-      <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed②">closed</a></code>) rejects, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑦">errors</a> open streams
+      <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed②">closed</a></code>) rejects, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑧">errors</a> open streams
    </table>
    <p class="note" role="note"><span class="marker">Note:</span> As discussed in <a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a> Section 3.2, receipt of a RESET_STREAM
 frame is not always indicated to the application. Receipt of the
@@ -3323,13 +3330,13 @@ code does not need to be converted to an HTTP error code, and vice versa.</p>
       <td>(await <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable⑨">readable</a></code>.getReader().<code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#default-reader-read" id="ref-for-default-reader-read③">read</a></code>()).done
      <tr>
       <td>received <a data-link-type="dfn" href="#stream-signal-reset_stream" id="ref-for-stream-signal-reset_stream②">WT_RESET_STREAM</a> with error
-      <td><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑧">errors</a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable①⓪">readable</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode⑤">streamErrorCode</a></code>
+      <td><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑨">errors</a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportbidirectionalstream-readable" id="ref-for-dom-webtransportbidirectionalstream-readable①⓪">readable</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode⑤">streamErrorCode</a></code>
      <tr>
       <td>Session cleanly <a data-link-type="dfn" href="#session-terminated" id="ref-for-session-terminated②">terminated</a> with closeInfo<br> 
-      <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed③">closed</a></code>).closeInfo, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑨">errors</a> open streams
+      <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed③">closed</a></code>).closeInfo, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error①⓪">errors</a> open streams
      <tr>
       <td>Network error<br> 
-      <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed④">closed</a></code>) rejects, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error①⓪">errors</a> open streams
+      <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed④">closed</a></code>) rejects, and <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error①①">errors</a> open streams
      <tr>
       <td>received <a data-link-type="dfn" href="#session-signal-goaway" id="ref-for-session-signal-goaway③">GOAWAY</a>
       <td>await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-draining" id="ref-for-dom-webtransport-draining③">draining</a></code>
@@ -4781,7 +4788,7 @@ window.dfnpanelData['04dc6c33'] = {"dfnID": "04dc6c33", "url": "https://streams.
 window.dfnpanelData['26af25ca'] = {"dfnID": "26af25ca", "url": "https://streams.spec.whatwg.org/#readablestream-current-byob-request-view", "dfnText": "current byob request view", "refSections": [{"refs": [{"id": "ref-for-readablestream-current-byob-request-view"}, {"id": "ref-for-readablestream-current-byob-request-view\u2460"}], "title": "4.3. Procedures"}, {"refs": [{"id": "ref-for-readablestream-current-byob-request-view\u2461"}, {"id": "ref-for-readablestream-current-byob-request-view\u2462"}, {"id": "ref-for-readablestream-current-byob-request-view\u2463"}, {"id": "ref-for-readablestream-current-byob-request-view\u2464"}], "title": "8.3. Procedures"}], "external": true};
 window.dfnpanelData['4cc676dc'] = {"dfnID": "4cc676dc", "url": "https://streams.spec.whatwg.org/#default-reader", "dfnText": "default reader", "refSections": [{"refs": [{"id": "ref-for-default-reader"}], "title": "8. Interface WebTransportReceiveStream"}], "external": true};
 window.dfnpanelData['6b6bb798'] = {"dfnID": "6b6bb798", "url": "https://streams.spec.whatwg.org/#readablestream-enqueue", "dfnText": "enqueue", "refSections": [{"refs": [{"id": "ref-for-readablestream-enqueue"}], "title": "4.3. Procedures"}, {"refs": [{"id": "ref-for-readablestream-enqueue\u2460"}, {"id": "ref-for-readablestream-enqueue\u2461"}], "title": "5.2. Constructor"}, {"refs": [{"id": "ref-for-readablestream-enqueue\u2462"}], "title": "8.3. Procedures"}], "external": true};
-window.dfnpanelData['3bd18bd6'] = {"dfnID": "3bd18bd6", "url": "https://streams.spec.whatwg.org/#readablestream-error", "dfnText": "error (for ReadableStream)", "refSections": [{"refs": [{"id": "ref-for-readablestream-error"}, {"id": "ref-for-readablestream-error\u2460"}, {"id": "ref-for-readablestream-error\u2461"}, {"id": "ref-for-readablestream-error\u2462"}], "title": "5.5. Procedures"}, {"refs": [{"id": "ref-for-readablestream-error\u2463"}], "title": "8.4. Reset signal coming from the server"}, {"refs": [{"id": "ref-for-readablestream-error\u2464"}, {"id": "ref-for-readablestream-error\u2465"}, {"id": "ref-for-readablestream-error\u2466"}, {"id": "ref-for-readablestream-error\u2467"}, {"id": "ref-for-readablestream-error\u2468"}, {"id": "ref-for-readablestream-error\u2460\u24ea"}], "title": "11. Protocol Mappings"}], "external": true};
+window.dfnpanelData['3bd18bd6'] = {"dfnID": "3bd18bd6", "url": "https://streams.spec.whatwg.org/#readablestream-error", "dfnText": "error (for ReadableStream)", "refSections": [{"refs": [{"id": "ref-for-readablestream-error"}, {"id": "ref-for-readablestream-error\u2460"}, {"id": "ref-for-readablestream-error\u2461"}, {"id": "ref-for-readablestream-error\u2462"}], "title": "5.5. Procedures"}, {"refs": [{"id": "ref-for-readablestream-error\u2463"}], "title": "8.3. Procedures"}, {"refs": [{"id": "ref-for-readablestream-error\u2464"}], "title": "8.4. Reset signal coming from the server"}, {"refs": [{"id": "ref-for-readablestream-error\u2465"}, {"id": "ref-for-readablestream-error\u2466"}, {"id": "ref-for-readablestream-error\u2467"}, {"id": "ref-for-readablestream-error\u2468"}, {"id": "ref-for-readablestream-error\u2460\u24ea"}, {"id": "ref-for-readablestream-error\u2460\u2460"}], "title": "11. Protocol Mappings"}], "external": true};
 window.dfnpanelData['39a98580'] = {"dfnID": "39a98580", "url": "https://streams.spec.whatwg.org/#writablestream-error", "dfnText": "error (for WritableStream)", "refSections": [{"refs": [{"id": "ref-for-writablestream-error"}, {"id": "ref-for-writablestream-error\u2460"}], "title": "5.5. Procedures"}, {"refs": [{"id": "ref-for-writablestream-error\u2461"}, {"id": "ref-for-writablestream-error\u2462"}], "title": "6.4. Procedures"}, {"refs": [{"id": "ref-for-writablestream-error\u2463"}], "title": "6.5. STOP_SENDING signal coming from the server"}, {"refs": [{"id": "ref-for-writablestream-error\u2464"}, {"id": "ref-for-writablestream-error\u2465"}], "title": "11. Protocol Mappings"}], "external": true};
 window.dfnpanelData['c93cffd2'] = {"dfnID": "c93cffd2", "url": "https://streams.spec.whatwg.org/#high-water-mark", "dfnText": "high water mark", "refSections": [{"refs": [{"id": "ref-for-high-water-mark"}, {"id": "ref-for-high-water-mark\u2460"}], "title": "4.1. Internal slots"}], "external": true};
 window.dfnpanelData['e2b69bfa'] = {"dfnID": "e2b69bfa", "url": "https://streams.spec.whatwg.org/#readablestream-set-up-highwatermark", "dfnText": "highwatermark", "refSections": [{"refs": [{"id": "ref-for-readablestream-set-up-highwatermark"}, {"id": "ref-for-readablestream-set-up-highwatermark\u2460"}, {"id": "ref-for-readablestream-set-up-highwatermark\u2461"}], "title": "5.2. Constructor"}], "external": true};
@@ -4966,7 +4973,7 @@ window.dfnpanelData['dom-webtransportsendstream-sendgroup'] = {"dfnID": "dom-web
 window.dfnpanelData['dom-webtransportsendstream-sendorder'] = {"dfnID": "dom-webtransportsendstream-sendorder", "url": "#dom-webtransportsendstream-sendorder", "dfnText": "sendOrder", "refSections": [{"refs": [{"id": "ref-for-dom-webtransportsendstream-sendorder"}], "title": "6. Interface WebTransportSendStream"}], "external": false};
 window.dfnpanelData['dom-webtransportsendstream-getstats'] = {"dfnID": "dom-webtransportsendstream-getstats", "url": "#dom-webtransportsendstream-getstats", "dfnText": "getStats()", "refSections": [{"refs": [{"id": "ref-for-dom-webtransportsendstream-getstats"}], "title": "6. Interface WebTransportSendStream"}], "external": false};
 window.dfnpanelData['dom-webtransportsendstream-internalstream-slot'] = {"dfnID": "dom-webtransportsendstream-internalstream-slot", "url": "#dom-webtransportsendstream-internalstream-slot", "dfnText": "[[InternalStream]]", "refSections": [{"refs": [{"id": "ref-for-dom-webtransportsendstream-internalstream-slot"}, {"id": "ref-for-dom-webtransportsendstream-internalstream-slot\u2460"}, {"id": "ref-for-dom-webtransportsendstream-internalstream-slot\u2461"}, {"id": "ref-for-dom-webtransportsendstream-internalstream-slot\u2462"}, {"id": "ref-for-dom-webtransportsendstream-internalstream-slot\u2463"}], "title": "6.4. Procedures"}], "external": false};
-window.dfnpanelData['dom-webtransportsendstream-pendingoperation-slot'] = {"dfnID": "dom-webtransportsendstream-pendingoperation-slot", "url": "#dom-webtransportsendstream-pendingoperation-slot", "dfnText": "[[PendingOperation]]", "refSections": [{"refs": [{"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2460"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2461"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2462"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2463"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2464"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2465"}], "title": "6.4. Procedures"}], "external": false};
+window.dfnpanelData['dom-webtransportsendstream-pendingoperation-slot'] = {"dfnID": "dom-webtransportsendstream-pendingoperation-slot", "url": "#dom-webtransportsendstream-pendingoperation-slot", "dfnText": "[[PendingOperation]]", "refSections": [{"refs": [{"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2460"}], "title": "5.5. Procedures"}, {"refs": [{"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2461"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2462"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2463"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2464"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2465"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2466"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2467"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2468"}], "title": "6.4. Procedures"}, {"refs": [{"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2460\u24ea"}, {"id": "ref-for-dom-webtransportsendstream-pendingoperation-slot\u2460\u2460"}], "title": "6.5. STOP_SENDING signal coming from the server"}], "external": false};
 window.dfnpanelData['dom-webtransportsendstream-transport-slot'] = {"dfnID": "dom-webtransportsendstream-transport-slot", "url": "#dom-webtransportsendstream-transport-slot", "dfnText": "[[Transport]]", "refSections": [{"refs": [{"id": "ref-for-dom-webtransportsendstream-transport-slot"}], "title": "6.1. Attributes"}, {"refs": [{"id": "ref-for-dom-webtransportsendstream-transport-slot\u2460"}, {"id": "ref-for-dom-webtransportsendstream-transport-slot\u2461"}, {"id": "ref-for-dom-webtransportsendstream-transport-slot\u2462"}, {"id": "ref-for-dom-webtransportsendstream-transport-slot\u2463"}], "title": "6.4. Procedures"}, {"refs": [{"id": "ref-for-dom-webtransportsendstream-transport-slot\u2464"}], "title": "6.5. STOP_SENDING signal coming from the server"}], "external": false};
 window.dfnpanelData['dom-webtransportsendstream-sendgroup-slot'] = {"dfnID": "dom-webtransportsendstream-sendgroup-slot", "url": "#dom-webtransportsendstream-sendgroup-slot", "dfnText": "[[SendGroup]]", "refSections": [{"refs": [{"id": "ref-for-dom-webtransportsendstream-sendgroup-slot"}, {"id": "ref-for-dom-webtransportsendstream-sendgroup-slot\u2460"}], "title": "6.1. Attributes"}, {"refs": [{"id": "ref-for-dom-webtransportsendstream-sendgroup-slot\u2461"}, {"id": "ref-for-dom-webtransportsendstream-sendgroup-slot\u2462"}], "title": "6.4. Procedures"}, {"refs": [{"id": "ref-for-dom-webtransportsendstream-sendgroup-slot\u2463"}], "title": "7.1. Methods"}], "external": false};
 window.dfnpanelData['dom-webtransportsendstream-sendorder-slot'] = {"dfnID": "dom-webtransportsendstream-sendorder-slot", "url": "#dom-webtransportsendstream-sendorder-slot", "dfnText": "[[SendOrder]]", "refSections": [{"refs": [{"id": "ref-for-dom-webtransportsendstream-sendorder-slot"}, {"id": "ref-for-dom-webtransportsendstream-sendorder-slot\u2460"}], "title": "6.1. Attributes"}, {"refs": [{"id": "ref-for-dom-webtransportsendstream-sendorder-slot\u2461"}, {"id": "ref-for-dom-webtransportsendstream-sendorder-slot\u2462"}, {"id": "ref-for-dom-webtransportsendstream-sendorder-slot\u2463"}], "title": "6.4. Procedures"}], "external": false};
