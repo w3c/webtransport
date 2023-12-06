@@ -1106,8 +1106,11 @@ optionally |closeInfo|, run these steps:
    to an empty [=queue=].
 1. If |closeInfo| is given, then set |transport|.{{[[State]]}} to `"closed"`.
    Otherwise, set |transport|.{{[[State]]}} to `"failed"`.
-1. [=For each=] |sendStream| in |sendStreams|, [=WritableStream/error=] |sendStream| with |error|.
-1. [=For each=] |receiveStream| in |receiveStreams|, [=ReadableStream/error=] |receiveStream|
+1. [=For each=] |stream| in |sendStreams|, run the following steps:
+  1. If |stream|.{{[[PendingOperation]]}} is not null, reject |stream|.{{[[PendingOperation]]}}
+     with |error|.
+  1. [=WritableStream/Error=] |stream| with |error|.
+1. [=For each=] |stream| in |receiveStreams|, [=ReadableStream/error=] |stream|
    with |error|.
 
   Note: Script authors can inject code which runs in Promise resolution synchronously. Hence
@@ -1623,7 +1626,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
   1. If the previous step failed, abort the remaining steps.
 
     Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
-    error |stream| and reject the result of this write operation.
+    reject |stream|.{{[[PendingOperation]]}}.
 
   1. [=Queue a network task=] with |transport| to run these steps:
     1. Set |stream|.{{[[PendingOperation]]}} to null.
@@ -1697,6 +1700,8 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportSendStream}} 
   1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
      {{WebTransportErrorOptions/source}} is `"stream"` and
      {{WebTransportErrorOptions/streamErrorCode}} is |code|.
+  1. If |stream|.{{[[PendingOperation]]}} is not null, reject |stream|.{{[[PendingOperation]]}}
+     with |error|.
   1. [=WritableStream/Error=] |stream| with |error|.
 
 </div>
@@ -1938,7 +1943,7 @@ To <dfn for="WebTransportReceiveStream">pull bytes</dfn> from a {{WebTransportRe
   1. If the previous step failed, abort the remaining steps.
 
     Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
-    error |stream| and reject the result of this read operation.
+    [=ReadableStream/error=] |stream|, which rejects any read requests awaiting this pull.
 
   1. [=Queue a network task=] with |transport| to run these steps:
 
