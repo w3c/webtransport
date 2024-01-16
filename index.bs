@@ -1708,7 +1708,11 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
 
 <div algorithm>
 To <dfn for="WebTransportSendStream">abort all atomic write requests</dfn> on a {{WebTransportSendStream}} |stream|, run these steps:
+  1. Let |writeRequests| be
+     |stream|.<a href="https://streams.spec.whatwg.org/#writablestream-writerequests">writeRequests</a>.
   1. Let |requestsToAbort| be [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
+  1. If |writeRequests| [=list/contains=] a promise not in |requestsToAbort|, then
+     [=WritableStream/error=] |stream| with {{AbortError}}, and abort these steps.
   1. [=list/Empty=] [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
   1. [=For each=] |promise| in |requestsToAbort|, [=reject=] |promise| with {{AbortError}}.
   1. [=In parallel=], [=for each=] |promise| in |requestsToAbort|, abort the
@@ -2143,7 +2147,7 @@ object |transport|, and a |sendOrder|, run these steps.
 # `WebTransportWriter` Interface #  {#web-transport-writer-procedures-interface}
 
 {{WebTransportWriter}} is a subclass of {{WritableStreamDefaultWriter}} that
-overloads one method and adds another.
+adds one method.
 
 A {{WebTransportWriter}} is always created by the
 [=WebTransportWriter/create=] procedure.
@@ -2151,45 +2155,39 @@ A {{WebTransportWriter}} is always created by the
 <pre class="idl">
 [Exposed=*, SecureContext]
 interface WebTransportWriter : WritableStreamDefaultWriter {
-  Promise&lt;undefined&gt; write(optional any chunk);
   Promise&lt;undefined&gt; atomicWrite(optional any chunk);
 };
 </pre>
 
 ## Methods ##  {#web-transport-writer-procedures-methods}
 
-: <dfn for="WebTransportWriter" method>write(chunk)</dfn>
-:: The {{write}} method will not reject on [=flow control=] blockage
-   unless queued behind one or more outstanding calls to {{atomicWrite}}.
-   This behavior is designed to satisfy most applications.
-
-   When called, run the following steps:
-   1. Let |stream| be the {{WebTransportSendStream}} associated with [=this=].
-   1. If |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} is not empty,
-      then return the result of [=writing atomically=] on |stream| with |chunk|.
-   1. Return the result of {{WritableStreamDefaultWriter/write(chunk)}}
-      on {{WritableStreamDefaultWriter}} with |chunk|.
-
 : <dfn for="WebTransportWriter" method>atomicWrite(chunk)</dfn>
 :: The {{atomicWrite}} method will reject if the |chunk| given to it
-   cannot be sent in its entirety within the [=flow control=] window that
-   is current at the time of sending. In other words, the sending of |chunk|
-   is all or nothing. This behavior is designed to satisfy niche transactional
-   applications sensitive to [=flow control=] deadlocks ([[RFC9308]]
+   could not be sent in its entirety within the [=flow control=] window that
+   is current at the time of sending. This behavior is designed to satisfy niche
+   transactional applications sensitive to [=flow control=] deadlocks ([[RFC9308]]
    [Section 4.4](https://datatracker.ietf.org/doc/html/rfc9308#section-4.4)).
 
-   Note: {{atomicWrite}} does not guarantee atomicity on the wire (e.g. MTU) or
-   at the server, nor does it prevent interleaving of data with other send
-   requests. Only the client will know if it failed.
+   Note: {{atomicWrite}} might have partially sent a chunk before rejecting. It
+   does not guarantee atomicity on the wire (e.g. MTU) or at the server, nor does
+   it prevent interleaving of data with other send requests. Only the client will
+   know if it failed.
 
    Note: Atomic writes can still block if queued behind non-atomic writes. If
-   the write is rejected, everything queued behind it will be rejected as well,
-   including non-atomic writes, which are enqueued as atomic writes when an
-   atomic write is outstanding. Applications are therefore encouraged to always
-   await atomic writes.
+   the atomic write is rejected, everything queued behind it at that moment
+   will be rejected as well. Any non-atomic writes rejected in this way will
+   [=WritableStream/error=] the stream. Applications are therefore encouraged to
+   always await atomic writes.
 
-   When called, return the result of [=writing atomically=] on the
-   {{WebTransportSendStream}} associated with [=this=], with |chunk|.
+   When atomicWrite is called, the user agent MUST run the following steps:
+   1. Let |p| be the result of {{WritableStreamDefaultWriter/write(chunk)}}
+       on {{WritableStreamDefaultWriter}} with |chunk|.
+   1. [=set/Append=] |p| to |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
+   1. Return the result of [=reacting=] to |p| with the following steps:
+      1. If |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} [=list/contains=] |p|,
+         [=list/remove=] |p|.
+      1. If |p| was rejected with reason |r|, then return [=a promise rejected with=] |r|.
+      1. Return undefined.
 
 ## Procedures ##  {#web-transport-writer-procedures-procedures}
 
@@ -2204,22 +2202,6 @@ steps:
 1. Return |writer|.
 
 </div>
-
-<div algorithm="write atomically">
-
-To <dfn export for="WebTransportWriter" lt="write atomically">write atomically</dfn>
-on a {{WebTransportSendStream}} |stream|, given |chunk|, run these steps:
-1. Let |p| be the result of {{WritableStreamDefaultWriter/write(chunk)}}
-    on {{WritableStreamDefaultWriter}} with |chunk|.
-1. [=set/Append=] |p| to |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
-1. Return the result of [=reacting=] to |p| with the following steps:
-   1. If |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} [=list/contains=] |p|,
-      [=list/remove=] |p|.
-   1. If |p| was rejected with reason |r|, then return [=a promise rejected with=] |r|.
-   1. Return undefined.
-
-</div>
-
 
 # `WebTransportError` Interface #  {#web-transport-error-interface}
 
@@ -2804,7 +2786,7 @@ async function sendTransactionalData(wt, bytes) {
   } catch (e) {
     if (e.name != "AbortError") throw e;
     // rejected to avoid blocking on flow control
-    // The writable remains un-errored unlike with regular writes
+    // The writable remains un-errored provided no non-atomic writes are pending
   } finally {
     writer.releaseLock();
   }
