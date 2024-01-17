@@ -606,6 +606,9 @@ interface WebTransport {
   readonly attribute Promise&lt;undefined&gt; ready;
   readonly attribute WebTransportReliabilityMode reliability;
   readonly attribute WebTransportCongestionControl congestionControl;
+  [EnforceRange] attribute unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams;
+  [EnforceRange] attribute unsigned short? anticipatedConcurrentIncomingBidirectionalStreams;
+
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   readonly attribute Promise&lt;undefined&gt; draining;
   undefined close(optional WebTransportCloseInfo closeInfo = {});
@@ -742,10 +745,10 @@ agent MUST run the following steps:
    congestion control algorithms that optimize for |congestionControl|, as allowed by
    [[!RFC9002]] [Section 7](https://www.rfc-editor.org/rfc/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
-1. Let |concurrentIncomingUnidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
-   {{WebTransportOptions/concurrentIncomingUnidirectionalStreams}}.
-1. Let |concurrentIncomingBidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
-   {{WebTransportOptions/concurrentIncomingBidirectionalStreams}}.
+1. Let |anticipatedConcurrentIncomingUnidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
+   {{WebTransportOptions/anticipatedConcurrentIncomingUnidirectionalStreams}}.
+1. Let |anticipatedConcurrentIncomingBidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
+   {{WebTransportOptions/anticipatedConcurrentIncomingBidirectionalStreams}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
@@ -769,9 +772,9 @@ agent MUST run the following steps:
     : {{[[CongestionControl]]}}
     :: |congestionControl|
     : {{[[AnticipatedConcurrentIncomingUniStreams]]}}
-    :: |concurrentIncomingUnidirectionalStreams|
+    :: |anticipatedConcurrentIncomingUnidirectionalStreams|
     : {{[[AnticipatedConcurrentIncomingBidiStreams]]}}
-    :: |concurrentIncomingBidirectionalStreams|
+    :: |anticipatedConcurrentIncomingBidirectionalStreams|
     : {{[[Closed]]}}
     :: a new promise
     : {{[[Draining]]}}
@@ -965,6 +968,34 @@ these steps.
    throughput or low latency for sending on this connection. If a preference was
    requested but not satisfied, then the value is `"default"`
    The getter steps are to return [=this=]'s {{[[CongestionControl]]}}.
+
+: <dfn for="WebTransport" attribute>anticipatedConcurrentIncomingUnidirectionalStreams</dfn>
+:: Optionally lets an application specify the number of concurrently open
+   [=incoming unidirectional=] streams it anticipates the server creating.
+   If not null, the user agent SHOULD attempt to reduce future round-trips by taking
+   {{[[AnticipatedConcurrentIncomingUniStreams]]}} into consideration in its
+   [=implementation-defined=] calculation of cumulative values for MAX_STREAM frames
+   it sends to the server.
+   [[!QUIC]][Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11)
+
+   The getter steps are to return [=this=]'s {{[[AnticipatedConcurrentIncomingUniStreams]]}}.
+
+   The setter steps, given |value|, are to set [=this=]'s
+   {{[[AnticipatedConcurrentIncomingUniStreams]]}} to |value|.
+
+: <dfn for="WebTransport" attribute>anticipatedConcurrentIncomingBidirectionalStreams</dfn>
+:: Optionally lets an application specify the number of concurrently open
+   [=incoming bidirectional=] streams it anticipates the server creating.
+   If not null, the user agent SHOULD attempt to reduce future round-trips by taking
+   {{[[AnticipatedConcurrentIncomingBiStreams]]}} into consideration in its
+   [=implementation-defined=] calculation of cumulative values for MAX_STREAM frames
+   it sends to the server.
+   [[!QUIC]][Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11)
+
+   The getter steps are to return [=this=]'s {{[[AnticipatedConcurrentIncomingBiStreams]]}}.
+
+   The setter steps, given |value|, are to set [=this=]'s
+   {{[[AnticipatedConcurrentIncomingBiStreams]]}} to |value|.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -1231,8 +1262,8 @@ dictionary WebTransportOptions {
   boolean requireUnreliable = false;
   sequence&lt;WebTransportHash&gt; serverCertificateHashes;
   WebTransportCongestionControl congestionControl = "default";
-  [EnforceRange] unsigned short? concurrentIncomingUnidirectionalStreams = null;
-  [EnforceRange] unsigned short? concurrentIncomingBidirectionalStreams = null;
+  [EnforceRange] unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams = null;
+  [EnforceRange] unsigned short? anticipatedConcurrentIncomingBidirectionalStreams = null;
 };
 
 enum WebTransportCongestionControl {
@@ -1278,7 +1309,7 @@ that determine how the [=WebTransport session=] is established and used.
      </p>
    </div>
 
-: <dfn for="WebTransportOptions" dict-member>concurrentIncomingUnidirectionalStreams</dfn>
+: <dfn for="WebTransportOptions" dict-member>anticipatedConcurrentIncomingUnidirectionalStreams</dfn>
 :: Optionally lets an application specify the number of concurrently open
    [=incoming unidirectional=] streams it anticipates the server creating.
    If not null, the user agent SHOULD attempt to reduce round-trips by taking
@@ -1287,7 +1318,7 @@ that determine how the [=WebTransport session=] is established and used.
    it sends to the server.
    [[!QUIC]][Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11)
 
-: <dfn for="WebTransportOptions" dict-member>concurrentIncomingBidirectionalStreams</dfn>
+: <dfn for="WebTransportOptions" dict-member>anticipatedConcurrentIncomingBidirectionalStreams</dfn>
 :: Optionally lets an application specify the number of concurrently open
    [=bidirectional=] streams it anticipates a server creating.
    If not null, the user agent SHOULD attempt to reduce round-trips by taking
