@@ -2167,10 +2167,11 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
    transactional applications sensitive to [=flow control=] deadlocks ([[RFC9308]]
    [Section 4.4](https://datatracker.ietf.org/doc/html/rfc9308#section-4.4)).
 
-   Note: {{atomicWrite}} might have partially sent a chunk before rejecting. It
-   does not guarantee atomicity on the wire (e.g. MTU) or at the server, nor does
-   it prevent interleaving of data with other send requests. Only the client will
-   know if it failed.
+   Note: {{atomicWrite}} can still reject after sending some data. Though it
+   provides atomicity with respect to flow control, other errors may occur. 
+   {{atomicWrite}} does not prevent data from being split between packets
+   or being interleaved with other data. Only the sender learns if
+   {{atomicWrite}} fails due to lack of available flow control credit.
 
    Note: Atomic writes can still block if queued behind non-atomic writes. If
    the atomic write is rejected, everything queued behind it at that moment
