@@ -1613,8 +1613,13 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 1. Let |atomic| be true if [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}
    [=list/contains=] |inFlightWriteRequest|, otherwise false.
 1. Run the following steps [=in parallel=]:
-  1. [=stream/Send=] |bytes| on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the
-     operation to complete.
+  1. If |atomic| is true and the current [=flow control=] window is too small for |bytes| to be sent
+     in its entirety, then abort the remaining steps and [=queue a network task=] with |transport|
+     to run these sub-steps:
+    1. Set |stream|.{{[[PendingOperation]]}} to null.
+    1. [=Abort all atomic write requests=] on |stream|.
+  1. Otherwise, [=stream/send=] |bytes| on |stream|.{{WebTransportSendStream/[[InternalStream]]}}
+     and wait for the operation to complete.
      This sending MAY be interleaved with sending of previously queued streams and datagrams,
      as well as streams and datagrams yet to be queued to be sent over this transport.
 
@@ -1639,18 +1644,11 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 
      Note: The definition of fairness here is [=implementation-defined=].
 
-     Stop sending |bytes| if |atomic| is true and the current [=flow control=] window
-     ends before |bytes| can be sent in their entirety.
-
   1. If the previous step failed due to a network error, abort the remaining steps.
 
     Note: We don't reject |promise| here because we handle network errors elsewhere, and those steps
     error |stream| and reject the result of this write operation.
 
-  1. If |bytes| were not sent in their entirety, [=queue a network task=] with |transport|
-     to run these steps:
-    1. Set |stream|.{{[[PendingOperation]]}} to null.
-    1. [=Abort all atomic write requests=] on |stream|.
   1. Otherwise, [=queue a network task=] with |transport|
      to run these steps:
     1. Set |stream|.{{[[PendingOperation]]}} to null.
