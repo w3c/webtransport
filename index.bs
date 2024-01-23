@@ -692,12 +692,12 @@ A {{WebTransport}} object has the following internal slots.
    by the user agent, or `"default"`.
   </tr>
   <tr>
-   <td><dfn>`[[AnticipatedConcurrentIncomingUniStreams]]`</dsfn>
+   <td><dfn>`[[AnticipatedConcurrentIncomingUnidirectionalStreams]]`</dsfn>
    <td class="non-normative">The number of concurrently open
    [=incoming unidirectional=] streams the application anticipates the server creating, or null.
   </tr>
   <tr>
-   <td><dfn>`[[AnticipatedConcurrentIncomingBidiStreams]]`</dfn>
+   <td><dfn>`[[AnticipatedConcurrentIncomingBidirectionalStreams]]`</dfn>
    <td class="non-normative">The number of concurrently open
    [=bidirectional=] streams the application anticipates the server creating, or null.
   </tr>
@@ -773,9 +773,9 @@ agent MUST run the following steps:
     :: "pending"
     : {{[[CongestionControl]]}}
     :: |congestionControl|
-    : {{[[AnticipatedConcurrentIncomingUniStreams]]}}
+    : {{[[AnticipatedConcurrentIncomingUnidirectionalStreams]]}}
     :: |anticipatedConcurrentIncomingUnidirectionalStreams|
-    : {{[[AnticipatedConcurrentIncomingBidiStreams]]}}
+    : {{[[AnticipatedConcurrentIncomingBidirectionalStreams]]}}
     :: |anticipatedConcurrentIncomingBidirectionalStreams|
     : {{[[Closed]]}}
     :: a new promise
@@ -979,29 +979,29 @@ these steps.
 :: Optionally lets an application specify the number of concurrently open
    [=incoming unidirectional=] streams it anticipates the server creating.
    If not null, the user agent SHOULD attempt to reduce future round-trips by taking
-   {{[[AnticipatedConcurrentIncomingUniStreams]]}} into consideration in its
+   {{[[AnticipatedConcurrentIncomingUnidirectionalStreams]]}} into consideration in its
    [=implementation-defined=] calculation of cumulative values for MAX_STREAM frames
    it sends to the server.
    [[!QUIC]][Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11)
 
-   The getter steps are to return [=this=]'s {{[[AnticipatedConcurrentIncomingUniStreams]]}}.
+   The getter steps are to return [=this=]'s {{[[AnticipatedConcurrentIncomingUnidirectionalStreams]]}}.
 
    The setter steps, given |value|, are to set [=this=]'s
-   {{[[AnticipatedConcurrentIncomingUniStreams]]}} to |value|.
+   {{[[AnticipatedConcurrentIncomingUnidirectionalStreams]]}} to |value|.
 
 : <dfn for="WebTransport" attribute>anticipatedConcurrentIncomingBidirectionalStreams</dfn>
 :: Optionally lets an application specify the number of concurrently open
    [=bidirectional=] streams it anticipates the server creating.
    If not null, the user agent SHOULD attempt to reduce future round-trips by taking
-   {{[[AnticipatedConcurrentIncomingBiStreams]]}} into consideration in its
+   {{[[AnticipatedConcurrentIncomingBidirectionalStreams]]}} into consideration in its
    [=implementation-defined=] calculation of cumulative values for MAX_STREAM frames
    it sends to the server.
    [[!QUIC]][Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11)
 
-   The getter steps are to return [=this=]'s {{[[AnticipatedConcurrentIncomingBiStreams]]}}.
+   The getter steps are to return [=this=]'s {{[[AnticipatedConcurrentIncomingBidirectionalStreams]]}}.
 
    The setter steps, given |value|, are to set [=this=]'s
-   {{[[AnticipatedConcurrentIncomingBiStreams]]}} to |value|.
+   {{[[AnticipatedConcurrentIncomingBidirectionalStreams]]}} to |value|.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -1322,7 +1322,7 @@ that determine how the [=WebTransport session=] is established and used.
 :: Optionally lets an application specify the number of concurrently open
    [=incoming unidirectional=] streams it anticipates the server creating.
    If not null, the user agent SHOULD attempt to reduce round-trips by taking
-   {{[[AnticipatedConcurrentIncomingUniStreams]]}} into consideration in its
+   {{[[AnticipatedConcurrentIncomingUnidirectionalStreams]]}} into consideration in its
    [=implementation-defined=] calculation of cumulative values for MAX_STREAM frames
    it sends to the server.
    [[!QUIC]][Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11)
@@ -1331,7 +1331,7 @@ that determine how the [=WebTransport session=] is established and used.
 :: Optionally lets an application specify the number of concurrently open
    [=bidirectional=] streams it anticipates a server creating.
    If not null, the user agent SHOULD attempt to reduce round-trips by taking
-   {{[[AnticipatedConcurrentIncomingBidiStreams]]}} into consideration in its
+   {{[[AnticipatedConcurrentIncomingBidirectionalStreams]]}} into consideration in its
    [=implementation-defined=] calculation of cumulative values for MAX_STREAM frames
    it sends to the server.
    [[!QUIC]][Section 19.11](https://www.rfc-editor.org/rfc/rfc9000#section-19.11)
