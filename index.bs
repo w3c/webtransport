@@ -2700,6 +2700,42 @@ async function receiveDatagrams(url) {
 }
 </pre>
 
+## Receiving datagrams with a BYOB reader ## {#example-datagrams-byob}
+
+*This section is non-normative.*
+
+As {{WebTransport/datagrams}} are [=ReadableStream/readable byte streams=],
+you can acquire a [=ReadableStream/BYOB reader=] for them, which allows more
+precise control over buffer allocation in order to avoid copies. This example
+reads the datagram into a 64kB memory buffer.
+
+<pre class="example" highlight="js">
+const wt = new WebTransport(url);
+
+for await (const datagram of wt.datagrams.readable) {
+  const reader = datagram.getReader({ mode: "byob" });
+  
+  let array_buffer = new ArrayBuffer(65536);
+  const buffer = await readInto(array_buffer);
+}
+
+async function readInto(buffer) {
+  let offset = 0;
+
+  while (offset < buffer.byteLength) {
+    const {value: view, done} = await reader.read(
+        new Uint8Array(buffer, offset, buffer.byteLength - offset));
+    buffer = view.buffer;
+    if (done) {
+      break;
+    }
+    offset += view.byteLength;
+  }
+
+  return buffer;
+}
+</pre>
+
 ## Sending a stream ##  {#example-sending-stream}
 
 *This section is non-normative.*
@@ -2781,6 +2817,42 @@ async function receiveText(url, createWritableStreamForTextData) {
       console.error(e);
     }
   }
+}
+</pre>
+
+## Receiving a stream with a BYOB reader ## {#example-stream-byob}
+
+*This section is non-normative.*
+
+As {{WebTransportReceiveStream}}s are [=ReadableStream/readable byte streams=], you
+can acquire a [=ReadableStream/BYOB reader=] for them, which allows more precise
+control over buffer allocation in order to avoid copies. This example reads the
+first 1024 bytes from a {{WebTransportReceiveStream}} into a single memory buffer.
+
+<pre class="example" highlight="js">
+const wt = new WebTransport(url);
+
+const reader = wt.incomingUnidirectionalStreams.getReader();
+const { value: recv_stream, done } = await reader.read();
+const byob_reader = recv_stream.getReader({ mode: "byob" });
+
+let array_buffer = new ArrayBuffer(1024);
+const buffer = await readInto(array_buffer);
+
+async function readInto(buffer) {
+  let offset = 0;
+
+  while (offset < buffer.byteLength) {
+    const {value: view, done} = await reader.read(
+        new Uint8Array(buffer, offset, buffer.byteLength - offset));
+    buffer = view.buffer;
+    if (done) {
+      break;
+    }
+    offset += view.byteLength;
+  }
+
+  return buffer;
 }
 </pre>
 
