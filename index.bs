@@ -1207,16 +1207,16 @@ This specification defines <dfn>context cleanup steps</dfn> as the following ste
 
 A {{WebTransport}} object whose {{[[State]]}} is `"connecting"` must not be garbage collected if
 {{[[IncomingBidirectionalStreams]]}}, {{[[IncomingUnidirectionalStreams]]}}, any
-{{WebTransportReceiveStream}}, or {{[[Datagrams]]}}.{{[[Readable]]}} is [=ReadableStream/locked=],
-or if the {{ready}}, {{draining}}, or {{closed}} promise is being awaited.
+{{WebTransportReceiveStream}}, or {{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Readable]]}}
+is [=ReadableStream/locked=], or if the {{ready}}, {{draining}}, or {{closed}} promise is being observed.
 
 A {{WebTransport}} object whose {{[[State]]}} is `"connected"` must not be garbage collected if
 {{[[IncomingBidirectionalStreams]]}}, {{[[IncomingUnidirectionalStreams]]}}, any
-{{WebTransportReceiveStream}}, or {{[[Datagrams]]}}.{{[[Readable]]}} is [=ReadableStream/locked=],
-or if the {{draining}} or {{closed}} promise is being awaited.
+{{WebTransportReceiveStream}}, or {{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Readable]]}}
+is [=ReadableStream/locked=], or if the {{draining}} or {{closed}} promise is being observed.
 
 A {{WebTransport}} object whose {{[[State]]}} is `"draining"` must not be garbage
-collected if the {{closed}} promise is being awaited.
+collected if the {{closed}} promise is being observed.
 
 A {{WebTransport}} object with an [=session/established=] [=WebTransport session=]
 that has data queued to be transmitted to the network, including datagrams in
