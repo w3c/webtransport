@@ -1438,21 +1438,26 @@ on datagram transmission over the [=underlying connection=].
 
 <pre class="idl">
 dictionary WebTransportDatagramStats {
-  unsigned long long expiredOutgoing;
   unsigned long long droppedIncoming;
+  unsigned long long expiredIncoming;
+  unsigned long long expiredOutgoing;
   unsigned long long lostOutgoing;
 };
 </pre>
 
 The dictionary SHALL have the following attributes:
 
-: <dfn for="WebTransportDatagramStats" dict-member>expiredOutgoing</dfn>
-:: The number of datagrams queued for sending that were dropped, due to being
-   older than {{outgoingMaxAge}} before they were able to be sent.
 : <dfn for="WebTransportDatagramStats" dict-member>droppedIncoming</dfn>
-:: The number of incoming datagrams that were dropped, due to the application not reading
+:: The number of incoming datagrams that were dropped due to the application not reading
   from {{WebTransport/datagrams}}' {{WebTransportDatagramDuplexStream/readable}}
   before new datagrams overflow the receive queue.
+: <dfn for="WebTransportDatagramStats" dict-member>expiredIncoming</dfn>
+:: The number of incoming datagrams that were dropped due to being older than
+  {{incomingMaxAge}} before they were read from {{WebTransport/datagrams}}'
+  {{WebTransportDatagramDuplexStream/readable}}.
+: <dfn for="WebTransportDatagramStats" dict-member>expiredOutgoing</dfn>
+:: The number of datagrams queued for sending that were dropped due to being
+   older than {{outgoingMaxAge}} before they were able to be sent.
 : <dfn for="WebTransportDatagramStats" dict-member>lostOutgoing</dfn>
 :: The number of sent datagrams that were declared lost, as defined in
    [[!RFC9002]] [Section 6.1](https://www.rfc-editor.org/rfc/rfc9002#section-6.1).
