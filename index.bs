@@ -1156,13 +1156,10 @@ series of steps |steps|, run these steps:
 Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} |transport| is
 [=session/terminated=] with optionally |code| and |reasonBytes|, run these steps:
 
-1. Let |cleanly| be a boolean representing whether |transport|.{{[[Session]]}}'s [=CONNECT stream=]
-   is in the "Data Recvd" state. [[!QUIC]]
 1. [=Queue a network task=] with |transport| to run these steps:
   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, abort these steps.
   1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
      {{WebTransportErrorOptions/source}} is `"session"`.
-  1. If |cleanly| is false, then [=cleanup=] |transport| with |error|, and abort these steps.
   1. Let |closeInfo| be a [=new=] {{WebTransportCloseInfo}}.
   1. If |code| is given, set |closeInfo|'s {{WebTransportCloseInfo/closeCode}} to |code|.
   1. If |reasonBytes| is given, set |closeInfo|'s {{WebTransportCloseInfo/reason}} to |reasonBytes|,
