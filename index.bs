@@ -66,6 +66,7 @@ spec:infra; type:dfn; for:set; text:for each
 spec:infra; type:dfn; for:/; text:set
 spec:streams; type:interface; text:ReadableStream
 spec:fetch; type:dfn; for:/; text:fetch
+spec:fetch; type:dfn; for:/; text:credentials
 spec:url; type:dfn; text:scheme
 spec:url; type:dfn; text:fragment
 spec:infra; type:dfn; for:/; text:ASCII case-insensitive
@@ -1205,8 +1206,29 @@ This specification defines <dfn>context cleanup steps</dfn> as the following ste
 
 ## Garbage Collection ## {#web-transport-gc}
 
-The user agent MUST NOT garbage collect a {{WebTransport}} object whose {{[[State]]}} is either
-`"connecting"` or `"connected"`.
+A {{WebTransport}} object whose {{[[State]]}} is `"connecting"` must not be garbage collected if
+{{[[IncomingBidirectionalStreams]]}}, {{[[IncomingUnidirectionalStreams]]}}, any
+{{WebTransportReceiveStream}}, or {{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Readable]]}}
+are [=ReadableStream/locked=], or if the {{ready}}, {{draining}}, or {{closed}} promise is being observed.
+
+A {{WebTransport}} object whose {{[[State]]}} is `"connected"` must not be garbage collected if
+{{[[IncomingBidirectionalStreams]]}}, {{[[IncomingUnidirectionalStreams]]}}, any
+{{WebTransportReceiveStream}}, or {{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Readable]]}}
+are [=ReadableStream/locked=], or if the {{draining}} or {{closed}} promise is being observed.
+
+A {{WebTransport}} object whose {{[[State]]}} is `"draining"` must not be garbage collected if
+{{[[IncomingBidirectionalStreams]]}}, {{[[IncomingUnidirectionalStreams]]}}, any
+{{WebTransportReceiveStream}}, or {{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Readable]]}}
+are [=ReadableStream/locked=], or if the {{closed}} promise is being observed.
+
+A {{WebTransport}} object with an [=session/established=] [=WebTransport session=]
+that has data queued to be transmitted to the network, including datagrams in
+{{[[Datagrams]]}}.{{[[OutgoingDatagramsQueue]]}}, must not be garbage collected.
+
+If a {{WebTransport}} object is garbage collected while the [=underlying connection=]
+is still open, the user agent must 
+<a href="https://www.ietf.org/archive/id/draft-ietf-webtrans-overview-06.html#section-4.1-2.4.1">terminate the WebTransport session</a>
+with an Application Error Code of `0` and Application Error Message of `""`.
 
 ## Configuration ##  {#web-transport-configuration}
 
