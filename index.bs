@@ -3007,6 +3007,28 @@ async function sendTransactionalData(wt, bytes) {
 }
 </pre>
 
+## Using a server certificate hash ## {#example-server-certificate-hash}
+
+*This section is non-normative.*
+
+A WebTransport connection can override the default trust evaluation performed by
+the client with a check against the hash of the certificate provided to the
+server. In the example below, hashValue is a {{BufferSource}} containing the
+sha-256 hash of a server certificate that the WebTransport connection should
+consider to be valid.
+
+<pre class="example" highlight="js>
+const wt = new WebTransport(url, {
+  serverCertificateHashes: [
+    {
+      algorithm: "sha-256",
+      value: hashValue,
+    }
+  ]
+});
+await wt.ready;
+</pre>
+
 ## Complete example ##  {#example-complete}
 
 *This section is non-normative.*
