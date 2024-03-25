@@ -1742,6 +1742,11 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      respond to live updates of these values during sending, though the details are
      [=implementation-defined=].
 
+     Note: User agents are encouraged to retransmit lost data at a higher priority
+     than sending new data. Ordering of retransmissions is [=implementation-defined=],
+     but user agents are strongly advised to prioritize retransmissions of data with
+     higher {{[[SendOrder]]}} values.
+
      This sending MUST NOT starve otherwise,
      except for [=flow control=] reasons or [=WritableStream/Error | error=].
 
