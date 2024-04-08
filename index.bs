@@ -180,13 +180,18 @@ A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRAN
  </tbody>
 </table>
 
-To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=/origin=] |origin|,
+To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=/origin=] |origin| and a
+|protocols| array,
 follow [[!WEB-TRANSPORT-OVERVIEW]]
 [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-2.2.1),
 with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomorphic encoded=],
 as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
+Additionally, if the [=underlying connection=] is using HTTP/3 and the |protocols| array is non-empty,
+add a `WebTransport-Subprotocols-Available` header field containing [=isomorphic encoded=] |protocols|
+in the CONNECT request following [[!WEB-TRANSPORT-HTTP3]]
+[Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4).
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
 [=CONNECT stream=] receives an [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when a
@@ -610,6 +615,7 @@ interface WebTransport {
   readonly attribute WebTransportCongestionControl congestionControl;
   [EnforceRange] attribute unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams;
   [EnforceRange] attribute unsigned short? anticipatedConcurrentIncomingBidirectionalStreams;
+  readonly attribute DOMString protocol;
 
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   readonly attribute Promise&lt;undefined&gt; draining;
@@ -704,6 +710,11 @@ A {{WebTransport}} object has the following internal slots.
    [=bidirectional=] streams the application anticipates the server creating, or null.
   </tr>
   <tr>
+   <td><dfn>`[[Protocol]]`</dfn>
+   <td class="non-normative">A string indicating the subprotocol selected by the server,
+   if any. Initially an empty string.
+  </tr>
+  <tr>
    <td><dfn>`[[Closed]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated {{WebTransport}} object is
    closed gracefully, or rejected when it is closed abruptly or failed on initialization.
@@ -749,6 +760,14 @@ agent MUST run the following steps:
    congestion control algorithms that optimize for |congestionControl|, as allowed by
    [[!RFC9002]] [Section 7](https://www.rfc-editor.org/rfc/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
+1. Let |protocols| be {{WebTransport/constructor(url, options)/options}}'s
+   {{WebTransportOptions/protocols}}
+1. If any of the values in |protocols| occur more than once, fail to match
+   the requirements for elements that comprise the value of `WebTransport-Subprotocol`
+   fields as defined by the WebTransport protocol, or have an [=isomorphic encoded=]
+   length exceeding 512, [=throw=] a {{SyntaxError}} exception.
+   [[!WEB-TRANSPORT-HTTP3]]
+   [Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4).
 1. Let |anticipatedConcurrentIncomingUnidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/anticipatedConcurrentIncomingUnidirectionalStreams}}.
 1. Let |anticipatedConcurrentIncomingBidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
@@ -779,6 +798,8 @@ agent MUST run the following steps:
     :: |anticipatedConcurrentIncomingUnidirectionalStreams|
     : {{[[AnticipatedConcurrentIncomingBidirectionalStreams]]}}
     :: |anticipatedConcurrentIncomingBidirectionalStreams|
+    : {{[[Protocol]]}}
+    :: an empty string
     : {{[[Closed]]}}
     :: a new promise
     : {{[[Draining]]}}
@@ -811,7 +832,7 @@ This will ensure the stream is not errored due to a datagram being larger than t
    [=ReadableStream/set up/pullAlgorithm=] set to |pullUnidirectionalStreamAlgorithm|, and
    [=ReadableStream/set up/highWaterMark=] set to 0.
 1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL|, |dedicated|,
-   |requireUnreliable|, |congestionControl|, and |serverCertificateHashes|.
+   |requireUnreliable|, |congestionControl|, |protocols|, and |serverCertificateHashes|.
 1. Return |transport|.
 
 </div>
@@ -819,7 +840,8 @@ This will ensure the stream is not errored due to a datagram being larger than t
 <div algorithm>
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 <var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, a boolean
-|http3Only|, a {{WebTransportCongestionControl}} |congestionControl|, and a
+|http3Only|, a {{WebTransportCongestionControl}} |congestionControl|,
+a |protocols| array, and a
 sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 
 1. Let |client| be |transport|'s [=relevant settings object=].
@@ -865,7 +887,7 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
     1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
        {{WebTransportErrorOptions/source}} is `"session"`.
     1. [=Cleanup=] |transport| with |error|.
-  1. [=session/Establish=] a [=WebTransport session=] with |origin| on |connection|.
+  1. [=session/Establish=] a [=WebTransport session=] with |origin| and |protocols| on |connection|.
 
     Note: This step also contains the transport parameter exchange specified in [[!QUIC-DATAGRAM]].
 
@@ -883,7 +905,10 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
       1. Abort these steps.
     1. Set |transport|.{{[[State]]}} to `"connected"`.
     1. Set |transport|.{{[[Session]]}} to |session|.
-    1. If the connection is an HTTP/3 connection, set |transport|'s {{[[Reliability]]}} to `"supports-unreliable"`.
+    1. If the connection is an HTTP/3 connection, set |transport|'s {{[[Reliability]]}} to `"supports-unreliable"`,
+       and set {{[[Protocol]]}} to the `WebTransport-Subprotocol` header field in the 2xx response to the
+       CONNECT request, following [[!WEB-TRANSPORT-HTTP3]]
+       [Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4).
     1. If the connection is an HTTP/2 connection [[!WEB-TRANSPORT-HTTP2]], set |transport|'s {{[[Reliability]]}} to `"reliable-only"`.
     1. [=Resolve=] |transport|.{{[[Ready]]}} with undefined.
 
@@ -1004,6 +1029,12 @@ these steps.
 Note: Setting {{WebTransport/anticipatedConcurrentIncomingUnidirectionalStreams}} or
 {{WebTransport/anticipatedConcurrentIncomingBidirectionalStreams}} does not guarantee
 the application will receive the number of streams it anticipates.
+
+: <dfn for="WebTransport" attribute>protocol</dfn>
+:: Once a [=WebTransport session=] has been established and the {{protocols}}
+   constructor option was used to provide a non-empty array, returns the subprotocol
+   selected by the server, if any. Otherwise, an empty string.
+   The getter steps are to return [=this=]'s {{[[Protocol]]}}.
 
 ## Methods ##  {#webtransport-methods}
 
@@ -1294,6 +1325,7 @@ dictionary WebTransportOptions {
   WebTransportCongestionControl congestionControl = "default";
   [EnforceRange] unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams = null;
   [EnforceRange] unsigned short? anticipatedConcurrentIncomingBidirectionalStreams = null;
+  sequence&lt;DOMString&gt; protocols = [];
 };
 
 enum WebTransportCongestionControl {
@@ -1356,6 +1388,10 @@ that determine how the [=WebTransport session=] is established and used.
    If not null, the user agent SHOULD attempt to reduce round-trips by taking
    {{[[AnticipatedConcurrentIncomingBidirectionalStreams]]}} into consideration in its
    negotiations with the server.
+
+: <dfn for="WebTransportOptions" dict-member>protocols</dfn>
+:: An optionally provided array of subprotocol names. The connection will only be established if
+   the server reports that it has selected one of these subprotocols.
 
 <div algorithm>
 To <dfn>compute a certificate hash</dfn>, given a |certificate|, perform the following steps:
