@@ -837,6 +837,12 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
   1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
      {{WebTransportErrorOptions/source}} is `"session"`.
   1. [=Cleanup=] |transport| with |error|.
+1. If |request| receives a 3xx response from the server, indicating redirection, then abort the remaining
+steps and [=queue a network task=] with |transport| to run these steps:
+  1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
+  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
+     {{WebTransportErrorOptions/source}} is `"session"`.
+  1. [=Cleanup=] |transport| with |error|.
 1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
    |transport|'s [=relevant settings object=].
 1. Run the following steps [=in parallel=], but [=abort when=] |transport|.{{[[State]]}} becomes `"closed"` or `"failed"`:
