@@ -188,8 +188,8 @@ as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
 Additionally, if the [=underlying connection=] is using HTTP/3 and the |protocols| array is non-empty,
-add a `WebTransport-Subprotocols-Available` header field containing [=isomorphic encoded=] |protocols|
-in the CONNECT request following [[!WEB-TRANSPORT-HTTP3]]
+add a `WebTransport-Subprotocols-Available` header field to the CONNECT request, containing
+[=isomorphic encoded=] protocols from |protocols| in the order given, following [[!WEB-TRANSPORT-HTTP3]]
 [Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4).
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
@@ -764,7 +764,7 @@ agent MUST run the following steps:
 1. If any of the values in |protocols| occur more than once, fail to match
    the requirements for elements that comprise the value of `WebTransport-Subprotocol`
    fields as defined by the WebTransport protocol, or have an [=isomorphic encoded=]
-   length exceeding 512, [=throw=] a {{SyntaxError}} exception.
+   length of 0 or exceeding 512, [=throw=] a {{SyntaxError}} exception.
    [[!WEB-TRANSPORT-HTTP3]]
    [Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4).
 1. Let |anticipatedConcurrentIncomingUnidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
