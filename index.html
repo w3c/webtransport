@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="95b76668a1a39bd9c97c7298c9f4ab082f93a3cf" name="document-revision">
+  <meta content="5080111cf7c5cebf46193f7a8151355675940384" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -669,7 +669,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2024-05-21">21 May 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2024-06-04">4 June 2024</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -2637,7 +2637,8 @@ data to the server.</p>
        <li data-md>
         <p>Otherwise, <a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send">send</a> <var>bytes</var> on <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-internalstream-slot" id="ref-for-dom-webtransportsendstream-internalstream-slot①">[[InternalStream]]</a></code> and wait for the operation to complete.
  This sending MAY be interleaved with sending of previously queued streams and datagrams,
- as well as streams and datagrams yet to be queued to be sent over this transport.</p>
+ as well as streams and datagrams yet to be queued to be sent over this transport.
+ Datagrams SHOULD be given priority over this sending, but not to the point of starving it.</p>
         <p>The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
  SHOULD have a fixed upper limit, to carry the backpressure information to the user of the <code class="idl"><a data-link-type="idl" href="#webtransportsendstream" id="ref-for-webtransportsendstream②⓪">WebTransportSendStream</a></code>.</p>
         <p>This sending MUST starve
