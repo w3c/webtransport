@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="5080111cf7c5cebf46193f7a8151355675940384" name="document-revision">
+  <meta content="55eb1637feb6caa338e43271ded53cea581a8ff0" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -1587,7 +1587,7 @@ This will ensure the stream is not errored due to a datagram being larger than t
     </ol>
    </div>
    <div class="algorithm" data-algorithm="initialize WebTransport over HTTP">
-     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="initialize-webtransport-over-http">initialize WebTransport over HTTP</dfn>, given a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①②">WebTransport</a></code> object <var>transport</var>, a <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url①">URL record</a> <var>url</var>, a boolean <var>dedicated</var>, a boolean <var>http3Only</var>, a <code class="idl"><a data-link-type="idl" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol②">WebTransportCongestionControl</a></code> <var>congestionControl</var>, and a
+     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="initialize-webtransport-over-http">initialize WebTransport over HTTP</dfn>, given a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①②">WebTransport</a></code> object <var>transport</var>, a <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url①">URL record</a> <var>url</var>, a boolean <var>dedicated</var>, a boolean <var>requireUnreliable</var>, a <code class="idl"><a data-link-type="idl" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol②">WebTransportCongestionControl</a></code> <var>congestionControl</var>, and a
 sequence&lt;<code class="idl"><a data-link-type="idl" href="#dictdef-webtransporthash" id="ref-for-dictdef-webtransporthash">WebTransportHash</a></code>> <var>serverCertificateHashes</var>, run these steps. 
     <ol>
      <li data-md>
@@ -1617,7 +1617,7 @@ sequence&lt;<code class="idl"><a data-link-type="idl" href="#dictdef-webtranspor
        <li data-md>
         <p>Let <var>newConnection</var> be "<code>no</code>" if <var>dedicated</var> is false; otherwise "<code>yes-and-dedicated</code>".</p>
        <li data-md>
-        <p>Let <var>connection</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-connection-obtain" id="ref-for-concept-connection-obtain">obtaining a connection</a> with <var>networkPartitionKey</var>, <var>url</var>, false, <var>newConnection</var>, and <var>http3Only</var>. If the user agent
+        <p>Let <var>connection</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-connection-obtain" id="ref-for-concept-connection-obtain">obtaining a connection</a> with <var>networkPartitionKey</var>, <var>url</var>, false, <var>newConnection</var>, and <var>requireUnreliable</var>. If the user agent
  supports more than one congestion control algorithm, choose one appropriate for <var>congestionControl</var> for sending of data on this <var>connection</var>. When obtaining a connection, if <var>serverCertificateHashes</var> is specified, instead of using the default certificate verification
  algorithm, consider the certificate valid if it meets the <a data-link-type="dfn" href="#custom-certificate-requirements" id="ref-for-custom-certificate-requirements">custom certificate
  requirements</a> and if <a data-link-type="dfn" href="#verify-a-certificate-hash" id="ref-for-verify-a-certificate-hash">verifying the certificate hash</a> against <var>serverCertificateHashes</var> returns true. If either condition is not met, let <var>connection</var> be
