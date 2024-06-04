@@ -1730,6 +1730,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      and wait for the operation to complete.
      This sending MAY be interleaved with sending of previously queued streams and datagrams,
      as well as streams and datagrams yet to be queued to be sent over this transport.
+     Datagrams SHOULD be given priority over this sending, but not to the point of starving it.
 
      The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
      SHOULD have a fixed upper limit, to carry the backpressure information to the user of the
