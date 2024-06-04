@@ -820,7 +820,7 @@ This will ensure the stream is not errored due to a datagram being larger than t
 <div algorithm>
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 <var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, a boolean
-|http3Only|, a {{WebTransportCongestionControl}} |congestionControl|, and a
+|requireUnreliable|, a {{WebTransportCongestionControl}} |congestionControl|, and a
 sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 
 1. Let |client| be |transport|'s [=relevant settings object=].
@@ -843,7 +843,7 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 1. Run the following steps [=in parallel=], but [=abort when=] |transport|.{{[[State]]}} becomes `"closed"` or `"failed"`:
   1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
   1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
-     |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|. If the user agent
+     |networkPartitionKey|, |url|, false, |newConnection|, and |requireUnreliable|. If the user agent
      supports more than one congestion control algorithm, choose one appropriate for
      |congestionControl| for sending of data on this |connection|. When obtaining a connection, if
      |serverCertificateHashes| is specified, instead of using the default certificate verification
