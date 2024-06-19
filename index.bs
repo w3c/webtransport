@@ -188,6 +188,10 @@ as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
 
+To <dfn for=session>drain</dfn> a [=WebTransport session=] |session|, the [=CONNECT stream=] sends a
+[=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule to the server, as described in [[!WEB-TRANSPORT-HTTP3]]
+[Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6-3).
+
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
 [=CONNECT stream=] receives an [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when a
 [=session-signal/GOAWAY=] frame is received, as described in [[!WEB-TRANSPORT-HTTP3]]
@@ -614,6 +618,7 @@ interface WebTransport {
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   readonly attribute Promise&lt;undefined&gt; draining;
   undefined close(optional WebTransportCloseInfo closeInfo = {});
+  undefined drain();
 
   readonly attribute WebTransportDatagramDuplexStream datagrams;
 
@@ -1034,6 +1039,19 @@ the application will receive the number of streams it anticipates.
      1. [=Cleanup=] |transport| with {{AbortError}} and |closeInfo|.
 
 </div>
+
+: <dfn for="WebTransport" method>drain()</dfn>
+:: Drains the [=WebTransport session=] associated with the WebTransport object.
+
+   When drain is called, the user agent MUST run the following steps:
+     1. Let |transport| be [=this=].
+     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, [=throw=] an {{InvalidStateError}}
+        and abort these steps.
+     1. Set |transport|.{{[[State]]}} to `"draining"`.
+     1. Let |draining| be |transport|.{{[[Draining]]}}.
+     1. Let |session| be |transport|.{{[[Session]]}}.
+     1. [=In parallel=], [=session/drain=] |session|.
+     1. [=Resolve=] |draining|.
 
 : <dfn for="WebTransport" method>getStats()</dfn>
 :: Gathers stats for this {{WebTransport}}'s [=underlying connection=]
@@ -2487,6 +2505,9 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
         <td>wt.{{WebTransport/close}}(closeInfo)</td>
         <td>[=session/terminate|terminates=] session with closeInfo<br>
       </tr>
+      <tr>
+        <td>wt.{{WebTransport/drain}}()</td>
+        <td>[=session/drain|drains=] session</td>
     </tbody>
   </table>
 
