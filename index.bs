@@ -1563,10 +1563,10 @@ on datagram transmission over the [=underlying connection=].
 
 <pre class="idl">
 dictionary WebTransportSendRateStats {
-  unsigned long long estimate;
-  boolean isDataLimited;
-  boolean isServerLimited;
-  boolean inSlowStart;
+  required unsigned long long estimate;
+  required boolean isDataLimited;
+  required boolean isServerLimited;
+  required boolean inSlowStart;
 };
 </pre>
 
@@ -1579,8 +1579,9 @@ The dictionary SHALL have the following members:
    {{WebTransport/congestionControl}}).
 : <dfn for="WebTransportSendRateStats" dict-member>isDataLimited</dfn>
 :: True if the rate at which queued data will be sent by the user agent on all streams
-   and datagrams that share a [=WebTransport session=], as calculated by the
+   that share a [=WebTransport session=], as calculated by the
    congestion control algorithm, is considered application limited. Otherwise false.
+   Datagrams MUST NOT be included in this calculation.
 : <dfn for="WebTransportSendRateStats" dict-member>isServerLimited</dfn>
 :: True if the rate at which queued data will be sent by the user agent on all streams
    and datagrams that share a [=WebTransport session=], as calculated by the
