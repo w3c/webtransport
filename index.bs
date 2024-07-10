@@ -739,8 +739,9 @@ A {{WebTransport}} object has the following internal slots.
 <div algorithm="webtransport-contructor">
 When the {{WebTransport/constructor()}} constructor is invoked, the user
 agent MUST run the following steps:
+1. Let |baseURL| be [=this=]'s [=relevant settings object=]'s [=API base URL=].
 1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
-   {{WebTransport/constructor(url, options)/url}}.
+   {{WebTransport/constructor(url, options)/url}} with |baseURL|.
 1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
 1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
@@ -839,7 +840,7 @@ This will ensure the stream is not errored due to a datagram being larger than t
 <div algorithm>
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 <var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, a boolean
-|http3Only|, a {{WebTransportCongestionControl}} |congestionControl|,
+|requireUnreliable|, a {{WebTransportCongestionControl}} |congestionControl|,
 a |protocols| array, and a
 sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 
@@ -863,7 +864,7 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 1. Run the following steps [=in parallel=], but [=abort when=] |transport|.{{[[State]]}} becomes `"closed"` or `"failed"`:
   1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
   1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
-     |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|. If the user agent
+     |networkPartitionKey|, |url|, false, |newConnection|, and |requireUnreliable|. If the user agent
      supports more than one congestion control algorithm, choose one appropriate for
      |congestionControl| for sending of data on this |connection|. When obtaining a connection, if
      |serverCertificateHashes| is specified, instead of using the default certificate verification
@@ -1213,7 +1214,9 @@ optionally |closeInfo|, run these steps:
   1. [=ReadableStream/Close=] |incomingDatagrams|.
 1. Otherwise:
   1. [=Reject=] |closed| with |error|.
+  1. Set |closed|.`[[PromiseIsHandled]]` to true.
   1. [=Reject=] |ready| with |error|.
+  1. Set |ready|.`[[PromiseIsHandled]]` to true.
   1. [=ReadableStream/Error=] |incomingBidirectionalStreams| with |error|.
   1. [=ReadableStream/Error=] |incomingUnidirectionalStreams| with |error|.
   1. [=WritableStream/Error=] |outgoingDatagrams| with |error|.
@@ -1762,6 +1765,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      and wait for the operation to complete.
      This sending MAY be interleaved with sending of previously queued streams and datagrams,
      as well as streams and datagrams yet to be queued to be sent over this transport.
+     Datagrams SHOULD be given priority over this sending, but not to the point of starving it.
 
      The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
      SHOULD have a fixed upper limit, to carry the backpressure information to the user of the
@@ -1776,6 +1780,10 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      We access |stream|.{{[[SendOrder]]}} [=in parallel=] here. User agents SHOULD
      respond to live updates of these values during sending, though the details are
      [=implementation-defined=].
+
+     Note: Ordering of retransmissions is [=implementation-defined=],
+     but user agents are strongly encouraged to prioritize retransmissions of data with
+     higher {{[[SendOrder]]}} values.
 
      This sending MUST NOT starve otherwise,
      except for [=flow control=] reasons or [=WritableStream/Error | error=].
