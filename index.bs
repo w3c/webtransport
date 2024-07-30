@@ -761,7 +761,7 @@ agent MUST run the following steps:
    [[!RFC9002]] [Section 7](https://www.rfc-editor.org/rfc/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
 1. Let |subprotocols| be {{WebTransport/constructor(url, options)/options}}'s
-   {{WebTransportOptions/subprotocols}}
+   {{WebTransportOptions/protocols}}
 1. If any of the values in |subprotocols| occur more than once, fail to match
    the requirements for elements that comprise the value of `WebTransport-Subprotocol`
    fields as defined by the WebTransport protocol, or have an [=isomorphic encoded=]
@@ -1031,7 +1031,7 @@ Note: Setting {{WebTransport/anticipatedConcurrentIncomingUnidirectionalStreams}
 the application will receive the number of streams it anticipates.
 
 : <dfn for="WebTransport" attribute>protocol</dfn>
-:: Once a [=WebTransport session=] has been established and the {{subprotocols}}
+:: Once a [=WebTransport session=] has been established and the {{protocols}}
    constructor option was used to provide a non-empty array, returns the subprotocol
    selected by the server, if any. Otherwise, an empty string.
    The getter steps are to return [=this=]'s {{[[Protocol]]}}.
@@ -1327,7 +1327,7 @@ dictionary WebTransportOptions {
   WebTransportCongestionControl congestionControl = "default";
   [EnforceRange] unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams = null;
   [EnforceRange] unsigned short? anticipatedConcurrentIncomingBidirectionalStreams = null;
-  sequence&lt;DOMString&gt; subprotocols = [];
+  sequence&lt;DOMString&gt; protocols = [];
 };
 
 enum WebTransportCongestionControl {
@@ -1391,7 +1391,7 @@ that determine how the [=WebTransport session=] is established and used.
    {{[[AnticipatedConcurrentIncomingBidirectionalStreams]]}} into consideration in its
    negotiations with the server.
 
-: <dfn for="WebTransportOptions" dict-member>subprotocols</dfn>
+: <dfn for="WebTransportOptions" dict-member>protocols</dfn>
 :: An optionally provided array of subprotocol names. The connection will only be established if
    the server reports that it has selected one of these subprotocols.
 
