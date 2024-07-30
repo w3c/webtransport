@@ -62,22 +62,21 @@ function metrics_update(data) {
 
 function metrics_report() {
   metrics.all.sort((a, b) =>  {
-    return (100000 * (a.mediaTime - b.mediaTime) + a.output - b.output);
+    return (100000 * (b.mediaTime - a.mediaTime) + b.output - a.output);
   });
   const len = metrics.all.length;
   if (len < 2) return; 
-  for (let i = 1; i < len ; i++ ) {
-    if ((metrics.all[i].output == 1) && (metrics.all[i-1].output == 0)) {
+  for (let i = 0; i < len ; i++ ) {
+    if (metrics.all[i].output == 1) {
       const frameno = metrics.all[i].presentedFrames;
       const fps = metrics.all[i].fps;
       const time = metrics.all[i].elapsed;
-      const g2g = Math.max(0, metrics.all[i].expectedDisplayTime - metrics.all[i-1].captureTime);
       const mediaTime = metrics.all[i].mediaTime;
-      const captureTime = metrics.all[i-1].captureTime;
+      const captureTime = metrics.all[i].captureTime;
       const expectedDisplayTime = metrics.all[i].expectedDisplayTime;
-      const delay = metrics.all[i].expectedDisplayTime - metrics.all[i-1].expectedDisplayTime;
+      const g2g = Math.max(0, expectedDisplayTime - captureTime);
       const data = [frameno, g2g];
-      const info = {frameno: frameno, fps: fps, time: time, g2g: g2g, mediaTime: mediaTime, captureTime: captureTime, expectedDisplayTime: expectedDisplayTime, delay: delay};
+      const info = {frameno: frameno, fps: fps, time: time, g2g: g2g, mediaTime: mediaTime, captureTime: captureTime, expectedDisplayTime: expectedDisplayTime};
       e2e.all.push(data);
       display_metrics.all.push(info);
     }
