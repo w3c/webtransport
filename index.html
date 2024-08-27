@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="eb0123913d64741d3263e06b843001c0283ae84f" name="document-revision">
+  <meta content="3363834b7fcd5854aa8ef47c62881d9bf8c4eb2b" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -669,7 +669,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2024-07-30">30 July 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2024-08-27">27 August 2024</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -1595,8 +1595,7 @@ sequence&lt;<code class="idl"><a data-link-type="idl" href="#dictdef-webtranspor
      <li data-md>
       <p>Let <var>origin</var> be <var>client</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin" id="ref-for-concept-settings-object-origin">origin</a>.</p>
      <li data-md>
-      <p>Let <var>request</var> be a new <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a> whose <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url">URL</a> is <var>url</var>, <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client">client</a> is <var>client</var>, <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-policy-container" id="ref-for-concept-request-policy-container">policy container</a> is <var>client</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container" id="ref-for-concept-settings-object-policy-container">policy container</a>, <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-destination" id="ref-for-concept-request-destination">destination</a> is an empty string,
- and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin">origin</a> is <var>origin</var>.</p>
+      <p>Let <var>request</var> be a new <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a> whose <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url">URL</a> is <var>url</var>, <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client">client</a> is <var>client</var>, <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-policy-container" id="ref-for-concept-request-policy-container">policy container</a> is <var>client</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container" id="ref-for-concept-settings-object-policy-container">policy container</a>, <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-destination" id="ref-for-concept-request-destination">destination</a> is an empty string, <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin">origin</a> is <var>origin</var> and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-redirect-mode" id="ref-for-concept-request-redirect-mode">redirect mode</a> is "error".</p>
      <li data-md>
       <p>Run <a data-link-type="dfn" href="https://w3c.github.io/webappsec-csp/#report-for-request" id="ref-for-report-for-request">report Content Security Policy violations for <var>request</var></a>.</p>
      <li data-md>
@@ -1631,6 +1630,10 @@ sequence&lt;<code class="idl"><a data-link-type="idl" href="#dictdef-webtranspor
           <p>Let <var>error</var> be a newly <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-create-exception" id="ref-for-dfn-create-exception①">created</a> <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror①">WebTransportError</a></code> whose <code class="idl"><a data-link-type="idl" href="#dom-webtransporterroroptions-source" id="ref-for-dom-webtransporterroroptions-source①">source</a></code> is <code>"session"</code>.</p>
          <li data-md>
           <p><a data-link-type="dfn" href="#webtransport-cleanup" id="ref-for-webtransport-cleanup①">Cleanup</a> <var>transport</var> with <var>error</var>.</p>
+          <p class="note" role="note"><span class="marker">Note:</span> Redirects are not followed. Network errors caused by redirection are intentionally
+ indistinguishable from other network errors.  In cross-origin contexts, this would reveal
+ information that would normally be blocked by CORS. In same-origin contexts, it might
+ encourage applications to abuse the handshake as a vector for passing information.</p>
         </ol>
        <li data-md>
         <p>Wait for <var>connection</var> to receive the first SETTINGS frame, and let <var>settings</var> be a dictionary that
@@ -4340,6 +4343,7 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="ddf444bb">origin</span>
      <li><span class="dfn-paneled" id="f78d5b5c">origin <small>(for request)</small></span>
      <li><span class="dfn-paneled" id="86efadaf">policy container</span>
+     <li><span class="dfn-paneled" id="64b62ea0">redirect mode</span>
      <li><span class="dfn-paneled" id="55213b5b">request</span>
      <li><span class="dfn-paneled" id="db8aa4d8">stream</span>
      <li><span class="dfn-paneled" id="dc1cd39b">url</span>
@@ -5058,6 +5062,7 @@ window.dfnpanelData['8e1fb11c'] = {"dfnID": "8e1fb11c", "url": "https://fetch.sp
 window.dfnpanelData['ddf444bb'] = {"dfnID": "ddf444bb", "url": "https://fetch.spec.whatwg.org/#http-origin", "dfnText": "origin", "refSections": [{"refs": [{"id": "ref-for-http-origin"}], "title": "3.1. WebTransport session"}, {"refs": [{"id": "ref-for-http-origin\u2460"}], "title": "13.3. Protocol Security"}], "external": true};
 window.dfnpanelData['f78d5b5c'] = {"dfnID": "f78d5b5c", "url": "https://fetch.spec.whatwg.org/#concept-request-origin", "dfnText": "origin (for request)", "refSections": [{"refs": [{"id": "ref-for-concept-request-origin"}], "title": "5.2. Constructor"}], "external": true};
 window.dfnpanelData['86efadaf'] = {"dfnID": "86efadaf", "url": "https://fetch.spec.whatwg.org/#concept-request-policy-container", "dfnText": "policy container", "refSections": [{"refs": [{"id": "ref-for-concept-request-policy-container"}], "title": "5.2. Constructor"}], "external": true};
+window.dfnpanelData['64b62ea0'] = {"dfnID": "64b62ea0", "url": "https://fetch.spec.whatwg.org/#concept-request-redirect-mode", "dfnText": "redirect mode", "refSections": [{"refs": [{"id": "ref-for-concept-request-redirect-mode"}], "title": "5.2. Constructor"}], "external": true};
 window.dfnpanelData['55213b5b'] = {"dfnID": "55213b5b", "url": "https://fetch.spec.whatwg.org/#concept-request", "dfnText": "request", "refSections": [{"refs": [{"id": "ref-for-concept-request"}], "title": "5.2. Constructor"}], "external": true};
 window.dfnpanelData['db8aa4d8'] = {"dfnID": "db8aa4d8", "url": "https://fetch.spec.whatwg.org/#concept-body-stream", "dfnText": "stream", "refSections": [{"refs": [{"id": "ref-for-concept-body-stream"}, {"id": "ref-for-concept-body-stream\u2460"}, {"id": "ref-for-concept-body-stream\u2461"}], "title": "6.4. Procedures"}], "external": true};
 window.dfnpanelData['dc1cd39b'] = {"dfnID": "dc1cd39b", "url": "https://fetch.spec.whatwg.org/#concept-request-url", "dfnText": "url", "refSections": [{"refs": [{"id": "ref-for-concept-request-url"}], "title": "5.2. Constructor"}], "external": true};
