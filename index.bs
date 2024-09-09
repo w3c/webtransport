@@ -131,6 +131,8 @@ specification uses that specification and terminology.
 There are two main protocol concepts for WebTransport: sessions and streams. Each [=WebTransport
 session=] can contain multiple [=WebTransport streams=].
 
+These should not be confused with [=subprotocol names=] which is an application-level API construct.
+
 ## WebTransport session ## {#webtransport-session}
 
 A <dfn for="protocol">WebTransport session</dfn> is a session of WebTransport over an HTTP/3
@@ -187,10 +189,14 @@ with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomo
 as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
-Additionally, if the [=underlying connection=] is using HTTP/3 and the |subprotocols| array is non-empty,
-add a `WebTransport-Subprotocols-Available` header field to the CONNECT request, containing
+Additionally, if the |subprotocols| array is non-empty,
+add a `WT-Available-Protocols` header field to the CONNECT request, containing
 [=isomorphic encoded=] subprotocols from |subprotocols| in the order given, following [[!WEB-TRANSPORT-HTTP3]]
 [Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4).
+<div class="note">
+  This should reference [[!WEB-TRANSPORT-OVERVIEW]] instead pending
+  [issue 15](https://github.com/ietf-wg-webtrans/draft-ietf-webtrans-overview/issues/15).
+</div>
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
 [=CONNECT stream=] receives an [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when a
@@ -763,7 +769,7 @@ agent MUST run the following steps:
 1. Let |subprotocols| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/protocols}}
 1. If any of the values in |subprotocols| occur more than once, fail to match
-   the requirements for elements that comprise the value of `WebTransport-Subprotocol`
+   the requirements for elements that comprise the value of `WT-Protocol`
    fields as defined by the WebTransport protocol, or have an [=isomorphic encoded=]
    length of 0 or exceeding 512, [=throw=] a {{SyntaxError}} exception.
    [[!WEB-TRANSPORT-HTTP3]]
@@ -905,10 +911,15 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
       1. Abort these steps.
     1. Set |transport|.{{[[State]]}} to `"connected"`.
     1. Set |transport|.{{[[Session]]}} to |session|.
-    1. If the connection is an HTTP/3 connection, set |transport|.{{[[Reliability]]}} to `"supports-unreliable"`,
-       and set |transport|.{{[[Protocol]]}} to the `WebTransport-Subprotocol` header field in the 2xx response to
-       the CONNECT request if present, following [[!WEB-TRANSPORT-HTTP3]]
-       [Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4).
+    1. Set |transport|.{{[[Protocol]]}} to either the string value of the `WT-Protocol` header field
+       in the 2xx response to the CONNECT request if present, following [[!WEB-TRANSPORT-HTTP3]]
+       [Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4),
+       or `""` if not present.
+       <div class="note">
+         This should reference [[!WEB-TRANSPORT-OVERVIEW]] instead pending
+         [issue 15](https://github.com/ietf-wg-webtrans/draft-ietf-webtrans-overview/issues/15).
+       </div>
+    1. If the connection is an HTTP/3 connection, set |transport|.{{[[Reliability]]}} to `"supports-unreliable"`.
     1. If the connection is an HTTP/2 connection [[!WEB-TRANSPORT-HTTP2]], set |transport|'s {{[[Reliability]]}} to `"reliable-only"`.
     1. [=Resolve=] |transport|.{{[[Ready]]}} with undefined.
 
@@ -1392,8 +1403,9 @@ that determine how the [=WebTransport session=] is established and used.
    negotiations with the server.
 
 : <dfn for="WebTransportOptions" dict-member>protocols</dfn>
-:: An optionally provided array of subprotocol names. The connection will only be established if
-   the server reports that it has selected one of these subprotocols.
+:: An optionally provided array of application-level <dfn>subprotocol names</dfn>. The connection
+   will only be established if the server reports that it has selected one of these
+   application-level subprotocols.
 
 <div algorithm>
 To <dfn>compute a certificate hash</dfn>, given a |certificate|, perform the following steps:
