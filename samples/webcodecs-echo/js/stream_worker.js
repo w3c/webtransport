@@ -31,16 +31,24 @@ let rtt_aggregate = {
 
 let enc_aggregate = {
   all: [],
+};
+
+let enc_time = {
+  all: [],
   min: Number.MAX_VALUE,
   max: 0,
-  sum: 0,
+  sum: 0
 };
 
 let dec_aggregate = {
   all: [],
+};
+
+let dec_time = {
+  all: [],
   min: Number.MAX_VALUE,
   max: 0,
-  sum: 0,
+  sum: 0
 };
 
 let encqueue_aggregate = {
@@ -101,11 +109,8 @@ function rtt_update(len, rtt_new) {
   rtt_aggregate.rto = rtt_aggregate.srtt + Math.max(g, k * rtt_aggregate.rttvar);
 }
 
-function enc_update(duration) {
-  enc_aggregate.all.push(duration);
-  enc_aggregate.min = Math.min(enc_aggregate.min, duration);
-  enc_aggregate.max = Math.max(enc_aggregate.max, duration);
-  enc_aggregate.sum += duration;
+function enc_update(data) {
+  enc_aggregate.all.push(data);
 }
 
 function encqueue_update(duration) {
@@ -198,24 +203,29 @@ function rtt_report() {
 }
 
 function enc_report() {
-  enc_aggregate.all.sort();
+  enc_aggregate.all.sort((a, b) =>  {
+    return (100000 * (a.timestamp - b.timestamp) + a.output - b.output);
+  });
   const len = enc_aggregate.all.length;
-  const half = len >> 1;
-  const f = (len + 1) >> 2;
-  const t = (3 * (len + 1)) >> 2;
-  const alpha1 = (len + 1)/4 - Math.trunc((len + 1)/4);
-  const alpha3 = (3 * (len + 1)/4) - Math.trunc(3 * (len + 1)/4);
-  const fquart = enc_aggregate.all[f] + alpha1 * (enc_aggregate.all[f + 1] - enc_aggregate.all[f]);
-  const tquart = enc_aggregate.all[t] + alpha3 * (enc_aggregate.all[t + 1] - enc_aggregate.all[t]);
-  const median = len % 2 === 1 ? enc_aggregate.all[len >> 1] : (enc_aggregate.all[half - 1] + enc_aggregate.all[half]) / 2;
+  if (len < 2) return;
+  for (let i = 1; i < len ; i++ ) {
+    if ((enc_aggregate.all[i].output == 1) && (enc_aggregate.all[i-1].output == 0) && (enc_aggregate.all[i].timestamp == enc_aggregate.all[i-1].timestamp)) {
+      const timestamp = enc_aggregate.all[i].timestamp;
+      const enc_delay = enc_aggregate.all[i].time - enc_aggregate.all[i-1].time;
+      const data = [timestamp, enc_delay];
+      enc_time.all.push(data);
+      enc_time.min = Math.min(enc_time.min, enc_delay);
+      enc_time.max = Math.max(enc_time.max, enc_delay);
+      enc_time.sum += enc_delay;
+    }
+  }
+  const avg = enc_time.sum / enc_time.all.length;
+  //self.postMessage({text: 'Encode Time Data dump: ' + JSON.stringify(enc_time.all)});
   return {
-     count: len,
-     min: enc_aggregate.min,
-     fquart: fquart,
-     avg: enc_aggregate.sum / len,
-     median: median,
-     tquart: tquart,
-     max: enc_aggregate.max,
+     count: enc_time.all.length,
+     min: enc_time.min,
+     avg: avg,
+     max: enc_time.max
   };
 }
 
@@ -241,32 +251,34 @@ function encqueue_report() {
   };
 }
 
-function dec_update(duration) {
-   dec_aggregate.all.push(duration);
-   dec_aggregate.min = Math.min(dec_aggregate.min, duration);
-   dec_aggregate.max = Math.max(dec_aggregate.max, duration);
-   dec_aggregate.sum += duration;
+function dec_update(data) {
+   dec_aggregate.all.push(data);
 }
 
 function dec_report() {
-  dec_aggregate.all.sort();
+  dec_aggregate.all.sort((a, b) =>  {
+    return (100000 * (a.timestamp - b.timestamp) + a.output - b.output);
+  });
   const len = dec_aggregate.all.length;
-  const half = len >> 1;
-  const f = (len + 1) >> 2;
-  const t = (3 * (len + 1)) >> 2;
-  const alpha1 = (len + 1)/4 - Math.trunc((len + 1)/4);
-  const alpha3 = (3 * (len + 1)/4) - Math.trunc(3 * (len + 1)/4);
-  const fquart = dec_aggregate.all[f] + alpha1 * (dec_aggregate.all[f + 1] - dec_aggregate.all[f]);
-  const tquart = dec_aggregate.all[t] + alpha3 * (dec_aggregate.all[t + 1] - dec_aggregate.all[t]);
-  const median = len % 2 === 1 ? dec_aggregate.all[len >> 1] : (dec_aggregate.all[half - 1] + dec_aggregate.all[half]) / 2;
+  if (len < 2) return;
+  for (let i = 1; i < len ; i++ ) {
+    if ((dec_aggregate.all[i].output == 1) && (dec_aggregate.all[i-1].output == 0) && (dec_aggregate.all[i].timestamp == dec_aggregate.all[i-1].timestamp)) {
+      const timestamp = dec_aggregate.all[i].timestamp;
+      const dec_delay = dec_aggregate.all[i].time - dec_aggregate.all[i-1].time;
+      const data = [timestamp, dec_delay];
+      dec_time.all.push(data);
+      dec_time.min = Math.min(dec_time.min, dec_delay);
+      dec_time.max = Math.max(dec_time.max, dec_delay);
+      dec_time.sum += dec_delay;
+    }
+  }
+  const avg = dec_time.sum / dec_time.all.length;
+  //self.postMessage({text: 'Decode Time Data dump: ' + JSON.stringify(dec_time.all)});
   return {
-     count: len,
-     min: dec_aggregate.min,
-     fquart: fquart,
-     avg: dec_aggregate.sum / len,
-     median: median,
-     tquart: tquart,
-     max: dec_aggregate.max,
+     count: dec_time.all.length,
+     min: dec_time.min,
+     avg: avg,
+     max: dec_time.max
   };
 }
 
@@ -665,9 +677,13 @@ SSRC = this.config.ssrc
      return new TransformStream({
        start(controller) {
          this.decoder = decoder = new VideoDecoder({
-           output: frame => controller.enqueue(frame),
+           output: (frame) => {
+             const after = performance.now();
+             dec_update({output: 1, timestamp: frame.timestamp, time: after});
+             controller.enqueue(frame);
+           },
            error: (e) => {
-              self.postMessage({severity: 'fatal', text: `Decoder error: ${e.message}`});
+             self.postMessage({severity: 'fatal', text: `Decoder error: ${e.message}`});
            }
          });
        },
@@ -692,10 +708,8 @@ SSRC = this.config.ssrc
                const queue = this.decoder.decodeQueueSize;
                decqueue_update(queue);
                const before = performance.now();
+               dec_update({output: 0, timestamp: chunk.timestamp, time: before}); 
                this.decoder.decode(chunk);
-               const after = performance.now();
-               const duration = after - before;
-               dec_update(duration);
              } catch (e) {
                self.postMessage({severity: 'fatal', text: 'Derror size: ' + chunk.byteLength + ' seq: ' + chunk.seqNo + ' dur: ' + chunk.duration + ' ts: ' + chunk.timestamp + ' ssrc: ' + chunk.ssrc + ' pt: ' + chunk.pt + ' tid: ' + chunk.temporalLayerId + ' type: ' + chunk.type});
                self.postMessage({severity: 'fatal', text: `Catch Decode error: ${e.message}`});
@@ -733,6 +747,10 @@ SSRC = this.config.ssrc
                   config: decoderConfig 
                };
                controller.enqueue(configChunk); 
+             }
+             if (chunk.type != 'config'){
+              const after = performance.now();
+              enc_update({output: 1, timestamp: chunk.timestamp, time: after});
              } 
              chunk.temporalLayerId = 0;
              if (cfg.svc) {
@@ -781,10 +799,8 @@ SSRC = this.config.ssrc
                const queue = this.encoder.encodeQueueSize;
                encqueue_update(queue);
                const before = performance.now();
+               enc_update({output: 0, timestamp: frame.timestamp, time: before});  
                this.encoder.encode(frame, { keyFrame: insert_keyframe });
-               const after = performance.now();
-               const duration = after - before;
-               enc_update(duration);
              } 
            } catch(e) {
              self.postMessage({severity: 'fatal', text: `Encoder Error: ${e.message}`});
@@ -954,7 +970,10 @@ SSRC = this.config.ssrc
        const decqueue_stats = decqueue_report();
        const rtt_stats = rtt_report();
        const bwe_stats = bwe_report();
-       self.postMessage({severity: 'chart', text: JSON.stringify(rtt_aggregate.all)});
+       self.postMessage({severity: 'chart', x: 'Length', y: 'RTT', label: 'RTT (ms) by Frame length', div: 'chart_div', text: JSON.stringify(rtt_aggregate.all)});
+       self.postMessage({severity: 'chart', x: 'Frame Number', y: 'Glass-Glass Latency', label: 'Glass-Glass Latency (ms) by Frame Number', div: 'chart2_div', text: ''});
+       self.postMessage({severity: 'chart', x: 'Timestamp', y: 'Encoding Time', label: 'Encoding Time (ms) by Timestamp', div: 'chart3_div', text: JSON.stringify(enc_time.all)});
+       self.postMessage({severity: 'chart', x: 'Timestamp', y: 'Decoding Time', label: 'Decoding Time (ms) by Timestamp', div: 'chart4_div', text: JSON.stringify(dec_time.all)});
        self.postMessage({text: 'BWE report: ' + JSON.stringify(bwe_stats)});
        self.postMessage({text: 'RTT report: ' + JSON.stringify(rtt_stats)});
        self.postMessage({text: 'Encoder Time report: ' + JSON.stringify(enc_stats)});

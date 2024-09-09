@@ -820,7 +820,7 @@ This will ensure the stream is not errored due to a datagram being larger than t
 <div algorithm>
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 <var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, a boolean
-|http3Only|, a {{WebTransportCongestionControl}} |congestionControl|, and a
+|requireUnreliable|, a {{WebTransportCongestionControl}} |congestionControl|, and a
 sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 
 1. Let |client| be |transport|'s [=relevant settings object=].
@@ -828,7 +828,7 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 1. Let |request| be a new [=/request=] whose [=request/URL=] is |url|, [=request/client=] is
    |client|, [=request/policy container=] is |client|'s
    [=environment settings object/policy container=], [=request/destination=] is an empty string,
-   and [=request/origin=] is |origin|.
+   [=request/origin=] is |origin| and [=request/redirect mode=] is "error". 
 1. Run <a>report Content Security Policy violations for |request|</a>.
 1. If [=should request be blocked by Content Security Policy?=] with |request| returns
    <b>"Blocked"</b>, or if |request| [=block bad port|should be blocked due to a bad port=]
@@ -843,7 +843,7 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 1. Run the following steps [=in parallel=], but [=abort when=] |transport|.{{[[State]]}} becomes `"closed"` or `"failed"`:
   1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
   1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
-     |networkPartitionKey|, |url|, false, |newConnection|, and |http3Only|. If the user agent
+     |networkPartitionKey|, |url|, false, |newConnection|, and |requireUnreliable|. If the user agent
      supports more than one congestion control algorithm, choose one appropriate for
      |congestionControl| for sending of data on this |connection|. When obtaining a connection, if
      |serverCertificateHashes| is specified, instead of using the default certificate verification
@@ -857,6 +857,12 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
     1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
        {{WebTransportErrorOptions/source}} is `"session"`.
     1. [=Cleanup=] |transport| with |error|.
+
+       Note: Redirects are not followed. Network errors caused by redirection are intentionally
+       indistinguishable from other network errors.  In cross-origin contexts, this would reveal
+       information that would normally be blocked by CORS. In same-origin contexts, it might
+       encourage applications to abuse the handshake as a vector for passing information.
+
   1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
      represents the SETTINGS frame.
   1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
@@ -1184,7 +1190,9 @@ optionally |closeInfo|, run these steps:
   1. [=ReadableStream/Close=] |incomingDatagrams|.
 1. Otherwise:
   1. [=Reject=] |closed| with |error|.
+  1. Set |closed|.`[[PromiseIsHandled]]` to true.
   1. [=Reject=] |ready| with |error|.
+  1. Set |ready|.`[[PromiseIsHandled]]` to true.
   1. [=ReadableStream/Error=] |incomingBidirectionalStreams| with |error|.
   1. [=ReadableStream/Error=] |incomingUnidirectionalStreams| with |error|.
   1. [=WritableStream/Error=] |outgoingDatagrams| with |error|.
@@ -1476,18 +1484,18 @@ Note: Any unavailable stats will be [=map/exists|absent=] from the {{WebTranspor
 
 <pre class="idl">
 dictionary WebTransportConnectionStats {
-  unsigned long long bytesSent;
-  unsigned long long packetsSent;
-  unsigned long long bytesLost;
-  unsigned long long packetsLost;
-  unsigned long long bytesReceived;
-  unsigned long long packetsReceived;
-  DOMHighResTimeStamp smoothedRtt;
-  DOMHighResTimeStamp rttVariation;
-  DOMHighResTimeStamp minRtt;
-  WebTransportDatagramStats datagrams;
-  unsigned long long? estimatedSendRate;
-  boolean isSendDataLimited;
+  unsigned long long bytesSent = 0;
+  unsigned long long packetsSent = 0;
+  unsigned long long bytesLost = 0;
+  unsigned long long packetsLost = 0;
+  unsigned long long bytesReceived = 0;
+  unsigned long long packetsReceived = 0;
+  required DOMHighResTimeStamp smoothedRtt;
+  required DOMHighResTimeStamp rttVariation;
+  required DOMHighResTimeStamp minRtt;
+  required WebTransportDatagramStats datagrams;
+  required unsigned long long? estimatedSendRate = null;
+  required boolean isSendDataLimited = true;
 };
 </pre>
 
@@ -1538,10 +1546,10 @@ on datagram transmission over the [=underlying connection=].
 
 <pre class="idl">
 dictionary WebTransportDatagramStats {
-  unsigned long long droppedIncoming;
-  unsigned long long expiredIncoming;
-  unsigned long long expiredOutgoing;
-  unsigned long long lostOutgoing;
+  unsigned long long droppedIncoming = 0;
+  unsigned long long expiredIncoming = 0;
+  unsigned long long expiredOutgoing = 0;
+  unsigned long long lostOutgoing = 0;
 };
 </pre>
 
@@ -1733,6 +1741,7 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      and wait for the operation to complete.
      This sending MAY be interleaved with sending of previously queued streams and datagrams,
      as well as streams and datagrams yet to be queued to be sent over this transport.
+     Datagrams SHOULD be given priority over this sending, but not to the point of starving it.
 
      The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
      SHOULD have a fixed upper limit, to carry the backpressure information to the user of the
@@ -1865,9 +1874,9 @@ on stats specific to one {{WebTransportSendStream}}.
 
 <pre class="idl">
 dictionary WebTransportSendStreamStats {
-  unsigned long long bytesWritten;
-  unsigned long long bytesSent;
-  unsigned long long bytesAcknowledged;
+  unsigned long long bytesWritten = 0;
+  unsigned long long bytesSent = 0;
+  unsigned long long bytesAcknowledged = 0;
 };
 </pre>
 
@@ -2175,8 +2184,8 @@ information on stats specific to one {{WebTransportReceiveStream}}.
 
 <pre class="idl">
 dictionary WebTransportReceiveStreamStats {
-  unsigned long long bytesReceived;
-  unsigned long long bytesRead;
+  unsigned long long bytesReceived = 0;
+  unsigned long long bytesRead = 0;
 };
 </pre>
 
