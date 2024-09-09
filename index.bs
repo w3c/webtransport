@@ -1534,10 +1534,13 @@ The dictionary SHALL have the following attributes:
    currently have an estimate, the member MUST be the `null` value.
    The member can be `null` even if it was not `null` in previous results.
 : <dfn for="WebTransportConnectionStats" dict-member>isSendDataLimited</dfn>
-:: False if {{estimatedSendRate}} is not `null` and the rate at which queued data
-   will be sent by the user agent on all streams and datagrams that share a
-   [=WebTransport session=], as calculated by the congestion control algorithm,
-   is not application limited; Otherwise true.
+:: False if the rate at which queued data will be sent by the user agent on all streams
+   and datagrams that share a [=WebTransport session=], as calculated by the congestion
+   control algorithm, is not currently application limited; Otherwise true.
+   <div class="note">
+   When {{isSendDataLimited}} is `false`, the {{estimatedSendRate}} reflects a ceiling.
+   However, {{estimatedSendRate}} can be `null` while {{isSendDataLimited}} is true.
+   <div>
 
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
 
