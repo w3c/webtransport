@@ -1408,7 +1408,7 @@ dictionary WebTransportCloseInfo {
 };
 </pre>
 
-The dictionary SHALL have the following members:
+The dictionary SHALL have the following attributes:
 
 : <dfn for="WebTransportCloseInfo" dict-member>closeCode</dfn>
 :: The error code communicated to the peer.
@@ -1430,7 +1430,7 @@ dictionary WebTransportSendStreamOptions {
 };
 </pre>
 
-The dictionary SHALL have the following members:
+The dictionary SHALL have the following attributes:
 
 : <dfn for="WebTransportSendStreamOptions" dict-member>sendGroup</dfn>
 :: An optional {{WebTransportSendGroup}} to [=group=] this
@@ -1486,11 +1486,13 @@ dictionary WebTransportConnectionStats {
   DOMHighResTimeStamp rttVariation;
   DOMHighResTimeStamp minRtt;
   WebTransportDatagramStats datagrams;
-  WebTransportSendRateStats? sendRate;
+  unsigned long long? estimatedSendRate;
+  boolean isSendDataLimited;
+  boolean inSlowStart;
 };
 </pre>
 
-The dictionary SHALL have the following members:
+The dictionary SHALL have the following attributes:
 
 : <dfn for="WebTransportConnectionStats" dict-member>bytesSent</dfn>
 :: The number of bytes sent on the [=underlying connection=], including retransmissions.
@@ -1517,13 +1519,20 @@ The dictionary SHALL have the following members:
    [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
 : <dfn for="WebTransportConnectionStats" dict-member>minRtt</dfn>
 :: The minimum round-trip time observed on the entire connection.
-: <dfn for="WebTransportConnectionStats" dict-member>datagrams</dfn>
-:: Contains statistics on datagram transmission over the [=underlying connection=].
-: <dfn for="WebTransportConnectionStats" dict-member>sendRate</dfn>
-:: Contains congestion control information such as an estimated send
-   rate. If the user agent does not currently have this information,
-   the member MUST be the `null` value. The member can be `null` even
-   if it was not `null` in previous results.
+: <dfn for="WebTransportConnectionStats" dict-member>estimatedSendRate</dfn>
+:: The estimated rate at which queued data will be sent by the user agent, in bits per second.
+   This rate applies to all streams and datagrams that share a [=WebTransport session=]
+   and is calculated by the congestion control algorithm (potentially chosen by
+   {{WebTransport/congestionControl}}). If the user agent does not
+   currently have an estimate, the member MUST be the `null` value.
+   The member can be `null` even if it was not `null` in previous results.
+: <dfn for="WebTransportConnectionStats" dict-member>isSendDataLimited</dfn>
+:: True if the rate at which queued data will be sent by the user agent on all streams
+   and datagrams that share a [=WebTransport session=], as calculated by the
+   congestion control algorithm, is considered application limited. Otherwise false.
+: <dfn for="WebTransportConnectionStats" dict-member>inSlowStart</dfn>
+:: True if the current congestion control algorithm implements "slow start" and the
+   [=WebTransport session=] is currently in this mode. Otherwise false.
 
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
 
@@ -1539,7 +1548,7 @@ dictionary WebTransportDatagramStats {
 };
 </pre>
 
-The dictionary SHALL have the following members:
+The dictionary SHALL have the following attributes:
 
 : <dfn for="WebTransportDatagramStats" dict-member>droppedIncoming</dfn>
 :: The number of incoming datagrams that were dropped due to the application not reading
@@ -1555,41 +1564,6 @@ The dictionary SHALL have the following members:
 : <dfn for="WebTransportDatagramStats" dict-member>lostOutgoing</dfn>
 :: The number of sent datagrams that were declared lost, as defined in
    [[!RFC9002]] [Section 6.1](https://www.rfc-editor.org/rfc/rfc9002#section-6.1).
-
-## `WebTransportSendRateStats` Dictionary ##  {#web-transport-sendrate-stats}
-
-The <dfn dictionary>WebTransportSendRateStats</dfn> dictionary includes statistics
-on datagram transmission over the [=underlying connection=].
-
-<pre class="idl">
-dictionary WebTransportSendRateStats {
-  required unsigned long long estimate;
-  required boolean isDataLimited;
-  required boolean isServerLimited;
-  required boolean inSlowStart;
-};
-</pre>
-
-The dictionary SHALL have the following members:
-
-: <dfn for="WebTransportSendRateStats" dict-member>estimate</dfn>
-:: The estimated rate at which queued data will be sent by the user agent, in bits per second.
-   This rate applies to all streams and datagrams that share a [=WebTransport session=]
-   and is calculated by the congestion control algorithm (potentially chosen by
-   {{WebTransport/congestionControl}}).
-: <dfn for="WebTransportSendRateStats" dict-member>isDataLimited</dfn>
-:: True if the rate at which queued data will be sent by the user agent on all streams
-   and datagrams that share a [=WebTransport session=], as calculated by the
-   congestion control algorithm, is considered application limited. Otherwise false.
-: <dfn for="WebTransportSendRateStats" dict-member>isServerLimited</dfn>
-:: True if the rate at which queued data will be sent by the user agent on all streams
-   that share a [=WebTransport session=], as calculated by the
-   congestion control algorithm, is considered limited by back pressure from the server. Otherwise false.
-   This is based on the server receive window.
-   Datagrams MUST NOT be included in this calculation.
-: <dfn for="WebTransportSendRateStats" dict-member>inSlowStart</dfn>
-:: True if the current congestion control algorithm implements "slow start" and the
-   [=WebTransport session=] is currently in this mode. Otherwise false.
 
 # Interface `WebTransportSendStream` #  {#send-stream}
 
@@ -1900,7 +1874,7 @@ dictionary WebTransportSendStreamStats {
 };
 </pre>
 
-The dictionary SHALL have the following members:
+The dictionary SHALL have the following attributes:
 
 : <dfn for="WebTransportSendStreamStats" dict-member>bytesWritten</dfn>
 :: The total number of bytes the application has successfully written to this
@@ -2209,7 +2183,7 @@ dictionary WebTransportReceiveStreamStats {
 };
 </pre>
 
-The dictionary SHALL have the following members:
+The dictionary SHALL have the following attributes:
 
 : <dfn for="WebTransportReceiveStreamStats" dict-member>bytesReceived</dfn>
 :: An indicator of progress on how many of the server application's bytes
