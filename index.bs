@@ -14,8 +14,8 @@ Former Editor: Robin Raymond, Optical Tone Ltd.
 Former Editor: Yutaka Hirano, Google
 Abstract:
   This document defines a set of ECMAScript APIs in WebIDL to allow data to be
-  sent and received between a browser and server, utilizing [[!WEB-TRANSPORT-HTTP3]] 
-  and [[!WEB-TRANSPORT-HTTP2]]. This specification is being developed in conjunction 
+  sent and received between a browser and server, utilizing [[!WEB-TRANSPORT-HTTP3]]
+  and [[!WEB-TRANSPORT-HTTP2]]. This specification is being developed in conjunction
   with protocol specifications developed by the IETF WEBTRANS Working Group.
 Repository: w3c/webtransport
 Indent: 2
@@ -110,7 +110,7 @@ diagrams, examples, and notes in this specification are non-normative.
 Everything else in this specification is normative.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
- "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" are to be interpreted as described in 
+ "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" are to be interpreted as described in
 [[!RFC2119]] and [[!RFC8174]] when, and only when, they appear in all capitals, as shown here.
 
 This specification defines conformance criteria that apply to a single product:
@@ -828,7 +828,7 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 1. Let |request| be a new [=/request=] whose [=request/URL=] is |url|, [=request/client=] is
    |client|, [=request/policy container=] is |client|'s
    [=environment settings object/policy container=], [=request/destination=] is an empty string,
-   [=request/origin=] is |origin| and [=request/redirect mode=] is "error". 
+   [=request/origin=] is |origin| and [=request/redirect mode=] is "error".
 1. Run <a>report Content Security Policy violations for |request|</a>.
 1. If [=should request be blocked by Content Security Policy?=] with |request| returns
    <b>"Blocked"</b>, or if |request| [=block bad port|should be blocked due to a bad port=]
@@ -1054,11 +1054,11 @@ the application will receive the number of streams it anticipates.
          1. If |transport|.{{[[State]]}} is `"connecting"`, wait until it changes.
          1. If |transport|.{{[[State]]}} is `"failed"`, [=reject=] |p| with an
             {{InvalidStateError}} and abort these steps.
-	 1. If |transport|.{{[[State]]}} is `"closed"`, [=resolve=] |p| with
-	    the most recent stats available for the connection and abort these
-	    steps. The exact point at which those stats are collected is
-	    [=implementation-defined=].
-	 1. Gather the stats from the [=underlying connection=], including stats on datagrams.
+         1. If |transport|.{{[[State]]}} is `"closed"`, [=resolve=] |p| with
+            the most recent stats available for the connection and abort these
+            steps. The exact point at which those stats are collected is
+            [=implementation-defined=].
+         1. Gather the stats from the [=underlying connection=], including stats on datagrams.
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportConnectionStats}} object representing the gathered stats.
            1. [=Resolve=] |p| with |stats|.
@@ -1223,8 +1223,8 @@ Whenever a [=WebTransport session=] which is associated with a {{WebTransport}} 
   1. If |code| is given, set |closeInfo|'s {{WebTransportCloseInfo/closeCode}} to |code|.
   1. If |reasonBytes| is given, set |closeInfo|'s {{WebTransportCloseInfo/reason}} to |reasonBytes|,
      [=UTF-8 decoded=].
-     
-     Note: No language or direction metadata is available with |reasonBytes|. 
+
+     Note: No language or direction metadata is available with |reasonBytes|.
      <a href=https://www.w3.org/TR/string-meta/#firststrong>First-strong</a> heuristics can be used
      for direction when displaying the value.
   1. [=Cleanup=] |transport| with |error| and |closeInfo|.
@@ -1284,7 +1284,7 @@ that has data queued to be transmitted to the network, including datagrams in
 {{[[Datagrams]]}}.{{[[OutgoingDatagramsQueue]]}}, must not be garbage collected.
 
 If a {{WebTransport}} object is garbage collected while the [=underlying connection=]
-is still open, the user agent must 
+is still open, the user agent must
 <a href="https://www.ietf.org/archive/id/draft-ietf-webtrans-overview-06.html#section-4.1-2.4.1">terminate the WebTransport session</a>
 with an Application Error Code of `0` and Application Error Message of `""`.
 
@@ -2291,7 +2291,7 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
    [Section 4.4](https://datatracker.ietf.org/doc/html/rfc9308#section-4.4)).
 
    Note: {{atomicWrite}} can still reject after sending some data. Though it
-   provides atomicity with respect to flow control, other errors may occur. 
+   provides atomicity with respect to flow control, other errors may occur.
    {{atomicWrite}} does not prevent data from being split between packets
    or being interleaved with other data. Only the sender learns if
    {{atomicWrite}} fails due to lack of available flow control credit.
@@ -2538,7 +2538,7 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
       </tr>
     </tbody>
   </table>
-  
+
 Note: As discussed in [[QUIC]] Section 3.2, receipt of a RESET_STREAM
 frame is not always indicated to the application. Receipt of the
 RESET_STREAM can be signaled immediately, interrupting delivery of
@@ -2719,7 +2719,7 @@ endpoint is verified to be a WebTransport endpoint; thus, the Web application
 cannot distinguish between a non-existing endpoint and the endpoint that is not
 willing to accept connections from the Web.
 
-## Authentication using Certificate Hashes {#certificate-hashes}
+## Authentication using Certificate Hashes ## {#certificate-hashes}
 
 Normally, a user agent authenticates a TLS connection between itself and a
 remote endpoint by verifying the validity of the TLS server certificate
@@ -2923,7 +2923,7 @@ const wt = new WebTransport(url);
 
 for await (const datagram of wt.datagrams.readable) {
   const reader = datagram.getReader({ mode: "byob" });
-  
+
   let array_buffer = new ArrayBuffer(65536);
   const buffer = await readInto(array_buffer);
 }
