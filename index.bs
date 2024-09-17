@@ -131,7 +131,7 @@ specification uses that specification and terminology.
 There are two main protocol concepts for WebTransport: sessions and streams. Each [=WebTransport
 session=] can contain multiple [=WebTransport streams=].
 
-These should not be confused with [=subprotocol names=] which is an application-level API construct.
+These should not be confused with [=protocol names=] which is an application-level API construct.
 
 ## WebTransport session ## {#webtransport-session}
 
@@ -183,15 +183,15 @@ A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRAN
 </table>
 
 To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=/origin=] |origin| and a
-|subprotocols| array, follow [[!WEB-TRANSPORT-OVERVIEW]]
+|protocols| array, follow [[!WEB-TRANSPORT-OVERVIEW]]
 [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-2.2.1),
 with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomorphic encoded=],
 as the [:Origin:] header of the request.
 When establishing a session, the client MUST NOT provide any [=credentials=].
 The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
-Additionally, if the |subprotocols| array is non-empty,
+Additionally, if the |protocols| array is non-empty,
 add a `WT-Available-Protocols` header field to the CONNECT request, containing
-[=isomorphic encoded=] subprotocols from |subprotocols| in the order given, following [[!WEB-TRANSPORT-HTTP3]]
+[=isomorphic encoded=] protocols from |protocols| in the order given, following [[!WEB-TRANSPORT-HTTP3]]
 [Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4).
 <div class="note">
   This should reference [[!WEB-TRANSPORT-OVERVIEW]] instead pending
@@ -716,7 +716,7 @@ A {{WebTransport}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[Protocol]]`</dfn>
-   <td class="non-normative">A string indicating the subprotocol selected by the server,
+   <td class="non-normative">A string indicating the application-level protocol selected by the server,
    if any. Initially an empty string.
   </tr>
   <tr>
@@ -766,9 +766,9 @@ agent MUST run the following steps:
    congestion control algorithms that optimize for |congestionControl|, as allowed by
    [[!RFC9002]] [Section 7](https://www.rfc-editor.org/rfc/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
-1. Let |subprotocols| be {{WebTransport/constructor(url, options)/options}}'s
+1. Let |protocols| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/protocols}}
-1. If any of the values in |subprotocols| occur more than once, fail to match
+1. If any of the values in |protocols| occur more than once, fail to match
    the requirements for elements that comprise the value of `WT-Protocol`
    fields as defined by the WebTransport protocol, or have an [=isomorphic encoded=]
    length of 0 or exceeding 512, [=throw=] a {{SyntaxError}} exception.
@@ -838,7 +838,7 @@ This will ensure the stream is not errored due to a datagram being larger than t
    [=ReadableStream/set up/pullAlgorithm=] set to |pullUnidirectionalStreamAlgorithm|, and
    [=ReadableStream/set up/highWaterMark=] set to 0.
 1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL|, |dedicated|,
-   |requireUnreliable|, |congestionControl|, |subprotocols|, and |serverCertificateHashes|.
+   |requireUnreliable|, |congestionControl|, |protocols|, and |serverCertificateHashes|.
 1. Return |transport|.
 
 </div>
@@ -847,7 +847,7 @@ This will ensure the stream is not errored due to a datagram being larger than t
 To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
 <var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, a boolean
 |requireUnreliable|, a {{WebTransportCongestionControl}} |congestionControl|,
-a |subprotocols| array, and a
+a |protocols| array, and a
 sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
 
 1. Let |client| be |transport|'s [=relevant settings object=].
@@ -893,7 +893,7 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
     1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
        {{WebTransportErrorOptions/source}} is `"session"`.
     1. [=Cleanup=] |transport| with |error|.
-  1. [=session/Establish=] a [=WebTransport session=] with |origin| and |subprotocols| on |connection|.
+  1. [=session/Establish=] a [=WebTransport session=] with |origin| and |protocols| on |connection|.
 
     Note: This step also contains the transport parameter exchange specified in [[!QUIC-DATAGRAM]].
 
@@ -1403,9 +1403,9 @@ that determine how the [=WebTransport session=] is established and used.
    negotiations with the server.
 
 : <dfn for="WebTransportOptions" dict-member>protocols</dfn>
-:: An optionally provided array of application-level <dfn>subprotocol names</dfn>. The connection
+:: An optionally provided array of application-level <dfn>protocol names</dfn>. The connection
    will only be established if the server reports that it has selected one of these
-   application-level subprotocols.
+   application-level protocols.
 
 <div algorithm>
 To <dfn>compute a certificate hash</dfn>, given a |certificate|, perform the following steps:
