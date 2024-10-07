@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="11009de9764e19bd92159bd819f20dbb1e19a0f4" name="document-revision">
+  <meta content="5690b863f65fd154927b4006cb556d93e62bbaf4" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -669,7 +669,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2024-09-17">17 September 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2024-10-07">7 October 2024</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -701,7 +701,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
    <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
    <p>This document defines a set of ECMAScript APIs in WebIDL to allow data to be
 
-  sent and received between a browser and server, utilizing <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> and <a data-link-type="biblio" href="#biblio-web-transport-http2" title="WebTransport over HTTP/2">[WEB-TRANSPORT-HTTP2]</a>. This specification is being developed in conjunction 
+  sent and received between a browser and server, utilizing <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> and <a data-link-type="biblio" href="#biblio-web-transport-http2" title="WebTransport over HTTP/2">[WEB-TRANSPORT-HTTP2]</a>. This specification is being developed in conjunction
   with protocol specifications developed by the IETF WEBTRANS Working Group.</p>
   </div>
   <h2 class="no-num no-toc no-ref heading settled" id="sotd"><span class="content">Status of this document</span></h2>
@@ -810,7 +810,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
       <li><a href="#confidentiality"><span class="secno">13.1</span> <span class="content">Confidentiality of Communications</span></a>
       <li><a href="#state-persistence"><span class="secno">13.2</span> <span class="content">State Persistence</span></a>
       <li><a href="#protocol-security"><span class="secno">13.3</span> <span class="content">Protocol Security</span></a>
-      <li><a href="#certificate-hashes"><span class="secno">13.4</span> <span class="content">Authentication using Certificate Hashes {#certificate-hashes}</span></a>
+      <li><a href="#certificate-hashes"><span class="secno">13.4</span> <span class="content">Authentication using Certificate Hashes</span></a>
       <li>
        <a href="#fingerprinting"><span class="secno">13.5</span> <span class="content">Fingerprinting and Tracking</span></a>
        <ol class="toc">
@@ -1928,16 +1928,12 @@ the application will receive the number of streams it anticipates.</p>
          <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②①">[[State]]</a></code> is <code>"connecting"</code>, wait until it changes.</p>
         <li data-md>
          <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②②">[[State]]</a></code> is <code>"failed"</code>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⓪">reject</a> <var>p</var> with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror③">InvalidStateError</a></code> and abort these steps.</p>
-       </ol>
-     </ol>
-     <ol>
-      <li data-md>
-       <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②③">[[State]]</a></code> is <code>"closed"</code>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①①">resolve</a> <var>p</var> with
+        <li data-md>
+         <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②③">[[State]]</a></code> is <code>"closed"</code>, <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①①">resolve</a> <var>p</var> with
   the most recent stats available for the connection and abort these
   steps. The exact point at which those stats are collected is <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined⑤">implementation-defined</a>.</p>
-      <li data-md>
-       <p>Gather the stats from the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①">underlying connection</a>, including stats on datagrams.</p>
-       <ol>
+        <li data-md>
+         <p>Gather the stats from the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①">underlying connection</a>, including stats on datagrams.</p>
         <li data-md>
          <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①⓪">Queue a network task</a> with <var>transport</var> to run the following steps:</p>
          <ol>
@@ -1947,10 +1943,8 @@ the application will receive the number of streams it anticipates.</p>
            <p><a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①②">Resolve</a> <var>p</var> with <var>stats</var>.</p>
          </ol>
        </ol>
-       <ol>
-        <li data-md>
-         <p>Return <var>p</var>.</p>
-       </ol>
+      <li data-md>
+       <p>Return <var>p</var>.</p>
      </ol>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="method" data-export data-lt="createBidirectionalStream(options)|createBidirectionalStream()" id="dom-webtransport-createbidirectionalstream"><code>createBidirectionalStream()</code></dfn>
     <dd data-md>
@@ -3599,7 +3593,7 @@ approach</a> to this problem: the specific connection error is not returned unti
 endpoint is verified to be a WebTransport endpoint; thus, the Web application
 cannot distinguish between a non-existing endpoint and the endpoint that is not
 willing to accept connections from the Web.</p>
-   <h3 class="heading settled" data-level="13.4" id="certificate-hashes"><span class="secno">13.4. </span><span class="content">Authentication using Certificate Hashes {#certificate-hashes}</span><a class="self-link" href="#certificate-hashes"></a></h3>
+   <h3 class="heading settled" data-level="13.4" id="certificate-hashes"><span class="secno">13.4. </span><span class="content">Authentication using Certificate Hashes</span><a class="self-link" href="#certificate-hashes"></a></h3>
    <p>Normally, a user agent authenticates a TLS connection between itself and a
 remote endpoint by verifying the validity of the TLS server certificate
 provided against the server name in the URL <a data-link-type="biblio" href="#biblio-rfc9525" title="Service Identity in TLS">[RFC9525]</a>.  This is accomplished
@@ -3754,7 +3748,7 @@ in order to avoid copies. This example reads the datagram into a 64kB memory buf
 
 <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> datagram <c- k>of</c-> wt<c- p>.</c->datagrams<c- p>.</c->readable<c- p>)</c-> <c- p>{</c->
   <c- a>const</c-> reader <c- o>=</c-> datagram<c- p>.</c->getReader<c- p>({</c-> mode<c- o>:</c-> <c- u>"byob"</c-> <c- p>});</c->
-  
+
   <c- a>let</c-> array_buffer <c- o>=</c-> <c- ow>new</c-> ArrayBuffer<c- p>(</c-><c- mf>65536</c-><c- p>);</c->
   <c- a>const</c-> buffer <c- o>=</c-> <c- k>await</c-> readInto<c- p>(</c->array_buffer<c- p>);</c->
 <c- p>}</c->
@@ -5080,7 +5074,7 @@ and has been adapted for use in this specification.</p>
 window.dfnpanelData = {};
 window.dfnpanelData['7bb14fda'] = {"dfnID": "7bb14fda", "url": "https://w3c.github.io/webappsec-csp/#report-for-request", "dfnText": "report content security policy violations for request", "refSections": [{"refs": [{"id": "ref-for-report-for-request"}], "title": "5.2. Constructor"}], "external": true};
 window.dfnpanelData['a413e715'] = {"dfnID": "a413e715", "url": "https://w3c.github.io/webappsec-csp/#should-block-request", "dfnText": "should request be blocked by content security policy?", "refSections": [{"refs": [{"id": "ref-for-should-block-request"}], "title": "5.2. Constructor"}], "external": true};
-window.dfnpanelData['c596a338'] = {"dfnID": "c596a338", "url": "https://w3c.github.io/webappsec-csp/#webrtc", "dfnText": "webrtc", "refSections": [{"refs": [{"id": "ref-for-webrtc"}], "title": "13.4. Authentication using Certificate Hashes {#certificate-hashes}"}], "external": true};
+window.dfnpanelData['c596a338'] = {"dfnID": "c596a338", "url": "https://w3c.github.io/webappsec-csp/#webrtc", "dfnText": "webrtc", "refSections": [{"refs": [{"id": "ref-for-webrtc"}], "title": "13.4. Authentication using Certificate Hashes"}], "external": true};
 window.dfnpanelData['28e64574'] = {"dfnID": "28e64574", "url": "https://dom.spec.whatwg.org/#abortsignal-abort-reason", "dfnText": "abort reason", "refSections": [{"refs": [{"id": "ref-for-abortsignal-abort-reason"}], "title": "6.4. Procedures"}], "external": true};
 window.dfnpanelData['87bc23a5'] = {"dfnID": "87bc23a5", "url": "https://dom.spec.whatwg.org/#abortsignal-add", "dfnText": "add", "refSections": [{"refs": [{"id": "ref-for-abortsignal-add"}], "title": "6.4. Procedures"}], "external": true};
 window.dfnpanelData['4aa3c96c'] = {"dfnID": "4aa3c96c", "url": "http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects", "dfnText": "fulfilled", "refSections": [{"refs": [{"id": "ref-for-sec-promise-objects"}, {"id": "ref-for-sec-promise-objects\u2460"}, {"id": "ref-for-sec-promise-objects\u2461"}, {"id": "ref-for-sec-promise-objects\u2462"}], "title": "4.3. Procedures"}, {"refs": [{"id": "ref-for-sec-promise-objects\u2463"}, {"id": "ref-for-sec-promise-objects\u2464"}, {"id": "ref-for-sec-promise-objects\u2465"}, {"id": "ref-for-sec-promise-objects\u2466"}, {"id": "ref-for-sec-promise-objects\u2467"}], "title": "5.2. Constructor"}, {"refs": [{"id": "ref-for-sec-promise-objects\u2468"}, {"id": "ref-for-sec-promise-objects\u2460\u24ea"}, {"id": "ref-for-sec-promise-objects\u2460\u2460"}, {"id": "ref-for-sec-promise-objects\u2460\u2461"}, {"id": "ref-for-sec-promise-objects\u2460\u2462"}, {"id": "ref-for-sec-promise-objects\u2460\u2463"}, {"id": "ref-for-sec-promise-objects\u2460\u2464"}, {"id": "ref-for-sec-promise-objects\u2460\u2465"}, {"id": "ref-for-sec-promise-objects\u2460\u2466"}, {"id": "ref-for-sec-promise-objects\u2460\u2467"}, {"id": "ref-for-sec-promise-objects\u2460\u2468"}, {"id": "ref-for-sec-promise-objects\u2461\u24ea"}, {"id": "ref-for-sec-promise-objects\u2461\u2460"}, {"id": "ref-for-sec-promise-objects\u2461\u2461"}], "title": "5.4. Methods"}, {"refs": [{"id": "ref-for-sec-promise-objects\u2461\u2462"}, {"id": "ref-for-sec-promise-objects\u2461\u2463"}, {"id": "ref-for-sec-promise-objects\u2461\u2464"}, {"id": "ref-for-sec-promise-objects\u2461\u2465"}], "title": "5.5. Procedures"}, {"refs": [{"id": "ref-for-sec-promise-objects\u2461\u2466"}, {"id": "ref-for-sec-promise-objects\u2461\u2467"}], "title": "5.11. WebTransportSendStreamOptions Dictionary"}, {"refs": [{"id": "ref-for-sec-promise-objects\u2461\u2468"}], "title": "6.2. Methods"}, {"refs": [{"id": "ref-for-sec-promise-objects\u2462\u24ea"}, {"id": "ref-for-sec-promise-objects\u2462\u2460"}, {"id": "ref-for-sec-promise-objects\u2462\u2461"}, {"id": "ref-for-sec-promise-objects\u2462\u2462"}, {"id": "ref-for-sec-promise-objects\u2462\u2463"}, {"id": "ref-for-sec-promise-objects\u2462\u2464"}], "title": "6.4. Procedures"}, {"refs": [{"id": "ref-for-sec-promise-objects\u2462\u2465"}], "title": "7.1. Methods"}, {"refs": [{"id": "ref-for-sec-promise-objects\u2462\u2466"}], "title": "8.1. Methods"}, {"refs": [{"id": "ref-for-sec-promise-objects\u2462\u2467"}, {"id": "ref-for-sec-promise-objects\u2462\u2468"}], "title": "8.3. Procedures"}], "external": true};
