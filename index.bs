@@ -1495,7 +1495,7 @@ dictionary WebTransportConnectionStats {
   required DOMHighResTimeStamp minRtt;
   required WebTransportDatagramStats datagrams;
   unsigned long long? estimatedSendRate = null;
-  boolean isSendDataLimited = true;
+  boolean atSendCapacity = false;
 };
 </pre>
 
@@ -1533,13 +1533,18 @@ The dictionary SHALL have the following attributes:
    {{WebTransport/congestionControl}}). If the user agent does not
    currently have an estimate, the member MUST be the `null` value.
    The member can be `null` even if it was not `null` in previous results.
-: <dfn for="WebTransportConnectionStats" dict-member>isSendDataLimited</dfn>
-:: False if the rate at which queued data will be sent by the user agent on all streams
-   and datagrams that share a [=WebTransport session=], as calculated by the congestion
-   control algorithm, is not currently application limited; Otherwise true.
+: <dfn for="WebTransportConnectionStats" dict-member>atSendCapacity</dfn>
+:: A value of false indicates the application is sending less data than available
+   network capacity, and the {{estimatedSendRate}} might be application limited.
+
+   A value of true indicates the application is sending data at network
+   capacity, and the {{estimatedSendRate}} reflects the network capacity available
+   to the application.
    <div class="note">
-   When {{isSendDataLimited}} is `false`, the {{estimatedSendRate}} reflects a ceiling.
-   However, {{estimatedSendRate}} can be `null` while {{isSendDataLimited}} is true.
+   When {{atSendCapacity}} is `true`, the {{estimatedSendRate}} reflects a ceiling.
+   As long as the send rate is sustained, {{estimatedSendRate}} will adapt to network
+   conditions. However, {{estimatedSendRate}} is allowed to be `null` while
+   {{atSendCapacity}} is true.
    <div>
 
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
