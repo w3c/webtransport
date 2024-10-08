@@ -1534,8 +1534,10 @@ The dictionary SHALL have the following attributes:
    currently have an estimate, the member MUST be the `null` value.
    The member can be `null` even if it was not `null` in previous results.
 : <dfn for="WebTransportConnectionStats" dict-member>atSendCapacity</dfn>
-:: A value of false indicates the application is sending less data than available
-   network capacity, and the {{estimatedSendRate}} might be application limited.
+:: A value of false indicates the {{estimatedSendRate}} might be application limited,
+   meaning the application is sending significantly less data than the congestion
+   controller allows. A congestion controller might produce a poor estimate of the
+   available network capacity while it is application limited.
 
    A value of true indicates the application is sending data at network
    capacity, and the {{estimatedSendRate}} reflects the network capacity available
