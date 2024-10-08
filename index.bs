@@ -1541,7 +1541,8 @@ dictionary WebTransportConnectionStats {
   required DOMHighResTimeStamp rttVariation;
   required DOMHighResTimeStamp minRtt;
   required WebTransportDatagramStats datagrams;
-  required unsigned long long? estimatedSendRate;
+  unsigned long long? estimatedSendRate = null;
+  boolean atSendCapacity = false;
 };
 </pre>
 
@@ -1579,7 +1580,21 @@ The dictionary SHALL have the following attributes:
    {{WebTransport/congestionControl}}). If the user agent does not
    currently have an estimate, the member MUST be the `null` value.
    The member can be `null` even if it was not `null` in previous results.
+: <dfn for="WebTransportConnectionStats" dict-member>atSendCapacity</dfn>
+:: A value of false indicates the {{estimatedSendRate}} might be application limited,
+   meaning the application is sending significantly less data than the congestion
+   controller allows. A congestion controller might produce a poor estimate of the
+   available network capacity while it is application limited.
 
+   A value of true indicates the application is sending data at network
+   capacity, and the {{estimatedSendRate}} reflects the network capacity available
+   to the application.
+   <div class="note">
+   When {{atSendCapacity}} is `true`, the {{estimatedSendRate}} reflects a ceiling.
+   As long as the application send rate is sustained, the {{estimatedSendRate}} will adapt
+   to network conditions. However, {{estimatedSendRate}} is allowed to be `null` while
+   {{atSendCapacity}} is true.
+   <div>
 
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
 
