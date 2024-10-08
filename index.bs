@@ -322,15 +322,138 @@ A [=WebTransport stream=] has the following signals:
  </tbody>
 </table>
 
-# `WebTransportDatagramDuplexStream` Interface #  {#duplex-stream}
+# `WebTransportDatagramsWritable` Interface #  {#datagram-writable}
+
+A <dfn interface>WebTransportDatagramsWritable</dfn> is a {{WritableStream}} providing outgoing streaming
+features to [=send a datagram | send datagrams=].
+
+<pre class="idl">
+[Exposed=(Window,Worker), SecureContext, Transferable]
+interface WebTransportDatagramsWritable : WritableStream {
+};
+</pre>
+
+## Internal slots ## {#datagram-writable-internal-slots}
+
+A {{WebTransportDatagramsWritable}} object has the following internal slots.
+
+<table class="data" dfn-for="WebTransportDatagramsWritable" dfn-type="attribute">
+ <thead>
+  <tr>
+   <th>Internal Slot
+   <th>Description (<em>non-normative</em>)
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>`[[Writable]]`</dfn>
+   <td class="non-normative">A {{WritableStream}} for outgoing datagrams.
+  </tr>
+  <tr>
+   <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
+   <td class="non-normative">A queue of tuples of an outgoing datagram, a timestamp and a promise
+   which is resolved when the datagram is sent or discarded.
+  </tr>
+ </tbody>
+</table>
+
+The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport}} object whose
+{{[[State]]}} is either `"connecting"` or `"connected"`.
+
+ To <dfn export for="WebTransportDatagramsWritable" lt="create|creating">create</dfn> a
+ {{WebTransportDatagramsWritable}} given a
+ <dfn export for="WebTransportDatagramsWritable/create"><var>readable</var></dfn>, and
+ a <dfn export for="WebTransportDatagramsWritable/create"><var>writable</var></dfn>,
+ perform the following steps.
+
+ 1. Let |stream| be a [=new=] {{WebTransportDatagramsWritable}}, with:
+    : {{WebTransportDatagramsWritable/[[Writable]]}}
+    :: |writable|
+    : {{[[OutgoingDatagramsQueue]]}}
+    :: an empty queue
+    : {{[[OutgoingDatagramsHighWaterMark]]}}
+    :: an [=implementation-defined=] value
+       <div class="note">
+        <p>This implementation-defined value should be tuned to ensure decent throughput, without
+           jeopardizing the timeliness of transmitted data.</p>
+       </div>
+    : {{[[OutgoingDatagramsExpirationDuration]]}}
+    :: null
+    : {{[[OutgoingMaxDatagramSize]]}}
+    :: an [=implementation-defined=] integer.
+ 1. Return |stream|.
+
+## Attributes ##  {#datagram-writable-attributes}
+
+## Procedures ## {#datagram-writable-procedures}
+
+<div algorithm>
+
+The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
+|data| as input. It is defined by running the following steps:
+
+1. Let |timestamp| be a timestamp representing now.
+1. If |data| is not a {{BufferSource}} object, then return [=a promise rejected with=] a {{TypeError}}.
+1. Let |datagrams| be |transport|.{{[[Datagrams]]}}.
+1. If |datagrams|.{{[[OutgoingMaxDatagramSize]]}} is less than |data|'s \[[ByteLength]], return
+   [=a promise resolved with=] undefined.
+1. Let |promise| be a new promise.
+1. Let |bytes| be a copy of bytes which |data| represents.
+1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
+1. Enqueue |chunk| to |datagrams|.{{[[OutgoingDatagramsQueue]]}}.
+1. If the length of |datagrams|.{{[[OutgoingDatagramsQueue]]}} is less than
+   |datagrams|.{{[[OutgoingDatagramsHighWaterMark]]}}, then [=resolve=] |promise| with undefined.
+1. Return |promise|.
+
+Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
+have been returned by [=writeDatagrams=] have been resolved. Hence the timestamp and the expiration
+duration work well only when the web developer pays attention to
+{{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
+
+</div>
+
+<div algorithm>
+
+To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
+1. Let |queue| be |datagrams|.{{[[OutgoingDatagramsQueue]]}}.
+1. Let |duration| be |datagrams|.{{[[OutgoingDatagramsExpirationDuration]]}}.
+1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
+1. While |queue| is not empty:
+  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
+  1. If more than |duration| milliseconds have passed since |timestamp|, then:
+     1. Remove the first element from |queue|.
+     1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with |undefined|.
+  1. Otherwise, break this loop.
+1. If |transport|.{{[[State]]}} is not `"connected"`, then return.
+1. Let |maxSize| be |datagrams|.{{[[OutgoingMaxDatagramSize]]}}.
+1. While |queue| is not empty:
+  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
+  1. If |bytes|'s length ≤ |maxSize|:
+    1. If it is not possible to send |bytes| to the network immediately, then break this loop.
+    1. [=session/Send a datagram=], with |transport|.{{[[Session]]}} and |bytes|.
+  1. Remove the first element from |queue|.
+  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+
+</div>
+
+The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whose
+{{[[State]]}} is `"connecting"` or `"connected"` as soon as reasonably possible whenever the
+algorithm can make progress.
+
+Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
+datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
+in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
+`"connected"`, it will start sending the queued datagrams.
+
+# `WebTransportDatagramDuplexStream` Interface #  {#datagram-duplex-stream}
 
 A <dfn interface>WebTransportDatagramDuplexStream</dfn> is a generic duplex stream.
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
 interface WebTransportDatagramDuplexStream {
+  WebTransportDatagramsWritable createWritable();
   readonly attribute ReadableStream readable;
-  readonly attribute WritableStream writable;
 
   readonly attribute unsigned long maxDatagramSize;
   attribute unrestricted double? incomingMaxAge;
@@ -340,7 +463,7 @@ interface WebTransportDatagramDuplexStream {
 };
 </pre>
 
-## Internal slots ## {#datagramduplexstream-internal-slots}
+## Internal slots ## {#datagram-duplex-stream-internal-slots}
 
 A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
 
@@ -355,10 +478,6 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>`[[Readable]]`</dfn>
    <td class="non-normative">A {{ReadableStream}} for incoming datagrams.
-  </tr>
-  <tr>
-   <td><dfn>`[[Writable]]`</dfn>
-   <td class="non-normative">A {{WritableStream}} for outgoing datagrams.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsQueue]]`</dfn>
@@ -377,11 +496,6 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
    <td><dfn>`[[IncomingDatagramsExpirationDuration]]`</dfn>
    <td class="non-normative">An {{unrestricted double}} representing the
    expiration duration for incoming datagrams (in milliseconds), or null.
-  </tr>
-  <tr>
-   <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
-   <td class="non-normative">A queue of tuples of an outgoing datagram, a timestamp and a promise
-   which is resolved when the datagram is sent or discarded.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsHighWaterMark]]`</dfn>
@@ -412,8 +526,6 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
  1. Let |stream| be a [=new=] {{WebTransportDatagramDuplexStream}}, with:
     : {{WebTransportDatagramDuplexStream/[[Readable]]}}
     :: |readable|
-    : {{WebTransportDatagramDuplexStream/[[Writable]]}}
-    :: |writable|
     : {{[[IncomingDatagramsQueue]]}}
     :: an empty queue
     : {{[[IncomingDatagramsPullPromise]]}}
@@ -422,8 +534,6 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     :: an [=implementation-defined=] value
     : {{[[IncomingDatagramsExpirationDuration]]}}
     :: null
-    : {{[[OutgoingDatagramsQueue]]}}
-    :: an empty queue
     : {{[[OutgoingDatagramsHighWaterMark]]}}
     :: an [=implementation-defined=] value
        <div class="note">
@@ -436,15 +546,24 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     :: an [=implementation-defined=] integer.
  1. Return |stream|.
 
+## Methods ##  {#datagram-duplex-stream-methods}
+
+: <dfn for="WebTransport" method>createWritable()</dfn>
+
+:: Creates a {{WebTransportDatagramsWritable}}.
+
+   When `createWritable()` method is called, the user agent MUST
+   run the following steps:
+     1. Let |transport| be {{WebTransport}} object associated with [=this=].
+     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+        [=throw=] an {{InvalidStateError}}.
+     1. Return the result of [=WebTransportDatagramsWritable/creating=] a {{WebTransportDatagramsWritable}} with |transport|.
+
 ## Attributes ##  {#datagram-duplex-stream-attributes}
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>readable</dfn>
 :: The getter steps are:
      1. Return [=this=].{{WebTransportDatagramDuplexStream/[[Readable]]}}.
-
-: <dfn for="WebTransportDatagramDuplexStream" attribute>writable</dfn>
-:: The getter steps are:
-     1. Return [=this=].{{WebTransportDatagramDuplexStream/[[Writable]]}}.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxAge</dfn>
 :: The getter steps are:
@@ -535,64 +654,6 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
 The user agent SHOULD run [=receiveDatagrams=] for any {{WebTransport}} object whose
 {{[[State]]}} is `"connected"` as soon as reasonably possible whenever the algorithm can make
 progress.
-
-<div algorithm>
-
-The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
-|data| as input. It is defined by running the following steps:
-
-1. Let |timestamp| be a timestamp representing now.
-1. If |data| is not a {{BufferSource}} object, then return [=a promise rejected with=] a {{TypeError}}.
-1. Let |datagrams| be |transport|.{{[[Datagrams]]}}.
-1. If |datagrams|.{{[[OutgoingMaxDatagramSize]]}} is less than |data|'s \[[ByteLength]], return
-   [=a promise resolved with=] undefined.
-1. Let |promise| be a new promise.
-1. Let |bytes| be a copy of bytes which |data| represents.
-1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
-1. Enqueue |chunk| to |datagrams|.{{[[OutgoingDatagramsQueue]]}}.
-1. If the length of |datagrams|.{{[[OutgoingDatagramsQueue]]}} is less than
-   |datagrams|.{{[[OutgoingDatagramsHighWaterMark]]}}, then [=resolve=] |promise| with undefined.
-1. Return |promise|.
-
-Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
-have been returned by [=writeDatagrams=] have been resolved. Hence the timestamp and the expiration
-duration work well only when the web developer pays attention to
-{{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
-
-</div>
-
-<div algorithm>
-
-To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
-1. Let |queue| be |datagrams|.{{[[OutgoingDatagramsQueue]]}}.
-1. Let |duration| be |datagrams|.{{[[OutgoingDatagramsExpirationDuration]]}}.
-1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
-1. While |queue| is not empty:
-  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-  1. If more than |duration| milliseconds have passed since |timestamp|, then:
-     1. Remove the first element from |queue|.
-     1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with |undefined|.
-  1. Otherwise, break this loop.
-1. If |transport|.{{[[State]]}} is not `"connected"`, then return.
-1. Let |maxSize| be |datagrams|.{{[[OutgoingMaxDatagramSize]]}}.
-1. While |queue| is not empty:
-  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-  1. If |bytes|'s length ≤ |maxSize|:
-    1. If it is not possible to send |bytes| to the network immediately, then break this loop.
-    1. [=session/Send a datagram=], with |transport|.{{[[Session]]}} and |bytes|.
-  1. Remove the first element from |queue|.
-  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
-
-</div>
-
-The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whose
-{{[[State]]}} is `"connecting"` or `"connected"` as soon as reasonably possible whenever the
-algorithm can make progress.
-
-Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
-datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
-in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
-`"connected"`, it will start sending the queued datagrams.
 
 # `WebTransport` Interface #  {#web-transport}
 
