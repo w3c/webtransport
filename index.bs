@@ -994,11 +994,17 @@ these steps.
 : <dfn for="WebTransport" attribute>incomingBidirectionalStreams</dfn>
 :: Returns a {{ReadableStream}} of {{WebTransportBidirectionalStream}}s that have been
    received from the server.
+
+   Note: whether the incoming streams already have data on them will depend on server behavior. 
+
    The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
      1. Return [=this=]'s {{[[IncomingBidirectionalStreams]]}}.
 : <dfn for="WebTransport" attribute>incomingUnidirectionalStreams</dfn>
 :: A {{ReadableStream}} of unidirectional streams, each represented by a
    {{WebTransportReceiveStream}}, that have been received from the server.
+
+   Note: whether the incoming streams already have data on them will depend on server behavior. 
+
    The getter steps for `incomingUnidirectionalStreams` are:
      1. Return [=this=].{{[[IncomingUnidirectionalStreams]]}}.
 
@@ -1110,6 +1116,8 @@ the application will receive the number of streams it anticipates.
    stream.  Note that the mere creation of a stream is not immediately visible to the peer until
    it is used to send data.
 
+   Note: there is no expectation that the server will be aware of the stream until data is sent on it.
+
    When `createBidirectionalStream` is called, the user agent MUST run the
    following steps:
 
@@ -1147,6 +1155,8 @@ the application will receive the number of streams it anticipates.
 :: Creates a {{WebTransportSendStream}} for an outgoing unidirectional stream.  Note
    that the mere creation of a stream is not immediately visible to the server until it is used
    to send data.
+
+   Note: there is no expectation that the server will be aware of the stream until data is sent on it.
 
    When `createUnidirectionalStream()` method is called, the user agent MUST
    run the following steps:
