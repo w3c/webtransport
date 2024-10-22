@@ -330,7 +330,7 @@ features to [=send a datagram | send datagrams=].
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext, Transferable]
 interface WebTransportDatagramsWritable : WritableStream {
-  attribute unsigned long long weight;
+  [EnforceRange] attribute unsigned long long weight;
 };
 </pre>
 
@@ -396,7 +396,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 :: The getter steps are:
      1. Return [=this=]'s {{WebTransportDatagramsWritable/[[Weight]]}}.
 :: The setter steps, given |value|, are:
-     1. If |value| is less than 1 or NaN, [=throw=] a {{RangeError}}.
+     1. If |value| is less than, [=throw=] a {{TypeError}}.
      1. Set [=this=].{{WebTransportDatagramsWritable/[[Weight]]}} to |value|.
 
 ## Procedures ## {#datagram-writable-procedures}
@@ -1994,7 +1994,7 @@ also establishes a separate numberspace for evaluating
 [Exposed=(Window,Worker), SecureContext]
 interface WebTransportSendGroup {
   Promise&lt;WebTransportSendStreamStats&gt; getStats();
-  attribute unsigned long long weight;
+  [EnforceRange] attribute unsigned long long weight;
 };
 </pre>
 
@@ -2007,7 +2007,7 @@ A {{WebTransportSendGroup}} is always created by the
 :: The getter steps are:
      1. Return [=this=]'s {{WebTransportSendGroup/[[Weight]]}}.
 :: The setter steps, given |value|, are:
-     1. If |value| is less than 1 or NaN, [=throw=] a {{RangeError}}.
+     1. If |value| is less than 1, [=throw=] a {{TypeError}}.
      1. Set [=this=].{{WebTransportSendGroup/[[Weight]]}} to |value|.
 
 ## Methods ##  {#send-group-methods}
