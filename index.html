@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="3a324bf5a7684a9f61b27dee68d98365301896a4" name="document-revision">
+  <meta content="3e4bbadca13c46d571d7a57046b04d1383af1a5b" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -669,7 +669,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2024-10-08">8 October 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2024-10-22">22 October 2024</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -1817,16 +1817,18 @@ these steps.
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-incomingbidirectionalstreams"><code>incomingBidirectionalStreams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①⓪">ReadableStream</a>, readonly</span>
     <dd data-md>
      <p>Returns a <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①①">ReadableStream</a></code> of <code class="idl"><a data-link-type="idl" href="#webtransportbidirectionalstream" id="ref-for-webtransportbidirectionalstream③">WebTransportBidirectionalStream</a></code>s that have been
- received from the server.
- The getter steps for the <code>incomingBidirectionalStreams</code> attribute SHALL be:</p>
+ received from the server.</p>
+     <p class="note" role="note"><span class="marker">Note:</span> Whether the incoming streams already have data on them will depend on server behavior.</p>
+     <p>The getter steps for the <code>incomingBidirectionalStreams</code> attribute SHALL be:</p>
      <ol>
       <li data-md>
        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑥">this</a>'s <code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingbidirectionalstreams-slot" id="ref-for-dom-webtransport-incomingbidirectionalstreams-slot③">[[IncomingBidirectionalStreams]]</a></code>.</p>
      </ol>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-incomingunidirectionalstreams"><code>incomingUnidirectionalStreams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①②">ReadableStream</a>, readonly</span>
     <dd data-md>
-     <p>A <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①③">ReadableStream</a></code> of unidirectional streams, each represented by a <code class="idl"><a data-link-type="idl" href="#webtransportreceivestream" id="ref-for-webtransportreceivestream③">WebTransportReceiveStream</a></code>, that have been received from the server.
- The getter steps for <code>incomingUnidirectionalStreams</code> are:</p>
+     <p>A <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#readablestream" id="ref-for-readablestream①③">ReadableStream</a></code> of unidirectional streams, each represented by a <code class="idl"><a data-link-type="idl" href="#webtransportreceivestream" id="ref-for-webtransportreceivestream③">WebTransportReceiveStream</a></code>, that have been received from the server.</p>
+     <p class="note" role="note"><span class="marker">Note:</span> Whether the incoming streams already have data on them will depend on server behavior.</p>
+     <p>The getter steps for <code>incomingUnidirectionalStreams</code> are:</p>
      <ol>
       <li data-md>
        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑦">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingunidirectionalstreams-slot" id="ref-for-dom-webtransport-incomingunidirectionalstreams-slot③">[[IncomingUnidirectionalStreams]]</a></code>.</p>
@@ -1951,6 +1953,7 @@ the application will receive the number of streams it anticipates.</p>
      <p>Creates a <code class="idl"><a data-link-type="idl" href="#webtransportbidirectionalstream" id="ref-for-webtransportbidirectionalstream④">WebTransportBidirectionalStream</a></code> object for an outgoing bidirectional
  stream.  Note that the mere creation of a stream is not immediately visible to the peer until
  it is used to send data.</p>
+     <p class="note" role="note"><span class="marker">Note:</span> There is no expectation that the server will be aware of the stream until data is sent on it.</p>
      <p>When <code>createBidirectionalStream</code> is called, the user agent MUST run the
  following steps:</p>
      <ol>
@@ -1995,6 +1998,7 @@ the application will receive the number of streams it anticipates.</p>
      <p>Creates a <code class="idl"><a data-link-type="idl" href="#webtransportsendstream" id="ref-for-webtransportsendstream②">WebTransportSendStream</a></code> for an outgoing unidirectional stream.  Note
  that the mere creation of a stream is not immediately visible to the server until it is used
  to send data.</p>
+     <p class="note" role="note"><span class="marker">Note:</span> There is no expectation that the server will be aware of the stream until data is sent on it.</p>
      <p>When <code>createUnidirectionalStream()</code> method is called, the user agent MUST
  run the following steps:</p>
      <ol>
