@@ -464,6 +464,7 @@ A <dfn interface>WebTransportDatagramDuplexStream</dfn> is a generic duplex stre
 interface WebTransportDatagramDuplexStream {
   WebTransportDatagramsWritable createWritable();
   readonly attribute ReadableStream readable;
+  readonly attribute WritableStream writable;
 
   readonly attribute unsigned long maxDatagramSize;
   attribute unrestricted double? incomingMaxAge;
@@ -488,6 +489,10 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>`[[Readable]]`</dfn>
    <td class="non-normative">A {{ReadableStream}} for incoming datagrams.
+  </tr>
+  <tr>
+   <td><dfn>`[[Writable]]`</dfn>
+   <td class="non-normative">A default {{WebTransportDatagramsWritable}} for outgoing datagrams.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsQueue]]`</dfn>
@@ -536,6 +541,8 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
  1. Let |stream| be a [=new=] {{WebTransportDatagramDuplexStream}}, with:
     : {{WebTransportDatagramDuplexStream/[[Readable]]}}
     :: |readable|
+    : {{WebTransportDatagramDuplexStream/[[Writable]]}}
+    :: |writable|
     : {{[[IncomingDatagramsQueue]]}}
     :: an empty queue
     : {{[[IncomingDatagramsPullPromise]]}}
@@ -574,6 +581,10 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 : <dfn for="WebTransportDatagramDuplexStream" attribute>readable</dfn>
 :: The getter steps are:
      1. Return [=this=].{{WebTransportDatagramDuplexStream/[[Readable]]}}.
+
+: <dfn for="WebTransportDatagramDuplexStream" attribute>writable</dfn>
+:: The getter steps are:
+     1. Return [=this=].{{WebTransportDatagramDuplexStream/[[Writable]]}}.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxAge</dfn>
 :: The getter steps are:
