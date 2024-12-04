@@ -345,7 +345,7 @@ interface WebTransportDatagramsWritable : WritableStream {
 
 ## Internal slots ## {#datagram-writable-internal-slots}
 
-A {{WebTransportDatagramsWritable}} object has the following internal slots.
+A {{WebTransportDatagramsWritable}} object has the following internal slot.
 
 <table class="data" dfn-for="WebTransportDatagramsWritable" dfn-type="attribute">
  <thead>
@@ -355,10 +355,6 @@ A {{WebTransportDatagramsWritable}} object has the following internal slots.
   </tr>
  </thead>
  <tbody>
-  <tr>
-   <td><dfn>`[[Writable]]`</dfn>
-   <td class="non-normative">A {{WritableStream}} for outgoing datagrams.
-  </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
    <td class="non-normative">A queue of tuples of an outgoing datagram, a timestamp and a promise
@@ -464,7 +460,7 @@ A <dfn interface>WebTransportDatagramDuplexStream</dfn> is a generic duplex stre
 interface WebTransportDatagramDuplexStream {
   WebTransportDatagramsWritable createWritable();
   readonly attribute ReadableStream readable;
-  readonly attribute WritableStream writable;
+  readonly attribute WebTransportDatagramsWritable writable;
 
   readonly attribute unsigned long maxDatagramSize;
   attribute unrestricted double? incomingMaxAge;
