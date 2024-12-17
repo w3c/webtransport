@@ -363,39 +363,19 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
  </tbody>
 </table>
 
-The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport}} object whose
-{{[[State]]}} is either `"connecting"` or `"connected"`.
-
  To <dfn export for="WebTransportDatagramsWritable" lt="create|creating">create</dfn> a
- {{WebTransportDatagramsWritable}} given a
- <dfn export for="WebTransportDatagramsWritable/create"><var>readable</var></dfn>, and
- a <dfn export for="WebTransportDatagramsWritable/create"><var>writable</var></dfn>,
- perform the following steps.
+ {{WebTransportDatagramsWritable}}, perform the following steps.
 
  1. Let |stream| be a [=new=] {{WebTransportDatagramsWritable}}, with:
-    : {{WebTransportDatagramsWritable/[[Writable]]}}
-    :: |writable|
     : {{[[OutgoingDatagramsQueue]]}}
     :: an empty queue
-    : {{[[OutgoingDatagramsHighWaterMark]]}}
-    :: an [=implementation-defined=] value
-       <div class="note">
-        <p>This implementation-defined value should be tuned to ensure decent throughput, without
-           jeopardizing the timeliness of transmitted data.</p>
-       </div>
-    : {{[[OutgoingDatagramsExpirationDuration]]}}
-    :: null
-    : {{[[OutgoingMaxDatagramSize]]}}
-    :: an [=implementation-defined=] integer.
  1. Return |stream|.
-
-## Attributes ##  {#datagram-writable-attributes}
 
 ## Procedures ## {#datagram-writable-procedures}
 
 <div algorithm>
 
-The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
+The <dfn>writeDatagrams</dfn> algorithm is given a |transport| and |writable| as parameters and
 |data| as input. It is defined by running the following steps:
 
 1. Let |timestamp| be a timestamp representing now.
@@ -406,22 +386,24 @@ The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
 1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of bytes which |data| represents.
 1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
-1. Enqueue |chunk| to |datagrams|.{{[[OutgoingDatagramsQueue]]}}.
-1. If the length of |datagrams|.{{[[OutgoingDatagramsQueue]]}} is less than
+1. Enqueue |chunk| to |writable|.{{[[OutgoingDatagramsQueue]]}}.
+1. If the length of |writable|.{{[[OutgoingDatagramsQueue]]}} is less than
    |datagrams|.{{[[OutgoingDatagramsHighWaterMark]]}}, then [=resolve=] |promise| with undefined.
 1. Return |promise|.
 
 Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
-have been returned by [=writeDatagrams=] have been resolved. Hence the timestamp and the expiration
-duration work well only when the web developer pays attention to
+have been returned by [=writeDatagrams=] for that stream have been resolved. Hence the
+timestamp and the expiration duration work well only when the web developer pays attention to
 {{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
 
 </div>
 
 <div algorithm>
 
-To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
-1. Let |queue| be |datagrams|.{{[[OutgoingDatagramsQueue]]}}.
+To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport| and a
+{{WebTransportDatagramsWritable}} object |writable|, run these steps:
+1. Let |queue| be |writable|.{{[[OutgoingDatagramsQueue]]}}.
+1. Let |datagrams| be |transport|.{{[[Datagrams]]}}.
 1. Let |duration| be |datagrams|.{{[[OutgoingDatagramsExpirationDuration]]}}.
 1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
 1. While |queue| is not empty:
@@ -443,7 +425,8 @@ To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 </div>
 
 The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whose
-{{[[State]]}} is `"connecting"` or `"connected"` as soon as reasonably possible whenever the
+{{[[State]]}} is `"connecting"` or `"connected"` as soon as reasonably possible on each of
+its associated {{WebTransportDatagramsWritable}} objects whenever the
 algorithm can make progress.
 
 Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
@@ -570,7 +553,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. Let |transport| be {{WebTransport}} object associated with [=this=].
      1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
         [=throw=] an {{InvalidStateError}}.
-     1. Return the result of [=WebTransportDatagramsWritable/creating=] a {{WebTransportDatagramsWritable}} with |transport|.
+     1. Return the result of [=WebTransportDatagramsWritable/creating=] a {{WebTransportDatagramsWritable}}.
 
 ## Attributes ##  {#datagram-duplex-stream-attributes}
 
@@ -847,7 +830,8 @@ agent MUST run the following steps:
 1. Let |anticipatedConcurrentIncomingBidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/anticipatedConcurrentIncomingBidirectionalStreams}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
-1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
+1. Let |outgoingDatagrams| be a the result of [=WebTransportDatagramsWritable/creating=] a
+   {{WebTransportDatagramsWritable}} with |transport|.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
    {{WebTransportDatagramDuplexStream}}, its [=WebTransportDatagramDuplexStream/create/readable=] set to
    |incomingDatagrams| and its [=WebTransportDatagramDuplexStream/create/writable=] set to |outgoingDatagrams|.
