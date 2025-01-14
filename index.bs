@@ -1656,6 +1656,7 @@ To <dfn for="WebTransportSendStream">close</dfn> a {{WebTransportSendStream}} |s
 1. Run the following steps [=in parallel=]:
   1. [=stream/Send=] FIN on |stream|.{{WebTransportSendStream/[[InternalStream]]}} and wait for the operation to
      complete.
+  1. Wait for |stream|.{{WebTransportSendStream/[[InternalStream]]}} to enter the "all data committed" state. [[!QUIC]]
   1. [=Queue a network task=] with |transport| to run these steps:
     1. Set |stream|.{{[[PendingOperation]]}} to null.
     1. [=Resolve=] |promise| with undefined.
