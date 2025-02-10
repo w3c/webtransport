@@ -581,7 +581,7 @@ To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
   1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
   1. If more than |duration| milliseconds have passed since |timestamp|, then:
      1. Remove the first element from |queue|.
-     1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with |undefined|.
+     1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
   1. Otherwise, break this loop.
 1. If |transport|.{{[[State]]}} is not `"connected"`, then return.
 1. Let |maxSize| be |datagrams|.{{[[OutgoingMaxDatagramSize]]}}.
@@ -705,7 +705,7 @@ A {{WebTransport}} object has the following internal slots.
    by the user agent, or `"default"`.
   </tr>
   <tr>
-   <td><dfn>`[[AnticipatedConcurrentIncomingUnidirectionalStreams]]`</dsfn>
+   <td><dfn>`[[AnticipatedConcurrentIncomingUnidirectionalStreams]]`</dfn>
    <td class="non-normative">The number of concurrently open
    [=incoming unidirectional=] streams the application anticipates the server creating, or null.
   </tr>
@@ -1090,7 +1090,7 @@ the application will receive the number of streams it anticipates.
 
 : <dfn for="WebTransport" method>getStats()</dfn>
 :: Gathers stats for this {{WebTransport}}'s [=underlying connection=]
-   and reports the result asynchronously.</p>
+   and reports the result asynchronously.
 
    When getStats is called, the user agent MUST run the following steps:
      1. Let |transport| be [=this=].
@@ -1604,7 +1604,7 @@ The dictionary SHALL have the following attributes:
    As long as the application send rate is sustained, the {{estimatedSendRate}} will adapt
    to network conditions. However, {{estimatedSendRate}} is allowed to be `null` while
    {{atSendCapacity}} is true.
-   <div>
+   </div>
 
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
 
@@ -1685,7 +1685,7 @@ The {{WebTransportSendStream}}'s [=transfer steps=] and
 
 : <dfn for="WebTransportSendStream" method>getStats()</dfn>
 :: Gathers stats specific to this {{WebTransportSendStream}}'s performance,
-   and reports the result asynchronously.</p>
+   and reports the result asynchronously.
 
    When getStats is called, the user agent MUST run the following steps:
      1. Let |p| be a new promise.
@@ -2002,7 +2002,7 @@ A {{WebTransportSendGroup}} is always created by the
 : <dfn for="WebTransportSendGroup" method>getStats()</dfn>
 :: Aggregates stats from all {{WebTransportSendStream}}s
    [=grouped=] under [=this=] sendGroup, and reports the result
-    asynchronously.</p>
+    asynchronously.
 
    When getStats is called, the user agent MUST run the following steps:
      1. Let |p| be a new promise.
@@ -2079,7 +2079,7 @@ The {{WebTransportReceiveStream}}'s [=transfer steps=] and
 
 : <dfn for="WebTransportReceiveStream" method>getStats()</dfn>
 :: Gathers stats specific to this {{WebTransportReceiveStream}}'s performance,
-   and reports the result asynchronously.</p>
+   and reports the result asynchronously.
 
    When getStats is called, the user agent MUST run the following steps:
      1. Let |p| be a new promise.
@@ -2166,7 +2166,7 @@ To <dfn for="WebTransportReceiveStream">pull bytes</dfn> from a {{WebTransportRe
      The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
      SHOULD have a fixed upper limit, to carry the backpressure information to the server.
 
-     Note: This operation may return before filling up all of |bytes|.
+     Note: This operation may return before filling up all of |buffer|.
 
   1. If the previous step failed, abort the remaining steps.
 
