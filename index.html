@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 60c422380, updated Thu Feb 20 19:11:22 2025 -0800" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="1791753524c6b5995386c6f91e0109bd2776a00c" name="revision">
+  <meta content="fd928910006d16641f8dcd8003dbd4c29af15f11" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -2508,8 +2508,9 @@ same <a href="https://fetch.spec.whatwg.org/#network-partition-keys">network par
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-estimatedsendrate"><code>estimatedSendRate</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①③">unsigned long long</a>, nullable, defaulting to <code>null</code></span>
     <dd data-md>
      <p>The estimated rate at which queued data will be sent by the user agent, in bits per second.
- This rate applies to all streams and datagrams that share a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session②⑤">WebTransport session</a> and is calculated by the congestion control algorithm (potentially chosen by <code class="idl"><a data-link-type="idl" href="#dom-webtransport-congestioncontrol" id="ref-for-dom-webtransport-congestioncontrol①">congestionControl</a></code>). If the user agent does not
- currently have an estimate, the member MUST be the <code>null</code> value.
+ This rate applies to all streams and datagrams that share a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session②⑤">WebTransport session</a> and is calculated by the congestion control algorithm (potentially chosen by <code class="idl"><a data-link-type="idl" href="#dom-webtransport-congestioncontrol" id="ref-for-dom-webtransport-congestioncontrol①">congestionControl</a></code>). This estimate excludes any framing overhead and
+ represents the rate at which an application payload might be sent. If the user agent
+ does not currently have an estimate, the member MUST be the <code>null</code> value.
  The member can be <code>null</code> even if it was not <code>null</code> in previous results.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-atsendcapacity"><code>atSendCapacity</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-boolean" id="ref-for-idl-boolean⑨">boolean</a>, defaulting to <code>false</code></span>
     <dd data-md>
