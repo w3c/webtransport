@@ -333,15 +333,166 @@ A [=WebTransport stream=] has the following signals:
  </tbody>
 </table>
 
-# `WebTransportDatagramDuplexStream` Interface #  {#duplex-stream}
+# `WebTransportDatagramsWritable` Interface #  {#datagram-writable}
+
+A <dfn interface>WebTransportDatagramsWritable</dfn> is a {{WritableStream}} providing outgoing streaming
+features to [=send a datagram | send datagrams=].
+
+<pre class="idl">
+[Exposed=(Window,Worker), SecureContext, Transferable]
+interface WebTransportDatagramsWritable : WritableStream {
+  attribute WebTransportSendGroup? sendGroup;
+  attribute long long sendOrder;
+};
+</pre>
+
+## Internal slots ## {#datagram-writable-internal-slots}
+
+A {{WebTransportDatagramsWritable}} object has the following internal slot.
+
+<table class="data" dfn-for="WebTransportDatagramsWritable" dfn-type="attribute">
+ <thead>
+  <tr>
+   <th>Internal Slot
+   <th>Description (<em>non-normative</em>)
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
+   <td class="non-normative">A queue of tuples of an outgoing datagram, a timestamp and a promise
+   which is resolved when the datagram is sent or discarded.
+  </tr>
+  <tr>
+   <td><dfn>`[[Transport]]`</dfn>
+   <td class="non-normative">A {{WebTransport}} which owns this {{WebTransportDatagramsWritable}}.
+  </tr>
+  <tr>
+   <td><dfn>`[[SendGroup]]`</dfn>
+   <td class="non-normative">An optional {{WebTransportSendGroup}}, or null.
+  </tr>
+  <tr>
+   <td><dfn>`[[SendOrder]]`</dfn>
+   <td class="non-normative">An optional send order number, defaulting to 0.
+  </tr>
+ </tbody>
+</table>
+
+ To <dfn export for="WebTransportDatagramsWritable" lt="create|creating">create</dfn> a
+ {{WebTransportDatagramsWritable}}, given a {{WebTransport}} |transport|, a |sendGroup|,
+ and a |sendOrder|, perform the following steps.
+
+ 1. Let |stream| be a [=new=] {{WebTransportDatagramsWritable}}, with:
+    : {{[[OutgoingDatagramsQueue]]}}
+    :: an empty queue
+    : {{WebTransportDatagramsWritable/[[Transport]]}}
+    :: |transport|
+    : {{WebTransportDatagramsWritable/[[SendGroup]]}}
+    :: |sendGroup|
+    : {{WebTransportDatagramsWritable/[[SendOrder]]}}
+    :: |sendOrder|
+ 1. Return |stream|.
+
+## Attributes ##  {#datagram-writable-attributes}
+
+: <dfn for="WebTransportDatagramsWritable" attribute>sendGroup</dfn>
+:: The getter steps are:
+     1. Return [=this=]'s {{WebTransportDatagramsWritable/[[SendGroup]]}}.
+:: The setter steps, given |value|, are:
+     1. If |value| is non-null, and
+        |value|.{{WebTransportSendGroup/[[Transport]]}} is not
+        [=this=].{{WebTransportDatagramsWritable/[[Transport]]}}, [=throw=]
+        an {{InvalidStateError}}.
+     1. Set [=this=].{{WebTransportDatagramsWritable/[[SendGroup]]}} to |value|.
+
+: <dfn for="WebTransportDatagramsWritable" attribute>sendOrder</dfn>
+:: The getter steps are:
+     1. Return [=this=]'s {{WebTransportDatagramsWritable/[[SendOrder]]}}.
+:: The setter steps, given |value|, are:
+     1. Set [=this=].{{WebTransportDatagramsWritable/[[SendOrder]]}} to |value|.
+
+## Procedures ## {#datagram-writable-procedures}
+
+<div algorithm>
+
+The <dfn>writeDatagrams</dfn> algorithm is given a |transport| and |writable| as parameters and
+|data| as input. It is defined by running the following steps:
+
+1. Let |timestamp| be a timestamp representing now.
+1. If |data| is not a {{BufferSource}} object, then return [=a promise rejected with=] a {{TypeError}}.
+1. Let |datagrams| be |transport|.{{[[Datagrams]]}}.
+1. If |datagrams|.{{[[OutgoingMaxDatagramSize]]}} is less than |data|'s \[[ByteLength]], return
+   [=a promise resolved with=] undefined.
+1. Let |promise| be a new promise.
+1. Let |bytes| be a copy of bytes which |data| represents.
+1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
+1. Enqueue |chunk| to |writable|.{{[[OutgoingDatagramsQueue]]}}.
+1. If the length of |writable|.{{[[OutgoingDatagramsQueue]]}} is less than
+   |datagrams|.{{[[OutgoingDatagramsHighWaterMark]]}}, then [=resolve=] |promise| with undefined.
+1. Return |promise|.
+
+Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
+have been returned by [=writeDatagrams=] for that stream have been resolved. Hence the
+timestamp and the expiration duration work well only when the web developer pays attention to
+{{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
+
+</div>
+
+<div algorithm>
+
+To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport| and a
+{{WebTransportDatagramsWritable}} object |writable|, run these steps:
+1. Let |queue| be |writable|.{{[[OutgoingDatagramsQueue]]}}.
+1. Let |datagrams| be |transport|.{{[[Datagrams]]}}.
+1. Let |duration| be |datagrams|.{{[[OutgoingDatagramsExpirationDuration]]}}.
+1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
+1. While |queue| is not empty:
+  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
+  1. If more than |duration| milliseconds have passed since |timestamp|, then:
+     1. Remove the first element from |queue|.
+     1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+  1. Otherwise, break this loop.
+1. If |transport|.{{[[State]]}} is not `"connected"`, then return.
+1. Let |maxSize| be |datagrams|.{{[[OutgoingMaxDatagramSize]]}}.
+1. While |queue| is not empty:
+  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
+  1. If |bytes|'s length ≤ |maxSize|:
+    1. If it is not possible to send |bytes| to the network immediately, then break this loop.
+    1. [=session/Send a datagram=], with |transport|.{{[[Session]]}} and |bytes|.
+  1. Remove the first element from |queue|.
+  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+
+</div>
+
+The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whose
+{{[[State]]}} is `"connecting"` or `"connected"` as soon as reasonably possible on a
+subset, based on [=send-order rules=], of its associated {{WebTransportDatagramsWritable}}
+objects whenever the algorithm can make progress.
+
+The <dfn>send-order rules</dfn> are that sending in general MAY be interleaved with
+sending of previously queued streams and datagrams, as well as streams and datagrams
+yet to be queued to be sent over this transport, except that sending MUST starve until
+all bytes queued for sending on streams and datagrams with the same
+{{WebTransportDatagramsWritable/[[SendGroup]]}} and a higher
+{{WebTransportDatagramsWritable/[[SendOrder]]}}, that are neither
+[=WritableStream/Error | errored=] nor blocked by [=flow control=], have been sent.
+
+Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
+datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
+in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
+`"connected"`, it will start sending the queued datagrams.
+
+# `WebTransportDatagramDuplexStream` Interface #  {#datagram-duplex-stream}
 
 A <dfn interface>WebTransportDatagramDuplexStream</dfn> is a generic duplex stream.
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
 interface WebTransportDatagramDuplexStream {
+  WebTransportDatagramsWritable createWritable(
+      optional WebTransportSendOptions options = {});
   readonly attribute ReadableStream readable;
-  readonly attribute WritableStream writable;
+  readonly attribute WebTransportDatagramsWritable writable;
 
   readonly attribute unsigned long maxDatagramSize;
   attribute unrestricted double? incomingMaxAge;
@@ -351,7 +502,7 @@ interface WebTransportDatagramDuplexStream {
 };
 </pre>
 
-## Internal slots ## {#datagramduplexstream-internal-slots}
+## Internal slots ## {#datagram-duplex-stream-internal-slots}
 
 A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
 
@@ -369,7 +520,7 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[Writable]]`</dfn>
-   <td class="non-normative">A {{WritableStream}} for outgoing datagrams.
+   <td class="non-normative">A default {{WebTransportDatagramsWritable}} for outgoing datagrams.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsQueue]]`</dfn>
@@ -388,11 +539,6 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
    <td><dfn>`[[IncomingDatagramsExpirationDuration]]`</dfn>
    <td class="non-normative">An {{unrestricted double}} representing the
    expiration duration for incoming datagrams (in milliseconds), or null.
-  </tr>
-  <tr>
-   <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
-   <td class="non-normative">A queue of tuples of an outgoing datagram, a timestamp and a promise
-   which is resolved when the datagram is sent or discarded.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsHighWaterMark]]`</dfn>
@@ -433,8 +579,6 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     :: an [=implementation-defined=] value
     : {{[[IncomingDatagramsExpirationDuration]]}}
     :: null
-    : {{[[OutgoingDatagramsQueue]]}}
-    :: an empty queue
     : {{[[OutgoingDatagramsHighWaterMark]]}}
     :: an [=implementation-defined=] value
        <div class="note">
@@ -446,6 +590,24 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     : {{[[OutgoingMaxDatagramSize]]}}
     :: an [=implementation-defined=] integer.
  1. Return |stream|.
+
+## Methods ##  {#datagram-duplex-stream-methods}
+
+: <dfn for="WebTransport" method>createWritable()</dfn>
+
+:: Creates a {{WebTransportDatagramsWritable}}.
+
+   When `createWritable()` method is called, the user agent MUST
+   run the following steps:
+     1. Let |transport| be {{WebTransport}} object associated with [=this=].
+     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+        [=throw=] an {{InvalidStateError}}.
+     1. Let |sendGroup| be {{WebTransportDatagramDuplexStream/createWritable(options)/options}}'s
+        {{WebTransportSendOptions/sendGroup}}.
+     1. Let |sendOrder| be {{WebTransportDatagramDuplexStream/createWritable(options)/options}}'s
+        {{WebTransportSendOptions/sendOrder}}.
+     1. Return the result of [=WebTransportDatagramsWritable/creating=] a {{WebTransportDatagramsWritable}}
+        with |transport|, |sendGroup| and |sendOrder|.
 
 ## Attributes ##  {#datagram-duplex-stream-attributes}
 
@@ -546,64 +708,6 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
 The user agent SHOULD run [=receiveDatagrams=] for any {{WebTransport}} object whose
 {{[[State]]}} is `"connected"` as soon as reasonably possible whenever the algorithm can make
 progress.
-
-<div algorithm>
-
-The <dfn>writeDatagrams</dfn> algorithm is given a |transport| as parameter and
-|data| as input. It is defined by running the following steps:
-
-1. Let |timestamp| be a timestamp representing now.
-1. If |data| is not a {{BufferSource}} object, then return [=a promise rejected with=] a {{TypeError}}.
-1. Let |datagrams| be |transport|.{{[[Datagrams]]}}.
-1. If |datagrams|.{{[[OutgoingMaxDatagramSize]]}} is less than |data|'s \[[ByteLength]], return
-   [=a promise resolved with=] undefined.
-1. Let |promise| be a new promise.
-1. Let |bytes| be a copy of bytes which |data| represents.
-1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
-1. Enqueue |chunk| to |datagrams|.{{[[OutgoingDatagramsQueue]]}}.
-1. If the length of |datagrams|.{{[[OutgoingDatagramsQueue]]}} is less than
-   |datagrams|.{{[[OutgoingDatagramsHighWaterMark]]}}, then [=resolve=] |promise| with undefined.
-1. Return |promise|.
-
-Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
-have been returned by [=writeDatagrams=] have been resolved. Hence the timestamp and the expiration
-duration work well only when the web developer pays attention to
-{{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
-
-</div>
-
-<div algorithm>
-
-To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
-1. Let |queue| be |datagrams|.{{[[OutgoingDatagramsQueue]]}}.
-1. Let |duration| be |datagrams|.{{[[OutgoingDatagramsExpirationDuration]]}}.
-1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
-1. While |queue| is not empty:
-  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-  1. If more than |duration| milliseconds have passed since |timestamp|, then:
-     1. Remove the first element from |queue|.
-     1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
-  1. Otherwise, break this loop.
-1. If |transport|.{{[[State]]}} is not `"connected"`, then return.
-1. Let |maxSize| be |datagrams|.{{[[OutgoingMaxDatagramSize]]}}.
-1. While |queue| is not empty:
-  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-  1. If |bytes|'s length ≤ |maxSize|:
-    1. If it is not possible to send |bytes| to the network immediately, then break this loop.
-    1. [=session/Send a datagram=], with |transport|.{{[[Session]]}} and |bytes|.
-  1. Remove the first element from |queue|.
-  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
-
-</div>
-
-The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whose
-{{[[State]]}} is `"connecting"` or `"connected"` as soon as reasonably possible whenever the
-algorithm can make progress.
-
-Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
-datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
-in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
-`"connected"`, it will start sending the queued datagrams.
 
 # `WebTransport` Interface #  {#web-transport}
 
@@ -780,7 +884,8 @@ agent MUST run the following steps:
 1. Let |anticipatedConcurrentIncomingBidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/anticipatedConcurrentIncomingBidirectionalStreams}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
-1. Let |outgoingDatagrams| be a [=new=] {{WritableStream}}.
+1. Let |outgoingDatagrams| be the result of [=WebTransportDatagramsWritable/creating=] a
+   {{WebTransportDatagramsWritable}} with |transport|.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
    {{WebTransportDatagramDuplexStream}}, its [=WebTransportDatagramDuplexStream/create/readable=] set to
    |incomingDatagrams| and its [=WebTransportDatagramDuplexStream/create/writable=] set to |outgoingDatagrams|.
@@ -1127,9 +1232,9 @@ the application will receive the number of streams it anticipates.
    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
       return a new [=rejected=] promise with an {{InvalidStateError}}.
    1. Let |sendGroup| be {{WebTransport/createBidirectionalStream(options)/options}}'s
-      {{WebTransportSendStreamOptions/sendGroup}}.
+      {{WebTransportSendOptions/sendGroup}}.
    1. Let |sendOrder| be {{WebTransport/createBidirectionalStream(options)/options}}'s
-      {{WebTransportSendStreamOptions/sendOrder}}.
+      {{WebTransportSendOptions/sendOrder}}.
    1. Let |waitUntilAvailable| be {{WebTransport/createBidirectionalStream(options)/options}}'s
       {{WebTransportSendStreamOptions/waitUntilAvailable}}.
    1. Let |p| be a new promise.
@@ -1167,9 +1272,9 @@ the application will receive the number of streams it anticipates.
      1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
         return a new [=rejected=] promise with an {{InvalidStateError}}.
      1. Let |sendGroup| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
-        {{WebTransportSendStreamOptions/sendGroup}}.
+        {{WebTransportSendOptions/sendGroup}}.
      1. Let |sendOrder| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
-        {{WebTransportSendStreamOptions/sendOrder}}.
+        {{WebTransportSendOptions/sendOrder}}.
      1. Let |waitUntilAvailable| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
         {{WebTransportSendStreamOptions/waitUntilAvailable}}.
      1. Let |p| be a new promise.
@@ -1484,6 +1589,43 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportCloseInfo" dict-member>reason</dfn>
 :: The reason for closing the {{WebTransport}}.
 
+## `WebTransportSendOptions` Dictionary ##  {#send-options}
+
+The <dfn dictionary>WebTransportSendOptions</dfn> is a
+base dictionary of parameters that affect how {{WebTransport/createUnidirectionalStream}},
+{{WebTransport/createBidirectionalStream}}, and the
+{{WebTransportDatagramDuplexStream/createWritable}} methods behave.
+
+<pre class="idl">
+dictionary WebTransportSendOptions {
+  WebTransportSendGroup? sendGroup = null;
+  long long sendOrder = 0;
+};
+</pre>
+
+The dictionary SHALL have the following attributes:
+
+: <dfn for="WebTransportSendOptions" dict-member>sendGroup</dfn>
+:: An optional {{WebTransportSendGroup}} to [=group=] the
+   created stream under, or null.
+
+: <dfn for="WebTransportSendOptions" dict-member>sendOrder</dfn>
+:: A send order number that, if provided, opts the created
+   stream in to participating in <dfn>strict ordering</dfn>.
+   Bytes currently queued on [=strict ordering|strictly ordered=]
+   streams will be sent ahead of bytes currently queued on
+   other [=strict ordering|strictly ordered=] streams
+   created with lower send order numbers.
+
+   If no send order number is provided, then the order in which the
+   user agent sends bytes from it relative to other streams
+   is [=implementation-defined=]. User agents are strongly encouraged however to
+   divide bandwidth fairly between all streams that aren't starved by lower send
+   order numbers.
+
+   Note: This is sender-side data prioritization which does not guarantee
+   reception order.
+
 ## `WebTransportSendStreamOptions` Dictionary ##  {#uni-stream-options}
 
 The <dfn dictionary>WebTransportSendStreamOptions</dfn> is a
@@ -1492,35 +1634,12 @@ dictionary of parameters that affect how {{WebTransportSendStream}}s created by
 {{WebTransport/createBidirectionalStream}} behave.
 
 <pre class="idl">
-dictionary WebTransportSendStreamOptions {
-  WebTransportSendGroup? sendGroup = null;
-  long long sendOrder = 0;
+dictionary WebTransportSendStreamOptions : WebTransportSendOptions {
   boolean waitUntilAvailable = false;
 };
 </pre>
 
 The dictionary SHALL have the following attributes:
-
-: <dfn for="WebTransportSendStreamOptions" dict-member>sendGroup</dfn>
-:: An optional {{WebTransportSendGroup}} to [=group=] this
-   {{WebTransportSendStream}} under, or null.
-
-: <dfn for="WebTransportSendStreamOptions" dict-member>sendOrder</dfn>
-:: A send order number that, if provided, opts the created
-   {{WebTransportSendStream}} in to participating in <dfn>strict ordering</dfn>.
-   Bytes currently queued on [=strict ordering|strictly ordered=]
-   {{WebTransportSendStream}}s will be sent ahead of bytes currently queued on
-   other [=strict ordering|strictly ordered=] {{WebTransportSendStream}}s
-   created with lower send order numbers.
-
-   If no send order number is provided, then the order in which the
-   user agent sends bytes from it relative to other {{WebTransportSendStream}}s
-   is [=implementation-defined=]. User agents are strongly encouraged however to
-   divide bandwidth fairly between all streams that aren't starved by lower send
-   order numbers.
-
-   Note: This is sender-side data prioritization which does not guarantee
-   reception order.
 
 : <dfn for="WebTransportSendStreamOptions" dict-member>waitUntilAvailable</dfn>
 :: If true, the promise returned by the
@@ -1813,25 +1932,25 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
      and wait for the operation to complete.
      This sending MAY be interleaved with sending of previously queued streams and datagrams,
      as well as streams and datagrams yet to be queued to be sent over this transport.
-     Datagrams SHOULD be given priority over this sending, but not to the point of starving it.
 
      The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
      SHOULD have a fixed upper limit, to carry the backpressure information to the user of the
      {{WebTransportSendStream}}.
 
      This sending MUST starve
-     until all bytes queued for sending on {{WebTransportSendStream}}s with the
-     same {{[[SendGroup]]}} and a higher {{[[SendOrder]]}}, that are neither
+     until all bytes queued for sending on streams with the
+     same {{WebTransportSendStream/[[SendGroup]]}} and a higher
+     {{WebTransportSendStream/[[SendOrder]]}}, that are neither
      [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been
      sent.
 
-     We access |stream|.{{[[SendOrder]]}} [=in parallel=] here. User agents SHOULD
-     respond to live updates of these values during sending, though the details are
-     [=implementation-defined=].
+     We access |stream|.{{WebTransportSendStream/[[SendOrder]]}} [=in parallel=] here.
+     User agents SHOULD respond to live updates of these values during sending, though
+     the details are [=implementation-defined=].
 
      Note: Ordering of retransmissions is [=implementation-defined=],
      but user agents are strongly encouraged to prioritize retransmissions of data with
-     higher {{[[SendOrder]]}} values.
+     higher {{WebTransportSendStream/[[SendOrder]]}} values.
 
      This sending MUST NOT starve otherwise,
      except for [=flow control=] reasons or [=WritableStream/Error | error=].
@@ -1990,7 +2109,7 @@ their `sendGroup` attribute, be <dfn>grouped</dfn> under at most one
 The user agent considers {{WebTransportSendGroup}}s as equals when allocating
 bandwidth for sending {{WebTransportSendStream}}s. Each {{WebTransportSendGroup}}
 also establishes a separate numberspace for evaluating
-{{WebTransportSendStreamOptions/sendOrder}} numbers.
+{{WebTransportSendOptions/sendOrder}} numbers.
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext]
