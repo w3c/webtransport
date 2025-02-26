@@ -1588,8 +1588,9 @@ The dictionary SHALL have the following attributes:
 :: The estimated rate at which queued data will be sent by the user agent, in bits per second.
    This rate applies to all streams and datagrams that share a [=WebTransport session=]
    and is calculated by the congestion control algorithm (potentially chosen by
-   {{WebTransport/congestionControl}}). If the user agent does not
-   currently have an estimate, the member MUST be the `null` value.
+   {{WebTransport/congestionControl}}). This estimate excludes any framing overhead and
+   represents the rate at which an application payload might be sent. If the user agent
+   does not currently have an estimate, the member MUST be the `null` value.
    The member can be `null` even if it was not `null` in previous results.
 : <dfn for="WebTransportConnectionStats" dict-member>atSendCapacity</dfn>
 :: A value of false indicates the {{estimatedSendRate}} might be application limited,
