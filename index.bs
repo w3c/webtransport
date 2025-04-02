@@ -185,19 +185,14 @@ A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRAN
 
 To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=/origin=] |origin| and a
 |protocols| array, follow [[!WEB-TRANSPORT-OVERVIEW]]
-[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-2.2.1),
-with using |origin|, [=ASCII serialization of an origin|serialized=] and [=isomorphic encoded=],
-as the [:Origin:] header of the request.
+[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09#section-4.1-2.2.1),
+using |origin|, [=ASCII serialization of an origin|serialized=] and
+[=isomorphic encoded|isomorphically encoded=], as the [:Origin:] header of the request, and the
+[=isomorphic encoded|isomorphically encoded=] |protocols| as the list of protocols the client would
+like the server to use in this session, in preference order, following
+[Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09#section-3.1).
 When establishing a session, the client MUST NOT provide any [=credentials=].
 The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
-Additionally, if the |protocols| array is non-empty,
-add a `WT-Available-Protocols` header field to the CONNECT request, containing
-[=isomorphic encoded=] protocols from |protocols| in the order given, following [[!WEB-TRANSPORT-HTTP3]]
-[Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4).
-<div class="note">
-  This should reference [[!WEB-TRANSPORT-OVERVIEW]] instead pending
-  [issue 15](https://github.com/ietf-wg-webtrans/draft-ietf-webtrans-overview/issues/15).
-</div>
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
 [=CONNECT stream=] receives an [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when a
