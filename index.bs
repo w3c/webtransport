@@ -386,6 +386,10 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
     :: |sendGroup|
     : {{WebTransportDatagramsWritable/[[SendOrder]]}}
     :: |sendOrder|
+ 1. Let |writeDatagramsAlgorithm| be an action that runs [=writeDatagrams=] with
+    |transport| and |stream|.
+ 1. [=WritableStream/Set up=] |stream| with [=WritableStream/set up/writeAlgorithm=]
+    set to |writeDatagramsAlgorithm|.
  1. Return |stream|.
 
 ## Attributes ##  {#datagram-writable-attributes}
@@ -487,7 +491,6 @@ interface WebTransportDatagramDuplexStream {
   WebTransportDatagramsWritable createWritable(
       optional WebTransportSendOptions options = {});
   readonly attribute ReadableStream readable;
-  readonly attribute WebTransportDatagramsWritable writable;
 
   readonly attribute unsigned long maxDatagramSize;
   attribute unrestricted double? incomingMaxAge;
@@ -514,8 +517,9 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
    <td class="non-normative">A {{ReadableStream}} for incoming datagrams.
   </tr>
   <tr>
-   <td><dfn>`[[Writable]]`</dfn>
-   <td class="non-normative">A default {{WebTransportDatagramsWritable}} for outgoing datagrams.
+   <td><dfn>`[[Writables]]`</dfn>
+   <td class="non-normative">An [=ordered set=] of {{WebTransportDatagramsWritable}} streams,
+   initially empty.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsQueue]]`</dfn>
@@ -557,15 +561,14 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 
  To <dfn export for="WebTransportDatagramDuplexStream" lt="create|creating">create</dfn> a
  {{WebTransportDatagramDuplexStream}} given a
- <dfn export for="WebTransportDatagramDuplexStream/create"><var>readable</var></dfn>, and
- a <dfn export for="WebTransportDatagramDuplexStream/create"><var>writable</var></dfn>,
+ <dfn export for="WebTransportDatagramDuplexStream/create"><var>readable</var></dfn>,
  perform the following steps.
 
  1. Let |stream| be a [=new=] {{WebTransportDatagramDuplexStream}}, with:
     : {{WebTransportDatagramDuplexStream/[[Readable]]}}
     :: |readable|
-    : {{WebTransportDatagramDuplexStream/[[Writable]]}}
-    :: |writable|
+    : {{WebTransportDatagramDuplexStream/[[Writables]]}}
+    :: an empty [=ordered set=].
     : {{[[IncomingDatagramsQueue]]}}
     :: an empty queue
     : {{[[IncomingDatagramsPullPromise]]}}
@@ -588,8 +591,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 
 ## Methods ##  {#datagram-duplex-stream-methods}
 
-: <dfn for="WebTransport" method>createWritable()</dfn>
-
+: <dfn for="WebTransportDatagramDuplexStream" method>createWritable()</dfn>
 :: Creates a {{WebTransportDatagramsWritable}}.
 
    When `createWritable()` method is called, the user agent MUST
@@ -610,10 +612,6 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 :: The getter steps are:
      1. Return [=this=].{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 
-: <dfn for="WebTransportDatagramDuplexStream" attribute>writable</dfn>
-:: The getter steps are:
-     1. Return [=this=].{{WebTransportDatagramDuplexStream/[[Writable]]}}.
-
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxAge</dfn>
 :: The getter steps are:
      1. Return [=this=].{{[[IncomingDatagramsExpirationDuration]]}}.
@@ -623,7 +621,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. Set [=this=].{{[[IncomingDatagramsExpirationDuration]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>maxDatagramSize</dfn>
-:: The maximum size data that may be passed to {{WebTransportDatagramDuplexStream/writable}}.
+:: The maximum size data that may be passed to a {{WebTransportDatagramsWritable}}.
    The getter steps are to return [=this=].{{[[OutgoingMaxDatagramSize]]}}.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingMaxAge</dfn>
@@ -879,11 +877,9 @@ agent MUST run the following steps:
 1. Let |anticipatedConcurrentIncomingBidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/anticipatedConcurrentIncomingBidirectionalStreams}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
-1. Let |outgoingDatagrams| be the result of [=WebTransportDatagramsWritable/creating=] a
-   {{WebTransportDatagramsWritable}} with |transport|.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
    {{WebTransportDatagramDuplexStream}}, its [=WebTransportDatagramDuplexStream/create/readable=] set to
-   |incomingDatagrams| and its [=WebTransportDatagramDuplexStream/create/writable=] set to |outgoingDatagrams|.
+   |incomingDatagrams|.
 1. Let |transport| be a newly constructed {{WebTransport}} object, with:
     : {{[[SendStreams]]}}
     :: an empty [=ordered set=]
@@ -916,7 +912,6 @@ agent MUST run the following steps:
     : {{[[Session]]}}
     :: null
 1. Let |pullDatagramsAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
-1. Let |writeDatagramsAlgorithm| be an action that runs [=writeDatagrams=] with |transport|.
 
 Note: Using 64kB buffers with datagrams is recommended because the effective
 maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
@@ -926,8 +921,6 @@ This will ensure the stream is not errored due to a datagram being larger than t
 1. [=ReadableStream/Set up with byte reading support=] |incomingDatagrams| with
    [=ReadableStream/set up with byte reading support/pullAlgorithm=] set to
    |pullDatagramsAlgorithm|, and [=ReadableStream/set up/highWaterMark=] set to 0.
-1. [=WritableStream/Set up=] |outgoingDatagrams| with [=WritableStream/set up/writeAlgorithm=]
-   set to |writeDatagramsAlgorithm|.
 1. Let |pullBidirectionalStreamAlgorithm| be an action that runs [=pullBidirectionalStream=]
    with |transport|.
 1. [=ReadableStream/Set up=] |transport|.{{[[IncomingBidirectionalStreams]]}} with
@@ -1311,7 +1304,7 @@ To <dfn for="WebTransport">cleanup</dfn> a {{WebTransport}} |transport| with |er
 optionally |closeInfo|, run these steps:
 1. Let |sendStreams| be a copy of |transport|.{{[[SendStreams]]}}.
 1. Let |receiveStreams| be a copy of |transport|.{{[[ReceiveStreams]]}}.
-1. Let |outgoingDatagrams| be |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Writable]]}}.
+1. Let |outgoingDatagramWritables| be |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Writables]]}}.
 1. Let |incomingDatagrams| be |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 1. Let |ready| be |transport|.{{[[Ready]]}}.
 1. Let |closed| be |transport|.{{[[Closed]]}}.
@@ -1341,7 +1334,7 @@ optionally |closeInfo|, run these steps:
   1. Assert: |ready| is [=settled=].
   1. [=ReadableStream/Close=] |incomingBidirectionalStreams|.
   1. [=ReadableStream/Close=] |incomingUnidirectionalStreams|.
-  1. [=WritableStream/Close=] |outgoingDatagrams|.
+  1. For each |writable| in |outgoingDatagramWritables|, [=WritableStream/close=] |writable|.
   1. [=ReadableStream/Close=] |incomingDatagrams|.
 1. Otherwise:
   1. [=Reject=] |closed| with |error|.
@@ -1350,7 +1343,7 @@ optionally |closeInfo|, run these steps:
   1. Set |ready|.`[[PromiseIsHandled]]` to true.
   1. [=ReadableStream/Error=] |incomingBidirectionalStreams| with |error|.
   1. [=ReadableStream/Error=] |incomingUnidirectionalStreams| with |error|.
-  1. [=WritableStream/Error=] |outgoingDatagrams| with |error|.
+  1. For each |writable| in |outgoingDatagramWritables|, [=WritableStream/error=] |writable| with |error|.
   1. [=ReadableStream/Error=] |incomingDatagrams| with |error|.
 
 </div>
@@ -3058,17 +3051,20 @@ where use of a shared session might enable unwanted cross-site recognition.
 *This section is non-normative.*
 
 Sending a buffer of datagrams can be achieved by using the
-{{WebTransport/datagrams}}' {{WebTransportDatagramDuplexStream/writable}} attribute. In the
+{{WebTransport/datagrams}}' {{WebTransportDatagramDuplexStream/createWritable}}
+method and the resulting stream's writer. In the
 following example datagrams are only sent if the transport is ready to send.
 
 <pre class="example" highlight="js">
 async function sendDatagrams(url, datagrams) {
   const wt = new WebTransport(url);
-  const writer = wt.datagrams.writable.getWriter();
+  const writable = wt.datagrams.createWritable();
+  const writer = writable.getWriter();
   for (const bytes of datagrams) {
     await writer.ready;
     writer.write(bytes).catch(() => {});
   }
+  await writer.close();
 }
 </pre>
 
@@ -3078,15 +3074,15 @@ async function sendDatagrams(url, datagrams) {
 
 Sending datagrams at a fixed rate regardless if the transport is ready to send
 can be achieved by simply using {{WebTransport/datagrams}}'
-{{WebTransportDatagramDuplexStream/writable}} and not using the `ready` attribute. More complex
-scenarios can utilize the `ready` attribute.
+{{WebTransportDatagramDuplexStream/createWritable}} method and the resulting
+stream's writer without awaiting the `ready` attribute.
 
 <pre class="example" highlight="js">
 // Sends datagrams every 100 ms.
 async function sendFixedRate(url, createDatagram, ms = 100) {
   const wt = new WebTransport(url);
-  await wt.ready;
-  const writer = wt.datagrams.writable.getWriter();
+  const writable = wt.datagrams.createWritable();
+  const writer = writable.getWriter();
   const bytes = createDatagram();
   setInterval(() => writer.write(bytes).catch(() => {}), ms);
 }
@@ -3320,6 +3316,12 @@ This example illustrates use of the closed and ready promises, opening
 of uni-directional and bi-directional streams by either the client or
 the server, and sending and receiving datagrams.
 
+<div class="note">
+The `writable` attribute that used to exist on
+a transport's {{WebTransport/datagrams}} is easy to polyfill as follows:
+<pre>wt.datagrams.writable ||= wt.datagrams.createWritable();</pre>
+</div>
+
 <pre class="example" highlight="js">
 // Adds an entry to the event log on the page, optionally applying a specified
 // CSS class.
@@ -3331,6 +3333,7 @@ connect.onclick = async () => {
     const url = document.getElementById('url').value;
 
     wt = new WebTransport(url);
+    wt.datagrams.writable ||= wt.datagrams.createWritable();
     addToEventLog('Initiating connection...');
     await wt.ready;
     addToEventLog(\`${(wt.reliability == "reliable-only")? "TCP" : "UDP"} \` +
