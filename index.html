@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version b25686b9f, updated Fri Mar 14 14:15:20 2025 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="8aad168629bf8a8d3cde73bf2f8cfb3f978ba70d" name="revision">
+  <meta content="a04b0a2decd71e7027a561a1f3e391b0f415498c" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -738,7 +738,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types/#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2025-04-02">2 April 2025</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types/#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2025-04-08">8 April 2025</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -2436,6 +2436,15 @@ that determine how the <a data-link-type="dfn" href="#protocol-webtransport-sess
  use for normal <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch">fetch</a> operations.</p>
     <dd data-md>
      <p>This cannot be used with <code class="idl"><a data-link-type="idl" href="#dom-webtransportoptions-allowpooling" id="ref-for-dom-webtransportoptions-allowpooling②">allowPooling</a></code>.</p>
+     <div class="issue atrisk" id="issue-34a5e989">
+      <a class="self-link" href="#issue-34a5e989"></a> <code class="idl"><a data-link-type="idl" href="#dom-webtransportoptions-servercertificatehashes" id="ref-for-dom-webtransportoptions-servercertificatehashes③">serverCertificateHashes</a></code> has been identified by the chairs as a feature at
+   risk, in spite of having two implementations. This is due to lack of consensus
+   over the following two open issues: 
+      <ul>
+       <li><a href="https://github.com/w3c/webtransport/issues/623">https://github.com/w3c/webtransport/issues/623</a>
+       <li><a href="https://github.com/w3c/webtransport/issues/59">https://github.com/w3c/webtransport/issues/59</a>
+      </ul>
+     </div>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportOptions" data-dfn-type="dict-member" data-export id="dom-webtransportoptions-congestioncontrol"><code>congestionControl</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransportcongestioncontrol" id="ref-for-enumdef-webtransportcongestioncontrol⑤">WebTransportCongestionControl</a>, defaulting to <code>"default"</code></span>
     <dd data-md>
      <p>Optionally specifies an application’s preference for a congestion control
@@ -5008,6 +5017,16 @@ and has been adapted for use in this specification.</p>
   <div style="counter-reset:issue">
    <div class="issue"> This needs to be done in workers too. See <a href="https://www.github.com/w3c/webtransport/issues/127">#127</a> and <a href="https://www.github.com/whatwg/html/issues/6831">whatwg/html#6731</a>. <a class="issue-return" href="#issue-c18b6608" title="Jump to section">↵</a></div>
    <div class="issue atrisk">
+     <code class="idl"><a data-link-type="idl" href="#dom-webtransportoptions-servercertificatehashes">serverCertificateHashes</a></code> has been identified by the chairs as a feature at
+   risk, in spite of having two implementations. This is due to lack of consensus
+   over the following two open issues: 
+    <ul>
+     <li><a href="https://github.com/w3c/webtransport/issues/623">https://github.com/w3c/webtransport/issues/623</a>
+     <li><a href="https://github.com/w3c/webtransport/issues/59">https://github.com/w3c/webtransport/issues/59</a>
+    </ul>
+     <a class="issue-return" href="#issue-34a5e989" title="Jump to section">↵</a>
+   </div>
+   <div class="issue atrisk">
     <p> This configuration option is considered a feature at risk due to the lack
      of implementation in browsers of a congestion control algorithm,
      at the time of writing, that optimizes for low latency. </p>
@@ -5471,7 +5490,7 @@ let dfnPanelData = {
 "dom-webtransportoptions-congestioncontrol": {"dfnID":"dom-webtransportoptions-congestioncontrol","dfnText":"congestionControl","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportoptions-congestioncontrol"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-dom-webtransportoptions-congestioncontrol\u2460"}],"title":"6.9. Configuration"}],"url":"#dom-webtransportoptions-congestioncontrol"},
 "dom-webtransportoptions-protocols": {"dfnID":"dom-webtransportoptions-protocols","dfnText":"protocols","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportoptions-protocols"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-dom-webtransportoptions-protocols\u2460"}],"title":"6.3. Attributes"},{"refs":[{"id":"ref-for-dom-webtransportoptions-protocols\u2461"}],"title":"6.9. Configuration"}],"url":"#dom-webtransportoptions-protocols"},
 "dom-webtransportoptions-requireunreliable": {"dfnID":"dom-webtransportoptions-requireunreliable","dfnText":"requireUnreliable","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportoptions-requireunreliable"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-dom-webtransportoptions-requireunreliable\u2460"}],"title":"6.9. Configuration"}],"url":"#dom-webtransportoptions-requireunreliable"},
-"dom-webtransportoptions-servercertificatehashes": {"dfnID":"dom-webtransportoptions-servercertificatehashes","dfnText":"serverCertificateHashes","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportoptions-servercertificatehashes"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-dom-webtransportoptions-servercertificatehashes\u2460"},{"id":"ref-for-dom-webtransportoptions-servercertificatehashes\u2461"}],"title":"6.9. Configuration"}],"url":"#dom-webtransportoptions-servercertificatehashes"},
+"dom-webtransportoptions-servercertificatehashes": {"dfnID":"dom-webtransportoptions-servercertificatehashes","dfnText":"serverCertificateHashes","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportoptions-servercertificatehashes"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-dom-webtransportoptions-servercertificatehashes\u2460"},{"id":"ref-for-dom-webtransportoptions-servercertificatehashes\u2461"},{"id":"ref-for-dom-webtransportoptions-servercertificatehashes\u2462"}],"title":"6.9. Configuration"}],"url":"#dom-webtransportoptions-servercertificatehashes"},
 "dom-webtransportreceivestream-getstats": {"dfnID":"dom-webtransportreceivestream-getstats","dfnText":"getStats()","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportreceivestream-getstats"}],"title":"9. Interface WebTransportReceiveStream"}],"url":"#dom-webtransportreceivestream-getstats"},
 "dom-webtransportreceivestream-internalstream-slot": {"dfnID":"dom-webtransportreceivestream-internalstream-slot","dfnText":"[[InternalStream]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportreceivestream-internalstream-slot"},{"id":"ref-for-dom-webtransportreceivestream-internalstream-slot\u2460"},{"id":"ref-for-dom-webtransportreceivestream-internalstream-slot\u2461"}],"title":"9.3. Procedures"}],"url":"#dom-webtransportreceivestream-internalstream-slot"},
 "dom-webtransportreceivestream-transport-slot": {"dfnID":"dom-webtransportreceivestream-transport-slot","dfnText":"[[Transport]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportreceivestream-transport-slot"},{"id":"ref-for-dom-webtransportreceivestream-transport-slot\u2460"},{"id":"ref-for-dom-webtransportreceivestream-transport-slot\u2461"}],"title":"9.3. Procedures"},{"refs":[{"id":"ref-for-dom-webtransportreceivestream-transport-slot\u2462"}],"title":"9.4. Reset signal coming from the server"}],"url":"#dom-webtransportreceivestream-transport-slot"},
