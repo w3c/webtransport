@@ -713,6 +713,7 @@ interface WebTransport {
   constructor(USVString url, optional WebTransportOptions options = {});
 
   Promise&lt;WebTransportConnectionStats&gt; getStats();
+  [NewObject] Promise&lt;ArrayBuffer&gt; deriveKeyingExporter(BufferSource label, optional BufferSource context);
   readonly attribute Promise&lt;undefined&gt; ready;
   readonly attribute WebTransportReliabilityMode reliability;
   readonly attribute WebTransportCongestionControl congestionControl;
@@ -1205,6 +1206,26 @@ the application will receive the number of streams it anticipates.
            1. Let |stats| be a [=new=] {{WebTransportConnectionStats}} object representing the gathered stats.
            1. [=Resolve=] |p| with |stats|.
      1. Return |p|.
+
+: <dfn for="WebTransport" method>deriveKeyingExporter(BufferSource label, optional BufferSource context)</dfn>
+:: Derives a [TLS Keying Material Exporter](https://www.rfc-editor.org/rfc/rfc8446#section-7.3) for
+   the TLS session uniquely associated with this {{WebTransport}}'s [=underlying connection=].
+
+   When `deriveKeyingExporter` is called, the user agent MUST run the following steps:
+
+   1. Let |transport| be [=this=].
+   1. Let |labelLength| be |label|.[=BufferSource/byte length=].
+   1. Let |contextLength| be 0.
+   1. If |context| is given, set |contextLength| to |context|.[=BufferSource/byte length=].
+   1. Let |p| be a new promise.
+   1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
+      {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
+      [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
+     1. Let |keyingExporter| be the result of deriving a TLS keying exporter, as defined
+        in [[!WEB-TRANSPORT-HTTP3]] [Section 4.7](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.7), with
+        |labelLength|, |label|, |contextLength|, and if present, |context|.
+     1. [=Resolve=] |p| with |keyingExporter|.
+   1. Return |p|.
 
 : <dfn for="WebTransport" method>createBidirectionalStream()</dfn>
 :: Creates a {{WebTransportBidirectionalStream}} object for an outgoing bidirectional
