@@ -189,15 +189,15 @@ To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=/origin
 using |origin|, [=ASCII serialization of an origin|serialized=] and
 [=isomorphic encoded|isomorphically encoded=], as the [:Origin:] header of the request, and the
 [=isomorphic encoded|isomorphically encoded=] |protocols| as the list of protocols the client would
-like the server to use in this session, in preference order, following
+like the server to use in this session, in preference order, following [[!WEB-TRANSPORT-OVERVIEW]]
 [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09#section-3.1).
 When establishing a session, the client MUST NOT provide any [=credentials=].
 The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
-[=CONNECT stream=] receives an [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule, or when a
-[=session-signal/GOAWAY=] frame is received, as described in [[!WEB-TRANSPORT-HTTP3]]
-[Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6).
+[=CONNECT stream=] receives a [=session-signal/WT_DRAIN_SESSION=] capsule, or when a
+[=session-signal/GOAWAY=] frame is received, as described in [[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1).
 
 To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an optional integer
 |code| and an optional [=byte sequence=] |reason|, follow [[!WEB-TRANSPORT-OVERVIEW]]
@@ -219,14 +219,14 @@ A [=WebTransport session=] has the following signals:
  </thead>
  <tbody>
   <tr>
-   <td><dfn>DRAIN_WEBTRANSPORT_SESSION</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
+   <td><dfn>WT_DRAIN_SESSION</dfn>
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1)
   </tr>
   <tr>
    <td><dfn>GOAWAY</dfn>
-   <td>[[!WEB-TRANSPORT-HTTP3]]
-   [Section 4.6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.6)
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1)
   </tr>
  </tbody>
 </table>
@@ -825,7 +825,7 @@ A {{WebTransport}} object has the following internal slots.
   <tr>
    <td><dfn>`[[Draining]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated [=WebTransport session=]
-   receives a [=session-signal/DRAIN_WEBTRANSPORT_SESSION=] capsule or a
+   receives a [=session-signal/WT_DRAIN_SESSION=] capsule or a
    [=session-signal/GOAWAY=] frame.
   </tr>
   <tr>
@@ -867,11 +867,11 @@ agent MUST run the following steps:
 1. Let |protocols| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/protocols}}
 1. If any of the values in |protocols| occur more than once, fail to match
-   the requirements for elements that comprise the value of `WT-Protocol`
-   fields as defined by the WebTransport protocol, or have an [=isomorphic encoded=]
+   the requirements for elements that comprise the value of the negotiated
+   application protocol as defined by the WebTransport protocol, or have an [=isomorphic encoded=]
    length of 0 or exceeding 512, [=throw=] a {{SyntaxError}} exception.
-   [[!WEB-TRANSPORT-HTTP3]]
-   [Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4).
+   [[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-3.1).
 1. Let |anticipatedConcurrentIncomingUnidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/anticipatedConcurrentIncomingUnidirectionalStreams}}.
 1. Let |anticipatedConcurrentIncomingBidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
@@ -1011,14 +1011,10 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
       1. Abort these steps.
     1. Set |transport|.{{[[State]]}} to `"connected"`.
     1. Set |transport|.{{[[Session]]}} to |session|.
-    1. Set |transport|.{{[[Protocol]]}} to either the string value of the `WT-Protocol` header field
-       in the 2xx response to the CONNECT request if present, following [[!WEB-TRANSPORT-HTTP3]]
-       [Section 3.4](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.4),
+    1. Set |transport|.{{[[Protocol]]}} to either the string value of the negotiated application
+       protocol if present, following [[!WEB-TRANSPORT-OVERVIEW]]
+       [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-3.1),
        or `""` if not present.
-       <div class="note">
-         This should reference [[!WEB-TRANSPORT-OVERVIEW]] instead pending
-         [issue 15](https://github.com/ietf-wg-webtrans/draft-ietf-webtrans-overview/issues/15).
-       </div>
     1. If the connection is an HTTP/3 connection, set |transport|.{{[[Reliability]]}} to `"supports-unreliable"`.
     1. If the connection is an HTTP/2 connection [[!WEB-TRANSPORT-HTTP2]], set |transport|'s {{[[Reliability]]}} to `"reliable-only"`.
     1. [=Resolve=] |transport|.{{[[Ready]]}} with undefined.
@@ -2631,7 +2627,7 @@ not be immediate due to buffering.
     </thead>
     <tbody>
       <tr>
-        <td>received [=session-signal/DRAIN_WEBTRANSPORT_SESSION=]</td>
+        <td>received [=session-signal/WT_DRAIN_SESSION=]</td>
         <td>await wt.{{WebTransport/draining}}</td>
       </tr>
     </tbody>
