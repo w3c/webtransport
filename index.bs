@@ -552,6 +552,12 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>`[[OutgoingMaxDatagramSize]]`</dfn>
    <td class="non-normative">An integer representing the maximum size for an outgoing datagram.
+   <p class=note>The maximum datagram size depends on the protocol that is in use.
+   In HTTP/3 [[WEB-TRANSPORT-HTTP3]], the value is related to the estimate of the
+   path <acronym title="Maximum Transmission Unit">MTU</acronym>,
+   which is reduced by some implementation-defined amount to account for any overheads.
+   In HTTP/2  [[WEB-TRANSPORT-HTTP2]], the value primarily comes from
+   the SETTINGS_MAX_DATAGRAM_SIZE \[TODO!] setting.
   </tr>
  </tbody>
 </table>
@@ -1085,7 +1091,7 @@ these steps.
 :: Returns a {{ReadableStream}} of {{WebTransportBidirectionalStream}}s that have been
    received from the server.
 
-   Note: Whether the incoming streams already have data on them will depend on server behavior. 
+   Note: Whether the incoming streams already have data on them will depend on server behavior.
 
    The getter steps for the `incomingBidirectionalStreams` attribute SHALL be:
      1. Return [=this=]'s {{[[IncomingBidirectionalStreams]]}}.
@@ -1093,7 +1099,7 @@ these steps.
 :: A {{ReadableStream}} of unidirectional streams, each represented by a
    {{WebTransportReceiveStream}}, that have been received from the server.
 
-   Note: Whether the incoming streams already have data on them will depend on server behavior. 
+   Note: Whether the incoming streams already have data on them will depend on server behavior.
 
    The getter steps for `incomingUnidirectionalStreams` are:
      1. Return [=this=].{{[[IncomingUnidirectionalStreams]]}}.
