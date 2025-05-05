@@ -3012,7 +3012,7 @@ agent.
 ### Shared Networking ### {#fp-shared}
 
 Contested links present sites with opportunities to enable
-[[privacy-principles#dfn-cross-site-recognition|cross-site recognition]],
+[[privacy-principles|cross-site recognition]],
 which might be used to perform unsanctioned tracking [[UNSANCTIONED-TRACKING]].
 Network capacity is a finite shared resource, so a user agent that concurrently
 accesses different sites might reveal a connection between the identity
@@ -3144,6 +3144,9 @@ async function readInto(buffer) {
 Sending data as a one-way stream can be achieved by using the
 {{WebTransport/createUnidirectionalStream}} function and the resulting stream's writer.
 
+The written chunk boundaries aren't preserved on reception, as the bytes might coalesce
+on the wire. Applications are therefore encouraged to do their own framing.
+
 <pre class="example" highlight="js">
 async function sendData(url, ...data) {
   const wt = new WebTransport(url);
@@ -3182,6 +3185,8 @@ async function sendText(url, readableStreamOfTextData) {
 Reading incoming streams can be achieved by iterating over the
 {{WebTransport/incomingUnidirectionalStreams}} attribute,
 and then consuming each {{WebTransportReceiveStream}} by iterating over its chunks.
+
+Chunking is determined by the user agent, not the sender.
 
 <pre class="example" highlight="js">
 async function receiveData(url, processTheData) {
