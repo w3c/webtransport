@@ -455,7 +455,7 @@ To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport| and a
 1. Let |maxSize| be |datagrams|.{{[[OutgoingMaxDatagramSize]]}}.
 1. While |queue| is not empty:
   1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-  1. If |bytes|'s length ≤ |maxSize|:
+  1. If |bytes|'s length > 0 and ≤ |maxSize|:
     1. If it is not possible to send |bytes| to the network immediately, then break this loop.
     1. [=session/Send a datagram=], with |transport|.{{[[Session]]}} and |bytes|.
   1. Remove the first element from |queue|.
@@ -668,7 +668,8 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
      |view|.\[[TypedArrayName]]. If |view| does not have a \[[TypedArrayName]] internal slot
      (i.e. it is a {{DataView}}), let |elementSize| be 0.
   1. If |elementSize| is not 1, return [=a promise rejected with=] a {{TypeError}}.
-1. [=ReadableStream/Pull from bytes=] |datagram| into |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
+1. If |datagram|.[=byte sequence/length=] > 0, then [=ReadableStream/pull from bytes=]
+   |datagram| into |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 1. Return [=a promise resolved with=] undefined.
 
 To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
@@ -1540,7 +1541,7 @@ perform the following steps:
 1. For every hash |hash| in |hashes|:
    1. If |hash|.{{WebTransportHash/value}} is not null and |hash|.{{WebTransportHash/algorithm}}
       is an [=ASCII case-insensitive=] match with "sha-256":
-     1. Let |hashValue| be the byte sequence which |hash|.{{WebTransportHash/value}} represents.
+     1. Let |hashValue| be the [=byte sequence=] which |hash|.{{WebTransportHash/value}} represents.
      1. If |hashValue| is equal to |referenceHash|, return true.
 1. Return false.
 
