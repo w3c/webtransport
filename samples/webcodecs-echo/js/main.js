@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', async function(event) {
     let [track] = mediaStream.getVideoTracks();
     let ts = track.getSettings();
     // Uses non-standard Chrome-only API
-    const processor = new MediaStreamTrackProcessor(track);
+    const processor = new MediaStreamTrackProcessor({track});
     inputStream = processor.readable;
 
     // Create a MediaStreamTrackGenerator, which exposes a track from a
