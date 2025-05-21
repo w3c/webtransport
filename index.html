@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version b25686b9f, updated Fri Mar 14 14:15:20 2025 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="ac036c3f951ab07163be4324b0314b8e0e52614f" name="revision">
+  <meta content="40b8fc02e5d1142b78f41e3de7c95fce1912004a" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -4011,6 +4011,8 @@ in order to avoid copies. This example reads the datagram into a 64kB memory buf
    <h3 class="heading settled" data-level="15.5" id="example-sending-stream"><span class="secno">15.5. </span><span class="content">Sending a stream</span><a class="self-link" href="#example-sending-stream"></a></h3>
    <p><em>This section is non-normative.</em></p>
    <p>Sending data as a one-way stream can be achieved by using the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-createunidirectionalstream" id="ref-for-dom-webtransport-createunidirectionalstream④">createUnidirectionalStream</a></code> function and the resulting stream’s writer.</p>
+   <p>The written chunk boundaries aren’t preserved on reception, as the bytes might coalesce
+on the wire. Applications are therefore encouraged to provide their own framing.</p>
 <pre class="example highlight" id="example-72df6ceb"><a class="self-link" href="#example-72df6ceb"></a><c- k>async</c-> <c- a>function</c-> sendData<c- p>(</c->url<c- p>,</c-> <c- p>...</c->data<c- p>)</c-> <c- p>{</c->
   <c- a>const</c-> wt <c- o>=</c-> <c- ow>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
   <c- a>const</c-> writable <c- o>=</c-> <c- k>await</c-> wt<c- p>.</c->createUnidirectionalStream<c- p>();</c->
@@ -4038,6 +4040,7 @@ in order to avoid copies. This example reads the datagram into a 64kB memory buf
    <p><em>This section is non-normative.</em></p>
    <p>Reading incoming streams can be achieved by iterating over the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingunidirectionalstreams" id="ref-for-dom-webtransport-incomingunidirectionalstreams①">incomingUnidirectionalStreams</a></code> attribute,
 and then consuming each <code class="idl"><a data-link-type="idl" href="#webtransportreceivestream" id="ref-for-webtransportreceivestream②⑦">WebTransportReceiveStream</a></code> by iterating over its chunks.</p>
+   <p>Chunking is determined by the user agent, not the sender.</p>
 <pre class="example highlight" id="example-53f87595"><a class="self-link" href="#example-53f87595"></a><c- k>async</c-> <c- a>function</c-> receiveData<c- p>(</c->url<c- p>,</c-> processTheData<c- p>)</c-> <c- p>{</c->
   <c- a>const</c-> wt <c- o>=</c-> <c- ow>new</c-> WebTransport<c- p>(</c->url<c- p>);</c->
   <c- k>for</c-> <c- k>await</c-> <c- p>(</c-><c- a>const</c-> readable <c- k>of</c-> wt<c- p>.</c->incomingUnidirectionalStreams<c- p>)</c-> <c- p>{</c->
