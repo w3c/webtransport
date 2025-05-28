@@ -28,11 +28,12 @@ See the [proposed spec](https://wicg.github.io/web-transport/).
 # Samples
 
 Basic Echo
-- Live: https://webrtc.internaut.com/wt/
+- Chicago USA: https://wt-ord.akaleapi.net/echo/
+- Amsterdam NL: https://wt-ams.akaleapi.net/echo/
 - Source: https://github.com/w3c/webtransport/tree/main/samples/echo
-  
+
 WebCodecs Echo
- - Live: https://webrtc.internaut.com/wc/wtSender10/
- - Source: https://github.com/aboba/wt-demo
- - PR: https://github.com/w3c/webtransport/pull/430
-   
+- Chicago USA: https://wt-ord.akaleapi.net/webcodecs-echo/
+- Amsterdam NL: https://wt-ams.akaleapi.net/webcodecs-echo/
+- Source: https://github.com/w3c/webtransport/tree/main/samples/webcodecs-echo
+
