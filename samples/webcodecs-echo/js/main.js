@@ -115,7 +115,7 @@ function gotDevices(deviceInfos) {
     }
   }
   if ([...videoSelect.childNodes].some(({value}) => value == oldValue)) {
-    videoSelect.value = value;
+    videoSelect.value = oldValue;
   }
 }
 
