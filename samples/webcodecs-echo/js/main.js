@@ -119,7 +119,7 @@ function gotDevices(deviceInfos) {
       videoSelect.appendChild(option);
     }
   }
-  if ([...videoSelect.childNodes].some(({value}) => value == oldValue)) {
+  if ([...videoSelect.options].some(({value}) => value == oldValue)) {
     videoSelect.value = oldValue;
   }
 }
