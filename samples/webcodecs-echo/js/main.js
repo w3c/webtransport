@@ -1,7 +1,7 @@
 'use strict';
 
 let preferredResolution;
-let mediaStream, videoSource, bitrate = 300000;
+let bitrate = 300000;
 let stopped = false;
 let preferredCodec ="VP8";
 let mode = "L1T3";
@@ -9,18 +9,10 @@ let latencyPref = "realtime", bitPref = "variable";
 let encHw = "no-preference", decHw = "no-preference";
 let streamWorker;
 let inputStream, outputStream;
-let metrics = {
-   all: [],
-};
-let e2e = {
-   all: [],
-};
-let display_metrics = {
-   all: [],
-};
+let metrics = {all: []};
+let e2e = {all: []};
+let display_metrics = {all: []};
 
-const rate = document.querySelector('#rate');
-const framer = document.querySelector('#framer');
 const connectButton = document.querySelector('#connect');
 const stopButton = document.querySelector('#stop');
 const codecButtons = document.querySelector('#codecButtons');
@@ -28,14 +20,18 @@ const resButtons = document.querySelector('#resButtons');
 const modeButtons = document.querySelector('#modeButtons');
 const decHwButtons = document.querySelector('#decHwButtons');
 const encHwButtons = document.querySelector('#encHwButtons');
+const prefButtons = document.querySelector('#prefButtons');
+const bitButtons = document.querySelector('#bitButtons');
+const rateInput = document.querySelector('#rateInput');
+const frameInput = document.querySelector('#frameInput');
+const keyInput = document.querySelector('#keyInput');
 const chart_div = document.getElementById('chart_div');
 const chart2_div = document.getElementById('chart2_div');
 const chart3_div = document.getElementById('chart3_div');
 const chart4_div = document.getElementById('chart4_div');
 const videoSelect = document.querySelector('select#videoSource');
 const outputVideo = document.getElementById('outputVideo');
-const inputVideo  = document.getElementById('inputVideo');
-const selectors = [videoSelect];
+const inputVideo = document.getElementById('inputVideo');
 chart_div.style.display = "none";
 chart2_div.style.display = "none";
 chart3_div.style.display = "none";
@@ -43,18 +39,33 @@ chart4_div.style.display = "none";
 connectButton.disabled = false;
 stopButton.disabled = true;
 
-videoSelect.onchange = function () {
-  videoSource = videoSelect.value;
+const resolutions = {
+  "qvga": {width: 320, height: 240},
+  "vga": {width: 640, height: 480},
+  "hd": {width: 1280, height: 720},
+  "full-hd": {width: {min: 1920}, height: {min: 1080}},
+  "tv4K": {width: {min: 3840}, height: {min: 2160}},
+  "cinema4K": {width: {min: 4096}, height: {min: 2160}},
+  "eightK": {width: {min: 7680}, height: {min: 4320}},
 };
 
-const qvgaConstraints   = {video: {width: 320,  height: 240}};
-const vgaConstraints    = {video: {width: 640,  height: 480}};
-const hdConstraints     = {video: {width: 1280, height: 720}};
-const fullHdConstraints = {video: {width: {min: 1920}, height: {min: 1080}}};
-const tv4KConstraints   = {video: {width: {exact: 3840}, height: {exact: 2160}}};
-const cinema4KConstraints = {video: {width: {exact: 4096}, height: {exact: 2160}}};
-const eightKConstraints = {video: {width: {min: 7680}, height: {min: 4320}}};
-let constraints = qvgaConstraints;
+videoSelect.onchange = async function() {
+  try {
+    localStorage.videoSource = videoSelect.value;
+    if (!inputVideo.srcObject) return;
+    const [track] = inputVideo.srcObject.getTracks();
+    if (track.getSettings().deviceId == localStorage.videoSource) return;
+    track.stop();
+    inputVideo.srcObject = await navigator.mediaDevices.getUserMedia({
+      video: {
+        deviceId: localStorage.videoSource,
+        ...resolutions[preferredResolution]
+      }
+    });
+  } catch(e) {
+    addToEventLog(`getUserMedia error: ${e.message}`, 'fatal');
+  }
+};
 
 function metrics_update(data) {
   metrics.all.push(data);
@@ -95,12 +106,10 @@ function addToEventLog(text, severity = 'info') {
 
 function gotDevices(deviceInfos) {
   // Handles being called several times to update labels. Preserve values.
-  const values = selectors.map(select => select.value);
-  selectors.forEach(select => {
-    while (select.firstChild) {
-      select.removeChild(select.firstChild);
-    }
-  });
+  const oldValue = videoSelect.value;
+  while (videoSelect.firstChild) {
+    videoSelect.removeChild(videoSelect.firstChild);
+  }
   for (let i = 0; i !== deviceInfos.length; ++i) {
     const deviceInfo = deviceInfos[i];
     const option = document.createElement('option');
@@ -110,61 +119,20 @@ function gotDevices(deviceInfos) {
       videoSelect.appendChild(option);
     }
   }
-  selectors.forEach((select, selectorIndex) => {
-    if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
-      select.value = values[selectorIndex];
-    }
-  });
+  if ([...videoSelect.options].some(({value}) => value == oldValue)) {
+    videoSelect.value = oldValue;
+  }
 }
 
 async function getResValue(radio) {
-  preferredResolution = radio.value;
-  addToEventLog('Resolution selected: ' + preferredResolution);
-  switch(preferredResolution) {
-     case "qvga":
-       constraints = qvgaConstraints;
-       break;
-     case "vga":
-       constraints = vgaConstraints;
-       break;
-     case "hd":
-       constraints = hdConstraints;
-       break;
-     case "full-hd":
-       constraints = fullHdConstraints;
-       break;
-     case "tv4K":
-       constraints = tv4KConstraints;
-       break;
-     case "cinema4K":
-       constraints = cinema4KConstraints;
-       break;
-     case "eightK":
-       constraints = eightKConstraints;
-       break;
-     default:
-       constraints = qvgaConstraints;
-       break;
-  }
-  // Get a MediaStream from the webcam, and reset the resolution.
   try {
-    //stop the tracks
-    if (mediaStream){
-      mediaStream.getTracks().forEach(track => {
-        track.stop();
-      });
-    }
-    gotDevices(await navigator.mediaDevices.enumerateDevices());
-    constraints.deviceId = (videoSource ? {exact: videoSource} : undefined);
-    //addToEventLog('videoSource: ' + JSON.stringify(videoSource) + ' DeviceId: ' + constraints.deviceId);
+    preferredResolution = radio.value;
+    addToEventLog('Resolution selected: ' + preferredResolution);
+    if (!inputVideo.srcObject) return;
+    const [track] = inputVideo.srcObject.getVideoTracks();
+    await track.applyConstraints(resolutions[preferredResolution]);
   } catch(e) {
-    addToEventLog(`EnumerateDevices error: ${e.message}`, 'fatal');
-  }
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-    document.getElementById('inputVideo').srcObject = mediaStream;
-  } catch(e) {
-    addToEventLog(`getUserMedia error: ${e.message}`, 'fatal');
+    addToEventLog(`applyConstraints error: ${e.message}`, 'fatal');
   }
 }
 
@@ -207,17 +175,13 @@ function stop() {
   chart3_div.style.display = "initial";
   chart4_div.style.display = "initial";
   streamWorker.postMessage({ type: "stop" });
-  try {
+  if (inputStream) {
     inputStream.cancel();
     addToEventLog('inputStream cancelled');
-  } catch(e) {
-    addToEventLog(`Could not cancel inputStream: ${e.message}`);
   }
-  try {
+  if (outputStream) {
     outputStream.abort();
     addToEventLog('outputStream aborted');
-  } catch(e) {
-    addToEventLog(`Could not abort outputStream: ${e.message}`);
   }
 }
 
@@ -225,30 +189,23 @@ document.addEventListener('DOMContentLoaded', async function(event) {
   if (stopped) return;
   addToEventLog('DOM Content Loaded');
 
-  if (typeof WebTransport === 'undefined') {
+  if (!WebTransport) {
     addToEventLog('Your browser does not support the WebTransport API.', 'fatal');
     return;
   }
+  preferredResolution = document.querySelector('input[name="resolution"]:checked').value;
 
-  // Need to support standard mediacapture-transform implementations
+  // Get the webcam and connect it to the video element.
+  inputVideo.srcObject = await navigator.mediaDevices.getUserMedia({
+    video: {
+      deviceId: localStorage.videoSource,
+      ...resolutions[preferredResolution]
+    }
+  });
+  const [track] = inputVideo.srcObject.getVideoTracks();
+  gotDevices(await navigator.mediaDevices.enumerateDevices());
+  videoSelect.value = track.getSettings().deviceId;
 
-  if (typeof MediaStreamTrackProcessor === 'undefined' ||
-      typeof MediaStreamTrackGenerator === 'undefined') {
-    addToEventLog('Your browser does not support the MSTP and MSTG APIs.', 'fatal');
-    return;
-  }
-
-  try {
-    gotDevices(await navigator.mediaDevices.enumerateDevices());
-  } catch (e) {
-    addToEventLog('Error in Device enumeration', 'fatal');
-  }
-  constraints.deviceId = videoSource ? {exact: videoSource} : undefined;
-  //addToEventLog('videoSource: ' + JSON.stringify(videoSource) + ' DeviceId: ' + constraints.deviceId);
-  // Get a MediaStream from the webcam.
-  mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-  // Connect the webcam stream to the video element.
-  document.getElementById('inputVideo').srcObject = mediaStream;
   // Create a new worker.
   streamWorker = new Worker("js/stream_worker.js");
   addToEventLog('Worker created.');
@@ -317,20 +274,18 @@ document.addEventListener('DOMContentLoaded', async function(event) {
   async function startMedia() {
     if (stopped) return;
     addToEventLog('startMedia called');
-    // Collect the bitrate
+    // Collect the bitrate, framerate and keyframe gap
     const rate = document.getElementById('rate').value;
-
-    // Collect the framerate
     const framer = document.getElementById('framer').value;
-
-    // Collect the keyframe gap
     const keygap = document.getElementById('keygap').value;
 
     // Create a MediaStreamTrackProcessor, which exposes frames from the track
     // as a ReadableStream of VideoFrames.
-    let [track] = mediaStream.getVideoTracks();
+    // Relies on non-standard API in Chrome and polyfills in other browsers
+    // TODO: support standard mediacapture-transform implementations
+
+    let [track] = inputVideo.srcObject.getVideoTracks();
     let ts = track.getSettings();
-    // Uses non-standard Chrome-only API
     const processor = new MediaStreamTrackProcessor({track});
     inputStream = processor.readable;
 
