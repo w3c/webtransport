@@ -20,19 +20,34 @@ const resButtons = document.querySelector('#resButtons');
 const modeButtons = document.querySelector('#modeButtons');
 const decHwButtons = document.querySelector('#decHwButtons');
 const encHwButtons = document.querySelector('#encHwButtons');
+const prefButtons = document.querySelector('#prefButtons');
+const bitButtons = document.querySelector('#bitButtons');
+const rateInput = document.querySelector('#rateInput');
+const frameInput = document.querySelector('#frameInput');
+const keyInput = document.querySelector('#keyInput');
 const chart_div = document.getElementById('chart_div');
 const chart2_div = document.getElementById('chart2_div');
 const chart3_div = document.getElementById('chart3_div');
 const chart4_div = document.getElementById('chart4_div');
 const videoSelect = document.querySelector('select#videoSource');
 const outputVideo = document.getElementById('outputVideo');
-const inputVideo  = document.getElementById('inputVideo');
+const inputVideo = document.getElementById('inputVideo');
 chart_div.style.display = "none";
 chart2_div.style.display = "none";
 chart3_div.style.display = "none";
 chart4_div.style.display = "none";
 connectButton.disabled = false;
 stopButton.disabled = true;
+
+const resolutions = {
+  "qvga": {width: 320, height: 240},
+  "vga": {width: 640, height: 480},
+  "hd": {width: 1280, height: 720},
+  "full-hd": {width: {min: 1920}, height: {min: 1080}},
+  "tv4K": {width: {min: 3840}, height: {min: 2160}},
+  "cinema4K": {width: {min: 4096}, height: {min: 2160}},
+  "eightK": {width: {min: 7680}, height: {min: 4320}},
+};
 
 videoSelect.onchange = async function() {
   try {
@@ -50,16 +65,6 @@ videoSelect.onchange = async function() {
   } catch(e) {
     addToEventLog(`getUserMedia error: ${e.message}`, 'fatal');
   }
-};
-
-const resolutions = {
-  "qvga": {width: 320, height: 240},
-  "vga": {width: 640, height: 480},
-  "hd": {width: 1280, height: 720},
-  "full-hd": {width: {min: 1920}, height: {min: 1080}},
-  "tv4K": {width: {min: 3840}, height: {min: 2160}},
-  "cinema4K": {width: {min: 4096}, height: {min: 2160}},
-  "eightK": {width: {min: 7680}, height: {min: 4320}},
 };
 
 function metrics_update(data) {
