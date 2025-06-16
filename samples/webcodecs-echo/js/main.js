@@ -7,8 +7,7 @@ let preferredCodec ="VP8";
 let mode = "L1T3";
 let latencyPref = "realtime", bitPref = "variable";
 let encHw = "no-preference", decHw = "no-preference";
-let streamWorker;
-let inputStream, outputStream;
+let worker;
 let metrics = {all: []};
 let e2e = {all: []};
 let display_metrics = {all: []};
@@ -72,9 +71,7 @@ function metrics_update(data) {
 }
 
 function metrics_report() {
-  metrics.all.sort((a, b) =>  {
-    return (100000 * (b.mediaTime - a.mediaTime) + b.output - a.output);
-  });
+  metrics.all.sort((a, b) => 100000 * (b.mediaTime - a.mediaTime) + b.output - a.output);
   const len = metrics.all.length;
   if (len < 2) return; 
   for (let i = 0; i < len ; i++ ) {
@@ -87,7 +84,7 @@ function metrics_report() {
       const expectedDisplayTime = metrics.all[i].expectedDisplayTime;
       const g2g = Math.max(0, expectedDisplayTime - captureTime);
       const data = [frameno, g2g];
-      const info = {frameno: frameno, fps: fps, time: time, g2g: g2g, mediaTime: mediaTime, captureTime: captureTime, expectedDisplayTime: expectedDisplayTime};
+      const info = {frameno, fps, time, g2g, mediaTime, captureTime, expectedDisplayTime};
       e2e.all.push(data);
       display_metrics.all.push(info);
     }
@@ -174,18 +171,10 @@ function stop() {
   chart2_div.style.display = "initial";
   chart3_div.style.display = "initial";
   chart4_div.style.display = "initial";
-  streamWorker.postMessage({ type: "stop" });
-  if (inputStream) {
-    inputStream.cancel();
-    addToEventLog('inputStream cancelled');
-  }
-  if (outputStream) {
-    outputStream.abort();
-    addToEventLog('outputStream aborted');
-  }
+  worker.postMessage({ type: "stop" });
 }
 
-document.addEventListener('DOMContentLoaded', async function(event) {
+document.addEventListener('DOMContentLoaded', async () => {
   if (stopped) return;
   addToEventLog('DOM Content Loaded');
 
@@ -207,13 +196,13 @@ document.addEventListener('DOMContentLoaded', async function(event) {
   videoSelect.value = track.getSettings().deviceId;
 
   // Create a new worker.
-  streamWorker = new Worker("js/stream_worker.js");
+  worker = new Worker("js/stream_worker.js");
   addToEventLog('Worker created.');
   // Print messages from the worker in the text area.
-  streamWorker.addEventListener('message', function(e) {
+  worker.addEventListener('message', e => {
     let labels = '';
     if (e.data.severity != 'chart'){
-       addToEventLog('Worker msg: ' + e.data.text, e.data.severity);
+      addToEventLog('Worker msg: ' + e.data.text, e.data.severity);
     } else {
       if (e.data.text == '') {
         metrics_report();  // sets e2e.all and display_metrics
@@ -248,7 +237,7 @@ document.addEventListener('DOMContentLoaded', async function(event) {
         title: e.data.label,
       });
     }
-  }, false);
+  });
 
   stopButton.onclick = () => {
     addToEventLog('Stop button clicked.');
@@ -268,32 +257,22 @@ document.addEventListener('DOMContentLoaded', async function(event) {
     rateInput.style.display = "none";
     frameInput.style.display = "none";
     keyInput.style.display = "none";
+    videoSelect.style.display = "none";
     startMedia();
   }
+});
 
-  async function startMedia() {
+async function startMedia() {
+  try {
     if (stopped) return;
     addToEventLog('startMedia called');
     // Collect the bitrate, framerate and keyframe gap
-    const rate = document.getElementById('rate').value;
+    const bitrate = document.getElementById('rate').value;
     const framer = document.getElementById('framer').value;
-    const keygap = document.getElementById('keygap').value;
-
-    // Create a MediaStreamTrackProcessor, which exposes frames from the track
-    // as a ReadableStream of VideoFrames.
-    // Relies on non-standard API in Chrome and polyfills in other browsers
-    // TODO: support standard mediacapture-transform implementations
+    const keyInterval = document.getElementById('keygap').value;
 
     let [track] = inputVideo.srcObject.getVideoTracks();
-    let ts = track.getSettings();
-    const processor = new MediaStreamTrackProcessor({track});
-    inputStream = processor.readable;
-
-    // Create a MediaStreamTrackGenerator, which exposes a track from a
-    // WritableStream of VideoFrames, using non-standard Chrome API
-    const generator = new MediaStreamTrackGenerator({kind: 'video'});
-    outputStream = generator.writable;
-    outputVideo.srcObject = new MediaStream([generator]);
+    const {width, height, frameRate} = track.getSettings();
 
     // Initialize variables
     let paint_count = 0;
@@ -310,7 +289,6 @@ document.addEventListener('DOMContentLoaded', async function(event) {
       metrics_update(metadata);
       outputVideo.requestVideoFrameCallback(recordOutputFrames);
     };
-
     outputVideo.requestVideoFrameCallback(recordOutputFrames);
 
     const recordInputFrames = (now, metadata) => {
@@ -324,34 +302,27 @@ document.addEventListener('DOMContentLoaded', async function(event) {
       metrics_update(metadata);
       inputVideo.requestVideoFrameCallback(recordInputFrames);
     };
-
     inputVideo.requestVideoFrameCallback(recordInputFrames);
 
     //Create video Encoder configuration
-    const vConfig = {
-      keyInterval: keygap,
-      resolutionScale: 1,
-      framerateScale: 1.0,
-    };
-
-    let ssrcArr = new Uint32Array(1);
+    const ssrcArr = new Uint32Array(1);
     window.crypto.getRandomValues(ssrcArr);
-    const ssrc = ssrcArr[0];
-    const framerat = Math.min(framer, ts.frameRate/vConfig.framerateScale) ; 
+    const [ssrc] = ssrcArr;
+    const framerate = Math.min(framer, frameRate);
 
     const config = {
       alpha: "discard",
       latencyMode: latencyPref,
       bitrateMode: bitPref,
       codec: preferredCodec,
-      width: ts.width/vConfig.resolutionScale,
-      height: ts.height/vConfig.resolutionScale,
+      width,
+      height,
       hardwareAcceleration: encHw,
       decHwAcceleration: decHw,
-      bitrate: rate,
-      framerate: framerat, 
-      keyInterval: vConfig.keyInterval,
-      ssrc:  ssrc
+      bitrate,
+      framerate,
+      keyInterval,
+      ssrc
     };
 
     if (mode != "L1T1") {
@@ -388,14 +359,22 @@ document.addEventListener('DOMContentLoaded', async function(event) {
 
     // Collect the WebTransport URL
     const url = document.getElementById('url').value;
-
-    // Transfer the readable stream to the worker, as well as other info from the user interface.
-    // NOTE: transferring frameStream and reading it in the worker is more
-    // efficient than reading frameStream here and transferring VideoFrames individually.
     try {
-      streamWorker.postMessage({ type: "stream", config: config, url: url, streams: {input: inputStream, output: outputStream}}, [inputStream, outputStream]);
-    } catch(e) {
-       addToEventLog(e.name + ": " + e.message, 'fatal');
+      // Transfer track to worker and receive substitute
+      worker.postMessage({type: "track", config, url, track}, [track]);
+      const {data} = await new Promise(r => worker.onmessage = r);
+      track = data.track;
+    } catch (e) {
+      if (e.name != "DataCloneError") throw e;
+      // Non-transferable track. Fall back on non-standard polyfill/API
+      const {readable} = new MediaStreamTrackProcessor({track});
+      track = new MediaStreamTrackGenerator({kind: "video"});
+      const {writable} = track;
+      const streams = {readable, writable};
+      worker.postMessage({type: "stream", config, url, streams}, [readable, writable]);
     }
+    outputVideo.srcObject = new MediaStream([track]);
+  } catch (e) {
+    addToEventLog(e.name + ": " + e.message, 'fatal');
   }
-}, false);
+}
