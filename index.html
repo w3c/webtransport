@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 275834c42, updated Wed Jun 11 14:18:15 2025 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="d98413147f503eedfe4d4d1bc38d39923a3f5eb1" name="revision">
+  <meta content="8aa501358e36fb85ae7752cbee32279b3e8f1272" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -1041,39 +1041,18 @@ like the server to use in this session, in preference order, following <a data-l
 <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09#section-3.1">Section 3.1</a>.
 When establishing a session, the client MUST NOT provide any <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#credentials" id="ref-for-credentials">credentials</a>.
 The resulting underlying transport stream is referred to as the session’s <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="connect-stream">CONNECT stream</dfn>.</p>
-   <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session④">WebTransport session</a> <var>session</var> is <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-draining">draining</dfn> when the
-<a data-link-type="dfn" href="#connect-stream" id="ref-for-connect-stream">CONNECT stream</a> receives a <a data-link-type="dfn" href="#session-signal-wt_drain_session" id="ref-for-session-signal-wt_drain_session">WT_DRAIN_SESSION</a> capsule, or when a
-<a data-link-type="dfn" href="#session-signal-goaway" id="ref-for-session-signal-goaway">GOAWAY</a> frame is received, as described in <a data-link-type="biblio" href="#biblio-web-transport-overview" title="WebTransport Protocol Framework">[WEB-TRANSPORT-OVERVIEW]</a>
+   <p>To <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-drain">drain</dfn> a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session④">WebTransport session</a> <var>session</var>, follow <a data-link-type="biblio" href="#biblio-web-transport-overview" title="WebTransport Protocol Framework">[WEB-TRANSPORT-OVERVIEW]</a>
 <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1">Section 4.1</a>.</p>
-   <p>To <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminate">terminate</dfn> a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑤">WebTransport session</a> <var>session</var> with an optional integer
+   <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑤">WebTransport session</a> <var>session</var> is <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-draining">draining</dfn> when the <a data-link-type="dfn" href="#connect-stream" id="ref-for-connect-stream">CONNECT stream</a> is
+asked to gracefully close by the server, as described in <a data-link-type="biblio" href="#biblio-web-transport-overview" title="WebTransport Protocol Framework">[WEB-TRANSPORT-OVERVIEW]</a>
+<a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1">Section 4.1</a>.</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminate">terminate</dfn> a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑥">WebTransport session</a> <var>session</var> with an optional integer
 <var>code</var> and an optional <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence">byte sequence</a> <var>reason</var>, follow <a data-link-type="biblio" href="#biblio-web-transport-overview" title="WebTransport Protocol Framework">[WEB-TRANSPORT-OVERVIEW]</a>
 <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-2.2.1">Section 4.1</a>.</p>
-   <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑥">WebTransport session</a> <var>session</var> is <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminated">terminated</dfn>, with optionally
+   <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑦">WebTransport session</a> <var>session</var> is <dfn class="dfn-paneled" data-dfn-for="session" data-dfn-type="dfn" data-noexport id="session-terminated">terminated</dfn>, with optionally
 an integer <var>code</var> and a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence①">byte sequence</a> <var>reason</var>, when the <a data-link-type="dfn" href="#connect-stream" id="ref-for-connect-stream①">CONNECT stream</a> is closed by the server,
 as described at <a data-link-type="biblio" href="#biblio-web-transport-overview" title="WebTransport Protocol Framework">[WEB-TRANSPORT-OVERVIEW]</a>
 <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-4.2.1">Section 4.1</a>.</p>
-   <p>A <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑦">WebTransport session</a> has the following signals:</p>
-   <table class="data">
-    <thead>
-     <tr>
-      <th>event
-   
-      <th>definition
-  
-    <tbody>
-     <tr>
-      <td><dfn class="dfn-paneled" data-dfn-for="session-signal" data-dfn-type="dfn" data-noexport id="session-signal-wt_drain_session">WT_DRAIN_SESSION</dfn>
-   
-      <td><a data-link-type="biblio" href="#biblio-web-transport-overview" title="WebTransport Protocol Framework">[WEB-TRANSPORT-OVERVIEW]</a>
-   <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1">Section 4.1</a>
-  
-     <tr>
-      <td><dfn class="dfn-paneled" data-dfn-for="session-signal" data-dfn-type="dfn" data-noexport id="session-signal-goaway">GOAWAY</dfn>
-   
-      <td><a data-link-type="biblio" href="#biblio-web-transport-overview" title="WebTransport Protocol Framework">[WEB-TRANSPORT-OVERVIEW]</a>
-   <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1">Section 4.1</a>
-  
-   </table>
    <h3 class="heading settled" data-level="3.2" id="webtransport-stream"><span class="secno">3.2. </span><span class="content">WebTransport stream</span><a class="self-link" href="#webtransport-stream"></a></h3>
    <p>A <dfn class="dfn-paneled" data-dfn-for="protocol" data-dfn-type="dfn" data-noexport id="protocol-webtransport-stream">WebTransport stream</dfn> is a concept for a reliable in-order stream of
 bytes on a <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session⑧">WebTransport session</a>, as described in <a data-link-type="biblio" href="#biblio-web-transport-overview" title="WebTransport Protocol Framework">[WEB-TRANSPORT-OVERVIEW]</a>
@@ -1880,8 +1859,7 @@ defined in <a data-link-type="biblio" href="#biblio-web-transport-overview" titl
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-draining-slot"><code>[[Draining]]</code></dfn>
    
       <td class="non-normative">A promise fulfilled when the associated <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session①⓪">WebTransport session</a>
-   receives a <a data-link-type="dfn" href="#session-signal-wt_drain_session" id="ref-for-session-signal-wt_drain_session①">WT_DRAIN_SESSION</a> capsule or a
-   <a data-link-type="dfn" href="#session-signal-goaway" id="ref-for-session-signal-goaway①">GOAWAY</a> frame.
+   is <a data-link-type="dfn" href="#session-draining" id="ref-for-session-draining">drained</a>.
   
      <tr>
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="attribute" data-export id="dom-webtransport-datagrams-slot"><code>[[Datagrams]]</code></dfn>
@@ -4173,7 +4151,7 @@ not be immediate due to buffering.</p>
       <th>API Effect
     <tbody>
      <tr>
-      <td>received <a data-link-type="dfn" href="#session-signal-wt_drain_session" id="ref-for-session-signal-wt_drain_session②">WT_DRAIN_SESSION</a>
+      <td>Session <a data-link-type="dfn" href="#session-draining" id="ref-for-session-draining①">drained</a>
       <td>await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-draining" id="ref-for-dom-webtransport-draining③">draining</a></code>
    </table>
    <p>If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑨">underlying connection</a> is using HTTP/3, the following protocol behaviors
@@ -4272,7 +4250,7 @@ application, the RESET_STREAM signal can be suppressed.</p>
       <th>API Effect
     <tbody>
      <tr>
-      <td>received <a data-link-type="dfn" href="#session-signal-goaway" id="ref-for-session-signal-goaway②">GOAWAY</a>
+      <td>Session <a data-link-type="dfn" href="#session-draining" id="ref-for-session-draining②">drained</a>
       <td>await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-draining" id="ref-for-dom-webtransport-draining④">draining</a></code>
    </table>
    <p>If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②⓪">underlying connection</a> is using HTTP/2, the following protocol behaviors
@@ -4351,7 +4329,7 @@ code does not need to be converted to an HTTP error code, and vice versa.</p>
       <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed⑦">closed</a></code>) rejects, and
           <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error①①">errors</a> open streams
      <tr>
-      <td>received <a data-link-type="dfn" href="#session-signal-goaway" id="ref-for-session-signal-goaway③">GOAWAY</a>
+      <td>Session <a data-link-type="dfn" href="#session-draining" id="ref-for-session-draining③">drained</a>
       <td>await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-draining" id="ref-for-dom-webtransport-draining⑤">draining</a></code>
    </table>
    <h2 class="heading settled" data-level="14" id="privacy-security"><span class="secno">14. </span><span class="content">Privacy and Security Considerations</span><a class="self-link" href="#privacy-security"></a></h2>
@@ -4978,6 +4956,7 @@ and has been adapted for use in this specification.</p>
      <li><a href="#dom-webtransportconnectionstats-datagrams">dict-member for WebTransportConnectionStats</a><span>, in § 6.13</span>
     </ul>
    <li><a href="#dom-webtransportcongestioncontrol-default">"default"</a><span>, in § 6.9</span>
+   <li><a href="#session-drain">drain</a><span>, in § 3.1</span>
    <li><a href="#dom-webtransport-draining-slot">[[Draining]]</a><span>, in § 6.1</span>
    <li>
     draining
@@ -5002,7 +4981,6 @@ and has been adapted for use in this specification.</p>
      <li><a href="#dom-webtransportsendstream-getstats">method for WebTransportSendStream</a><span>, in § 7.2</span>
     </ul>
    <li><a href="#dom-webtransportsendstream-getwriter">getWriter()</a><span>, in § 7.2</span>
-   <li><a href="#session-signal-goaway">GOAWAY</a><span>, in § 3.1</span>
    <li><a href="#grouped">grouped</a><span>, in § 8</span>
    <li><a href="#dom-webtransport-incomingbidirectionalstreams-slot">[[IncomingBidirectionalStreams]]</a><span>, in § 6.1</span>
    <li><a href="#dom-webtransport-incomingbidirectionalstreams">incomingBidirectionalStreams</a><span>, in § 6.3</span>
@@ -5183,7 +5161,6 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-webtransportdatagramduplexstream-writables-slot">[[Writables]]</a><span>, in § 5.1</span>
    <li><a href="#webtransportsendstream-write">write</a><span>, in § 7.4</span>
    <li><a href="#writedatagrams">writeDatagrams</a><span>, in § 4.3</span>
-   <li><a href="#session-signal-wt_drain_session">WT_DRAIN_SESSION</a><span>, in § 3.1</span>
   </ul>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
   <ul class="index">
@@ -6169,14 +6146,13 @@ let dfnPanelData = {
 "senddatagrams": {"dfnID":"senddatagrams","dfnText":"sendDatagrams","external":false,"refSections":[{"refs":[{"id":"ref-for-senddatagrams"}],"title":"4.3. Procedures"}],"url":"#senddatagrams"},
 "session-create-a-bidirectional-stream": {"dfnID":"session-create-a-bidirectional-stream","dfnText":"create a bidirectional stream","external":false,"refSections":[{"refs":[{"id":"ref-for-session-create-a-bidirectional-stream"}],"title":"6.4. Methods"}],"url":"#session-create-a-bidirectional-stream"},
 "session-create-an-outgoing-unidirectional-stream": {"dfnID":"session-create-an-outgoing-unidirectional-stream","dfnText":"create an outgoing unidirectional stream","external":false,"refSections":[{"refs":[{"id":"ref-for-session-create-an-outgoing-unidirectional-stream"}],"title":"6.4. Methods"}],"url":"#session-create-an-outgoing-unidirectional-stream"},
-"session-draining": {"dfnID":"session-draining","dfnText":"draining","external":false,"refSections":[],"url":"#session-draining"},
+"session-drain": {"dfnID":"session-drain","dfnText":"drain","external":false,"refSections":[],"url":"#session-drain"},
+"session-draining": {"dfnID":"session-draining","dfnText":"draining","external":false,"refSections":[{"refs":[{"id":"ref-for-session-draining"}],"title":"6.1. Internal slots"},{"refs":[{"id":"ref-for-session-draining\u2460"},{"id":"ref-for-session-draining\u2461"},{"id":"ref-for-session-draining\u2462"}],"title":"13. Protocol Mappings"}],"url":"#session-draining"},
 "session-establish": {"dfnID":"session-establish","dfnText":"establish","external":false,"refSections":[{"refs":[{"id":"ref-for-session-establish"},{"id":"ref-for-session-establish\u2460"}],"title":"6.1. Internal slots"},{"refs":[{"id":"ref-for-session-establish\u2461"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-session-establish\u2462"}],"title":"6.8. Garbage Collection"}],"url":"#session-establish"},
 "session-receive-a-bidirectional-stream": {"dfnID":"session-receive-a-bidirectional-stream","dfnText":"receive a bidirectional stream","external":false,"refSections":[{"refs":[{"id":"ref-for-session-receive-a-bidirectional-stream"},{"id":"ref-for-session-receive-a-bidirectional-stream\u2460"}],"title":"6.2. Constructor"}],"url":"#session-receive-a-bidirectional-stream"},
 "session-receive-a-datagram": {"dfnID":"session-receive-a-datagram","dfnText":"receive a datagram","external":false,"refSections":[{"refs":[{"id":"ref-for-session-receive-a-datagram"},{"id":"ref-for-session-receive-a-datagram\u2460"}],"title":"5.4. Procedures"}],"url":"#session-receive-a-datagram"},
 "session-receive-an-incoming-unidirectional-stream": {"dfnID":"session-receive-an-incoming-unidirectional-stream","dfnText":"receive an incoming unidirectional stream","external":false,"refSections":[{"refs":[{"id":"ref-for-session-receive-an-incoming-unidirectional-stream"},{"id":"ref-for-session-receive-an-incoming-unidirectional-stream\u2460"}],"title":"6.2. Constructor"}],"url":"#session-receive-an-incoming-unidirectional-stream"},
 "session-send-a-datagram": {"dfnID":"session-send-a-datagram","dfnText":"send a datagram","external":false,"refSections":[{"refs":[{"id":"ref-for-session-send-a-datagram"}],"title":"4. WebTransportDatagramsWritable Interface"},{"refs":[{"id":"ref-for-session-send-a-datagram\u2460"}],"title":"4.3. Procedures"}],"url":"#session-send-a-datagram"},
-"session-signal-goaway": {"dfnID":"session-signal-goaway","dfnText":"GOAWAY","external":false,"refSections":[{"refs":[{"id":"ref-for-session-signal-goaway"}],"title":"3.1. WebTransport session"},{"refs":[{"id":"ref-for-session-signal-goaway\u2460"}],"title":"6.1. Internal slots"},{"refs":[{"id":"ref-for-session-signal-goaway\u2461"},{"id":"ref-for-session-signal-goaway\u2462"}],"title":"13. Protocol Mappings"}],"url":"#session-signal-goaway"},
-"session-signal-wt_drain_session": {"dfnID":"session-signal-wt_drain_session","dfnText":"WT_DRAIN_SESSION","external":false,"refSections":[{"refs":[{"id":"ref-for-session-signal-wt_drain_session"}],"title":"3.1. WebTransport session"},{"refs":[{"id":"ref-for-session-signal-wt_drain_session\u2460"}],"title":"6.1. Internal slots"},{"refs":[{"id":"ref-for-session-signal-wt_drain_session\u2461"}],"title":"13. Protocol Mappings"}],"url":"#session-signal-wt_drain_session"},
 "session-terminate": {"dfnID":"session-terminate","dfnText":"terminate","external":false,"refSections":[{"refs":[{"id":"ref-for-session-terminate"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-session-terminate\u2460"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-session-terminate\u2461"}],"title":"6.7. Context cleanup steps"},{"refs":[{"id":"ref-for-session-terminate\u2462"},{"id":"ref-for-session-terminate\u2463"}],"title":"13. Protocol Mappings"}],"url":"#session-terminate"},
 "session-terminated": {"dfnID":"session-terminated","dfnText":"terminated","external":false,"refSections":[{"refs":[{"id":"ref-for-session-terminated"}],"title":"6.6. Session termination not initiated by the client"},{"refs":[{"id":"ref-for-session-terminated\u2460"},{"id":"ref-for-session-terminated\u2461"}],"title":"13. Protocol Mappings"}],"url":"#session-terminated"},
 "stream-bidirectional": {"dfnID":"stream-bidirectional","dfnText":"bidirectional","external":false,"refSections":[{"refs":[{"id":"ref-for-stream-bidirectional"},{"id":"ref-for-stream-bidirectional\u2460"}],"title":"3.1. WebTransport session"},{"refs":[{"id":"ref-for-stream-bidirectional\u2461"},{"id":"ref-for-stream-bidirectional\u2462"}],"title":"3.2. WebTransport stream"},{"refs":[{"id":"ref-for-stream-bidirectional\u2463"}],"title":"6.1. Internal slots"},{"refs":[{"id":"ref-for-stream-bidirectional\u2464"}],"title":"6.3. Attributes"},{"refs":[{"id":"ref-for-stream-bidirectional\u2465"},{"id":"ref-for-stream-bidirectional\u2466"}],"title":"6.9. Configuration"},{"refs":[{"id":"ref-for-stream-bidirectional\u2467"}],"title":"7. Interface WebTransportSendStream"},{"refs":[{"id":"ref-for-stream-bidirectional\u2468"}],"title":"7.3. Internal Slots"},{"refs":[{"id":"ref-for-stream-bidirectional\u2460\u24ea"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-stream-bidirectional\u2460\u2460"}],"title":"9. Interface WebTransportReceiveStream"},{"refs":[{"id":"ref-for-stream-bidirectional\u2460\u2461"}],"title":"9.2. Internal Slots"},{"refs":[{"id":"ref-for-stream-bidirectional\u2460\u2462"}],"title":"9.3. Procedures"},{"refs":[{"id":"ref-for-stream-bidirectional\u2460\u2463"}],"title":"10.3. Procedures"}],"url":"#stream-bidirectional"},
@@ -6760,13 +6736,12 @@ let refsData = {
 "#senddatagrams": {"displayText":"senddatagrams","export":true,"for_":[],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"senddatagrams","type":"dfn","url":"#senddatagrams"},
 "#session-create-a-bidirectional-stream": {"displayText":"create a bidirectional stream","export":true,"for_":["session"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"create a bidirectional stream","type":"dfn","url":"#session-create-a-bidirectional-stream"},
 "#session-create-an-outgoing-unidirectional-stream": {"displayText":"create an outgoing unidirectional stream","export":true,"for_":["session"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"create an outgoing unidirectional stream","type":"dfn","url":"#session-create-an-outgoing-unidirectional-stream"},
+"#session-draining": {"displayText":"draining","export":true,"for_":["session"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"draining","type":"dfn","url":"#session-draining"},
 "#session-establish": {"displayText":"establish","export":true,"for_":["session"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"establish","type":"dfn","url":"#session-establish"},
 "#session-receive-a-bidirectional-stream": {"displayText":"receive a bidirectional stream","export":true,"for_":["session"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"receive a bidirectional stream","type":"dfn","url":"#session-receive-a-bidirectional-stream"},
 "#session-receive-a-datagram": {"displayText":"receive a datagram","export":true,"for_":["session"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"receive a datagram","type":"dfn","url":"#session-receive-a-datagram"},
 "#session-receive-an-incoming-unidirectional-stream": {"displayText":"receive an incoming unidirectional stream","export":true,"for_":["session"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"receive an incoming unidirectional stream","type":"dfn","url":"#session-receive-an-incoming-unidirectional-stream"},
 "#session-send-a-datagram": {"displayText":"send a datagram","export":true,"for_":["session"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"send a datagram","type":"dfn","url":"#session-send-a-datagram"},
-"#session-signal-goaway": {"displayText":"goaway","export":true,"for_":["session-signal"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"goaway","type":"dfn","url":"#session-signal-goaway"},
-"#session-signal-wt_drain_session": {"displayText":"wt_drain_session","export":true,"for_":["session-signal"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"wt_drain_session","type":"dfn","url":"#session-signal-wt_drain_session"},
 "#session-terminate": {"displayText":"terminate","export":true,"for_":["session"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"terminate","type":"dfn","url":"#session-terminate"},
 "#session-terminated": {"displayText":"terminated","export":true,"for_":["session"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"terminated","type":"dfn","url":"#session-terminated"},
 "#stream-bidirectional": {"displayText":"bidirectional","export":true,"for_":["stream"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"bidirectional","type":"dfn","url":"#stream-bidirectional"},
