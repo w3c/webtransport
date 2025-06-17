@@ -197,9 +197,11 @@ like the server to use in this session, in preference order, following [[!WEB-TR
 When establishing a session, the client MUST NOT provide any [=credentials=].
 The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
 
-A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the
-[=CONNECT stream=] receives a [=session-signal/WT_DRAIN_SESSION=] capsule, or when a
-[=session-signal/GOAWAY=] frame is received, as described in [[!WEB-TRANSPORT-OVERVIEW]]
+To <dfn for=session>drain</dfn> a [=WebTransport session=] |session|, follow [[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1).
+
+A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the [=CONNECT stream=] is
+asked to gracefully close by the server, as described in [[!WEB-TRANSPORT-OVERVIEW]]
 [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1).
 
 To <dfn for=session>terminate</dfn> a [=WebTransport session=] |session| with an optional integer
@@ -210,29 +212,6 @@ A [=WebTransport session=] |session| is <dfn for=session>terminated</dfn>, with 
 an integer |code| and a [=byte sequence=] |reason|, when the [=CONNECT stream=] is closed by the server,
 as described at [[!WEB-TRANSPORT-OVERVIEW]]
 [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.1-4.2.1).
-
-A [=WebTransport session=] has the following signals:
-
-<table class="data" dfn-for="session-signal">
- <thead>
-  <tr>
-   <th>event
-   <th>definition
-  </tr>
- </thead>
- <tbody>
-  <tr>
-   <td><dfn>WT_DRAIN_SESSION</dfn>
-   <td>[[!WEB-TRANSPORT-OVERVIEW]]
-   [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1)
-  </tr>
-  <tr>
-   <td><dfn>GOAWAY</dfn>
-   <td>[[!WEB-TRANSPORT-OVERVIEW]]
-   [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1)
-  </tr>
- </tbody>
-</table>
 
 ## WebTransport stream ## {#webtransport-stream}
 
@@ -829,8 +808,7 @@ A {{WebTransport}} object has the following internal slots.
   <tr>
    <td><dfn>`[[Draining]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated [=WebTransport session=]
-   receives a [=session-signal/WT_DRAIN_SESSION=] capsule or a
-   [=session-signal/GOAWAY=] frame.
+   is [=session/draining|drained=].
   </tr>
   <tr>
    <td><dfn>`[[Datagrams]]`</dfn>
@@ -2644,7 +2622,7 @@ not be immediate due to buffering.
     </thead>
     <tbody>
       <tr>
-        <td>received [=session-signal/WT_DRAIN_SESSION=]</td>
+        <td>Session [=session/draining|drained=]</td>
         <td>await wt.{{WebTransport/draining}}</td>
       </tr>
     </tbody>
@@ -2764,7 +2742,7 @@ application, the RESET_STREAM signal can be suppressed.
     </thead>
     <tbody>
       <tr>
-        <td>received [=session-signal/GOAWAY=]</td>
+        <td>Session [=session/draining|drained=]</td>
         <td>await wt.{{WebTransport/draining}}</td>
       </tr>
     </tbody>
@@ -2861,7 +2839,7 @@ code does not need to be converted to an HTTP error code, and vice versa.
           [=ReadableStream/error|errors=] open streams</td>
       </tr>
       <tr>
-        <td>received [=session-signal/GOAWAY=]</td>
+        <td>Session [=session/draining|drained=]</td>
         <td>await wt.{{WebTransport/draining}}</td>
       </tr>
     </tbody>
