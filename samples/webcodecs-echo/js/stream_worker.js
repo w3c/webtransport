@@ -356,28 +356,65 @@ async function writeChunk(transport, chunk, rto, info) {
 }
 
 async function readInto(reader, buffer, offset) {
-  let off = offset;
-  while (off < buffer.byteLength) {
+  let i = offset;
+  while (i < buffer.byteLength) {
     const {value: view, done} =
-     await reader.read(new Uint8Array(buffer, off, buffer.byteLength - off));
+      await reader.read(new Uint8Array(buffer, i, buffer.byteLength - i));
     buffer = view.buffer;
-    if (done) {
-      break;
-    }
-    off += view.byteLength;
+    if (done) break;
+    i += view.byteLength;
   }
-  return Promise.resolve(buffer);
+  return buffer;
+}
+
+// Version that works with either byob or default reader:
+// TODO: remove once Safari supports byte streams in WebTransport
+
+async function readIntoAny(reader, buffer, offset = 0) {
+  let i = offset;
+  const byob = reader.read.length;
+  let stash = reader._stash;
+  if (stash) {
+    const n = Math.min(stash.byteLength, buffer.byteLength - i);
+    new Uint8Array(buffer, i, n).set(stash.subarray(0, n));
+    i += n;
+    stash = n < stash.byteLength ? stash.subarray(n) : null;
+  }
+  while (i < buffer.byteLength) {
+    const view = byob && new Uint8Array(buffer, i, buffer.byteLength - i);
+    const {value, done} = await reader.read(view);
+    if (byob) buffer = value.buffer;
+    if (done) break;
+    if (byob) {
+      i += value.byteLength;
+    } else {
+      const n = Math.min(value.byteLength, buffer.byteLength - i);
+      new Uint8Array(buffer, i, n).set(value.subarray(0, n));
+      i += n;
+      if (n < value.byteLength) {
+        stash = value.slice(n);
+        break;
+      }
+    }
+  }
+  reader._stash = stash;
+  return buffer;
 }
 
 async function get_frame(readable, number) {
   let packlen, totalen = 0, frame, header, sendTime, seqno;
   let hdr = new ArrayBuffer(HEADER_LENGTH);
-  let reader = readable.getReader({mode: "byob"}); 
+  let reader;
   try {
-    header = new Uint8Array(await readInto(reader, hdr, 0));
+    reader = readable.getReader({mode: "byob"});
+  } catch (e) {
+    reader = readable.getReader(); // safari
+  }
+  try {
+    header = new Uint8Array(await readIntoAny(reader, hdr, 0));
   } catch (e) {
     reader.releaseLock();
-    self.PostMessage({text: `Couldn't read frame header from stream# ${number}: ${e.message}`});
+    self.postMessage({text: `Couldn't read frame header from stream# ${number}: ${e.message}`});
     return Promise.reject(e);
   }
   packlen = (header[0] << 24) | (header[1] << 16) | (header[2] << 8) | (header[3] << 0);
@@ -395,7 +432,7 @@ async function get_frame(readable, number) {
   totalen = HEADER_LENGTH;
   //self.postMessage({text: 'sendTime: ' + sendTime/1000. + ' seqno: ' + seqno + ' len: ' + packlen});
   try {
-    frame = await readInto(reader, frame.buffer, totalen);
+    frame = await readIntoAny(reader, frame.buffer, totalen);
   } catch (e) {
     reader.releaseLock();
     self.postMessage({text: `readInto failed: ${e.message}`});
@@ -437,17 +474,20 @@ function readUInt64(arr, pos) {
   return Number(view.getBigUint64(pos, false)); //Big-endian
 };
 
-self.addEventListener('message', async function(e) {
+self.addEventListener('message', async ({data}) => {
   if (stopped) return;
-  // In this demo, we expect at most two messages, one of each type.
-  let type = e.data.type;
-  let transport;
-
+  const {type} = data;
   if (type == "stop") {
     self.postMessage({text: 'Stop message received.'});
     if (started) pl.stop();
     return;
-  } else if (type != "stream"){
+  } else if (type == "track") {
+    const generator = new VideoTrackGenerator();
+    self.postMessage({track: generator.track}, [generator.track]);
+    const {writable} = generator;
+    const {readable} = new MediaStreamTrackProcessor({track: data.track});
+    data.streams = {readable, writable};
+  } else if (type != "stream") {
     self.postMessage({severity: 'fatal', text: 'Invalid message received.'});
     return;
   }
@@ -455,8 +495,9 @@ self.addEventListener('message', async function(e) {
   self.postMessage({text: 'Stream event received.'});
 
   // Create WebTransport
+  let transport;
   try {
-    transport = new WebTransport(e.data.url);
+    transport = new WebTransport(data.url);
     self.postMessage({text: 'Initiating connection...'});
   } catch (e) {
     self.postMessage({severity: 'fatal', text: `Failed to create connection object: ${e.message}`});
@@ -466,7 +507,7 @@ self.addEventListener('message', async function(e) {
   try {
     await transport.ready;
     self.postMessage({text: 'Connection ready.'});
-    pl = new pipeline(e.data, transport);
+    pl = new pipeline(data, transport);
     pl.start();
   } catch (e) {
     self.postMessage({severity: 'fatal', text: `Connection failed: ${e.message}`});
@@ -482,16 +523,16 @@ self.addEventListener('message', async function(e) {
     return;
   }
 
-}, false);
+});
 
 class pipeline {
 
-   constructor(eventData, transport) {
+   constructor({streams, config}, transport) {
      this.stopped = false;
      this.transport = transport;
-     this.inputStream = eventData.streams.input;
-     this.outputStream = eventData.streams.output;
-     this.config = eventData.config;
+     this.inputStream = streams.readable;
+     this.outputStream = streams.writable;
+     this.config = config;
    }
 
 /*
@@ -890,28 +931,20 @@ SSRC = this.config.ssrc
          this.streamNumber = 0;
          this.reader = transport.incomingUnidirectionalStreams.getReader();
        },
-       pull(controller) {
-         this.reader.read().then(({value, done}) => {
-           if (done) {
-             this.reader.releaseLock();
-             self.postMessage({text: 'Done accepting unidirectional streams'});
-             controller.close();
-             return;
-           } 
-           let number = this.streamNumber++;
-           //self.postMessage({text: 'New incoming stream # ' + number});
-           get_frame(value, number).then(
-             (frame) => {
-               if (frame) {
-                 controller.enqueue(frame);
-               }
-             }
-           ).catch((e) => {
-               this.reader.releaseLock();
-               self.postMessage({severity: 'fatal', text: `Unable to open reader# ${number}: ${e.messsage}`});
-               return;
-           });
-         });
+       async pull(controller) {
+         const {value, done} = await this.reader.read();
+         if (done) {
+           this.reader.releaseLock();
+           self.postMessage({text: 'Done accepting unidirectional streams'});
+           controller.close();
+           return;
+         }
+         let number = this.streamNumber++;
+         //self.postMessage({text: 'New incoming stream # ' + number});
+         const frame = await get_frame(value, number);
+         if (frame) {
+           controller.enqueue(frame);
+         }
        },
        cancel(reason){
          // called when cancel(reason) is called
@@ -922,35 +955,20 @@ SSRC = this.config.ssrc
      });
    }
 
-   start() {
+   async start() {
      if (stopped) return;
      started = true;
      self.postMessage({text: 'Start method called.'});
      const promise1 =  this.inputStream
           .pipeThrough(this.EncodeVideoStream(self,this.config))
           .pipeThrough(this.Serialize(self,this.config))
-          .pipeTo(this.createSendStream(self,this.transport)).then(
-            () =>  {
-              Promise.resolve('Receive pipeline ');
-           }).catch((e) => {
-             Promise.reject(e);
-           });
+          .pipeTo(this.createSendStream(self,this.transport));
      const promise2 =  this.createReceiveStream(self,this.transport)
           .pipeThrough(this.Deserialize(self))
           .pipeThrough(this.DecodeVideoStream(self))
-          .pipeTo(this.outputStream).then(
-            () =>  {
-              Promise.resolve('Send pipeline ');
-            }
-          ).catch((e) => {
-            Promise.reject(e);
-          });
-     Promise.all([promise1, promise2]).then(
-       (values) => { self.postMessage({text: 'Resolutions: ' + JSON.stringify(values)});
-       }
-       ).catch((e) => { 
-         self.postMessage({severity: 'fatal', text: `pipeline error: ${e.message}`}); 
-       });
+          .pipeTo(this.outputStream);
+     await Promise.all([promise1, promise2]);
+     self.postMessage({text: 'Resolved'});
    }
 
    stop() {
