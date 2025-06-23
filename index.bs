@@ -1573,7 +1573,7 @@ to provide an interoperable default.  It MUST NOT contain RSA keys
 
 The <dfn dictionary>WebTransportCloseInfo</dfn> dictionary includes information
 used to set the error code and reason when [=session/terminate|terminating=]
-the {{WebTransport session}}.
+a [=WebTransport session=].
 
 <pre class="idl">
 dictionary WebTransportCloseInfo {
@@ -2013,7 +2013,7 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
    [[!WEB-TRANSPORT-HTTP3]].
 
 1. Run the following steps [=in parallel=]:
-  1. [=stream/Reset=] |stream|.{{WebTransportSendStream/[[InternalStream]]}} with |code|.
+  1. [=stream/Abort sending=] on |stream|.{{WebTransportSendStream/[[InternalStream]]}} with |code|.
   1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
 1. Return |promise|.
 
