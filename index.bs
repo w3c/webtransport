@@ -2008,14 +2008,16 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
    null, then set |code| to |reason|.{{WebTransportError/[[StreamErrorCode]]}}.
 1. If |code| < 0, then set |code| to 0.
 1. If |code| > 4294967295, then set |code| to 4294967295.
+1. Let |committedOffset| be |stream|.{{WebTransportSendStream/[[CommittedOffset]]}}.
 
    Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
    using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
    [[!WEB-TRANSPORT-HTTP3]].
 
 1. Run the following steps [=in parallel=]:
-  1. [=stream/Reset=] |stream|.{{WebTransportSendStream/[[InternalStream]]}} with |code|.
-  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+  1.  [=stream/Reset=] |stream|.{{WebTransportSendStream/[[InternalStream]]}}
+      with |code| and |committedOffset|.
+  1.  [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
 1. Return |promise|.
 
 </div>
