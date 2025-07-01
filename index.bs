@@ -422,33 +422,38 @@ timestamp and the expiration duration work well only when the web developer pays
 <div algorithm>
 
 To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport| and a
-{{WebTransportDatagramsWritable}} object |writable|, run these steps:
-1. Let |queue| be |writable|.{{[[OutgoingDatagramsQueue]]}}.
-1. Let |datagrams| be |transport|.{{[[Datagrams]]}}.
-1. Let |duration| be |datagrams|.{{[[OutgoingDatagramsExpirationDuration]]}}.
+{{WebTransportDatagramsWritable}} object |writable|, [=queue a network task=]
+with |transport| to run the following steps:
+1. Let |queue| be a copy of |writable|.{{[[OutgoingDatagramsQueue]]}}.
+
+   Note: The above copy, as well as the queueing of a network task to run these steps, can be optimized.
+
+1. Let |maxSize| be |transport|.{{[[Datagrams]]}}.{{[[OutgoingMaxDatagramSize]]}}.
+1. Let |duration| be |transport|.{{[[Datagrams]]}}.{{[[OutgoingDatagramsExpirationDuration]]}}.
 1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
-1. While |queue| is not empty:
-  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-  1. If more than |duration| milliseconds have passed since |timestamp|, then:
-     1. Remove the first element from |queue|.
-     1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
-  1. Otherwise, break this loop.
-1. If |transport|.{{[[State]]}} is not `"connected"`, then return.
-1. Let |maxSize| be |datagrams|.{{[[OutgoingMaxDatagramSize]]}}.
-1. While |queue| is not empty:
-  1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-  1. If |bytes|'s length ≤ |maxSize|:
-    1. If it is not possible to send |bytes| to the network immediately, then break this loop.
-    1. [=session/Send a datagram=], with |transport|.{{[[Session]]}} and |bytes|.
-  1. Remove the first element from |queue|.
-  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+1. Run the following steps [=in parallel=]:
+  1. While |queue| is not empty:
+    1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
+    1. If more than |duration| milliseconds have passed since |timestamp|, then:
+       1. Remove the first element from |queue|.
+       1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+    1. Otherwise, break this loop.
+  1. If |transport|.{{[[State]]}} is not `"connected"`, then return.
+  1. While |queue| is not empty:
+    1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
+    1. If |bytes|'s length ≤ |maxSize|:
+      1. If it is not possible to send |bytes| to the network immediately, then break this loop.
+      1. [=session/Send a datagram=], with |transport|.{{[[Session]]}} and |bytes|.
+    1. Remove the first element from |queue|.
+    1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
 
 </div>
 
-The user agent SHOULD run [=sendDatagrams=] for any {{WebTransport}} object whose
-{{[[State]]}} is `"connecting"` or `"connected"` as soon as reasonably possible on a
-subset, based on [=send-order rules=], of its associated {{WebTransportDatagramsWritable}}
-objects whenever the algorithm can make progress.
+The user agent MUST, for any {{WebTransport}} object whose
+{{[[State]]}} is `"connecting"` or `"connected"`, occcasionally run [=sendDatagrams=] on a
+subset (determined by [=send-order rules=]) of its associated {{WebTransportDatagramsWritable}}
+objects, and SHOULD do so as soon as reasonably possible whenever the
+algorithm can make progress.
 
 The <dfn>send-order rules</dfn> are that sending in general MAY be interleaved with
 sending of previously queued streams and datagrams, as well as streams and datagrams
