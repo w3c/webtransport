@@ -39,6 +39,13 @@ Boilerplate: omit conformance
     "status": "Proposed Standard",
     "publisher": "IETF"
   },
+  "reliable-reset": {
+    "authors": ["Marten Seemann", "奥一穂"],
+    "href": "https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset",
+    "title": "QUIC Stream Resets with Partial Delivery",
+    "status": "Internet-Draft",
+    "publisher": "IETF"
+  },
   "web-transport-overview": {
     "authors": ["Victor Vasiliev"],
     "href": "https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview",
@@ -48,14 +55,14 @@ Boilerplate: omit conformance
   },
   "web-transport-http3": {
     "authors": ["Alan Frindell", "Eric Kinnear", "Victor Vasiliev"],
-    "href": "https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/",
+    "href": "https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3",
     "title": "WebTransport over HTTP/3",
     "status": "Internet-Draft",
     "publisher": "IETF"
   },
   "web-transport-http2": {
     "authors": ["Alan Frindell", "Eric Kinnear", "Tommy Pauly", "Martin Thomson", "Victor Vasiliev", "Guowu Xie"],
-    "href": "https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/",
+    "href": "https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2",
     "title": "WebTransport over HTTP/2",
     "status": "Internet-Draft",
     "publisher": "IETF"
@@ -1865,7 +1872,17 @@ A {{WebTransportSendStream}} has the following internal slots.
   <tr>
    <td><dfn>`[[AtomicWriteRequests]]`</dfn>
    <td class="non-normative">An [=ordered set=] of promises, keeping track of the subset of
-    write requests that are atomic among those queued to be processed by the underlying sink.
+   write requests that are atomic among those queued to be processed by the underlying sink.
+  </tr>
+  <tr>
+   <td><dfn>`[[BytesWritten]]`</dfn>
+   <td class="non-normative">The number of bytes that have been written to the stream.
+  </tr>
+  <tr>
+   <td><dfn>`[[CommittedOffset]]`</dfn>
+   <td class="non-normative">An offset in the stream that records the number of bytes
+   that will be delivered to a peer, even when the stream is [=stream/reset=];
+   see [[RELIABLE-RESET]].
   </tr>
  <tbody>
 </table>
@@ -1892,6 +1909,10 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
     :: |sendOrder|
     : {{WebTransportSendStream/[[AtomicWriteRequests]]}}
     :: An empty [=ordered set=] of promises.
+    : {{WebTransportSendStream/[[BytesWritten]]}}
+    :: 0
+    : {{WebTransportSendStream/[[CommittedOffset]]}}
+    :: 0
 1. Let |writeAlgorithm| be an action that [=writes=] |chunk| to |stream|, given |chunk|.
 1. Let |closeAlgorithm| be an action that [=closes=] |stream|.
 1. Let |abortAlgorithm| be an action that [=aborts=] |stream| with |reason|, given |reason|.
@@ -1967,9 +1988,10 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 
   1. Otherwise, [=queue a network task=] with |transport|
      to run these steps:
-    1. Set |stream|.{{[[PendingOperation]]}} to null.
-    1. If |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} [=list/contains=] |inFlightWriteRequest|, [=list/remove=] |inFlightWriteRequest|.
-    1. [=Resolve=] |promise| with undefined.
+    1.  Set |stream|.{{[[PendingOperation]]}} to null.
+    1.  Add the length of |bytes| to |stream|.{{[[BytesWritten]]}}.
+    1.  If |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} [=list/contains=] |inFlightWriteRequest|, [=list/remove=] |inFlightWriteRequest|.
+    1.  [=Resolve=] |promise| with undefined.
 1. Return |promise|.
 
 Note: The [=fulfilled|fulfillment=] of the promise returned from this algorithm (or,
@@ -2355,7 +2377,8 @@ Whenever a [=WebTransport stream=] associated with a {{WebTransportReceiveStream
 [=stream-signal/RESET_STREAM=] signal from the server, run these steps:
 
 1. Let |transport| be |stream|.{{WebTransportReceiveStream/[[Transport]]}}.
-1. Let |code| be the application protocol error code attached to the RESET_STREAM frame. [[!QUIC]]
+1. Let |code| be the application protocol error code attached to the RESET_STREAM_AT or WT_RESET_STREAM frame.
+   [[RELIABLE-RESET]] [[!WEB-TRANSPORT-HTTP2]]
 
    Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
    using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
@@ -2468,7 +2491,7 @@ object |transport|, and a |sendOrder|, run these steps.
 # `WebTransportWriter` Interface #  {#web-transport-writer-interface}
 
 {{WebTransportWriter}} is a subclass of {{WritableStreamDefaultWriter}} that
-adds one method.
+adds two methods.
 
 A {{WebTransportWriter}} is always created by the
 [=WebTransportWriter/create=] procedure.
@@ -2477,6 +2500,7 @@ A {{WebTransportWriter}} is always created by the
 [Exposed=*, SecureContext]
 interface WebTransportWriter : WritableStreamDefaultWriter {
   Promise&lt;undefined&gt; atomicWrite(optional any chunk);
+  undefined commit();
 };
 </pre>
 
@@ -2510,6 +2534,21 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
          [=list/remove=] |p|.
       1. If |p| was rejected with reason |r|, then return [=a promise rejected with=] |r|.
       1. Return undefined.
+
+: <dfn for="WebTransportWriter" method>commit()</dfn>
+:: The {{commit}} method will update the {{WebTransportSendStream/[[CommittedOffset]]}} of a stream
+   to match the number of bytes written to that stream ({{WebTransportSendStream/[[BytesWritten]]}}).
+   This ensures that those bytes will be delivered to a peer reliably,
+   even after writing is [=aborted=], causing the stream to be [=stream/reset=].
+   This uses the mechanism described in [[RELIABLE-RESET]].
+
+   Note: This does not guarantee delivery in the event that a connection fails,
+   only when a stream is [=stream/reset=].
+
+   When {{commit}} is called for |stream|, the user agent MUST run the following steps:
+   1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
+   1. Set |stream|.{{WebTransportSendStream/[[CommittedOffset]]}}
+      to the value of |stream|.{{WebTransportSendStream/[[BytesWritten]]}}.
 
 ## Procedures ##  {#web-transport-writer-procedures}
 
@@ -2662,7 +2701,10 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
     <tbody>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(error)</td>
-        <td>[=stream/Reset|sends RESET_STREAM=] with httpErrorCode</td>
+        <td>[=stream/Reset|sends RESET_STREAM_AT=] with httpErrorCode
+        and an offset that corresponds to the {{WebTransportSendStream/[[CommittedOffset]]}}
+        for the {{WebTransportBidirectionalStream/writable|stream}},
+        plus any stream header; see [[RELIABLE-RESET]]</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/close}}()</td>
@@ -2678,7 +2720,10 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(error)</td>
-        <td>[=stream/Reset|sends RESET_STREAM=] with httpErrorCode</td>
+        <td>[=stream/Reset|sends RESET_STREAM_AT=] with httpErrorCode
+        and an offset that corresponds to the {{WebTransportSendStream/[[CommittedOffset]]}}
+        for the {{WebTransportBidirectionalStream/writable|stream}},
+        plus any stream header; see [[RELIABLE-RESET]]</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(error)</td>
@@ -2738,13 +2783,21 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
     </tbody>
   </table>
 
-Note: As discussed in [[QUIC]] Section 3.2, receipt of a RESET_STREAM
-frame is not always indicated to the application. Receipt of the
-RESET_STREAM can be signaled immediately, interrupting delivery of
-stream data with any data not consumed being discarded. However,
-immediate signaling is not required. Also, if stream data
-is completely received but has not yet been read by the
-application, the RESET_STREAM signal can be suppressed.
+Note: As discussed in [[QUIC#section-3.2|Section 3.2]] of [[QUIC]],
+receipt of a RESET_STREAM frame or RESET_STREAM_AT frame ([[RELIABLE-RESET]])
+is not always indicated to the application.
+Receipt of the reset can be signaled immediately,
+interrupting delivery of stream data with any data not consumed being discarded.
+However, immediate signaling is not required.
+In particular, this signal might be delayed to allow delivery of the data
+indicated by the Reliable Size field in a RESET_STREAM_AT frame.
+If stream data has been completely received
+but has not yet been read by the application,
+the signal can be suppressed.
+WebTransport always uses the RESET_STREAM_AT frame
+to ensure reliable delivery of the stream header;
+see [[WEB-TRANSPORT-HTTP3#section-4.1|Section 4.1]] and [[WEB-TRANSPORT-HTTP3#section-4.2|Section 4.2]]
+of [[WEB-TRANSPORT-HTTP3]].
 
   <table class="data">
     <colgroup class="header"><col></colgroup>
