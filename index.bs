@@ -2554,8 +2554,7 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
 
    When {{commit}} is called for |stream|, the user agent MUST run the following steps:
    1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
-   1. [=Queue a network task=] with |transport|
-      to set |stream|.{{WebTransportSendStream/[[CommittedOffset]]}}
+   1. Set |stream|.{{WebTransportSendStream/[[CommittedOffset]]}}
       to the value of |stream|.{{WebTransportSendStream/[[BytesWritten]]}}.
 
 ## Procedures ##  {#web-transport-writer-procedures}
