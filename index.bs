@@ -1569,6 +1569,9 @@ that determine how the [=WebTransport session=] is established and used.
 : <dfn for="WebTransportOptions" dict-member>datagramsReadableMode</dfn>
 :: Optionally specifies an application's preference for using a default [=readable stream=]
    or [=readable byte stream=] for incoming datagrams.
+   Note: A [=readable byte stream=] can handle bytes more efficiently, in particular by
+   minimizing copies when using a [=BYOB reader=]. However, if zero-length datagrams are
+   required, a default [=readable stream=] should be used.
 
 <div algorithm>
 To <dfn>compute a certificate hash</dfn>, given a |certificate|, perform the following steps:
