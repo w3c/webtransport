@@ -204,9 +204,6 @@ like the server to use in this session, in preference order, following [[!WEB-TR
 When establishing a session, the client MUST NOT provide any [=credentials=].
 The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
 
-To <dfn for=session>drain</dfn> a [=WebTransport session=] |session|, follow [[!WEB-TRANSPORT-OVERVIEW]]
-[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1).
-
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the [=CONNECT stream=] is
 asked to gracefully close by the server, as described in [[!WEB-TRANSPORT-OVERVIEW]]
 [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-4.1).
@@ -1011,8 +1008,8 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
        {{WebTransportErrorOptions/source}} is `"session"`.
     1. [=Cleanup=] |transport| with |error|.
   1. Let |session| be the established [=WebTransport session=].
-  1. Assert: |maxDatagramSize| is an integer.
   1. [=Queue a network task=] with |transport| to run these steps:
+    1. Assert: [=this=]'s {{[[Datagrams]]}}'s {{[[OutgoingMaxDatagramSize]]}} is an integer.
     1. If |transport|.{{[[State]]}} is not `"connecting"`:
       1. [=In parallel=], [=session/terminate=] |session|.
       1. Abort these steps.
@@ -1041,8 +1038,8 @@ these steps.
 1. Let |p| be a new promise.
 1. Run the following steps [=in parallel=]:
   1. Wait until there is an [=session/receive a bidirectional stream|available incoming bidirectional
-     stream=].
-  1. Let |internalStream| be the result of [=session/receiving a bidirectional stream=].
+     stream=] in |session|.
+  1. Let |internalStream| be the result of [=session/receiving a bidirectional stream=] from |session|.
   1. [=Queue a network task=] with |transport| to run these steps:
     1. Let |stream| be the result of [=BidirectionalStream/creating=] a
        {{WebTransportBidirectionalStream}} with |internalStream| and |transport|.
@@ -1065,8 +1062,8 @@ these steps.
 1. Let |p| be a new promise.
 1. Run the following steps [=in parallel=]:
   1. Wait until there is an
-     [=session/receive an incoming unidirectional stream|available incoming unidirectional stream=].
-  1. Let |internalStream| be the result of [=session/receiving an incoming unidirectional stream=].
+     [=session/receive an incoming unidirectional stream|available incoming unidirectional stream=] in |session|.
+  1. Let |internalStream| be the result of [=session/receiving an incoming unidirectional stream=] from |session|.
   1. [=Queue a network task=] with |transport| to run these steps:
     1. Let |stream| be the result of [=WebTransportReceiveStream/creating=] a {{WebTransportReceiveStream}} with
        |internalStream| and |transport|.
@@ -1418,7 +1415,7 @@ run these steps:
 
 ## Context cleanup steps ##  {#web-transport-context-cleanup-steps}
 
-This specification defines <dfn>context cleanup steps</dfn> as the following steps, given
+This specification defines [=unloading document cleanup steps=] as the following steps, given
 {{WebTransport}} |transport|:
 
 1. If |transport|.{{[[State]]}} is `"connected"`, then:
@@ -2134,7 +2131,7 @@ transmission of data spread across many individual
 {{WebTransportSendStream}}s can, at their creation or through assignment of
 their `sendGroup` attribute, be <dfn>grouped</dfn> under at most one
 {{WebTransportSendGroup}} at any time. By default, they are
-<dfn>ungrouped</dfn>.
+[=grouped|ungrouped=].
 
 The user agent considers {{WebTransportSendGroup}}s as equals when allocating
 bandwidth for sending {{WebTransportSendStream}}s. Each {{WebTransportSendGroup}}
@@ -2624,7 +2621,7 @@ A {{WebTransportError}} has the following internal slots.
 <div algorithm>
 
 The <dfn constructor for="WebTransportError"
-lt="WebTransportError(message, options)">new WebTransportError(message, options)</dfn>
+lt="WebTransportError(message, options)">new WebTransportError(|message|, |options|)</dfn>
 constructor steps are:
 
 1. Set |this|'s [=DOMException/name=] to `"WebTransportError"`.
