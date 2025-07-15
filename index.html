@@ -5,9 +5,9 @@
   <title>WebTransport</title>
   <meta content="ED" name="w3c-status">
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
-  <meta content="Bikeshed version 618007319, updated Thu Jun 26 17:23:55 2025 -0700" name="generator">
+  <meta content="Bikeshed version 7a96e07ec, updated Mon Jul 14 11:12:36 2025 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="93f58233c0b26cb78bec1084f54cb01c4e8e60b4" name="revision">
+  <meta content="168c35cbdf0a876ed4722aca943fd4fddf0eab0a" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -742,7 +742,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
 </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#ED">Editor’s Draft</a>,
-    <time class="dt-updated" datetime="2025-07-01">1 July 2025</time></p>
+    <time class="dt-updated" datetime="2025-07-15">15 July 2025</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -803,7 +803,7 @@ with protocol specifications developed by the IETF WEBTRANS Working Group.</p>
 	W3C maintains a <a href="https://www.w3.org/2004/01/pp-impl/125908/status" rel="disclosure">public list of any patent disclosures</a>
 	made in connection with the deliverables of the group;
 	that page also includes instructions for disclosing a patent.
-	An individual who has actual knowledge of a patent which the individual believes contains <a href="https://www.w3.org/policies/patent-policy/#def-essential">Essential Claim(s)</a>
+	An individual who has actual knowledge of a patent that the individual believes contains <a href="https://www.w3.org/policies/patent-policy/#def-essential">Essential Claim(s)</a>
 	must disclose the information in accordance with <a href="https://www.w3.org/policies/patent-policy/#sec-Disclosure">section 6 of the W3C Patent Policy</a>.
 </p>
    <p>
@@ -1464,9 +1464,7 @@ in the same manner as when in the <code>"connected"</code> state. Once the trans
         
      The maximum datagram size depends on the protocol that is in use.
      In HTTP/3 <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>, the value is related to the estimate of the
-     path 
-        <acronym title="Maximum Transmission Unit">MTU</acronym>
-        ,
+     path <abbr title="Maximum Transmission Unit">MTU</abbr>,
      which is reduced by some implementation-defined amount to account for any overheads.
      In HTTP/2 <a data-link-type="biblio" href="#biblio-web-transport-http2" title="WebTransport over HTTP/2">[WEB-TRANSPORT-HTTP2]</a>, there is no equivalent limit.
 
@@ -2607,7 +2605,7 @@ optionally <var>closeInfo</var>, run these steps:
      <li data-md>
       <p>Set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-receivestreams-slot" id="ref-for-dom-webtransport-receivestreams-slot③">[[ReceiveStreams]]</a></code> to an empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-set" id="ref-for-ordered-set⑦">set</a>.</p>
      <li data-md>
-      <p>Set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot⑧">[[Datagrams]]</a></code>.<code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webtransport/#dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot">[[OutgoingDatagramsQueue]]</a></code>
+      <p>Set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot⑧">[[Datagrams]]</a></code>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot⑤">[[OutgoingDatagramsQueue]]</a></code>
  to an empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue" id="ref-for-queue">queue</a>.</p>
      <li data-md>
       <p>Set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot⑨">[[Datagrams]]</a></code>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot③">[[IncomingDatagramsQueue]]</a></code>
@@ -2771,7 +2769,7 @@ are <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestrea
 are <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-locked" id="ref-for-readablestream-locked②">locked</a>, or if the <code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed③">closed</a></code> promise is being observed.</p>
    <p>A <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②⑧">WebTransport</a></code> object with an <a data-link-type="dfn" href="#session-establish" id="ref-for-session-establish③">established</a> <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session①⑧">WebTransport session</a>
 that has data queued to be transmitted to the network, including datagrams in
-<code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot①③">[[Datagrams]]</a></code>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot⑤">[[OutgoingDatagramsQueue]]</a></code>, must not be garbage collected.</p>
+<code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot①③">[[Datagrams]]</a></code>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot⑥">[[OutgoingDatagramsQueue]]</a></code>, must not be garbage collected.</p>
    <p>If a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②⑨">WebTransport</a></code> object is garbage collected while the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection④">underlying connection</a>
 is still open, the user agent must
 <a href="https://www.ietf.org/archive/id/draft-ietf-webtrans-overview-06.html#section-4.1-2.4.1">terminate the WebTransport session</a>
@@ -5427,11 +5425,6 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="24bd7d25">upon fulfillment</span>
      <li><span class="dfn-paneled" id="2d6ca7ca">write</span>
     </ul>
-   <li>
-    <a data-link-type="biblio">[WEBTRANSPORT]</a> defines the following terms:
-    <ul>
-     <li><span class="dfn-paneled" id="88d83947">[[OutgoingDatagramsQueue]]</span>
-    </ul>
   </ul>
   <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
   <h3 class="no-num no-ref heading settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
@@ -5482,8 +5475,6 @@ and has been adapted for use in this specification.</p>
    <dd>Victor Vasiliev. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview"><cite>WebTransport Protocol Framework</cite></a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview">https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview</a>
    <dt id="biblio-webidl">[WEBIDL]
    <dd>Edgar Chen; Timothy Gu. <a href="https://webidl.spec.whatwg.org/"><cite>Web IDL Standard</cite></a>. Living Standard. URL: <a href="https://webidl.spec.whatwg.org/">https://webidl.spec.whatwg.org/</a>
-   <dt id="biblio-webtransport">[WEBTRANSPORT]
-   <dd>Nidhi Jaju; Victor Vasiliev. <a href="https://w3c.github.io/webtransport/"><cite>WebTransport</cite></a>. URL: <a href="https://w3c.github.io/webtransport/">https://w3c.github.io/webtransport/</a>
   </dl>
   <h3 class="no-num no-ref heading settled" id="informative"><span class="content">Informative References</span><a class="self-link" href="#informative"></a></h3>
   <dl>
@@ -5976,7 +5967,6 @@ let dfnPanelData = {
 "8855a9aa": {"dfnID":"8855a9aa","dfnText":"DOMString","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-DOMString"}],"title":"6. WebTransport Interface"},{"refs":[{"id":"ref-for-idl-DOMString\u2460"}],"title":"6.3. Attributes"},{"refs":[{"id":"ref-for-idl-DOMString\u2461"},{"id":"ref-for-idl-DOMString\u2462"},{"id":"ref-for-idl-DOMString\u2463"}],"title":"6.9. Configuration"},{"refs":[{"id":"ref-for-idl-DOMString\u2464"}],"title":"12. WebTransportError Interface"}],"url":"https://webidl.spec.whatwg.org/#idl-DOMString"},
 "888d7c65": {"dfnID":"888d7c65","dfnText":"deserialization steps","external":true,"refSections":[{"refs":[{"id":"ref-for-deserialization-steps"},{"id":"ref-for-deserialization-steps\u2460"}],"title":"12.4. Serialization"}],"url":"https://html.spec.whatwg.org/multipage/structured-data.html#deserialization-steps"},
 "889e932f": {"dfnID":"889e932f","dfnText":"Exposed","external":true,"refSections":[{"refs":[{"id":"ref-for-Exposed"}],"title":"4. WebTransportDatagramsWritable Interface"},{"refs":[{"id":"ref-for-Exposed\u2460"}],"title":"5. WebTransportDatagramDuplexStream Interface"},{"refs":[{"id":"ref-for-Exposed\u2461"}],"title":"6. WebTransport Interface"},{"refs":[{"id":"ref-for-Exposed\u2462"}],"title":"7. Interface WebTransportSendStream"},{"refs":[{"id":"ref-for-Exposed\u2463"}],"title":"8. Interface WebTransportSendGroup"},{"refs":[{"id":"ref-for-Exposed\u2464"}],"title":"9. Interface WebTransportReceiveStream"},{"refs":[{"id":"ref-for-Exposed\u2465"}],"title":"10. Interface WebTransportBidirectionalStream"},{"refs":[{"id":"ref-for-Exposed\u2466"}],"title":"12. WebTransportError Interface"}],"url":"https://webidl.spec.whatwg.org/#Exposed"},
-"88d83947": {"dfnID":"88d83947","dfnText":"[[OutgoingDatagramsQueue]]","external":true,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot"}],"title":"6.5. Procedures"}],"url":"https://www.w3.org/TR/webtransport/#dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot"},
 "8e1fb11c": {"dfnID":"8e1fb11c","dfnText":"obtain a connection","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-connection-obtain"}],"title":"6.2. Constructor"}],"url":"https://fetch.spec.whatwg.org/#concept-connection-obtain"},
 "8f5c2179": {"dfnID":"8f5c2179","dfnText":"a promise resolved with","external":true,"refSections":[{"refs":[{"id":"ref-for-a-promise-resolved-with"}],"title":"4.3. Procedures"},{"refs":[{"id":"ref-for-a-promise-resolved-with\u2460"}],"title":"5.4. Procedures"}],"url":"https://webidl.spec.whatwg.org/#a-promise-resolved-with"},
 "95d7775a": {"dfnID":"95d7775a","dfnText":"Uint8Array","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-Uint8Array"}],"title":"5.4. Procedures"},{"refs":[{"id":"ref-for-idl-Uint8Array\u2460"}],"title":"7. Interface WebTransportSendStream"},{"refs":[{"id":"ref-for-idl-Uint8Array\u2461"}],"title":"9. Interface WebTransportReceiveStream"},{"refs":[{"id":"ref-for-idl-Uint8Array\u2462"}],"title":"9.3. Procedures"}],"url":"https://webidl.spec.whatwg.org/#idl-Uint8Array"},
@@ -6126,7 +6116,7 @@ let dfnPanelData = {
 "dom-webtransportdatagramstats-expiredincoming": {"dfnID":"dom-webtransportdatagramstats-expiredincoming","dfnText":"expiredIncoming","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportdatagramstats-expiredincoming"}],"title":"6.14. WebTransportDatagramStats Dictionary"}],"url":"#dom-webtransportdatagramstats-expiredincoming"},
 "dom-webtransportdatagramstats-expiredoutgoing": {"dfnID":"dom-webtransportdatagramstats-expiredoutgoing","dfnText":"expiredOutgoing","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportdatagramstats-expiredoutgoing"}],"title":"6.14. WebTransportDatagramStats Dictionary"}],"url":"#dom-webtransportdatagramstats-expiredoutgoing"},
 "dom-webtransportdatagramstats-lostoutgoing": {"dfnID":"dom-webtransportdatagramstats-lostoutgoing","dfnText":"lostOutgoing","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportdatagramstats-lostoutgoing"}],"title":"6.14. WebTransportDatagramStats Dictionary"}],"url":"#dom-webtransportdatagramstats-lostoutgoing"},
-"dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot": {"dfnID":"dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot","dfnText":"[[OutgoingDatagramsQueue]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot"}],"title":"4.1. Internal slots"},{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2460"},{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2461"},{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2462"},{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2463"}],"title":"4.3. Procedures"},{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2464"}],"title":"6.8. Garbage Collection"}],"url":"#dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot"},
+"dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot": {"dfnID":"dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot","dfnText":"[[OutgoingDatagramsQueue]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot"}],"title":"4.1. Internal slots"},{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2460"},{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2461"},{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2462"},{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2463"}],"title":"4.3. Procedures"},{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2464"}],"title":"6.5. Procedures"},{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot\u2465"}],"title":"6.8. Garbage Collection"}],"url":"#dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot"},
 "dom-webtransportdatagramswritable-sendgroup": {"dfnID":"dom-webtransportdatagramswritable-sendgroup","dfnText":"sendGroup","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-sendgroup"}],"title":"4. WebTransportDatagramsWritable Interface"}],"url":"#dom-webtransportdatagramswritable-sendgroup"},
 "dom-webtransportdatagramswritable-sendgroup-slot": {"dfnID":"dom-webtransportdatagramswritable-sendgroup-slot","dfnText":"[[SendGroup]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-sendgroup-slot"}],"title":"4.1. Internal slots"},{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-sendgroup-slot\u2460"},{"id":"ref-for-dom-webtransportdatagramswritable-sendgroup-slot\u2461"}],"title":"4.2. Attributes"},{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-sendgroup-slot\u2462"}],"title":"4.3. Procedures"}],"url":"#dom-webtransportdatagramswritable-sendgroup-slot"},
 "dom-webtransportdatagramswritable-sendorder": {"dfnID":"dom-webtransportdatagramswritable-sendorder","dfnText":"sendOrder","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportdatagramswritable-sendorder"}],"title":"4. WebTransportDatagramsWritable Interface"}],"url":"#dom-webtransportdatagramswritable-sendorder"},
@@ -7004,7 +6994,6 @@ let refsData = {
 "https://webidl.spec.whatwg.org/#syntaxerror": {"displayText":"SyntaxError","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"SyntaxError","type":"exception","url":"https://webidl.spec.whatwg.org/#syntaxerror"},
 "https://webidl.spec.whatwg.org/#this": {"displayText":"this","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"this","type":"dfn","url":"https://webidl.spec.whatwg.org/#this"},
 "https://webidl.spec.whatwg.org/#upon-fulfillment": {"displayText":"upon fulfillment","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"upon fulfillment","type":"dfn","url":"https://webidl.spec.whatwg.org/#upon-fulfillment"},
-"https://www.w3.org/TR/webtransport/#dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot": {"displayText":"[[OutgoingDatagramsQueue]]","export":true,"for_":["WebTransportDatagramDuplexStream"],"level":"1","normative":true,"shortname":"webtransport","spec":"webtransport","status":"snapshot","text":"[[OutgoingDatagramsQueue]]","type":"attribute","url":"https://www.w3.org/TR/webtransport/#dom-webtransportdatagramduplexstream-outgoingdatagramsqueue-slot"},
 };
 
 function mkRefHint(link, ref) {
