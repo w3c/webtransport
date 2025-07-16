@@ -256,17 +256,17 @@ A [=WebTransport stream=] has the following capabilities:
    <td>Yes
   </tr>
   <tr>
-   <td><dfn>send STOP_SENDING</dfn>
+   <td><dfn>abort receiving</dfn> on a [=WebTransport stream=]
    <td>[[!WEB-TRANSPORT-OVERVIEW]]
-   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-9.8.1)
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09.html#section-4.3-9.8.1)
    <td>Yes
    <td>No
    <td>Yes
   </tr>
   <tr>
-   <td><dfn>reset</dfn> a [=WebTransport stream=]
+   <td><dfn>abort sending</dfn> on a [=WebTransport stream=]
    <td>[[!WEB-TRANSPORT-OVERVIEW]]
-   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-9.6.1)
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09.html#section-4.3-9.6.1)
    <td>No
    <td>Yes
    <td>Yes
@@ -288,17 +288,17 @@ A [=WebTransport stream=] has the following signals:
  </thead>
  <tbody>
   <tr>
-   <td><dfn>STOP_SENDING</dfn>
+   <td><dfn>receiving aborted</dfn>
    <td>[[!WEB-TRANSPORT-OVERVIEW]]
-   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-9.8.1)
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09.html#section-4.3-11.4.1)
    <td>No
    <td>Yes
    <td>Yes
   </tr>
   <tr>
-   <td><dfn>RESET_STREAM</dfn>
+   <td><dfn>sending aborted</dfn>
    <td>[[!WEB-TRANSPORT-OVERVIEW]]
-   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-06#section-4.3-9.6.1)
+   [Section 4.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09.html#section-4.3-11.2.1)
    <td>Yes
    <td>No
    <td>Yes
@@ -1194,7 +1194,7 @@ the application will receive the number of streams it anticipates.
      1. Let |reason| be |reasonString|, [=UTF-8 encoded=].
      1. [=In parallel=], [=session/terminate=] |session| with |code| and |reason|.
 
-       Note: This also [=stream/resets=] or [=sends STOP_SENDING=] [=WebTransport streams=] contained in
+       Note: This also [=stream/aborts sending=] or [=stream/aborts receiving=] on [=WebTransport streams=] contained in
        |transport|.{{[[SendStreams]]}} and {{[[ReceiveStreams]]}}.
      1. [=Cleanup=] |transport| with {{AbortError}} and |closeInfo|.
 
@@ -1611,9 +1611,8 @@ to provide an interoperable default.  It MUST NOT contain RSA keys
 ## `WebTransportCloseInfo` Dictionary ##  {#web-transport-close-info}
 
 The <dfn dictionary>WebTransportCloseInfo</dfn> dictionary includes information
-relating to the error code for closing a {{WebTransport}}. This
-information is used to set the error code and reason for a CONNECTION_CLOSE
-frame.
+used to set the error code and reason when [=session/terminate|terminating=]
+a [=WebTransport session=].
 
 <pre class="idl">
 dictionary WebTransportCloseInfo {
@@ -1913,7 +1912,7 @@ A {{WebTransportSendStream}} has the following internal slots.
   <tr>
    <td><dfn>`[[CommittedOffset]]`</dfn>
    <td class="non-normative">An offset in the stream that records the number of bytes
-   that will be delivered to a peer, even when the stream is [=stream/reset=];
+   that will be delivered to a peer, even when the stream has [=stream/abort sending|aborted sending=];
    see [[RELIABLE-RESET]].
   </tr>
  <tbody>
@@ -2069,9 +2068,8 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
    [[!WEB-TRANSPORT-HTTP3]].
 
 1. Run the following steps [=in parallel=]:
-  1.  [=stream/Reset=] |stream|.{{WebTransportSendStream/[[InternalStream]]}}
-      with |code| and |committedOffset|.
-  1.  [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+  1. [=stream/Abort sending=] on |stream|.{{WebTransportSendStream/[[InternalStream]]}} with |code| and |committedOffset|.
+  1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
 1. Return |promise|.
 
 </div>
@@ -2090,14 +2088,14 @@ To <dfn for="WebTransportSendStream">abort all atomic write requests</dfn> on a 
 
 </div>
 
-## STOP_SENDING signal coming from the server ##  {#send-stream-STOP_SENDING}
+## Receiving aborted signal coming from the server ##  {#send-stream-receiving-aborted}
 
-<div algorithm="STOP_SENDING signal">
+<div algorithm="receiving aborted signal">
 Whenever a [=WebTransport stream=] associated with a {{WebTransportSendStream}} |stream| gets a
-[=stream-signal/STOP_SENDING=] signal from the server, run these steps:
+[=stream-signal/receiving aborted=] signal from the server, run these steps:
 
 1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
-1. Let |code| be the application protocol error code attached to the STOP_SENDING frame. [[!QUIC]]
+1. Let |code| be the application protocol error code attached to the [=stream-signal/receiving aborted=] signal.
 
    Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
    using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
@@ -2390,7 +2388,7 @@ steps.
 
 1. [=set/Remove=] |stream| from |transport|.{{[[SendStreams]]}}.
 1. Run the following steps [=in parallel=]:
-  1. [=Send STOP_SENDING=] with |internalStream| and |code|.
+  1. [=Abort receiving=] on |internalStream| with |code|.
   1. [=Queue a network task=] with |transport| to run these steps:
 
     Note: If the buffer described above is available in the [=agent/event loop=] where this procedure is
@@ -2402,15 +2400,14 @@ steps.
 
 </div>
 
-## Reset signal coming from the server ##  {#receive-stream-RESET_STREAM}
+## Sending aborted signal coming from the server ##  {#receive-stream-sending-aborted}
 
-<div algorithm="reset signal">
+<div algorithm="sending aborted signal">
 Whenever a [=WebTransport stream=] associated with a {{WebTransportReceiveStream}} |stream| gets a
-[=stream-signal/RESET_STREAM=] signal from the server, run these steps:
+[=stream-signal/sending aborted=] signal from the server, run these steps:
 
 1. Let |transport| be |stream|.{{WebTransportReceiveStream/[[Transport]]}}.
-1. Let |code| be the application protocol error code attached to the RESET_STREAM_AT or WT_RESET_STREAM frame.
-   [[RELIABLE-RESET]] [[!WEB-TRANSPORT-HTTP2]]
+1. Let |code| be the application protocol error code attached to the [=stream-signal/sending aborted=] signal.
 
    Note: Valid values of |code| are from 0 to 4294967295 inclusive. If the [=underlying connection=] is
    using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
@@ -2571,11 +2568,11 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
 :: The {{commit}} method will update the {{WebTransportSendStream/[[CommittedOffset]]}} of a stream
    to match the number of bytes written to that stream ({{WebTransportSendStream/[[BytesWritten]]}}).
    This ensures that those bytes will be delivered to a peer reliably,
-   even after writing is [=aborted=], causing the stream to be [=stream/reset=].
+   even after writing is [=aborted=], causing the stream to [=stream/abort sending=].
    This uses the mechanism described in [[RELIABLE-RESET]].
 
    Note: This does not guarantee delivery in the event that a connection fails,
-   only when a stream is [=stream/reset=].
+   only when a stream has [=stream/abort sending|aborted sending=].
 
    When {{commit}} is called for |stream|, the user agent MUST run the following steps:
    1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
@@ -2733,7 +2730,7 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
     <tbody>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(error)</td>
-        <td>[=stream/Reset|sends RESET_STREAM_AT=] with httpErrorCode
+        <td>[=stream/aborts sending=] on STREAM with httpErrorCode
         and an offset that corresponds to the {{WebTransportSendStream/[[CommittedOffset]]}}
         for the {{WebTransportBidirectionalStream/writable|stream}},
         plus any stream header; see [[RELIABLE-RESET]]</td>
@@ -2752,18 +2749,18 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(error)</td>
-        <td>[=stream/Reset|sends RESET_STREAM_AT=] with httpErrorCode
+        <td>[=stream/aborts sending=] on STREAM with httpErrorCode
         and an offset that corresponds to the {{WebTransportSendStream/[[CommittedOffset]]}}
         for the {{WebTransportBidirectionalStream/writable|stream}},
         plus any stream header; see [[RELIABLE-RESET]]</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(error)</td>
-        <td>[=send STOP_SENDING|sends STOP_SENDING=] with httpErrorCode</td>
+        <td>[=stream/aborts receiving=] on STREAM with httpErrorCode</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(error)</td>
-        <td>[=send STOP_SENDING|sends STOP_SENDING=] with httpErrorCode</td>
+        <td>[=stream/aborts receiving=] on STREAM with httpErrorCode</td>
       </tr>
       <tr>
         <td>wt.{{WebTransport/close}}(closeInfo)</td>
@@ -2783,7 +2780,7 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
     </thead>
     <tbody>
       <tr>
-        <td>received [=stream-signal/STOP_SENDING=] with httpErrorCode</td>
+        <td>received [=stream-signal/receiving aborted|STOP_SENDING=] with httpErrorCode</td>
         <td>[=WritableStream/Error|errors=] {{WebTransportBidirectionalStream/writable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
@@ -2798,7 +2795,7 @@ converted to an httpErrorCode, and vice versa, as specified in [[!WEB-TRANSPORT-
           {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).done</td>
       </tr>
       <tr>
-        <td>received [=stream-signal/RESET_STREAM=] with httpErrorCode</td>
+        <td>received [=stream-signal/sending aborted|RESET_STREAM=] with httpErrorCode</td>
         <td>[=ReadableStream/Error|errors=] {{WebTransportBidirectionalStream/readable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
@@ -2825,7 +2822,7 @@ In particular, this signal might be delayed to allow delivery of the data
 indicated by the Reliable Size field in a RESET_STREAM_AT frame.
 If stream data has been completely received
 but has not yet been read by the application,
-the signal can be suppressed.
+the sending aborted signal can be suppressed.
 WebTransport always uses the RESET_STREAM_AT frame
 to ensure reliable delivery of the stream header;
 see [[WEB-TRANSPORT-HTTP3#section-4.1|Section 4.1]] and [[WEB-TRANSPORT-HTTP3#section-4.2|Section 4.2]]
@@ -2865,7 +2862,7 @@ code does not need to be converted to an HTTP error code, and vice versa.
     <tbody>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/abort}}(error)</td>
-        <td>[=stream/Reset|sends WT_RESET_STREAM=] with error</td>
+        <td>[=stream/aborts sending=] on WT_STREAM with error</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.{{WritableStream/close}}()</td>
@@ -2881,15 +2878,15 @@ code does not need to be converted to an HTTP error code, and vice versa.
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/writable}}.getWriter().{{WritableStreamDefaultWriter/abort}}(error)</td>
-        <td>[=stream/Reset|sends WT_RESET_STREAM=] with error</td>
+        <td>[=stream/aborts sending=] on WT_STREAM with error</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/readable}}.{{ReadableStream/cancel}}(error)</td>
-        <td>[=send STOP_SENDING|sends WT_STOP_SENDING=] with error</td>
+        <td>[=stream/aborts receiving=] on WT_STREAM with error</td>
       </tr>
       <tr>
         <td>{{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamGenericReader/cancel}}(error)</td>
-        <td>[=send STOP_SENDING|sends WT_STOP_SENDING=] with error</td>
+        <td>[=stream/aborts receiving=] on WT_STREAM with error</td>
       </tr>
       <tr>
         <td>wt.{{WebTransport/close}}(closeInfo)</td>
@@ -2909,7 +2906,7 @@ code does not need to be converted to an HTTP error code, and vice versa.
     </thead>
     <tbody>
       <tr>
-        <td>received [=stream-signal/STOP_SENDING|WT_STOP_SENDING=] with error</td>
+        <td>received [=stream-signal/receiving aborted|WT_STOP_SENDING=] with error</td>
         <td>[=WritableStream/Error|errors=] {{WebTransportBidirectionalStream/writable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
@@ -2924,7 +2921,7 @@ code does not need to be converted to an HTTP error code, and vice versa.
           {{WebTransportBidirectionalStream/readable}}.getReader().{{ReadableStreamDefaultReader/read}}()).done</td>
       </tr>
       <tr>
-        <td>received [=stream-signal/RESET_STREAM|WT_RESET_STREAM=] with error</td>
+        <td>received [=stream-signal/sending aborted|WT_RESET_STREAM=] with error</td>
         <td>[=ReadableStream/Error|errors=] {{WebTransportBidirectionalStream/readable}}
         with {{WebTransportError/streamErrorCode}}</td>
       </tr>
