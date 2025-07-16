@@ -1912,7 +1912,7 @@ A {{WebTransportSendStream}} has the following internal slots.
   <tr>
    <td><dfn>`[[CommittedOffset]]`</dfn>
    <td class="non-normative">An offset in the stream that records the number of bytes
-   that will be delivered to a peer, even when the stream is [=stream/reset=];
+   that will be delivered to a peer, even when the stream has [=stream/abort sending|aborted sending=];
    see [[RELIABLE-RESET]].
   </tr>
  <tbody>
@@ -2568,11 +2568,11 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
 :: The {{commit}} method will update the {{WebTransportSendStream/[[CommittedOffset]]}} of a stream
    to match the number of bytes written to that stream ({{WebTransportSendStream/[[BytesWritten]]}}).
    This ensures that those bytes will be delivered to a peer reliably,
-   even after writing is [=aborted=], causing the stream to be [=stream/reset=].
+   even after writing is [=aborted=], causing the stream to [=stream/abort sending=].
    This uses the mechanism described in [[RELIABLE-RESET]].
 
    Note: This does not guarantee delivery in the event that a connection fails,
-   only when a stream is [=stream/reset=].
+   only when a stream has [=stream/abort sending|aborted sending=].
 
    When {{commit}} is called for |stream|, the user agent MUST run the following steps:
    1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
