@@ -508,6 +508,10 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
    <td class="non-normative">A {{ReadableStream}} for incoming datagrams.
   </tr>
   <tr>
+   <td><dfn>`[[ReadableMode]]`</dfn>
+   <td class="non-normative">The {{DatagramsReadableMode}} used for incoming datagrams.
+  </tr>
+  <tr>
    <td><dfn>`[[Writables]]`</dfn>
    <td class="non-normative">An [=ordered set=] of {{WebTransportDatagramsWritable}} streams,
    initially empty.
@@ -565,12 +569,15 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 
  To <dfn export for="WebTransportDatagramDuplexStream" lt="create|creating">create</dfn> a
  {{WebTransportDatagramDuplexStream}} given a
- <dfn export for="WebTransportDatagramDuplexStream/create"><var>readable</var></dfn>,
+ <dfn export for="WebTransportDatagramDuplexStream/create"><var>readable</var></dfn> and
+ <dfn export for="WebTransportDatagramDuplexStream/create"><var>readableMode</var></dfn>,
  perform the following steps.
 
  1. Let |stream| be a [=new=] {{WebTransportDatagramDuplexStream}}, with:
     : {{WebTransportDatagramDuplexStream/[[Readable]]}}
     :: |readable|
+    : {{WebTransportDatagramDuplexStream/[[ReadableMode]]}}
+    :: |readableMode|
     : {{WebTransportDatagramDuplexStream/[[Writables]]}}
     :: an empty [=ordered set=].
     : {{[[IncomingDatagramsQueue]]}}
@@ -662,17 +669,23 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
   1. Set |datagrams|.{{[[IncomingDatagramsPullPromise]]}} to a new promise.
   1. Return |datagrams|.{{[[IncomingDatagramsPullPromise]]}}.
 1. Let |datagram| and |timestamp| be the result of [=dequeuing=] |queue|.
-1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
-   [=ReadableStream/current BYOB request view=] is not null, then:
-  1. Let |view| be |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
-     [=ReadableStream/current BYOB request view=].
-  1. If |view|'s [=BufferSource/byte length=] is less than the size of |datagram|, return
-     [=a promise rejected with=] a {{RangeError}}.
-  1. Let |elementSize| be the element size specified in [=the typed array constructors table=] for
-     |view|.\[[TypedArrayName]]. If |view| does not have a \[[TypedArrayName]] internal slot
-     (i.e. it is a {{DataView}}), let |elementSize| be 0.
-  1. If |elementSize| is not 1, return [=a promise rejected with=] a {{TypeError}}.
-1. [=ReadableStream/Pull from bytes=] |datagram| into |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
+1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[ReadableMode]]}} is `"bytes"`, then:
+  1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
+    [=ReadableStream/current BYOB request view=] is not null, then:
+    1. Let |view| be |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
+      [=ReadableStream/current BYOB request view=].
+    1. If |view|'s [=BufferSource/byte length=] is less than the size of |datagram|, return
+      [=a promise rejected with=] a {{RangeError}}.
+    1. Let |elementSize| be the element size specified in [=the typed array constructors table=] for
+      |view|.\[[TypedArrayName]]. If |view| does not have a \[[TypedArrayName]] internal slot
+      (i.e. it is a {{DataView}}), let |elementSize| be 0.
+    1. If |elementSize| is not 1, return [=a promise rejected with=] a {{TypeError}}.
+  1. [=ReadableStream/Pull from bytes=] |datagram| into
+     |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
+1. Otherwise:
+  1. Let |chunk| be a new {{Uint8Array}} object representing |datagram|.
+  1. [=ReadableStream/Enqueue=] |chunk| to
+     |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 1. Return [=a promise resolved with=] undefined.
 
 To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
@@ -880,10 +893,12 @@ agent MUST run the following steps:
    {{WebTransportOptions/anticipatedConcurrentIncomingUnidirectionalStreams}}.
 1. Let |anticipatedConcurrentIncomingBidirectionalStreams| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/anticipatedConcurrentIncomingBidirectionalStreams}}.
+1. Let |datagramsReadableMode| be {{WebTransport/constructor(url, options)/options}}'s
+   {{WebTransportOptions/datagramsReadableMode}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
 1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
    {{WebTransportDatagramDuplexStream}}, its [=WebTransportDatagramDuplexStream/create/readable=] set to
-   |incomingDatagrams|.
+   |incomingDatagrams| and [=WebTransportDatagramDuplexStream/create/readableMode=] set to |datagramsReadableMode|.
 1. Let |transport| be a newly constructed {{WebTransport}} object, with:
     : {{[[SendStreams]]}}
     :: an empty [=ordered set=]
@@ -922,9 +937,12 @@ maximum WebTransport datagram frame size has an upper bound of the QUIC maximum 
 which is recommended to be 64kB (See [[!QUIC-DATAGRAM]] [Section 3](https://datatracker.ietf.org/doc/html/rfc9221#section-3)).
 This will ensure the stream is not errored due to a datagram being larger than the buffer.
 
-1. [=ReadableStream/Set up with byte reading support=] |incomingDatagrams| with
-   [=ReadableStream/set up with byte reading support/pullAlgorithm=] set to
-   |pullDatagramsAlgorithm|, and [=ReadableStream/set up/highWaterMark=] set to 0.
+1. If |datagramsReadableMode| is `"bytes"`, [=ReadableStream/set up with byte reading support=]
+   |incomingDatagrams| with [=ReadableStream/set up with byte reading support/pullAlgorithm=] set
+   to |pullDatagramsAlgorithm|, and [=ReadableStream/set up with byte reading support/highWaterMark=]
+   set to 0. Otherwise, [=ReadableStream/set up=] |incomingDatagrams| with
+   [=ReadableStream/set up/pullAlgorithm=] set to |pullDatagramsAlgorithm|, and
+   [=ReadableStream/set up/highWaterMark=] set to 0.
 1. Let |pullBidirectionalStreamAlgorithm| be an action that runs [=pullBidirectionalStream=]
    with |transport|.
 1. [=ReadableStream/Set up=] |transport|.{{[[IncomingBidirectionalStreams]]}} with
@@ -1474,6 +1492,7 @@ dictionary WebTransportOptions {
   [EnforceRange] unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams = null;
   [EnforceRange] unsigned short? anticipatedConcurrentIncomingBidirectionalStreams = null;
   sequence&lt;DOMString&gt; protocols = [];
+  DatagramsReadableMode datagramsReadableMode;
 };
 
 enum WebTransportCongestionControl {
@@ -1481,6 +1500,8 @@ enum WebTransportCongestionControl {
   "throughput",
   "low-latency",
 };
+
+enum DatagramsReadableMode { "bytes" };
 </pre>
 
 <dfn dictionary>WebTransportOptions</dfn> is a dictionary of parameters
@@ -1541,6 +1562,15 @@ that determine how the [=WebTransport session=] is established and used.
 :: An optionally provided array of application-level <dfn>protocol names</dfn>. Selecting a
    preferred application-protocol and communicating it to the client is optional for the server.
    Servers might reject the request if a suitable protocol was not provided.
+
+: <dfn for="WebTransportOptions" dict-member>datagramsReadableMode</dfn>
+:: Optionally specifies an application's preference for using a
+   [=readable byte stream=] for incoming datagrams. Otherwise,
+   a default [=readable stream=] is used. 
+   
+   Note: A default [=readable stream=] is necessary to detect zero-length datagrams.
+   However, a [=readable byte stream=] can handle bytes more efficiently, in particular by
+   minimizing copies when used with a [=BYOB reader=].
 
 <div algorithm>
 To <dfn>compute a certificate hash</dfn>, given a |certificate|, perform the following steps:
