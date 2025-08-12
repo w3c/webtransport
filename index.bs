@@ -737,6 +737,7 @@ interface WebTransport {
   [EnforceRange] attribute unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams;
   [EnforceRange] attribute unsigned short? anticipatedConcurrentIncomingBidirectionalStreams;
   readonly attribute DOMString protocol;
+  readonly attribute unrestricted double? idleTimeout;
 
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
   readonly attribute Promise&lt;undefined&gt; draining;
@@ -836,6 +837,11 @@ A {{WebTransport}} object has the following internal slots.
    if any. Initially an empty string.
   </tr>
   <tr>
+   <td><dfn>`[[IdleTimeout]]`</dfn>
+   <td class="non-normative">The effective idle timeout negotiated by the
+   [=underlying connection=], in milliseconds. Initially null.
+  </tr>
+  <tr>
    <td><dfn>`[[Closed]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated {{WebTransport}} object is
    closed gracefully, or rejected when it is closed abruptly or failed on initialization.
@@ -922,6 +928,8 @@ agent MUST run the following steps:
     :: |anticipatedConcurrentIncomingBidirectionalStreams|
     : {{[[Protocol]]}}
     :: an empty string
+    : {{[[IdleTimeout]]}}
+    :: null
     : {{[[Closed]]}}
     :: a new promise
     : {{[[Draining]]}}
@@ -1037,8 +1045,17 @@ sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
        protocol if present, following [[!WEB-TRANSPORT-OVERVIEW]]
        [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09/#section-3.1),
        or `""` if not present.
-    1. If the connection is an HTTP/3 connection, set |transport|.{{[[Reliability]]}} to `"supports-unreliable"`.
-    1. If the connection is an HTTP/2 connection [[!WEB-TRANSPORT-HTTP2]], set |transport|'s {{[[Reliability]]}} to `"reliable-only"`.
+    1. If the connection is an HTTP/3 connection, run the following substeps:
+      1. Set |transport|.{{[[Reliability]]}} to `"supports-unreliable"`.
+      1. Set |transport|.{{[[IdleTimeout]]}} to the effective value
+          negotiated for this [=session=], as defined in [[!QUIC]]
+          [Section 10.1](https://www.rfc-editor.org/rfc/rfc9000#section-10.1).
+    1. If the connection is an HTTP/2 connection [[!WEB-TRANSPORT-HTTP2]],
+        run the following substeps:
+        1. Set |transport|'s {{[[Reliability]]}} to `"reliable-only"`.
+        1. Set |transport|.{{[[IdleTimeout]]}} to an [=implementation-defined=]
+           value.
+
     1. [=Resolve=] |transport|.{{[[Ready]]}} with undefined.
 
 </div>
@@ -1169,7 +1186,15 @@ the application will receive the number of streams it anticipates.
 :: Once a [=WebTransport session=] has been established and the {{protocols}}
    constructor option was used to provide a non-empty array, returns the application-level protocol
    selected by the server, if any. Otherwise, an empty string.
-   The getter steps are to return [=this=]'s {{[[Protocol]]}}.
+   The getter steps are to return [=this=].{{[[Protocol]]}}.
+
+: <dfn for="WebTransport" attribute>idleTimeout</dfn>
+:: Once a [=WebTransport session=] has been established, returns the
+   effective idle timeout negotiated by the [=underlying connection=],
+   in milliseconds.
+   The getter steps are:
+   1.  If [=this=].{{[[IdleTimeout]]}} is 0, return [=Infinity=].
+   1.  Return [=this=].{{[[IdleTimeout]]}}.
 
 ## Methods ##  {#webtransport-methods}
 
