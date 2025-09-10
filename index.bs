@@ -15,9 +15,9 @@ Former Editor: Robin Raymond, Optical Tone Ltd.
 Former Editor: Yutaka Hirano, Google
 Abstract:
   This document defines a set of ECMAScript APIs in WebIDL to allow data to be
-  sent and received between a browser and server, utilizing [[!WEB-TRANSPORT-HTTP3]]
-  and [[!WEB-TRANSPORT-HTTP2]]. This specification is being developed in conjunction
-  with protocol specifications developed by the IETF WEBTRANS Working Group.
+  sent and received between a browser and server, utilizing [[!WEB-TRANSPORT-OVERVIEW]].
+  This specification is being developed in conjunction with protocol specifications
+  developed by the IETF WEBTRANS Working Group.
 Repository: w3c/webtransport
 Indent: 2
 Markup Shorthands: markdown yes
@@ -104,10 +104,10 @@ urlPrefix: https://w3ctag.github.io/privacy-principles/;
 
 *This section is non-normative.*
 
-This specification uses [[!WEB-TRANSPORT-HTTP3]] and [[!WEB-TRANSPORT-HTTP2]] to
-send data to and receive data from servers. It can be used like WebSockets but
-with support for multiple streams, unidirectional streams, out-of-order delivery,
-and reliable as well as unreliable transport.
+This specification uses [[!WEB-TRANSPORT-OVERVIEW]] to send data to and receive
+data from servers. It can be used like WebSockets but with support for multiple
+streams, unidirectional streams, out-of-order delivery, and reliable as well as
+unreliable transport.
 
 Note: The API presented in this specification represents a preliminary proposal
 based on work-in-progress within the IETF WEBTRANS WG. Since the [[!WEB-TRANSPORT-HTTP3]]
@@ -1241,7 +1241,7 @@ the application will receive the number of streams it anticipates.
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
       [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
      1. Let |keyingMaterial| be the result of exporting TLS keying material, as defined
-        in [[!WEB-TRANSPORT-HTTP3]] [Section 4.7](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.7),
+        in [[!WEB-TRANSPORT-OVERVIEW]] [Section TBD](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview/#section-TBD),
         with |labelLength|, |label|, |contextLength|, and if present, |context|.
      1. [=Queue a network task=] with |transport| to [=resolve=] |p| with |keyingMaterial|.
    1. Return |p|.
@@ -2989,8 +2989,10 @@ WebTransport imposes a set of requirements as described in
    field on the session establishment request carries this information.
 
 Protocol security related considerations are described in the
-*Security Considerations* sections of [[!WEB-TRANSPORT-HTTP3]] and
-[[!WEB-TRANSPORT-HTTP2]].
+*Security Considerations* sections of
+[[!WEB-TRANSPORT-OVERVIEW]] [Section 6](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview#section-6),
+[[!WEB-TRANSPORT-HTTP3]] [Section 8](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3#section-8), and
+[[!WEB-TRANSPORT-HTTP2]] [Section 9](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2#section-9).
 
 Networking APIs can be commonly used to scan the local network for available
 hosts, and thus be used for fingerprinting and other forms of attacks.
