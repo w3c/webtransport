@@ -54,7 +54,10 @@ WebTransport, and over a raw QUIC connection directly, such as
 ## Alternatives Considered
 
 * **Allowing Web developers to set arbitrary HTTP headers**.  This has been
-  proposed a few years ago, and the proposal has not since moved forward.
+  proposed a few years ago, and while the Working Group has agreed that we
+  should do that in principle, there has not been progress beyond that.
   Setting arbitrary headers has greater security implications due to potential
   concerns around things like CORS, and thus it is uncertain if and when that
-  would happen.
+  would happen.  Additionaly, the `protocols` parameter API provides Web
+  developers with better ergonomics, since it handles header serialization and
+  parsing for them, and is similar to the already existing API in WebSockets.
