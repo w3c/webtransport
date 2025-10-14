@@ -44,6 +44,9 @@ running the old version will ignore that header, and the client would retrieve
   of the WebSocket constructor.
 * Applications built directly on top of **TLS** can use the [TLS
   ALPN extension](https://datatracker.ietf.org/doc/html/rfc7301).
+* Applications built directly on top of **QUIC** use the above-mentioned [TLS
+  ALPN](https://datatracker.ietf.org/doc/html/rfc9001#name-protocol-negotiation)
+  extension; unlike TLS over TCP, in QUIC, using ALPN is mandatory.
 
 The mechanism provided in WebTransport matches the TLS ALPN semantics (the
 client offers a list of protocols, the server picks one of them).  This is done
