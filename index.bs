@@ -853,6 +853,18 @@ A {{WebTransport}} object has the following internal slots.
    <td><dfn>`[[Session]]`</dfn>
    <td class="non-normative">A [=WebTransport session=] for this {{WebTransport}} object, or null.
   </tr>
+  <tr>
+   <td><dfn>`[[NewConnection]]`</dfn>
+   <td class="non-normative">Either `"no"` or `"yes-and-dedicated"`.
+  </tr>
+  <tr>
+   <td><dfn>`[[RequireUnreliable]]`</dfn>
+   <td class="non-normative">A boolean indicating whether UDP is required.
+  </tr>
+  <tr>
+   <td><dfn>`[[ServerCertificateHashes]]`</dfn>
+   <td class="non-normative">A [=list=] of zero or more {{WebTransportHash}} objects.
+  </tr>
 </table>
 
 ## Constructor ##  {#webtransport-constructor}
@@ -861,11 +873,11 @@ A {{WebTransport}} object has the following internal slots.
 When the {{WebTransport/constructor()}} constructor is invoked, the user
 agent MUST run the following steps:
 1. Let |baseURL| be [=this=]'s [=relevant settings object=]'s [=API base URL=].
-1. Let |parsedURL| be the [=URL record=] resulting from [=URL parser|parsing=]
+1. Let |url| be the [=URL record=] resulting from [=URL parser|parsing=]
    {{WebTransport/constructor(url, options)/url}} with |baseURL|.
-1. If |parsedURL| is a failure, [=throw=] a {{SyntaxError}} exception.
-1. If |parsedURL| [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
-1. If |parsedURL| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
+1. If |url| is a failure, [=throw=] a {{SyntaxError}} exception.
+1. If |url| [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
+1. If |url| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
 1. Let |allowPooling| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/allowPooling}}.
 1. Let |dedicated| be the negation of |allowPooling|.
@@ -873,6 +885,7 @@ agent MUST run the following steps:
    {{WebTransportOptions/serverCertificateHashes}} if it exists, and null otherwise.
 1. If |dedicated| is false and |serverCertificateHashes| is non-null, then [=throw=] a
    {{NotSupportedError}} exception.
+1. Let |newConnection| be `"no"` if |dedicated| is false; otherwise `"yes-and-dedicated"`.
 1. Let |requireUnreliable| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/requireUnreliable}}.
 1. Let |congestionControl| be {{WebTransport/constructor(url, options)/options}}'s
@@ -930,12 +943,18 @@ agent MUST run the following steps:
     :: |datagrams|
     : {{[[Session]]}}
     :: null
+    : {{[[NewConnection]]}}
+    :: |newConnection|
+    : {{[[RequireUnreliable]]}}
+    :: |requireUnreliable|
+    : {{[[ServerCertificateHashes]]}}
+    :: |serverCertificateHashes|
 1. Let |pullDatagramsAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
 
-Note: Using 64kB buffers with datagrams is recommended because the effective
-maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
-which is recommended to be 64kB (See [[!QUIC-DATAGRAM]] [Section 3](https://datatracker.ietf.org/doc/html/rfc9221#section-3)).
-This will ensure the stream is not errored due to a datagram being larger than the buffer.
+    Note: Using 64kB buffers with datagrams is recommended because the effective
+    maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
+    which is recommended to be 64kB (See [[!QUIC-DATAGRAM]] [Section 3](https://datatracker.ietf.org/doc/html/rfc9221#section-3)).
+    This will ensure the stream is not errored due to a datagram being larger than the buffer.
 
 1. If |datagramsReadableMode| is `"bytes"`, [=ReadableStream/set up with byte reading support=]
    |incomingDatagrams| with [=ReadableStream/set up with byte reading support/pullAlgorithm=] set
@@ -953,48 +972,46 @@ This will ensure the stream is not errored due to a datagram being larger than t
 1. [=ReadableStream/Set up=] |transport|.{{[[IncomingUnidirectionalStreams]]}} with
    [=ReadableStream/set up/pullAlgorithm=] set to |pullUnidirectionalStreamAlgorithm|, and
    [=ReadableStream/set up/highWaterMark=] set to 0.
-1. [=Initialize WebTransport over HTTP=] with |transport|, |parsedURL|, |dedicated|,
-   |requireUnreliable|, |congestionControl|, |protocols|, and |serverCertificateHashes|.
+1. Let |client| be |transport|'s [=relevant settings object=].
+1. Let |origin| be |client|'s [=environment settings object/origin=].
+1. Let |request| be a new [=/request=] whose [=request/URL=] is |url|, [=request/client=] is
+   |client|, [=service-workers mode=] is "`none`",
+   [=request/referrer=] is "`no-referrer`", [=request/mode=] is "`webtransport`",
+   [=request/credentials mode=] is "`omit`", [=request/cache mode=] is "`no-store`",
+   [=request/policy container=] is |client|'s
+   [=environment settings object/policy container=], [=request/destination=] is "",
+   [=request/origin=] is |origin| and [=request/redirect mode=] is "error".
+1. [=Fetch=] |request|, with [=useParallelQueue=] set to true, and [=processResponse=]
+   set to the [=process a response=] steps.
 1. Return |transport|.
 
 </div>
 
-<div algorithm>
-To <dfn>initialize WebTransport over HTTP</dfn>, given a {{WebTransport}} object
-<var>transport</var>, a [=URL record=] |url|, a boolean |dedicated|, a boolean
-|requireUnreliable|, a {{WebTransportCongestionControl}} |congestionControl|,
-a |protocols| array, and a
-sequence&lt;{{WebTransportHash}}&gt; |serverCertificateHashes|, run these steps.
+Note: The plan is for [=fetch=] to call into the below algorithm based off a
+new "`webtransport`" [=request/mode=]. [#1808](https://github.com/whatwg/fetch/issues/1808).
 
-1. Let |client| be |transport|'s [=relevant settings object=].
-1. Let |origin| be |client|'s [=environment settings object/origin=].
-1. Let |request| be a new [=/request=] whose [=request/URL=] is |url|, [=request/client=] is
-   |client|, [=request/policy container=] is |client|'s
-   [=environment settings object/policy container=], [=request/destination=] is an empty string,
-   [=request/origin=] is |origin| and [=request/redirect mode=] is "error".
-1. Run <a>report Content Security Policy violations for |request|</a>.
-1. If [=should request be blocked by Content Security Policy?=] with |request| returns
-   <b>"Blocked"</b>, or if |request| [=block bad port|should be blocked due to a bad port=]
-   returns <b>blocked</b>, then abort the remaining steps and [=queue a network task=] with |transport|
-   to run these steps:
-  1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-  1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
-     {{WebTransportErrorOptions/source}} is `"session"`.
-  1. [=Cleanup=] |transport| with |error|.
-1. Let |networkPartitionKey| be the result of [=determining the network partition key=] with
-   |transport|'s [=relevant settings object=].
-1. Run the following steps [=in parallel=], but [=abort when=] |transport|.{{[[State]]}} becomes `"closed"` or `"failed"`:
-  1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
-  1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
+<div algorithm>
+To <dfn>obtain a WebTransport connection</dfn>, given a [=network partition key=]
+|networkPartitionKey|, and a [=URL record=] |url|, run these steps:
+  1. Let |transport| be the {{WebTransport}} object associated with this request.
+  1. Let |newConnection| be |transport|.{{[[NewConnection]]}}.
+  1. Let |requireUnreliable| be |transport|.{{[[RequireUnreliable]]}}.
+  1. Let |serverCertificateHashes| be the values in |transport|.{{[[ServerCertificateHashes]]}}.
+  1. Return the result of [=obtain a connection|obtaining a connection=] with
      |networkPartitionKey|, |url|, false, |newConnection|, and |requireUnreliable|. If the user agent
      supports more than one congestion control algorithm, choose one appropriate for
      |congestionControl| for sending of data on this |connection|. When obtaining a connection, if
      |serverCertificateHashes| is specified, instead of using the default certificate verification
      algorithm, consider the certificate valid if it meets the [=custom certificate
      requirements=] and if [=verify a certificate hash|verifying the certificate hash=] against
-     |serverCertificateHashes| returns true. If either condition is not met, let |connection| be
-     failure.
-  1. If |connection| is failure, then abort the remaining steps and [=queue a network task=] with
+     |serverCertificateHashes| returns true. If either condition is not met, let |response| be
+     [=network error=].
+</div>
+
+<div algorithm>
+To <dfn>process a response</dfn>, given a [=network partition key=]
+|networkPartitionKey|, and a [=URL record=] |url|, run these steps.
+  1. If |response| is [=network error=], then abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
     1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
