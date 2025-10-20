@@ -932,10 +932,10 @@ agent MUST run the following steps:
     :: null
 1. Let |pullDatagramsAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
 
-Note: Using 64kB buffers with datagrams is recommended because the effective
-maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
-which is recommended to be 64kB (See [[!QUIC-DATAGRAM]] [Section 3](https://datatracker.ietf.org/doc/html/rfc9221#section-3)).
-This will ensure the stream is not errored due to a datagram being larger than the buffer.
+    Note: Using 64kB buffers with datagrams is recommended because the effective
+    maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
+    which is recommended to be 64kB (See [[!QUIC-DATAGRAM]] [Section 3](https://datatracker.ietf.org/doc/html/rfc9221#section-3)).
+    This will ensure the stream is not errored due to a datagram being larger than the buffer.
 
 1. If |datagramsReadableMode| is `"bytes"`, [=ReadableStream/set up with byte reading support=]
    |incomingDatagrams| with [=ReadableStream/set up with byte reading support/pullAlgorithm=] set
