@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 3f621ba99, updated Mon Jul 28 15:38:36 2025 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="7c37476a060b69397d04896854d904c95812b101" name="revision">
+  <meta content="8537e5824b970320042d9dde8ac4c821a18aad2c" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -742,7 +742,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
 </p>
    <h1 class="p-name no-ref" id="title">WebTransport</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#ED">Editor’s Draft</a>,
-    <time class="dt-updated" datetime="2025-10-14">14 October 2025</time></p>
+    <time class="dt-updated" datetime="2025-10-21">21 October 2025</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -2012,12 +2012,10 @@ agent MUST run the following steps:
       </dl>
      <li data-md>
       <p>Let <var>pullDatagramsAlgorithm</var> be an action that runs <a data-link-type="dfn" href="#pulldatagrams" id="ref-for-pulldatagrams①">pullDatagrams</a> with <var>transport</var>.</p>
-    </ol>
-    <p class="note" role="note"><span class="marker">Note:</span> Using 64kB buffers with datagrams is recommended because the effective
-maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
-which is recommended to be 64kB (See <a data-link-type="biblio" href="#biblio-quic-datagram" title="An Unreliable Datagram Extension to QUIC">[QUIC-DATAGRAM]</a> <a href="https://datatracker.ietf.org/doc/html/rfc9221#section-3">Section 3</a>).
-This will ensure the stream is not errored due to a datagram being larger than the buffer.</p>
-    <ol>
+      <p class="note" role="note"><span class="marker">Note:</span> Using 64kB buffers with datagrams is recommended because the effective
+  maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
+  which is recommended to be 64kB (See <a data-link-type="biblio" href="#biblio-quic-datagram" title="An Unreliable Datagram Extension to QUIC">[QUIC-DATAGRAM]</a> <a href="https://datatracker.ietf.org/doc/html/rfc9221#section-3">Section 3</a>).
+  This will ensure the stream is not errored due to a datagram being larger than the buffer.</p>
      <li data-md>
       <p>If <var>datagramsReadableMode</var> is <code>"bytes"</code>, <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-set-up-with-byte-reading-support" id="ref-for-readablestream-set-up-with-byte-reading-support">set up with byte reading support</a>
  <var>incomingDatagrams</var> with <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-set-up-with-byte-reading-support-pullalgorithm" id="ref-for-readablestream-set-up-with-byte-reading-support-pullalgorithm">pullAlgorithm</a> set
