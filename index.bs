@@ -993,8 +993,9 @@ new "`webtransport`" [=request/mode=]. [#1808](https://github.com/whatwg/fetch/i
 
 <div algorithm>
 To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partition key=]
-|networkPartitionKey|, and a [=URL record=] |url|, run these steps:
-  1. Let |transport| be the {{WebTransport}} object associated with this request.
+|networkPartitionKey|, and a [=request=] |request|, run these steps:
+  1. Let |transport| be the {{WebTransport}} object associated with |request|.
+  1. Let |url| be |request|'s [=request/current URL=].
   1. Let |newConnection| be |transport|.{{[[NewConnection]]}}.
   1. Let |requireUnreliable| be |transport|.{{[[RequireUnreliable]]}}.
   1. Let |serverCertificateHashes| be the values in |transport|.{{[[ServerCertificateHashes]]}}.
