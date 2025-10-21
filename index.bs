@@ -982,7 +982,8 @@ agent MUST run the following steps:
    [=environment settings object/policy container=], [=request/destination=] is "",
    [=request/origin=] is |origin| and [=request/redirect mode=] is "error".
 1. [=Fetch=] |request|, with [=useParallelQueue=] set to true, and [=processResponse=]
-   set to the [=process a response=] steps.
+   set to the following steps given a |response|:
+    1. [=Process a response=] with |response|, |origin|, |protocols|, and |congestionControl|.
 1. Return |transport|.
 
 </div>
@@ -991,26 +992,24 @@ Note: The plan is for [=fetch=] to call into the below algorithm based off a
 new "`webtransport`" [=request/mode=]. [#1808](https://github.com/whatwg/fetch/issues/1808).
 
 <div algorithm>
-To <dfn>obtain a WebTransport connection</dfn>, given a [=network partition key=]
+To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partition key=]
 |networkPartitionKey|, and a [=URL record=] |url|, run these steps:
   1. Let |transport| be the {{WebTransport}} object associated with this request.
   1. Let |newConnection| be |transport|.{{[[NewConnection]]}}.
   1. Let |requireUnreliable| be |transport|.{{[[RequireUnreliable]]}}.
   1. Let |serverCertificateHashes| be the values in |transport|.{{[[ServerCertificateHashes]]}}.
   1. Return the result of [=obtain a connection|obtaining a connection=] with
-     |networkPartitionKey|, |url|, false, |newConnection|, and |requireUnreliable|. If the user agent
-     supports more than one congestion control algorithm, choose one appropriate for
-     |congestionControl| for sending of data on this |connection|. When obtaining a connection, if
+     |networkPartitionKey|, |url|, false, |newConnection|, and |requireUnreliable|.
+     When obtaining a connection, if
      |serverCertificateHashes| is specified, instead of using the default certificate verification
      algorithm, consider the certificate valid if it meets the [=custom certificate
      requirements=] and if [=verify a certificate hash|verifying the certificate hash=] against
-     |serverCertificateHashes| returns true. If either condition is not met, let |response| be
+     |serverCertificateHashes| returns true. If either condition is not met, fail with a
      [=network error=].
 </div>
 
 <div algorithm>
-To <dfn>process a response</dfn>, given a [=network partition key=]
-|networkPartitionKey|, and a [=URL record=] |url|, run these steps.
+To <dfn>process a response</dfn>, given a |response|, |origin|, |protocols|, and |congestionControl|, run these steps:
   1. If |response| is [=network error=], then abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
@@ -1023,6 +1022,7 @@ To <dfn>process a response</dfn>, given a [=network partition key=]
        information that would normally be blocked by CORS. In same-origin contexts, it might
        encourage applications to abuse the handshake as a vector for passing information.
 
+  1. Let |connection| be the underlying connection associated with |response|.
   1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
      represents the SETTINGS frame.
   1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
@@ -1043,6 +1043,8 @@ To <dfn>process a response</dfn>, given a [=network partition key=]
        {{WebTransportErrorOptions/source}} is `"session"`.
     1. [=Cleanup=] |transport| with |error|.
   1. Let |session| be the established [=WebTransport session=].
+  1. If the user agent supports more than one congestion control algorithm, choose one
+     appropriate for |congestionControl| for sending of data on this |connection|.
   1. [=Queue a network task=] with |transport| to run these steps:
     1. Assert: [=this=]'s {{[[Datagrams]]}}'s {{[[OutgoingMaxDatagramSize]]}} is an integer.
     1. If |transport|.{{[[State]]}} is not `"connecting"`:
@@ -1450,7 +1452,7 @@ run these steps:
 
 ## Context cleanup steps ##  {#web-transport-context-cleanup-steps}
 
-This specification defines <dfn>context cleanup steps</dfn> as the following steps, given
+This specification defines <dfn export>context cleanup steps</dfn> as the following steps, given
 {{WebTransport}} |transport|:
 
 1. If |transport|.{{[[State]]}} is `"connected"`, then:
