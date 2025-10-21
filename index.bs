@@ -983,7 +983,7 @@ agent MUST run the following steps:
    [=request/origin=] is |origin| and [=request/redirect mode=] is "error".
 1. [=Fetch=] |request|, with [=useParallelQueue=] set to true, and [=processResponse=]
    set to the following steps given a |response|:
-    1. [=Process a response=] with |response|, |origin|, |protocols|, and |congestionControl|.
+    1. [=Process a WebTransport fetch response=] with |response|, |origin|, |protocols|, and |congestionControl|.
 1. Return |transport|.
 
 </div>
@@ -1009,7 +1009,7 @@ To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partiti
 </div>
 
 <div algorithm>
-To <dfn>process a response</dfn>, given a |response|, |origin|, |protocols|, and |congestionControl|, run these steps:
+To <dfn>process a WebTransport fetch response</dfn>, given a |response|, |origin|, |protocols|, and |congestionControl|, run these steps:
   1. If |response| is [=network error=], then abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
