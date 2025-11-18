@@ -856,7 +856,7 @@ A {{WebTransport}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[NewConnection]]`</dfn>
-   <td class="non-normative">Either `"no"` or `"yes-and-dedicated"`.
+   <td class="non-normative">Either "`no`" or "`yes-and-dedicated`".
   </tr>
   <tr>
    <td><dfn>`[[RequireUnreliable]]`</dfn>
@@ -886,7 +886,7 @@ agent MUST run the following steps:
    {{WebTransportOptions/serverCertificateHashes}} if it exists, and null otherwise.
 1. If |dedicated| is false and |serverCertificateHashes| is non-null, then [=throw=] a
    {{NotSupportedError}} exception.
-1. Let |newConnection| be `"no"` if |dedicated| is false; otherwise `"yes-and-dedicated"`.
+1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
 1. Let |requireUnreliable| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/requireUnreliable}}.
 1. Let |congestionControl| be {{WebTransport/constructor(url, options)/options}}'s
@@ -952,9 +952,9 @@ agent MUST run the following steps:
     :: |serverCertificateHashes|
 1. Let |pullDatagramsAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
 
-    Note: Using 64kB buffers with datagrams is recommended because the effective
+    Note: Using 64 kibibytes buffers with datagrams is recommended because the effective
     maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
-    which is recommended to be 64kB (See [[!QUIC-DATAGRAM]] [Section 3](https://datatracker.ietf.org/doc/html/rfc9221#section-3)).
+    which is recommended to be 64 kibibytes (See [[!QUIC-DATAGRAM]] [Section 3](https://datatracker.ietf.org/doc/html/rfc9221#section-3)).
     This will ensure the stream is not errored due to a datagram being larger than the buffer.
 
 1. If |datagramsReadableMode| is `"bytes"`, [=ReadableStream/set up with byte reading support=]
@@ -3224,7 +3224,7 @@ async function receiveDatagrams(url) {
 
 As {{WebTransport/datagrams}} are [=readable byte streams=], you can acquire a
 [=BYOB reader=] for them, which allows more precise control over buffer allocation
-in order to avoid copies. This example reads the datagram into a 64kB memory buffer.
+in order to avoid copies. This example reads the datagram into a 64 kibibytes memory buffer.
 
 <pre class="example" highlight="js">
 const wt = new WebTransport(url);
