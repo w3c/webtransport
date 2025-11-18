@@ -877,8 +877,8 @@ agent MUST run the following steps:
 1. Let |url| be the [=URL record=] resulting from [=URL parser|parsing=]
    {{WebTransport/constructor(url, options)/url}} with |baseURL|.
 1. If |url| is failure, [=throw=] a {{SyntaxError}} exception.
-1. If |url| [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
-1. If |url| [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
+1. If |url|'s [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
+1. If |url|'s [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
 1. Let |allowPooling| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/allowPooling}}.
 1. Let |dedicated| be the negation of |allowPooling|.
@@ -994,7 +994,7 @@ new "`webtransport`" [=request/mode=]. [#1808](https://github.com/whatwg/fetch/i
 
 <div algorithm>
 To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partition key=]
-|networkPartitionKey|, and a [=request=] |request|, run these steps:
+|networkPartitionKey|, and a [=request=] |request|:
   1. Let |transport| be the {{WebTransport}} object associated with |request|.
   1. Let |url| be |request|'s [=request/current URL=].
   1. Let |newConnection| be |transport|.{{[[NewConnection]]}}.
