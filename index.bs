@@ -983,9 +983,13 @@ agent MUST run the following steps:
    TODO: specify the `:protocol` pseudo-header field with value "`webtransport`",
    either here somehow or in [=fetch=].
    </div>
-1. For each |protocol| in |protocols|, [=header list/combine=] (`WT-Available-Protocols`, |protocol|) in
-    |request|’s [=header list=].
-
+1. If |protocols| is not empty, [=header list/set a structured field value=] with
+    (`WT-Available-Protocols`, a
+    <a href="https://html.spec.whatwg.org/#http-structured-header-list">
+    structured header list</a> whose members are the
+    <a href="https://html.spec.whatwg.org/#http-structured-header-list">
+    structured header string</a> items in |protocols| in order) in |request|’s
+    [=header list=].
 1. [=Fetch=] |request|, with [=useParallelQueue=] set to true, and [=processResponse=]
    set to the following steps given a |response|:
     1. [=Process a WebTransport fetch response=] with |response|, |origin|, |protocols|, and |congestionControl|.
