@@ -978,10 +978,13 @@ agent MUST run the following steps:
    information that would normally be blocked by CORS. In same-origin contexts, it might
    encourage applications to abuse the handshake as a vector for passing information.
 
-1. Set |request|'s [=request/method=] to "`CONNECT`".
+1. Set |request|'s [=request/method=] to "`CONNECT`", and set the method's associated
+   <dfn>pseudo-headers</dfn> as follows: `:protocol` to `"webtransport"`,
+   `:scheme`, `:authority`, and `:path` from |request|’s [=request/URL=].
+
    <div class="note">
-   TODO: specify the `:protocol` pseudo-header field with value "`webtransport`",
-   either here somehow or in [=fetch=].
+     TODO: Have fetch populate CONNECT pseudo-headers based on [=/request=]
+     [=request/mode=]. [whatwg/fetch#1881](https://github.com/whatwg/fetch/issues/1881).
    </div>
 1. If |protocols| is not empty, [=header list/set a structured field value=] with
     (`WT-Available-Protocols`, a
@@ -3015,9 +3018,9 @@ WebTransport imposes a set of requirements as described in
 1. Ensuring that the remote server is aware that the WebTransport protocol is in
    use and confirming that the remote server is willing to use the WebTransport
    protocol. [[!WEB-TRANSPORT-HTTP3]] uses a combination of ALPN [[RFC7301]], an
-   HTTP/3 setting, and a `:protocol` pseudo-header to identify the WebTransport
+   HTTP/3 setting, and a `:protocol` [=pseudo-header=] to identify the WebTransport
    protocol. [[!WEB-TRANSPORT-HTTP2]] uses a combination of ALPN, an HTTP/2 setting,
-   and a `:protocol` pseudo-header to identify the WebTransport protocol.
+   and a `:protocol` [=pseudo-header=] to identify the WebTransport protocol.
 1. Allowing the server to filter connections based on the origin of the resource
    originating the transport session.  The <a http-header><code>Origin</code></a> header
    field on the session establishment request carries this information.
