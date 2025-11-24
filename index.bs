@@ -979,8 +979,7 @@ agent MUST run the following steps:
    encourage applications to abuse the handshake as a vector for passing information.
 
 1. Set |request|'s [=request/method=] to "`CONNECT`", and set the method's associated
-   <dfn>pseudo-headers</dfn> as follows: `:protocol` to `"webtransport"`,
-   `:scheme`, `:authority`, and `:path` from |request|’s [=request/URL=].
+   `:protocol` <dfn>pseudo-header</dfn> to `"webtransport"`.
 
    <div class="note">
      TODO: Have fetch populate CONNECT pseudo-headers based on [=/request=]
@@ -1019,7 +1018,7 @@ To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partiti
   1. If |connection| is failure, return failure.
   1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary
      that represents the SETTINGS frame.
-  1. If |settings| doesn't contain `SETTINGS_ENABLE_CONNECT_PROTOCOL` with a value of 1, then
+  1. If |settings| doesn't contain `SETTINGS_ENABLE_CONNECT_PROTOCOL` (0x08, see [Section 3](https://datatracker.ietf.org/doc/html/rfc8441#section-3) of [[!RFC8441]] for HTTP/2; 0x08, see [Section 3](https://www.rfc-editor.org/rfc/rfc9220.html#section-3) of [[!RFC9220]]) with a value of 1, then
      return failure.
   1. If |settings| doesn't indicate server support for WebTransport, then return failure.
      [[!WEB-TRANSPORT-OVERVIEW]] [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview#section-4.1-2.2.1).
