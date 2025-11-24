@@ -1013,18 +1013,24 @@ To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partiti
   1. If |connection| is failure, return failure.
   1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary
      that represents the SETTINGS frame.
-  1. If |settings| doesn't contain `SETTINGS_ENABLE_CONNECT_PROTOCOL` (0x08, see [Section 3](https://datatracker.ietf.org/doc/html/rfc8441#section-3) of [[!RFC8441]] for HTTP/2; 0x08, see [Section 3](https://www.rfc-editor.org/rfc/rfc9220.html#section-3) of [[!RFC9220]]) with a value of 1, then
-     return failure.
+  1. If |settings| doesn't contain `SETTINGS_ENABLE_CONNECT_PROTOCOL` (0x08, see
+     [Section 3](https://datatracker.ietf.org/doc/html/rfc8441#section-3) of [[!RFC8441]] for
+     HTTP/2; 0x08, see [Section 3](https://www.rfc-editor.org/rfc/rfc9220.html#section-3) of
+     [[!RFC9220]]) with a value of 1, then return failure.
   1. If |settings| doesn't indicate server support for WebTransport, then return failure.
-     [[!WEB-TRANSPORT-OVERVIEW]] [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview#section-4.1-2.2.1).
+     [[!WEB-TRANSPORT-OVERVIEW]]
+     [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview#section-4.1-2.2.1).
      <div class="note">
       -   Over HTTP/3, support requires `SETTINGS_WT_MAX_SESSIONS` with a value above 0,
-          and `SETTINGS_H3_DATAGRAM` with a value of 1.
-          [[!WEB-TRANSPORT-HTTP3]] [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.1).
-      - Over HTTP/2, potential support is already indicated by `SETTINGS_ENABLE_CONNECT_PROTOCOL` above. [[!WEB-TRANSPORT-HTTP2]] [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/#section-3.1).
+          and `SETTINGS_H3_DATAGRAM` with a value of 1. [[!WEB-TRANSPORT-HTTP3]]
+          [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.1).
+      -   Over HTTP/2, potential support is already indicated by `SETTINGS_ENABLE_CONNECT_PROTOCOL` above.
+          [[!WEB-TRANSPORT-HTTP2]]
+          [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/#section-3.1).
      </div>
 
-     Note: `SETTINGS_WT_MAX_SESSIONS` is in flux in the IETF and may change back to `SETTINGS_ENABLE_WEBTRANSPORT`.
+     Note: `SETTINGS_WT_MAX_SESSIONS` is in flux in the IETF and may change back to
+           `SETTINGS_ENABLE_WEBTRANSPORT`.
   1. Return |connection|.
 </div>
 
