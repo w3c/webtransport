@@ -1602,8 +1602,9 @@ To <dfn>compute a certificate hash</dfn>, given a |certificate|, perform the fol
 </div>
 
 <div algorithm>
-To <dfn>verify a certificate hash</dfn>, given a |certificate| and an array of hashes |hashes|,
+To <dfn>verify a certificate hash</dfn>, given a |certificate chain| and an array of hashes |hashes|,
 perform the following steps:
+1. Let |certificate| be the first certificate in |certificate chain| (the leaf certificate).
 1. Let |referenceHash| be the result of [=computing a certificate hash=] with |certificate|.
 1. For every hash |hash| in |hashes|:
    1. If |hash|.{{WebTransportHash/value}} is not null and |hash|.{{WebTransportHash/algorithm}}
