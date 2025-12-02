@@ -883,8 +883,8 @@ agent MUST run the following steps:
    {{WebTransportOptions/allowPooling}}.
 1. Let |dedicated| be the negation of |allowPooling|.
 1. Let |serverCertificateHashes| be {{WebTransport/constructor(url, options)/options}}'s
-   {{WebTransportOptions/serverCertificateHashes}} if it exists, and null otherwise.
-1. If |dedicated| is false and |serverCertificateHashes| is non-null, then [=throw=] a
+   {{WebTransportOptions/serverCertificateHashes}}.
+1. If |dedicated| is false and |serverCertificateHashes| is not empty, then [=throw=] a
    {{NotSupportedError}} exception.
 1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
 1. Let |requireUnreliable| be {{WebTransport/constructor(url, options)/options}}'s
@@ -1003,7 +1003,7 @@ To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partiti
   1. Return the result of [=obtain a connection|obtaining a connection=] with
      |networkPartitionKey|, |url|, false, |newConnection|, and |requireUnreliable|.
      When obtaining a connection, if
-     |serverCertificateHashes| is specified, instead of using the default certificate verification
+     |serverCertificateHashes| is not empty, instead of using the default certificate verification
      algorithm, consider the certificate valid if it meets the [=custom certificate
      requirements=] and if [=verify a certificate hash|verifying the certificate hash=] against
      |serverCertificateHashes| returns true. If either condition is not met, fail with a
@@ -1501,14 +1501,14 @@ with an Application Error Code of `0` and Application Error Message of `""`.
 
 <pre class="idl">
 dictionary WebTransportHash {
-  DOMString algorithm;
-  BufferSource value;
+  required DOMString algorithm;
+  required BufferSource value;
 };
 
 dictionary WebTransportOptions {
   boolean allowPooling = false;
   boolean requireUnreliable = false;
-  sequence&lt;WebTransportHash&gt; serverCertificateHashes;
+  sequence&lt;WebTransportHash&gt; serverCertificateHashes = [];
   WebTransportCongestionControl congestionControl = "default";
   [EnforceRange] unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams = null;
   [EnforceRange] unsigned short? anticipatedConcurrentIncomingBidirectionalStreams = null;
@@ -1545,8 +1545,8 @@ that determine how the [=WebTransport session=] is established and used.
    {{WebTransportOptions/serverCertificateHashes}}
    and satisfies [=custom certificate requirements=].  The user agent SHALL
    ignore any hash that uses an unknown {{WebTransportHash/algorithm}}.
-   If empty, the user agent SHALL use certificate verification procedures it would
-   use for normal [=fetch=] operations.
+   If empty or all {{WebTransportHash/algorithm}}s are unknown, the user agent SHALL
+   use certificate verification procedures it would use for normal [=fetch=] operations.
 :: This cannot be used with {{WebTransportOptions/allowPooling}}.
 
 : <dfn for="WebTransportOptions" dict-member>congestionControl</dfn>
