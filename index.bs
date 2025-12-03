@@ -76,6 +76,7 @@ spec:streams; type:interface; text:ReadableStream
 spec:fetch; type:dfn; for:/; text:fetch
 spec:fetch; type:dfn; for:/; text:credentials
 spec:fetch; type:dfn; for:fetch record; text:request
+spec:fetch; type:dfn; for:request; text:header list
 spec:url; type:dfn; text:scheme
 spec:url; type:dfn; text:fragment
 spec:infra; type:dfn; for:/; text:ASCII case-insensitive
@@ -193,17 +194,6 @@ A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRAN
   </tr>
  </tbody>
 </table>
-
-To <dfn for=session>establish</dfn> a [=WebTransport session=] with an [=/origin=] |origin| and a
-|protocols| array, follow [[!WEB-TRANSPORT-OVERVIEW]]
-[Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09#section-4.1-2.2.1),
-using |origin|, [=ASCII serialization of an origin|serialized=] and
-[=isomorphic encoded|isomorphically encoded=], as the [:Origin:] header of the request, and the
-[=isomorphic encoded|isomorphically encoded=] |protocols| as the list of protocols the client would
-like the server to use in this session, in preference order, following [[!WEB-TRANSPORT-OVERVIEW]]
-[Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09#section-3.1).
-When establishing a session, the client MUST NOT provide any [=credentials=].
-The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
 
 A [=WebTransport session=] |session| is <dfn for=session>draining</dfn> when the [=CONNECT stream=] is
 asked to gracefully close by the server, as described in [[!WEB-TRANSPORT-OVERVIEW]]
@@ -982,6 +972,21 @@ agent MUST run the following steps:
    [=request/policy container=] is |client|'s
    [=environment settings object/policy container=], [=request/destination=] is "",
    [=request/origin=] is |origin| and [=request/redirect mode=] is "error".
+
+   Note: Redirects are not followed. Network errors caused by redirection are intentionally
+   indistinguishable from other network errors.  In cross-origin contexts, this would reveal
+   information that would normally be blocked by CORS. In same-origin contexts, it might
+   encourage applications to abuse the handshake as a vector for passing information.
+
+1. Set |request|'s [=request/method=] to "`CONNECT`", and set the method's associated
+   `:protocol` <dfn>pseudo-header</dfn> to `"webtransport"`.
+1. If |protocols| is not empty, [=header list/set a structured field value=] with
+    (`WT-Available-Protocols`, a
+    <a href="https://html.spec.whatwg.org/#http-structured-header-list">
+    structured header list</a> whose members are the
+    <a href="https://html.spec.whatwg.org/#http-structured-header-list">
+    structured header string</a> items in |protocols| in order) in |request|’s
+    [=header list=].
 1. [=Fetch=] |request|, with [=useParallelQueue=] set to true, and [=processResponse=]
    set to the following steps given a |response|:
     1. [=Process a WebTransport fetch response=] with |response|, |origin|, |protocols|, and |congestionControl|.
@@ -989,10 +994,7 @@ agent MUST run the following steps:
 
 </div>
 
-Note: The plan is for [=fetch=] to call into the below algorithm based off a
-new "`webtransport`" [=request/mode=]. [#1808](https://github.com/whatwg/fetch/issues/1808).
-
-<div algorithm>
+<div algorithm="obtain a WebTransport connection">
 To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partition key=]
 |networkPartitionKey|, and a [=request=] |request|:
   1. Let |transport| be the {{WebTransport}} object associated with |request|.
@@ -1000,18 +1002,40 @@ To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partiti
   1. Let |newConnection| be |transport|.{{[[NewConnection]]}}.
   1. Let |requireUnreliable| be |transport|.{{[[RequireUnreliable]]}}.
   1. Let |serverCertificateHashes| be the values in |transport|.{{[[ServerCertificateHashes]]}}.
-  1. Return the result of [=obtain a connection|obtaining a connection=] with
+  1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
      |networkPartitionKey|, |url|, false, |newConnection|, and |requireUnreliable|.
      When obtaining a connection, if
      |serverCertificateHashes| is specified, instead of using the default certificate verification
      algorithm, consider the certificate valid if it meets the [=custom certificate
      requirements=] and if [=verify a certificate hash|verifying the certificate hash=] against
-     |serverCertificateHashes| returns true. If either condition is not met, fail with a
-     [=network error=].
+     |serverCertificateHashes| returns true. If either condition is not met, the result is
+     failure.
+  1. If |connection| is failure, return failure.
+  1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary
+     that represents the SETTINGS frame.
+  1. If |settings| doesn't contain `SETTINGS_ENABLE_CONNECT_PROTOCOL` (0x08, see
+     [Section 3](https://datatracker.ietf.org/doc/html/rfc8441#section-3) of [[!RFC8441]] for
+     HTTP/2; 0x08, see [Section 3](https://www.rfc-editor.org/rfc/rfc9220.html#section-3) of
+     [[!RFC9220]]) with a value of 1, then return failure.
+  1. If |settings| doesn't indicate server support for WebTransport, then return failure.
+     [[!WEB-TRANSPORT-OVERVIEW]]
+     [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview#section-4.1-2.2.1).
+     <div class="note">
+      -   Over HTTP/3, support requires `SETTINGS_WT_MAX_SESSIONS` with a value above 0,
+          and `SETTINGS_H3_DATAGRAM` with a value of 1. [[!WEB-TRANSPORT-HTTP3]]
+          [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-3.1).
+      -   Over HTTP/2, potential support is already indicated by `SETTINGS_ENABLE_CONNECT_PROTOCOL` above.
+          [[!WEB-TRANSPORT-HTTP2]]
+          [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/#section-3.1).
+     </div>
+
+     Note: `SETTINGS_WT_MAX_SESSIONS` is in flux in the IETF and may change back to
+           `SETTINGS_ENABLE_WEBTRANSPORT`.
+  1. Return |connection|.
 </div>
 
-<div algorithm>
-To <dfn>process a WebTransport fetch response</dfn>, given a |response|, |origin|, |protocols|, and |congestionControl|, run these steps:
+<div algorithm="process a WebTransport fetch response">
+To <dfn>process a WebTransport fetch response</dfn>, given a |response|, and |congestionControl|, run these steps:
   1. If |response| is [=network error=], then abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
@@ -1019,24 +1043,14 @@ To <dfn>process a WebTransport fetch response</dfn>, given a |response|, |origin
        {{WebTransportErrorOptions/source}} is `"session"`.
     1. [=Cleanup=] |transport| with |error|.
 
-       Note: Redirects are not followed. Network errors caused by redirection are intentionally
-       indistinguishable from other network errors.  In cross-origin contexts, this would reveal
-       information that would normally be blocked by CORS. In same-origin contexts, it might
-       encourage applications to abuse the handshake as a vector for passing information.
-
   1. Let |connection| be the underlying connection associated with |response|.
-  1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary that
-     represents the SETTINGS frame.
-  1. If |settings| doesn't contain SETTINGS_ENABLE_WEBTRANPORT with a value of 1, or it doesn't
-     contain H3_DATAGRAM with a value of 1, then abort the remaining steps and [=queue a network
-     task=] with |transport| to run these steps:
-    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
-    1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
-       {{WebTransportErrorOptions/source}} is `"session"`.
-    1. [=Cleanup=] |transport| with |error|.
-  1. [=session/Establish=] a [=WebTransport session=] with |origin| and |protocols| on |connection|.
+  1. Follow any restrictions in [[!WEB-TRANSPORT-OVERVIEW]]
+     [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-09#section-4.1-2.2.1)
+     to <dfn for=session>establish</dfn> a [=WebTransport session=] on |connection| using the server's |response|.
+  1. Let |session| be a the [=WebTransport session=] just [=establish|established=] on |connection|.
+     The resulting underlying transport stream is referred to as the session's <dfn>CONNECT stream</dfn>.
 
-    Note: This step also contains the transport parameter exchange specified in [[!QUIC-DATAGRAM]].
+     Note: This step also concludes the transport parameter exchange specified in [[!QUIC-DATAGRAM]].
 
   1. If the previous step fails, abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
@@ -1044,7 +1058,6 @@ To <dfn>process a WebTransport fetch response</dfn>, given a |response|, |origin
     1. Let |error| be a newly [=DOMException/created=] {{WebTransportError}} whose
        {{WebTransportErrorOptions/source}} is `"session"`.
     1. [=Cleanup=] |transport| with |error|.
-  1. Let |session| be the established [=WebTransport session=].
   1. If the user agent supports more than one congestion control algorithm, choose one
      appropriate for |congestionControl| for sending of data on this |connection|.
   1. [=Queue a network task=] with |transport| to run these steps:
@@ -3022,9 +3035,9 @@ WebTransport imposes a set of requirements as described in
 1. Ensuring that the remote server is aware that the WebTransport protocol is in
    use and confirming that the remote server is willing to use the WebTransport
    protocol. [[!WEB-TRANSPORT-HTTP3]] uses a combination of ALPN [[RFC7301]], an
-   HTTP/3 setting, and a `:protocol` pseudo-header to identify the WebTransport
+   HTTP/3 setting, and a `:protocol` [=pseudo-header=] to identify the WebTransport
    protocol. [[!WEB-TRANSPORT-HTTP2]] uses a combination of ALPN, an HTTP/2 setting,
-   and a `:protocol` pseudo-header to identify the WebTransport protocol.
+   and a `:protocol` [=pseudo-header=] to identify the WebTransport protocol.
 1. Allowing the server to filter connections based on the origin of the resource
    originating the transport session.  The <a http-header><code>Origin</code></a> header
    field on the session establishment request carries this information.
