@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 3c53a5b02, updated Thu Nov 27 17:03:30 2025 +0000" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="f7f419f707bb365f6e146446a8e53ecc1e6517fa" name="revision">
+  <meta content="3d414ee3b1fbf0f60949e30e3a6659ebf71465cf" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -2966,10 +2966,12 @@ To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="compute-a-cert
    </div>
    <div class="algorithm" data-algorithm="verify a certificate hash">
     
-To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="verify-a-certificate-hash">verify a certificate hash</dfn>, given a <var>certificate</var> and an array of hashes <var>hashes</var>,
+To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="verify-a-certificate-hash">verify a certificate hash</dfn>, given a <var>certificate chain</var> and an array of hashes <var>hashes</var>,
 perform the following steps:
 
     <ol>
+     <li data-md>
+      <p>Let <var>certificate</var> be the first certificate in <var>certificate chain</var> (the leaf certificate).</p>
      <li data-md>
       <p>Let <var>referenceHash</var> be the result of <a data-link-type="dfn" href="#compute-a-certificate-hash" id="ref-for-compute-a-certificate-hash">computing a certificate hash</a> with <var>certificate</var>.</p>
      <li data-md>
