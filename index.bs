@@ -988,10 +988,11 @@ agent MUST run the following steps:
 1. Set |request|'s [=request/method=] to "`CONNECT`", and set the method's associated
    `:protocol` <dfn>pseudo-header</dfn> to `"webtransport"`.
 1. Let |headers| be {{WebTransport/constructor(url, options)/options}}["{{WebTransportOptions/headers}}"].
-1. If |headers| is a {{Headers}} object, then [=for each=] |header| of its [=Headers/header list=],
-   [=Headers/append=] |header| to |request|’s [=Request/headers=].
-1. Otherwise, [=Headers/fill=] |request|'s [=Request/headers=] with |headers|.
-1. If |request|'s [=Request/headers=] [=header list/contains=] `WT-Available-Protocols`, then
+1. If |headers| is a not a {{Headers}} object, then set |headers| to a new {{Headers}}
+   object [=Headers/filled=] with
+   {{WebTransport/constructor(url, options)/options}}["{{WebTransportOptions/headers}}"].
+1. Set |request|'s [=request/header list=] to a copy of |headers|'s [=Headers/header list=].
+1. If |request|'s [=request/header list=] [=header list/contains=] `WT-Available-Protocols`, then
    throw a {{TypeError}}.
 1. If |protocols| is not empty, [=header list/set a structured field value=] with
     (`WT-Available-Protocols`, a
@@ -1580,6 +1581,11 @@ that determine how the [=WebTransport session=] is established and used.
 : <dfn for="WebTransportOptions" dict-member>requireUnreliable</dfn>
 :: When set to true, the [=WebTransport session=] cannot be established over an
    HTTP/2 [=connection=] if an HTTP/3 [=connection=] is not possible.
+
+: <dfn for="WebTransportOptions" dict-member>headers</dfn>
+:: Optionally, a {{Headers}} object, an object literal, or an array of two-item arrays
+   to set the [=request=] [=request/header list=] to use when [=session/establishing=]
+   a [=WebTransport session=].
 
 : <dfn for="WebTransportOptions" dict-member>serverCertificateHashes</dfn>
 :: This option is only supported for transports using dedicated connections.
