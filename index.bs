@@ -337,7 +337,7 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
   </tr>
   <tr>
    <td><dfn>`[[Transport]]`</dfn>
-   <td class="non-normative">A {{WebTransport}} which owns this {{WebTransportDatagramsWritable}}.
+   <td class="non-normative">The {{WebTransport}} that owns this {{WebTransportDatagramsWritable}}.
   </tr>
   <tr>
    <td><dfn>`[[SendGroup]]`</dfn>
@@ -350,6 +350,7 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
  </tbody>
 </table>
 
+<div algorithm="create writable">
  To <dfn export for="WebTransportDatagramsWritable" lt="create|creating">create</dfn> a
  {{WebTransportDatagramsWritable}}, given a {{WebTransport}} |transport|, a |sendGroup|,
  and a |sendOrder|, perform the following steps.
@@ -368,6 +369,8 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
  1. [=WritableStream/Set up=] |stream| with [=WritableStream/set up/writeAlgorithm=]
     set to |writeDatagramsAlgorithm|.
  1. Return |stream|.
+
+</div>
 
 ## Attributes ##  {#datagram-writable-attributes}
 
@@ -495,6 +498,10 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
  </thead>
  <tbody>
   <tr>
+   <td><dfn>`[[Transport]]`</dfn>
+   <td class="non-normative">The {{WebTransport}} that owns this {{WebTransportDatagramDuplexStream}}.
+  </tr>
+  <tr>
    <td><dfn>`[[Readable]]`</dfn>
    <td class="non-normative">A {{ReadableStream}} for incoming datagrams.
   </tr>
@@ -558,13 +565,14 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
 The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport}} object whose
 {{[[State]]}} is either `"connecting"` or `"connected"`.
 
+<div algorithm="create datagrams duplex stream">
  To <dfn export for="WebTransportDatagramDuplexStream" lt="create|creating">create</dfn> a
- {{WebTransportDatagramDuplexStream}} given a
- <dfn export for="WebTransportDatagramDuplexStream/create"><var>readable</var></dfn> and
- <dfn export for="WebTransportDatagramDuplexStream/create"><var>readableType</var></dfn>,
- perform the following steps.
+ {{WebTransportDatagramDuplexStream}} given a {{WebTransport}} |transport|, a
+ |readable| and |readableType|, perform the following steps.
 
  1. Let |stream| be a [=new=] {{WebTransportDatagramDuplexStream}}, with:
+    : {{WebTransportDatagramDuplexStream/[[Transport]]}}
+    :: |transport|
     : {{WebTransportDatagramDuplexStream/[[Readable]]}}
     :: |readable|
     : {{WebTransportDatagramDuplexStream/[[ReadableType]]}}
@@ -591,11 +599,14 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     :: an [=implementation-defined=] integer.
  1. Return |stream|.
 
+</div>
+
 ## Methods ##  {#datagram-duplex-stream-methods}
 
 : <dfn for="WebTransportDatagramDuplexStream" method>createWritable()</dfn>
 :: Creates a {{WebTransportDatagramsWritable}}.
 
+  <div algorithm="createWritable">
    When `createWritable()` method is called, the user agent MUST
    run the following steps:
      1. Let |transport| be {{WebTransport}} object associated with [=this=].
@@ -603,10 +614,16 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
         [=throw=] an {{InvalidStateError}}.
      1. Let |sendGroup| be {{WebTransportDatagramDuplexStream/createWritable(options)/options}}'s
         {{WebTransportSendOptions/sendGroup}}.
+     1. If |sendGroup| is not null, and
+        |sendGroup|.{{WebTransportSendGroup/[[Transport]]}} is not
+        [=this=].{{WebTransportDatagramDuplexStream/[[Transport]]}}, [=throw=]
+        an {{InvalidStateError}}.
      1. Let |sendOrder| be {{WebTransportDatagramDuplexStream/createWritable(options)/options}}'s
         {{WebTransportSendOptions/sendOrder}}.
      1. Return the result of [=WebTransportDatagramsWritable/creating=] a {{WebTransportDatagramsWritable}}
         with |transport|, |sendGroup| and |sendOrder|.
+
+  </div>
 
 ## Attributes ##  {#datagram-duplex-stream-attributes}
 
@@ -900,9 +917,6 @@ agent MUST run the following steps:
 1. Let |datagramsReadableType| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/datagramsReadableType}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
-1. Let |datagrams| be the result of [=WebTransportDatagramDuplexStream/creating=] a
-   {{WebTransportDatagramDuplexStream}}, its [=WebTransportDatagramDuplexStream/create/readable=] set to
-   |incomingDatagrams| and [=WebTransportDatagramDuplexStream/create/readableType=] set to |datagramsReadableType|.
 1. Let |transport| be a newly constructed {{WebTransport}} object, with:
     : {{[[SendStreams]]}}
     :: an empty [=ordered set=]
@@ -931,7 +945,7 @@ agent MUST run the following steps:
     : {{[[Draining]]}}
     :: a new promise
     : {{[[Datagrams]]}}
-    :: |datagrams|
+    :: undefined
     : {{[[Session]]}}
     :: null
     : {{[[NewConnection]]}}
@@ -940,6 +954,9 @@ agent MUST run the following steps:
     :: |requireUnreliable|
     : {{[[ServerCertificateHashes]]}}
     :: |serverCertificateHashes|
+1. Set |transport|.{{[[Datagrams]]}} to the result of [=WebTransportDatagramDuplexStream/creating=]
+   a {{WebTransportDatagramDuplexStream}}, with |transport|, |incomingDatagrams| and
+   |datagramsReadableType|.
 1. Let |pullDatagramsAlgorithm| be an action that runs [=pullDatagrams=] with |transport|.
 
     Note: Using 64 kibibytes buffers with datagrams is recommended because the effective
@@ -1296,19 +1313,22 @@ the application will receive the number of streams it anticipates.
 
    Note: There is no expectation that the server will be aware of the stream until data is sent on it.
 
+  <div algorithm="createBidirectionalStream">
    When `createBidirectionalStream` is called, the user agent MUST run the
    following steps:
 
-   1. Let |transport| be [=this=].
-   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+   1. If [=this=].{{[[State]]}} is `"closed"` or `"failed"`,
       return a new [=rejected=] promise with an {{InvalidStateError}}.
    1. Let |sendGroup| be {{WebTransport/createBidirectionalStream(options)/options}}'s
       {{WebTransportSendOptions/sendGroup}}.
+   1. If |sendGroup| is not null, and |sendGroup|.{{WebTransportSendGroup/[[Transport]]}}
+      is not [=this=], [=throw=] an {{InvalidStateError}}.
    1. Let |sendOrder| be {{WebTransport/createBidirectionalStream(options)/options}}'s
       {{WebTransportSendOptions/sendOrder}}.
    1. Let |waitUntilAvailable| be {{WebTransport/createBidirectionalStream(options)/options}}'s
       {{WebTransportSendStreamOptions/waitUntilAvailable}}.
    1. Let |p| be a new promise.
+   1. Let |transport| be [=this=].
    1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
       [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
@@ -1329,6 +1349,8 @@ the application will receive the number of streams it anticipates.
         1. [=Resolve=] |p| with |stream|.
    1. Return |p|.
 
+  </div>
+
 : <dfn for="WebTransport" method>createUnidirectionalStream()</dfn>
 
 :: Creates a {{WebTransportSendStream}} for an outgoing unidirectional stream.  Note
@@ -1337,18 +1359,22 @@ the application will receive the number of streams it anticipates.
 
    Note: There is no expectation that the server will be aware of the stream until data is sent on it.
 
+  <div algorithm="createUnidirectionalStream">
    When `createUnidirectionalStream()` method is called, the user agent MUST
    run the following steps:
-     1. Let |transport| be [=this=].
-     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+     1. If [=this=].{{[[State]]}} is `"closed"` or `"failed"`,
         return a new [=rejected=] promise with an {{InvalidStateError}}.
      1. Let |sendGroup| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
         {{WebTransportSendOptions/sendGroup}}.
+     1. If |sendGroup| is not null, and
+        |sendGroup|.{{WebTransportSendGroup/[[Transport]]}} is not [=this=], [=throw=]
+        an {{InvalidStateError}}.
      1. Let |sendOrder| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
         {{WebTransportSendOptions/sendOrder}}.
      1. Let |waitUntilAvailable| be {{WebTransport/createUnidirectionalStream(options)/options}}'s
         {{WebTransportSendStreamOptions/waitUntilAvailable}}.
      1. Let |p| be a new promise.
+     1. Let |transport| be [=this=].
      1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
         {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
         [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
@@ -1369,16 +1395,20 @@ the application will receive the number of streams it anticipates.
           1. [=Resolve=] |p| with |stream|.
      1. return |p|.
 
+    </div>
+
 : <dfn for="WebTransport" method>createSendGroup()</dfn>
 
 :: Creates a {{WebTransportSendGroup}}.
 
+  <div algorithm="createSendGroup">
    When `createSendGroup()` method is called, the user agent MUST
    run the following steps:
-     1. Let |transport| be [=this=].
-     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+     1. If [=this=].{{[[State]]}} is `"closed"` or `"failed"`,
         [=throw=] an {{InvalidStateError}}.
-     1. Return the result of [=WebTransportSendGroup/creating=] a {{WebTransportSendGroup}} with |transport|.
+     1. Return the result of [=WebTransportSendGroup/creating=] a {{WebTransportSendGroup}} with [=this=].
+
+  </div>
 
 ## Procedures ##  {#webtransport-procedures}
 
@@ -1749,6 +1779,8 @@ Note: Any unavailable stats will be [=map/exists|absent=] from the {{WebTranspor
 <pre class="idl">
 dictionary WebTransportConnectionStats {
   unsigned long long bytesSent;
+  unsigned long long bytesSentOverhead;
+  unsigned long long bytesAcknowledged;
   unsigned long long packetsSent;
   unsigned long long bytesLost;
   unsigned long long packetsLost;
@@ -1766,8 +1798,23 @@ dictionary WebTransportConnectionStats {
 The dictionary SHALL have the following attributes:
 
 : <dfn for="WebTransportConnectionStats" dict-member>bytesSent</dfn>
-:: The number of bytes sent on the [=underlying connection=], including retransmissions.
-   Does not include UDP or any other outer framing.
+:: The number of payload bytes sent over the [=underlying connection=], excluding any framing
+   overhead or retransmissions.
+: <dfn for="WebTransportConnectionStats" dict-member>bytesSentOverhead</dfn>
+:: The framing and retransmission overhead in bytes of sending
+   {{WebTransportConnectionStats/bytesSent}} number of payload bytes on the
+   [=underlying connection=].
+: <dfn for="WebTransportConnectionStats" dict-member>bytesAcknowledged</dfn>
+:: The number of payload bytes acknowledged as received by the server using
+   QUIC's ACK mechanism on the [=underlying connection=]. Excludes any framing.
+
+   Note: Typically trails {{WebTransportConnectionStats/bytesSent}} but can be permanently less due to packet loss.
+
+   <div class="issue atrisk">
+     {{WebTransportConnectionStats/bytesAcknowledged}} on {{WebTransportConnectionStats}} has been identified
+     by the Working Group as a feature at risk due to concerns over implementability.
+   </div>
+
 : <dfn for="WebTransportConnectionStats" dict-member>packetsSent</dfn>
 :: The number of packets sent on the [=underlying connection=], including those that are determined to have been lost.
 : <dfn for="WebTransportConnectionStats" dict-member>bytesLost</dfn>
@@ -1939,7 +1986,7 @@ A {{WebTransportSendStream}} has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[Transport]]`</dfn>
-   <td class="non-normative">A {{WebTransport}} which owns this {{WebTransportSendStream}}.
+   <td class="non-normative">The {{WebTransport}} that owns this {{WebTransportSendStream}}.
   </tr>
   <tr>
    <td><dfn>`[[SendGroup]]`</dfn>
