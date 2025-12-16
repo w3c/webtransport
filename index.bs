@@ -1778,6 +1778,8 @@ Note: Any unavailable stats will be [=map/exists|absent=] from the {{WebTranspor
 <pre class="idl">
 dictionary WebTransportConnectionStats {
   unsigned long long bytesSent;
+  unsigned long long bytesSentOverhead;
+  unsigned long long bytesAcknowledged;
   unsigned long long packetsSent;
   unsigned long long bytesLost;
   unsigned long long packetsLost;
@@ -1795,8 +1797,23 @@ dictionary WebTransportConnectionStats {
 The dictionary SHALL have the following attributes:
 
 : <dfn for="WebTransportConnectionStats" dict-member>bytesSent</dfn>
-:: The number of bytes sent on the [=underlying connection=], including retransmissions.
-   Does not include UDP or any other outer framing.
+:: The number of payload bytes sent over the [=underlying connection=], excluding any framing
+   overhead or retransmissions.
+: <dfn for="WebTransportConnectionStats" dict-member>bytesSentOverhead</dfn>
+:: The framing and retransmission overhead in bytes of sending
+   {{WebTransportConnectionStats/bytesSent}} number of payload bytes on the
+   [=underlying connection=].
+: <dfn for="WebTransportConnectionStats" dict-member>bytesAcknowledged</dfn>
+:: The number of payload bytes acknowledged as received by the server using
+   QUIC's ACK mechanism on the [=underlying connection=]. Excludes any framing.
+
+   Note: Typically trails {{WebTransportConnectionStats/bytesSent}} but can be permanently less due to packet loss.
+
+   <div class="issue atrisk">
+     {{WebTransportConnectionStats/bytesAcknowledged}} on {{WebTransportConnectionStats}} has been identified
+     by the Working Group as a feature at risk due to concerns over implementability.
+   </div>
+
 : <dfn for="WebTransportConnectionStats" dict-member>packetsSent</dfn>
 :: The number of packets sent on the [=underlying connection=], including those that are determined to have been lost.
 : <dfn for="WebTransportConnectionStats" dict-member>bytesLost</dfn>
