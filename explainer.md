@@ -12,15 +12,15 @@ Currently, web developers needing low-latency communication face a trade-off:
 * **WebRTC Data Channels** support unreliable UDP-like transport but are architected for Peer-to-Peer (P2P). Using them for client-server communication requires a complex "fake peer" setup involving ICE, STUN, and TURN.
 * **HTTP/2 and HTTP/3 (Fetch)** are request-response oriented and do not easily support long-lived, bidirectional, "push-style" data flow with custom reliability.
 
-WebTransport fills this gap by providing a QUIC-native, client-server API that handles multiplexing without head-of-line blocking.
+WebTransport provides a QUIC-native alternative that supports multiple independent streams and unreliable datagrams within a single, congestion-controlled connection.
 
 ## Goals
 
-* **Low Latency**: Support for unreliable datagrams and independent streams to avoid head-of-line blocking.
-* **Flexibility**: Allow developers to mix reliable and unreliable data on a single connection.
-* **Efficiency**: Enable complex prioritization (Send Groups) to manage bandwidth between different types of application data.
-* **Compatibility**: Provide a reliable fallback to HTTP/2 when HTTP/3 (UDP) is blocked by network middleboxes.
-* **Security**: Enforce origin-based security and TLS encryption.
+* **Low Latency**: Enable unreliable datagrams and independent reliable streams to eliminate head-of-line blocking. 
+* **Multiplexing**: Support many simultaneous data flows over one connection.
+* **Capability Negotiation**: Allow clients and servers to negotiate subprotocols and transport reliability (UDP vs. TCP fallback).
+* **Fine-grained Flow Control**: Provide "Send Groups" and "Atomic Writes" to manage bandwidth across different data types.
+* **Security & Privacy**: Enforce TLS 1.3, origin checks, and mitigations against cross-site tracking.
 
 ## Non-Goals
 
@@ -33,6 +33,7 @@ WebTransport fills this gap by providing a QUIC-native, client-server API that h
 2. **Live Streaming**: Pushing media chunks to a server with low overhead.
 3. **Collaborative Editing**: Sending cursor positions (unreliable) while ensuring document changes (reliable) are persisted.
 4. **Internet of Things (IoT)**: Efficiently multiplexing sensor data from thousands of devices.
+5. **Financial Tickers**: Delivering high-frequency market data where the latest packet is the most valuable.
 
 Additional use-cases are described in the [original use-cases](https://github.com/w3c/webtransport/blob/main/use-cases.md) document. 
 
@@ -62,7 +63,56 @@ console.log(`Negotiated protocol: ${transport.protocol}`);
 console.log(`Reliability mode: ${transport.reliability}`);
 ```
 
-### 2. Managing Bandwidth with Send Groups
+### 2. Connection with Headers and Cert Hashes
+
+```javascript
+const transport = new WebTransport("https://127.0.0.1:4433/wt", {
+  serverCertificateHashes: [{
+    algorithm: "sha-256",
+    value: new Uint8Array([0xed, 0xb0, 0x3e, ...]) // For local dev
+  }],
+  headers: { 'Authorization': 'Bearer <token>' }
+});
+await transport.ready;
+
+```
+
+
+### 3. Unidirectional and Bidirectional Streams
+
+```javascript
+// Receiving a server-initiated unidirectional stream
+const reader = transport.incomingUnidirectionalStreams.getReader();
+const { value: stream } = await reader.read();
+const data = await new Response(stream).arrayBuffer();
+
+// Creating a bidirectional stream
+const biStream = await transport.createBidirectionalStream();
+const biWriter = biStream.writable.getWriter();
+await biWriter.write(new TextEncoder().encode("Hello Server"));
+
+```
+
+### 4. Sending and Receiving Datagrams
+
+Ideal for high-frequency, time-sensitive data.
+
+```javascript
+async function handleDatagrams(transport) {
+  const writer = transport.datagrams.writable.getWriter();
+  await writer.write(new TextEncoder().encode("position: 10,20"));
+
+  const reader = transport.datagrams.readable.getReader();
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    console.log("Received datagram:", value);
+  }
+}
+
+```
+
+### 5. Managing Bandwidth with Send Groups
 
 In complex apps, different data types compete for bandwidth. **Send Groups** allow developers to group related streams and prioritize them collectively.
 
@@ -80,7 +130,7 @@ const audioStream = await transport.createUnidirectionalStream({
 
 ```
 
-### 3. Reliable Writes and Commits
+### 6. Reliable Writes and Commits
 
 WebTransport now supports "Atomic Writes" and "Reliable Reset" via the `commit()` method. This ensures that even if a stream is later aborted, the bytes marked as "committed" are guaranteed to be delivered.
 
@@ -97,7 +147,7 @@ try {
 
 ```
 
-### 4. Unreliable Datagrams with Aging
+### 7. Unreliable Datagrams with Aging
 
 For data like "player position," old updates are useless. Developers can now set an "expiration" on datagrams so the browser drops them rather than sending stale data.
 
@@ -110,6 +160,17 @@ await writer.write(new TextEncoder().encode("pos: 10,20"));
 
 ```
 
+### 8. Handling Session Draining
+
+Servers signal this during graceful restarts.
+
+```javascript
+transport.draining.then(() => {
+  console.log("Server is draining. Finalizing active streams...");
+  // Stop opening new streams
+});
+
+```
 ---
 
 ## Detailed Design
@@ -125,6 +186,10 @@ The combination of `sendOrder` (a numeric priority) and `WebTransportSendGroup` 
 ### Session Draining
 
 Servers can signal a "Draining" state. This informs the client that the server is preparing to shut down. The client should stop opening new streams and finish existing work gracefully.
+
+### Stats
+
+WebTransport provides granular visibility via getStats(). This includes RTT metrics (smoothedRtt), estimated send rates, and detailed datagram health (dropped, expired, or lost).
 
 ---
 
