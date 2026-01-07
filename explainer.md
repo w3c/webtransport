@@ -34,24 +34,32 @@ WebTransport fills this gap by providing a QUIC-native, client-server API that h
 3. **Collaborative Editing**: Sending cursor positions (unreliable) while ensuring document changes (reliable) are persisted.
 4. **Internet of Things (IoT)**: Efficiently multiplexing sensor data from thousands of devices.
 
+Additional use-cases are described in the [original use-cases](https://github.com/w3c/webtransport/blob/main/use-cases.md) document. 
+
 ---
 
 ## Proposed Solution: Key Scenarios
 
-### 1. Connection and Reliability Negotiation
+### 1. Connection, Reliability, and Subprotocol Negotiation
 
-WebTransport now supports both HTTP/3 (QUIC) and HTTP/2 (TCP). Applications can decide if they require the low-latency benefits of UDP or if a reliable-only fallback is acceptable.
+Applications can now propose a list of subprotocols (similar to WebSockets) and specify if they require the performance of an unreliable (UDP/QUIC) transport or if a reliable-only (TCP/H2) fallback is acceptable. See the additional [explainer on Subprotocol negotiation](https://github.com/w3c/webtransport/blob/main/explainers/subprotocol_negotiation.md) for more detail and background.
 
 ```javascript
 const transport = new WebTransport('https://example.com/wt', {
-  // If the network blocks UDP, setting this to true will fail the connection
-  // instead of falling back to a reliable-only TCP/H2 path.
+  // Propose subprotocols to the server
+  protocols: ['v2.chat', 'v1.chat'], 
+  
+  // Fail the connection if UDP/H3 is not available
   requireUnreliable: true 
 });
 
-await transport.ready;
-console.log(`Connected. Mode: ${transport.reliability}`); // "supports-unreliable" or "reliable-only"
+const { protocol, responseHeaders } = await transport.ready;
 
+// The server-selected subprotocol
+console.log(`Negotiated protocol: ${transport.protocol}`); 
+
+// The transport mode used ("supports-unreliable" or "reliable-only")
+console.log(`Reliability mode: ${transport.reliability}`);
 ```
 
 ### 2. Managing Bandwidth with Send Groups
@@ -133,6 +141,8 @@ To support development on local networks where a public CA-signed certificate is
 ### Fingerprinting
 
 The richness of the `getStats()` API (providing RTT, packet loss, and throughput) can potentially be used for fingerprinting. Browsers mitigate this by using network partition keys, ensuring a site cannot use WebTransport stats to track a user across different top-level domains.
+
+Additional security questions are answered in the [security questionnaire](https://github.com/w3c/webtransport/blob/main/security-questionnaire.md).
 
 ## Alternatives Considered
 
