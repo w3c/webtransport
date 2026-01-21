@@ -57,7 +57,7 @@ const wt = new WebTransport('https://example.com/wt', {
   // Propose subprotocols to the server
   protocols: ['v2.chat', 'v1.chat'], 
   
-  // Fail the connection if UDP/H3 is not available
+  // Fail the connection if only TCP/H2 is available
   requireUnreliable: true 
 });
 
