@@ -6,13 +6,20 @@ WebTransport is a web API that provides low-latency, bidirectional, client-serve
 
 ## Problem and Background
 
+Many applications, such as games and live streaming, need a mechanism to send many messages as quickly as possible, possibly out of order, and possibly unreliably from client to server or server to client.  The web platform is missing the capability to do this easily.
+
+Native applications can use raw UDP sockets, but those are not available on the web because they lack encryption, congestion control, and a mechanism for consent to send (to prevent DDoS attacks).
+
+Historically, web applications that needed bidirectional data stream between a client and a server could rely on WebSockets [RFC6455], a message-based protocol compatible with Web security model.  However, since the abstraction it provides is a single, reliable, ordered stream of messages, it suffers from head-of-line blocking (HOLB), meaning that all messages must be sent and received in order even if they are independent and some of them are no longer needed.  This makes it a poor fit for latency sensitive applications which rely on partial reliability and stream independence for performance.
+
 Currently, web developers needing low-latency communication face a trade-off:
 
 * **WebSockets** are easy to use but run over TCP, meaning a single lost packet delays all subsequent data (head-of-line blocking).
 * **WebRTC Data Channels** support unreliable UDP-like transport but are architected for Peer-to-Peer (P2P). Using them for client-server communication requires a complex "fake peer" setup involving ICE, STUN, and TURN.
 * **HTTP/2 and HTTP/3 (Fetch)** are request-response oriented and do not easily support long-lived, bidirectional, "push-style" data flow with custom reliability.
 
-WebTransport provides a QUIC-native alternative that supports multiple independent streams and unreliable datagrams within a single, congestion-controlled connection.
+We think there is a room for a simple, client-server, unordered/unreliable API with minimal latency.  The WebTransport protocol provides this with a single transport object that abstracts away the specific underlying protocol with a flexible set of possible capabilities including reliable unidirectional and bidirectional streams, and unreliable datagrams
+(much like the capabilities of QUIC).
 
 ## Goals
 
@@ -43,10 +50,10 @@ Additional use-cases are described in the [original use-cases](https://github.co
 
 ### 1. Connection, Reliability, and Subprotocol Negotiation
 
-Applications can now propose a list of subprotocols (similar to WebSockets) and specify if they require the performance of an unreliable (UDP/QUIC) transport or if a reliable-only (TCP/H2) fallback is acceptable. See the additional [explainer on Subprotocol negotiation](https://github.com/w3c/webtransport/blob/main/explainers/subprotocol_negotiation.md) for more detail and background.
+Applications can now propose a list of subprotocols (similar to WebSockets), and specify if they require the performance of an unreliable (UDP/QUIC) transport if a reliable-only (TCP/H2) fallback is undesirable. See the additional [explainer on Subprotocol negotiation](https://github.com/w3c/webtransport/blob/main/explainers/subprotocol_negotiation.md) for more detail and background.
 
 ```javascript
-const transport = new WebTransport('https://example.com/wt', {
+const wt = new WebTransport('https://example.com/wt', {
   // Propose subprotocols to the server
   protocols: ['v2.chat', 'v1.chat'], 
   
@@ -54,26 +61,26 @@ const transport = new WebTransport('https://example.com/wt', {
   requireUnreliable: true 
 });
 
-const { protocol, responseHeaders } = await transport.ready;
+const { protocol, responseHeaders } = await wt.ready;
 
 // The server-selected subprotocol
-console.log(`Negotiated protocol: ${transport.protocol}`); 
+console.log(`Negotiated protocol: ${wt.protocol}`); 
 
 // The transport mode used ("supports-unreliable" or "reliable-only")
-console.log(`Reliability mode: ${transport.reliability}`);
+console.log(`Reliability mode: ${wt.reliability}`);
 ```
 
 ### 2. Connection with Headers and Cert Hashes
 
 ```javascript
-const transport = new WebTransport("https://127.0.0.1:4433/wt", {
+const wt = new WebTransport("https://127.0.0.1:4433/wt", {
   serverCertificateHashes: [{
     algorithm: "sha-256",
     value: new Uint8Array([0xed, 0xb0, 0x3e, ...]) // For local dev
   }],
   headers: { 'Authorization': 'Bearer <token>' }
 });
-await transport.ready;
+await wt.ready;
 
 ```
 
@@ -82,12 +89,12 @@ await transport.ready;
 
 ```javascript
 // Receiving a server-initiated unidirectional stream
-const reader = transport.incomingUnidirectionalStreams.getReader();
+const reader = wt.incomingUnidirectionalStreams.getReader();
 const { value: stream } = await reader.read();
 const data = await new Response(stream).arrayBuffer();
 
 // Creating a bidirectional stream
-const biStream = await transport.createBidirectionalStream();
+const biStream = await wt.createBidirectionalStream();
 const biWriter = biStream.writable.getWriter();
 await biWriter.write(new TextEncoder().encode("Hello Server"));
 
@@ -98,11 +105,11 @@ await biWriter.write(new TextEncoder().encode("Hello Server"));
 Ideal for high-frequency, time-sensitive data.
 
 ```javascript
-async function handleDatagrams(transport) {
-  const writer = transport.datagrams.writable.getWriter();
+async function handleDatagrams(wt) {
+  const writer = wt.datagrams.writable.getWriter();
   await writer.write(new TextEncoder().encode("position: 10,20"));
 
-  const reader = transport.datagrams.readable.getReader();
+  const reader = wt.datagrams.readable.getReader();
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
@@ -114,14 +121,14 @@ async function handleDatagrams(transport) {
 
 ### 5. Managing Bandwidth with Send Groups
 
-In complex apps, different data types compete for bandwidth. **Send Groups** allow developers to group related streams and prioritize them collectively.
+In complex apps, different groups of related data might compete for bandwidth. **Send Groups** allow developers to group related streams and prioritize them individually within that group.
 
 ```javascript
-const audioGroup = transport.createSendGroup();
-const videoGroup = transport.createSendGroup();
+const audioGroup = wt.createSendGroup();
+const videoGroup = wt.createSendGroup();
 
 // Create a high-priority audio stream
-const audioStream = await transport.createUnidirectionalStream({
+const audioStream = await wt.createUnidirectionalStream({
   sendGroup: audioGroup,
   sendOrder: 10 // Highest priority within its group
 });
@@ -132,7 +139,7 @@ const audioStream = await transport.createUnidirectionalStream({
 
 ### 6. Reliable Writes and Commits
 
-WebTransport now supports "Atomic Writes" and "Reliable Reset" via the `commit()` method. This ensures that even if a stream is later aborted, the bytes marked as "committed" are guaranteed to be delivered.
+WebTransport also supports transactional writes and reliable reset via the 'atomicWrite()' and `commit()` methods respectively. The former ensures that bytes only go out together, and the latter commits to sending what has been written up to this point even if the stream is later aborted.
 
 ```javascript
 const writer = stream.getWriter();
@@ -152,7 +159,7 @@ try {
 For data like "player position," old updates are useless. Developers can now set an "expiration" on datagrams so the browser drops them rather than sending stale data.
 
 ```javascript
-const datagrams = transport.datagrams.createWritable();
+const datagrams = wt.datagrams.createWritable();
 datagrams.outgoingMaxAge = 500; // Drop if not sent within 500ms
 
 const writer = datagrams.getWriter();
@@ -165,7 +172,7 @@ await writer.write(new TextEncoder().encode("pos: 10,20"));
 Servers signal this during graceful restarts.
 
 ```javascript
-transport.draining.then(() => {
+wt.draining.then(() => {
   console.log("Server is draining. Finalizing active streams...");
   // Stop opening new streams
 });
