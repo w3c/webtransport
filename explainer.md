@@ -1,240 +1,228 @@
 # WebTransport Explainer
 
-## Problem and Motivation
+## Abstract
 
-Many applications, such as games and live streaming, need a mechanism to send
-many messages as quickly as possible, possibly out of order, and possibly
-unreliably from client to server or server to client.  The web platform is
-missing the capability to do this easily.
+WebTransport is a web API that provides low-latency, bidirectional, client-server communication. It is designed for applications that require the performance of QUIC (the transport layer of HTTP/3)—such as high-frequency state synchronization and media streaming—while maintaining a secure, origin-based web model. It supports both reliable streams and unreliable datagrams.
 
-Native applications can use raw UDP sockets, but those are not available on the
-web because they lack encryption, congestion control, and a mechanism for
-consent to send (to prevent DDoS attacks).
+## Problem and Background
 
-Historically, web applications that needed bidirectional data stream between a
-client and a server could rely on WebSockets [RFC6455], a message-based
-protocol compatible with Web security model.  However, since the abstraction it
-provides is a single, reliable, ordered stream of messages, it suffers from head-of-line
-blocking (HOLB), meaning that all messages must be sent and received in order
-even if they are independent and some of them are no longer needed.  This makes
-it a poor fit for latency sensitive applications which rely on partial
-reliability and stream independence for performance.
+Many applications, such as games and live streaming, need a mechanism to send many messages as quickly as possible, possibly out of order, and possibly unreliably from client to server or server to client.  The web platform is missing the capability to do this easily.
 
-We think there is a room for a simple, client-server, unordered/unreliable API
-with minimal latency.  The WebTransport protocol provides this with a single
-transport object that abstracts away the specific underlying protocol with
-a flexible set of possible capabilities including reliable
-unidirectional and bidirectional streams, and unreliable datagrams
+Native applications can use raw UDP sockets, but those are not available on the web because they lack encryption, congestion control, and a mechanism for consent to send (to prevent DDoS attacks).
+
+Historically, web applications that needed bidirectional data stream between a client and a server could rely on WebSockets [RFC6455], a message-based protocol compatible with Web security model.  However, since the abstraction it provides is a single, reliable, ordered stream of messages, it suffers from head-of-line blocking (HOLB), meaning that all messages must be sent and received in order even if they are independent and some of them are no longer needed.  This makes it a poor fit for latency sensitive applications which rely on partial reliability and stream independence for performance.
+
+Currently, web developers needing low-latency communication face a trade-off:
+
+* **WebSockets** are easy to use but run over TCP, meaning a single lost packet delays all subsequent data (head-of-line blocking).
+* **WebRTC Data Channels** support unreliable UDP-like transport but are architected for Peer-to-Peer (P2P). Using them for client-server communication requires a complex "fake peer" setup involving ICE, STUN, and TURN.
+* **HTTP/2 and HTTP/3 (Fetch)** are request-response oriented and do not easily support long-lived, bidirectional, "push-style" data flow with custom reliability.
+
+We think there is a room for a simple, client-server, unordered/unreliable API with minimal latency.  The WebTransport protocol provides this with a single transport object that abstracts away the specific underlying protocol with a flexible set of possible capabilities including reliable unidirectional and bidirectional streams, and unreliable datagrams
 (much like the capabilities of QUIC).
 
 ## Goals
 
-- Provide a way to communicate with servers with low latency, including support
-for unreliable and unordered communication.
+* **Low Latency**: Enable unreliable datagrams and independent reliable streams to eliminate head-of-line blocking. 
+* **Multiplexing**: Support many simultaneous data flows over one connection.
+* **Capability Negotiation**: Allow clients and servers to negotiate subprotocols and transport reliability (UDP vs. TCP fallback).
+* **Fine-grained Flow Control**: Provide "Send Groups" and "Atomic Writes" to manage bandwidth across different data types.
+* **Security & Privacy**: Enforce TLS 1.3, origin checks, and mitigations against cross-site tracking.
 
-- Provide an API that can be used for many use cases and that facilitates the transmission of data reliably and unreliably, in both ordered and unordered flows, between a client and a server.
+## Non-Goals
 
-- Ensure the same security properties as WebSockets (use of TLS,
-  server-controlled origin policy)
+* **Peer-to-Peer**: WebTransport is strictly client-server. P2P use cases should continue to use WebRTC.
+* **Universal UDP**: This is not "raw UDP." All traffic is congestion-controlled and encrypted.
 
-## Non-goals
+## Use Cases
 
-This is not [UDP Socket API](https://www.w3.org/TR/raw-sockets/).  We must have
-encrypted and congestion-controlled communication.
+1. **Cloud Gaming & Remote Desktop**: Sending user input (reliable) while receiving high-frequency video frames and input state (unreliable).
+2. **Live Streaming**: Pushing media chunks to a server with low overhead.
+3. **Collaborative Editing**: Sending cursor positions (unreliable) while ensuring document changes (reliable) are persisted.
+4. **Internet of Things (IoT)**: Efficiently multiplexing sensor data from thousands of devices.
+5. **Financial Tickers**: Delivering high-frequency market data where the latest packet is the most valuable.
 
-## Key use-cases
+Additional use-cases are described in the [original use-cases](https://github.com/w3c/webtransport/blob/main/use-cases.md) document. 
 
-- Sending game state with minimal latency to server in many small, unreliable,
-  out-of-order messages at a regular interval
+---
 
-- Receiving media pushed from server with minimal latency (out-of-order)
+## Proposed Solution: Key Scenarios
 
-- Receiving messages pushed from server (such as notifications)
+### 1. Connection, Reliability, and Subprotocol Negotiation
 
-- Requesting over HTTP and receiving media pushed out-of-order and unreliably
-  over the same network connection
-
-## Proposed solutions
-
-1. A generic transport interface that can be provided by any transport,
-   but match closely with QUIC's capabilities.
-
-2. The transport interface that can use
-   [an HTTP/3 extension](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
-   to enable transport capabilities provided by QUIC.
-
-3. The transport interface that can use
-   [an HTTP/2 extension](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http2/),
-   which provides the same functionality over TCP for situations where QUIC is
-   unavailable.
-
-Using TCP provides reliable, in-order delivery, which can mean that the HTTP/2
-version might lack some of the performance advantages provided by QUIC.
-Both HTTP/3 and HTTP/2 extensions provide the same capabilities, allowing
-applications to build to the same interface under most conditions.
-
-## Example of sending unreliable game state to server using datagrams
+Applications can now propose a list of subprotocols (similar to WebSockets), and specify if they require the performance of an unreliable (UDP/QUIC) transport if a reliable-only (TCP/H2) fallback is undesirable. See the additional [explainer on Subprotocol negotiation](https://github.com/w3c/webtransport/blob/main/explainers/subprotocol_negotiation.md) for more detail and background.
 
 ```javascript
-// The app provides a way to get a serialized state to send to the server
-function getSerializedGameState() { ... }
+const wt = new WebTransport('https://example.com/wt', {
+  // Propose subprotocols to the server
+  protocols: ['v2.chat', 'v1.chat'], 
+  
+  // Fail the connection if only TCP/H2 is available
+  requireUnreliable: true 
+});
 
-const wt = new WebTransport('https://example.com:10001/path');
-const writer = wt.datagrams.writable.getWriter();
-setInterval(() => {
-  const message = getSerializedGameState();
-  writer.write(message);
-}, 100);
+const { protocol, responseHeaders } = await wt.ready;
+
+// The server-selected subprotocol
+console.log(`Negotiated protocol: ${wt.protocol}`); 
+
+// The transport mode used ("supports-unreliable" or "reliable-only")
+console.log(`Reliability mode: ${wt.reliability}`);
 ```
 
-## Example of sending reliable game state to server using a unidirectional send stream
+### 2. Connection with Headers and Cert Hashes
 
 ```javascript
-// The app provides a way to get a serialized state to send to the server.
-function getSerializedGameState() { ... }
+const wt = new WebTransport("https://127.0.0.1:4433/wt", {
+  serverCertificateHashes: [{
+    algorithm: "sha-256",
+    value: new Uint8Array([0xed, 0xb0, 0x3e, ...]) // For local dev
+  }],
+  headers: { 'Authorization': 'Bearer <token>' }
+});
+await wt.ready;
 
-const wt = new WebTransport('https://example.com:10001/path');
-setInterval(async () => {
-  const message = getSerializedGameState();
-  const stream = await wt.createUnidirectionalStream();
-  const writer = stream.getWriter();
-  writer.write(message);
-  writer.close();
-}, 100);
 ```
 
-## Example of receiving media pushed from server using unidirectional receive streams
+
+### 3. Unidirectional and Bidirectional Streams
 
 ```javascript
-// The app provides a way to get a serialized media request to send to the server
-function getSerializedMediaRequest() { ... }
+// Receiving a server-initiated unidirectional stream
+const reader = wt.incomingUnidirectionalStreams.getReader();
+const { value: stream } = await reader.read();
+const data = await new Response(stream).arrayBuffer();
 
-const wt = new WebTransport('https://example.com:10001/path');
+// Creating a bidirectional stream
+const biStream = await wt.createBidirectionalStream();
+const biWriter = biStream.writable.getWriter();
+await biWriter.write(new TextEncoder().encode("Hello Server"));
 
-const mediaSource = new MediaSource();
-await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve, {once: true}));
-const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
+```
 
-// App-specific request
-const mediaRequest = getSerializedMediaRequest();
-const requestStream = await wt.createUnidirectionalStream();
-const requestWriter = requestStream.getWriter();
-requestWriter.write(mediaRequest);
-requestWriter.close();
+### 4. Sending and Receiving Datagrams
 
-// Receive the responses.
-for await (const receiveStream of wt.incomingUnidirectionalStreams) {
-  for await (const buffer of receiveStream) {
-    sourceBuffer.appendBuffer(buffer);
+Ideal for high-frequency, time-sensitive data.
+
+```javascript
+async function handleDatagrams(wt) {
+  const writer = wt.datagrams.writable.getWriter();
+  await writer.write(new TextEncoder().encode("position: 10,20"));
+
+  const reader = wt.datagrams.readable.getReader();
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    console.log("Received datagram:", value);
   }
-  await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
 }
+
 ```
 
-## Example of receiving notifications pushed from the server, with responses
+### 5. Managing Bandwidth with Send Groups
+
+In complex apps, different groups of related data might compete for bandwidth. **Send Groups** allow developers to group related streams and prioritize them individually within that group.
 
 ```javascript
-// The app provides a way to deserialize a notification received from the server.
-function deserializeNotification(serializedNotification) { ... }
-// The app also provides a way to serialize a "clicked" message to send to the server.
-function serializeClickedMessage(notification) { ... }
+const audioGroup = wt.createSendGroup();
+const videoGroup = wt.createSendGroup();
 
-const wt = new WebTransport('https://example.com:10001/path');
-for await (const {readable, writable} of wt.incomingBidirectionalStreams) {
-  const buffers = []
-  for await (const buffer of readable) {
-    buffers.push(buffer)
-  }
-  const notification = new Notification(deserializeNotification(buffers));
-  notification.addEventListener('onclick', () => {
-    const clickMessage = serializeClickedMessage(notification);
-    const writer = writable.getWriter();
-    writer.write(clickMessage);
-    writer.close();
-  });
-}
+// Create a high-priority audio stream
+const audioStream = await wt.createUnidirectionalStream({
+  sendGroup: audioGroup,
+  sendOrder: 10 // Highest priority within its group
+});
+
+// The browser scheduler will now balance bandwidth between the audioGroup and videoGroup
+
 ```
 
-## Example of requesting over pooled HTTP and receiving media pushed out-of-order and unreliably over the same network connection
+### 6. Reliable Writes and Commits
+
+WebTransport also supports transactional writes and reliable reset via the 'atomicWrite()' and `commit()` methods respectively. The former ensures that bytes only go out together, and the latter commits to sending what has been written up to this point even if the stream is later aborted.
 
 ```javascript
-const mediaSource = new MediaSource();
-await new Promise(resolve => mediaSource.addEventListener('sourceopen', resolve, {once: true}));
-const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
-const wt = new WebTransport('/video', {allowPooling: true});
-await fetch('https://example.com/babyshark');
-for await (const datagram of wt.datagrams.readable) {
-  sourceBuffer.appendBuffer(datagram);
-  await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
+const writer = stream.getWriter();
+
+try {
+  // atomicWrite ensures the chunk fits in the current flow-control window
+  await writer.atomicWrite(importantMetadata);
+  writer.commit(); // Ensure this metadata arrives even if we reset the stream later
+} catch (e) {
+  if (e.name === 'AbortError') console.warn("Network buffer full");
 }
+
 ```
 
-## Example of requesting over HTTP and receiving media pushed out-of-order and reliably over the same network connection
+### 7. Unreliable Datagrams with Aging
+
+For data like "player position," old updates are useless. Developers can now set an "expiration" on datagrams so the browser drops them rather than sending stale data.
 
 ```javascript
-const mediaSource = new MediaSource();
-await new Promise(resolve => mediaSource.addEventListener('sourceopen', () => resolve(), {once: true}));
-const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp09.00.10.08"');
-const wt = new WebTransport('https://example.com/video');
-for await (const receiveStream of transport.incomingUnidirectionalStreams) {
-  for await (const buffer of receiveStream) {
-    sourceBuffer.appendBuffer(buffer);
-  }
-  await new Promise(resolve => sourceBuffer.addEventListener('update', resolve, {once: true}));
-}
+const datagrams = wt.datagrams.createWritable();
+datagrams.outgoingMaxAge = 500; // Drop if not sent within 500ms
+
+const writer = datagrams.getWriter();
+await writer.write(new TextEncoder().encode("pos: 10,20"));
+
 ```
 
-## Detailed design discussion
+### 8. Handling Session Draining
 
-WebTransport can support multiple protocols, each of which provide some of the
-following capabilities.
+Servers signal this during graceful restarts.
 
-- Unidirectional streams are indefinitely long streams of bytes in one direction
-  with back pressure applied
-  to the sender when either the receiver can't read quickly enough or when
-  constrained by network capacity/congestions.  Useful for sending messages that
-  do not expect a response.  In-order, reliable messaging can be achieved by
-  sending many messages in a single stream. Out-of-order messaging can be achieved
-  by sending one message per stream.
+```javascript
+wt.draining.then(() => {
+  console.log("Server is draining. Finalizing active streams...");
+  // Stop opening new streams
+});
 
-- Bidirectional streams are full-duplex streams. A bidirectional stream is effectively
-  a pair of unidirectional streams.
+```
+---
 
-- Datagrams are small, out-of-order, unreliable messages.  They are useful for
-  sending messages with less API complexity
-  and less network overhead than streams.
+## Detailed Design
 
-[WebTransport over
-HTTP/3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3)
-is a WebTransport protocol built on top of HTTP/3. It is the only protocol supported
-by WebTransport as of now. More protocols such as WebTransport over HTTP/2 may be
-supported in the future.
+### Transport Modes
 
-## Alternative designs considered
+The API exposes a `reliability` attribute. If it returns `"reliable-only"`, the transport has fallen back to HTTP/2. In this mode, `datagrams` and `createUnidirectionalStream` may be unavailable or behave as reliable streams.
 
-### [WebRTC Data Channel](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel)
-While WebRTC data channel has been used for client/server communications (e.g.
-for cloud gaming applications), this requires that the server endpoint implement
-several protocols uncommonly found on servers (ICE, DTLS, and SCTP) and that the
-application use a complex API (RTCPeerConnection) designed for a very different use case.
+### Stream Prioritization
 
-### Layering WebSockets over HTTP/3
-[I-D.ietf-quic-http] in a manner similar to how they are currently layered over
-HTTP/2 [RFC8441].  That would avoid head-of-line blocking and provide an
-ability to cancel a stream by closing the corresponding WebSocket object.
-However, this approach has a number of drawbacks, which all stem primarily from
-the fact that semantically each WebSocket is a completely independent entity:
+The combination of `sendOrder` (a numeric priority) and `WebTransportSendGroup` (a logical bucket) allows for a hierarchical scheduling model. This is critical for preventing large file transfers from starving small, latency-sensitive control messages.
 
-1. Each new stream would require a WebSocket handshake to agree on application
-  protocol used, meaning that it would take at least one RTT for each new
-  stream before the client can write to it.
-1. Only clients can initiate streams.  Server-initiated streams and other
-  alternative modes of communication (such as QUIC DATAGRAM frame) are not
-  available.
-1. While the streams would normally be pooled by the user agent, this is not
-  guaranteed, and the general process of mapping a WebSocket to the end is
-  opaque to the client.  This introduces unpredictable performance properties
-  into the system, and prevents optimizations which rely on the streams being on
-  the same connection (for instance, it might be possible for the client to
-  request different retransmission priorities for different streams, but that
-  would be impossible unless they are all on the same connection).
+### Session Draining
+
+Servers can signal a "Draining" state. This informs the client that the server is preparing to shut down. The client should stop opening new streams and finish existing work gracefully.
+
+### Stats
+
+WebTransport provides granular visibility via getStats(). This includes RTT metrics (smoothedRtt), estimated send rates, and detailed datagram health (dropped, expired, or lost).
+
+---
+
+## Security and Privacy Considerations
+
+### Origin-based Security
+
+Connections follow the same security rules as `fetch()`. The server must explicitly allow the connection from the client's origin during the handshake.
+
+### Certificate Hashes
+
+To support development on local networks where a public CA-signed certificate is impossible, WebTransport allows `serverCertificateHashes`. These are restricted to a maximum 2-week validity to prevent long-term tracking.
+
+### Fingerprinting
+
+The richness of the `getStats()` API (providing RTT, packet loss, and throughput) can potentially be used for fingerprinting. Browsers mitigate this by using network partition keys, ensuring a site cannot use WebTransport stats to track a user across different top-level domains.
+
+Additional security questions are answered in the [security questionnaire](https://github.com/w3c/webtransport/blob/main/security-questionnaire.md).
+
+## Alternatives Considered
+
+### WebSockets over HTTP/3
+
+While possible, WebSockets are architected for a single reliable stream. Adding unreliable features to WebSockets would require a complete redesign of the protocol's framing.
+
+### WebRTC
+
+WebRTC remains the standard for Peer-to-Peer. However, its overhead for client-server (ICE/STUN/SDP) makes it significantly more difficult to scale on the server-side compared to WebTransport's HTTP-based handshake.
+
