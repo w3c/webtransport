@@ -124,9 +124,10 @@ for await (const datagram of wt.datagrams.readable) {
 // Send encoded datagrams to the server
 const writable = wt.datagrams.createWritable();
 const writer = writable.getWriter();
+const encoder = new TextEncoder();
 for (const message of messages) {
-  const bytes = encoder.encode(message);
-  if (bytes.length > wt.datagrams.maxDatagramSize) throw;
+  const datagram = encoder.encode(message);
+  if (datagram.length > wt.datagrams.maxDatagramSize) throw;
   await writer.ready;
   writer.write(datagram).catch(() => {});
 }
