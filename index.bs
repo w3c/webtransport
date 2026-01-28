@@ -869,10 +869,6 @@ A {{WebTransport}} object has the following internal slots.
    <td><dfn>`[[RequireUnreliable]]`</dfn>
    <td class="non-normative">A boolean indicating whether UDP is required.
   </tr>
-  <tr>
-   <td><dfn>`[[ServerCertificateHashes]]`</dfn>
-   <td class="non-normative">A [=list=] of zero or more {{WebTransportHash}} objects.
-  </tr>
 </table>
 
 ## Constructor ##  {#webtransport-constructor}
@@ -886,14 +882,12 @@ agent MUST run the following steps:
 1. If |url| is failure, [=throw=] a {{SyntaxError}} exception.
 1. If |url|'s [=scheme=] is not `https`, [=throw=] a {{SyntaxError}} exception.
 1. If |url|'s [=fragment=] is not null, [=throw=] a {{SyntaxError}} exception.
-1. Let |allowPooling| be {{WebTransport/constructor(url, options)/options}}'s
-   {{WebTransportOptions/allowPooling}}.
-1. Let |dedicated| be the negation of |allowPooling|.
+1. Let |newConnection| be "`no`" if {{WebTransport/constructor(url, options)/options}}'s
+   {{WebTransportOptions/allowPooling}} is true; otherwise "`yes-and-dedicated`".
 1. Let |serverCertificateHashes| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/serverCertificateHashes}}.
-1. If |dedicated| is false and |serverCertificateHashes| [=set/is empty|is not empty=], then [=throw=] a
+1. If |newConnection| is "`no`" and |serverCertificateHashes| [=set/is empty|is not empty=], then [=throw=] a
    {{NotSupportedError}} exception.
-1. Let |newConnection| be "`no`" if |dedicated| is false; otherwise "`yes-and-dedicated`".
 1. Let |requireUnreliable| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/requireUnreliable}}.
 1. Let |congestionControl| be {{WebTransport/constructor(url, options)/options}}'s
@@ -903,7 +897,7 @@ agent MUST run the following steps:
    [[!RFC9002]] [Section 7](https://www.rfc-editor.org/rfc/rfc9002#section-7),
    then set |congestionControl| to `"default"`.
 1. Let |protocols| be {{WebTransport/constructor(url, options)/options}}'s
-   {{WebTransportOptions/protocols}}
+   {{WebTransportOptions/protocols}}.
 1. If any of the values in |protocols| occur more than once, fail to match
    the requirements for elements that comprise the value of the negotiated
    application protocol as defined by the WebTransport protocol, or have an [=isomorphic encoded=]
@@ -952,8 +946,6 @@ agent MUST run the following steps:
     :: |newConnection|
     : {{[[RequireUnreliable]]}}
     :: |requireUnreliable|
-    : {{[[ServerCertificateHashes]]}}
-    :: |serverCertificateHashes|
 1. Set |transport|.{{[[Datagrams]]}} to the result of [=WebTransportDatagramDuplexStream/creating=]
    a {{WebTransportDatagramDuplexStream}}, with |transport|, |incomingDatagrams| and
    |datagramsReadableType|.
@@ -988,7 +980,8 @@ agent MUST run the following steps:
    [=request/credentials mode=] is "`omit`", [=request/cache mode=] is "`no-store`",
    [=request/policy container=] is |client|'s
    [=environment settings object/policy container=], [=request/destination=] is "",
-   [=request/origin=] is |origin| and [=request/redirect mode=] is "error".
+   [=request/origin=] is |origin|, [=request/WebTransport-hash list=] is
+   |serverCertificateHashes| and [=request/redirect mode=] is "error".
 
    Note: Redirects are not followed. Network errors caused by redirection are intentionally
    indistinguishable from other network errors.  In cross-origin contexts, this would reveal
@@ -1018,15 +1011,10 @@ To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partiti
   1. Let |url| be |request|'s [=request/current URL=].
   1. Let |newConnection| be |transport|.{{[[NewConnection]]}}.
   1. Let |requireUnreliable| be |transport|.{{[[RequireUnreliable]]}}.
-  1. Let |serverCertificateHashes| be the values in |transport|.{{[[ServerCertificateHashes]]}}.
+  1. Let |webTransportHashes| be the values in |request|'s [=request/WebTransport-hash list=].
   1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
-     |networkPartitionKey|, |url|, false, |newConnection|, and |requireUnreliable|.
-     When obtaining a connection, if
-     |serverCertificateHashes| [=set/is empty|is not empty=], instead of using the default certificate verification
-     algorithm, consider the certificate valid if it meets the [=custom certificate
-     requirements=] and if [=verify a certificate hash|verifying the certificate hash=] against
-     |serverCertificateHashes| returns true. If either condition is not met, the result is
-     failure.
+     |networkPartitionKey|, |url|, false, |newConnection|, |requireUnreliable| and
+     |webTransportHashes|.
   1. If |connection| is failure, return failure.
   1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary
      that represents the SETTINGS frame.
