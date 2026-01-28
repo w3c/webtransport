@@ -67,52 +67,46 @@ console.log(wt.reliability); // supports-unreliable
 ```javascript
 // Replace these two with real values from your server.
 const token = "dev-token-123";
-const certHashHex = "edb03e3a0a5fbb4c1c8e62c8a0cf9c54c2e5a6d3b2b4a1c9d0e1f2a3b4c5d6e7";
-
+const certHash = new Uint8Array([
+  0xed, 0xb0, 0x3e, 0x3a, 0x0a, 0x5f, 0xbb, 0x4c, 0x1c, 0x8e, 0x62, 0xc8, 0xa0, 0xcf, 0x9c, 0x54,
+  0xc2, 0xe5, 0xa6, 0xd3, 0xb2, 0xb4, 0xa1, 0xc9, 0xd0, 0xe1, 0xf2, 0xa3, 0xb4, 0xc5, 0xd6, 0xe7,
+]);
 const wt = new WebTransport("https://127.0.0.1:4433/wt", {
   headers: { Authorization: `Bearer ${token}` },
-  serverCertificateHashes: [{ algorithm: "sha-256", value: hexToU8(certHashHex) }],
+  serverCertificateHashes: [{ algorithm: "sha-256", value: certHash }],
 });
 await wt.ready;
-
-function hexToU8(hex) {
-  const out = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
-  return out;
-}
 ```
 
 
 ### 3. Unidirectional and Bidirectional Streams
 
 ```javascript
-// Receiving server-initiated unidirectional streams of data
-for await (const readable of wt.incomingUnidirectionalStreams) {
-  // consume streams independently using IFFEs, reporting per-stream errors
-  ((async () => {
-    try {
-      for await (const bytes of readable) processTheData(bytes);
-    } catch (e) {
-      console.error(e);
-    }
-  })());
+// Receive server-initiated unidirectional streams of data
+async function consumeConcurrently(readable) {
+  try {
+    for await (const bytes of readable) processTheData(bytes);
+  } catch (e) {
+    console.error(e);
+  }
 }
+for await (const readable of wt.incomingUnidirectionalStreams) consumeConcurrently(readable);
 
-// Sending a UTF-8 encoded stream
-const encoder = new TextEncoderStream("utf-8");
+// Send a UTF-8 encoded stream
+const encoder = new TextEncoderStream();
 const writer = encoder.writable.getWriter();
 writer.write("Hello Server").catch(() => {});
 writer.close();
 await encoder.readable.pipeTo(await wt.createUnidirectionalStream());
 
-// Using non-blocking bidirectional streams as a request/response pattern
-const encoder = new TextEncoderStream("utf-8");
+// Use non-blocking bidirectional streams as a request/response pattern
+const encoder = new TextEncoderStream();
 const writer = encoder.writable.getWriter();
 writer.write("Hello Server").catch(() => {});
 writer.close();
 await encoder.readable
   .pipeThrough(await wt.createBidirectionalStream())
-  .pipeThrough(new TextDecoderStream("utf-8"))
+  .pipeThrough(new TextDecoderStream())
   .pipeTo(new WritableStream({write: msg => console.log(msg)}); // "Hi client"
 ```
 
@@ -121,20 +115,21 @@ await encoder.readable
 Ideal for high-frequency, time-sensitive data.
 
 ```javascript
-// Decoding server-initiated datagrams into text
+// Decode server-initiated datagrams into text
 const decoder = new TextDecoder();
 for await (const datagram of wt.datagrams.readable) {
   console.log(decoder.decode(datagram));
 }
 
-// Sending datagrams to the server
+// Send encoded datagrams to the server
 const writable = wt.datagrams.createWritable();
 const writer = writable.getWriter();
 for (const message of messages) {
+  const bytes = encoder.encode(message);
+  if (bytes.length > wt.datagrams.maxDatagramSize) throw;
   await writer.ready;
-  writer.write(encoder.encode(message)).catch(() => {});
+  writer.write(datagram).catch(() => {});
 }
-
 ```
 
 ### 5. Managing Bandwidth with Send Groups
