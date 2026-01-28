@@ -54,50 +54,66 @@ Applications can now propose a list of subprotocols (similar to WebSockets), and
 
 ```javascript
 const wt = new WebTransport('https://example.com/wt', {
-  // Propose subprotocols to the server
-  protocols: ['v2.chat', 'v1.chat'], 
-  
-  // Fail the connection if only TCP/H2 is available
-  requireUnreliable: true 
+  protocols: ['v2.chat', 'v1.chat'], // Proposed to the server
+  requireUnreliable: true            // Fail if only H2/TCP available
 });
-
-const { protocol, responseHeaders } = await wt.ready;
-
-// The server-selected subprotocol
-console.log(`Negotiated protocol: ${wt.protocol}`); 
-
-// The transport mode used ("supports-unreliable" or "reliable-only")
-console.log(`Reliability mode: ${wt.reliability}`);
+await wt.ready;
+console.log(`The server selected ${wt.protocol || "no"} protocol`); 
+console.log(wt.reliability); // supports-unreliable
 ```
 
 ### 2. Connection with Headers and Cert Hashes
 
 ```javascript
+// Replace these two with real values from your server.
+const token = "dev-token-123";
+const certHashHex = "edb03e3a0a5fbb4c1c8e62c8a0cf9c54c2e5a6d3b2b4a1c9d0e1f2a3b4c5d6e7";
+
 const wt = new WebTransport("https://127.0.0.1:4433/wt", {
-  serverCertificateHashes: [{
-    algorithm: "sha-256",
-    value: new Uint8Array([0xed, 0xb0, 0x3e, ...]) // For local dev
-  }],
-  headers: { 'Authorization': 'Bearer <token>' }
+  headers: { Authorization: `Bearer ${token}` },
+  serverCertificateHashes: [{ algorithm: "sha-256", value: hexToU8(certHashHex) }],
 });
 await wt.ready;
 
+function hexToU8(hex) {
+  const out = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+  return out;
+}
 ```
 
 
 ### 3. Unidirectional and Bidirectional Streams
 
 ```javascript
-// Receiving a server-initiated unidirectional stream
-const reader = wt.incomingUnidirectionalStreams.getReader();
-const { value: stream } = await reader.read();
-const data = await new Response(stream).arrayBuffer();
+// Receiving server-initiated unidirectional streams of data
+for await (const readable of wt.incomingUnidirectionalStreams) {
+  // consume streams independently using IFFEs, reporting per-stream errors
+  ((async () => {
+    try {
+      for await (const bytes of readable) processTheData(bytes);
+    } catch (e) {
+      console.error(e);
+    }
+  })());
+}
 
-// Creating a bidirectional stream
-const biStream = await wt.createBidirectionalStream();
-const biWriter = biStream.writable.getWriter();
-await biWriter.write(new TextEncoder().encode("Hello Server"));
+// Sending a UTF-8 encoded stream
+const encoder = new TextEncoderStream("utf-8");
+const writer = encoder.writable.getWriter();
+writer.write("Hello Server").catch(() => {});
+writer.close();
+await encoder.readable.pipeTo(await wt.createUnidirectionalStream());
 
+// Using non-blocking bidirectional streams as a request/response pattern
+const encoder = new TextEncoderStream("utf-8");
+const writer = encoder.writable.getWriter();
+writer.write("Hello Server").catch(() => {});
+writer.close();
+await encoder.readable
+  .pipeThrough(await wt.createBidirectionalStream())
+  .pipeThrough(new TextDecoderStream("utf-8"))
+  .pipeTo(new WritableStream({write: msg => console.log(msg)}); // "Hi client"
 ```
 
 ### 4. Sending and Receiving Datagrams
@@ -105,16 +121,18 @@ await biWriter.write(new TextEncoder().encode("Hello Server"));
 Ideal for high-frequency, time-sensitive data.
 
 ```javascript
-async function handleDatagrams(wt) {
-  const writer = wt.datagrams.writable.getWriter();
-  await writer.write(new TextEncoder().encode("position: 10,20"));
+// Decoding server-initiated datagrams into text
+const decoder = new TextDecoder();
+for await (const datagram of wt.datagrams.readable) {
+  console.log(decoder.decode(datagram));
+}
 
-  const reader = wt.datagrams.readable.getReader();
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    console.log("Received datagram:", value);
-  }
+// Sending datagrams to the server
+const writable = wt.datagrams.createWritable();
+const writer = writable.getWriter();
+for (const message of messages) {
+  await writer.ready;
+  writer.write(encoder.encode(message)).catch(() => {});
 }
 
 ```
