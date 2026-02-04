@@ -82,6 +82,15 @@ await wt.ready;
 
 ### 3. Unidirectional and Bidirectional Streams
 
+Here are examples of sending and receiving streams of data, following [best practices](https://streams.spec.whatwg.org/#example-manual-write-dont-await) in the streams spec.
+```javascript
+// Send a UTF-8 encoded stream
+const { writable, readable } = new TextEncoderStream();
+const writer = writable.getWriter();
+writer.write("Hello server").catch(() => {});
+writer.close();
+await readable.pipeTo(await wt.createUnidirectionalStream());
+```
 ```javascript
 // Receive server-initiated unidirectional streams of data (may arrive out of order)
 for await (const readable of wt.incomingUnidirectionalStreams) consumeConcurrently(readable);
@@ -93,14 +102,6 @@ async function consumeConcurrently(readable) {
     console.error(e);
   }
 }
-```
-```javascript
-// Send a UTF-8 encoded stream
-const { writable, readable } = new TextEncoderStream();
-const writer = writable.getWriter();
-writer.write("Hello server").catch(() => {});
-writer.close();
-await readable.pipeTo(await wt.createUnidirectionalStream());
 ```
 ```javascript
 // Use bidirectional streams as a request/response pattern
@@ -120,12 +121,6 @@ for await (const message of readable
 Ideal for high-frequency, time-sensitive data.
 
 ```javascript
-// Receive server-initiated utf-8 encoded datagrams
-const decoder = new TextDecoder();
-for await (const datagram of wt.datagrams.readable) {
-  console.log(decoder.decode(datagram));
-}
-
 // Send utf-8 encoded datagrams to the server
 const writable = wt.datagrams.createWritable();
 const writer = writable.getWriter();
@@ -137,10 +132,17 @@ for (const message of messages) {
   writer.write(datagram).catch(() => {});
 }
 ```
+```javascript
+// Receive server-initiated utf-8 encoded datagrams
+const decoder = new TextDecoder();
+for await (const datagram of wt.datagrams.readable) {
+  console.log(decoder.decode(datagram));
+}
+```
 
 ### 5. Sending Real-time Video one Frame per Stream with Send Order
 
-As video frames tend to exceed the size of a datagram, a common way to send video is to use a stream per frame or segment. This ensures frames arrive whole without blocking on previous frames, allowing for frame loss. The streams can be assigned a send order to avoid them competing with one another. In this particular example, earlier frames are given a higher priority to preserve decode order. 
+As video frames tend to exceed the size of a datagram, a common way to send video is to use a stream per frame or segment. This ensures frames arrive whole without blocking on previous frames, allowing for frame loss. The streams can be assigned a send order to avoid them competing with one another. In this particular example, earlier frames are given a higher priority to assist decode order. 
 ```js
 let sendOrder = 0;
 for await (const encodedVideoChunk of realtimeEncodedVideoChunks.readable) {
@@ -179,6 +181,7 @@ async function sendParticipant(realtimeEncodedVideoChunks, sendGroup) {
 WebTransport also supports transactional writes and reliable reset via the `atomicWrite()` and `commit()` methods respectively. The former ensures that bytes only go out together, and the latter commits to sending what has been written up to this point even if the stream is later aborted.
 
 ```javascript
+// Send all bytes or nothing
 const writable = await wt.createUnidirectionalStream();
 const writer = writable.getWriter();
 try {
@@ -189,9 +192,13 @@ try {
 }
 ```
 ```javascript
+// Send bytes reliably ahead of aborting
 const writable = await wt.createUnidirectionalStream();
 const writer = writable.getWriter();
-writer.write(bytes).then(() => writer.commit()).catch(() => {});
+writer.write(bytes).then(async () => {
+  writer.commit();
+  await writer.abort(new WebTransportError("", {streamErrorCode: 42}));
+});
 ```
 
 ### 8. Unreliable Datagrams with Aging
