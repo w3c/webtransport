@@ -185,7 +185,7 @@ try {
   await writer.atomicWrite(bytes);
 } catch (e) {
   if (e.name != "AbortError") throw e;
-  // Blocked on flow control; the writable remains un-errored.
+  // Write prevented by flow control. The writable remains un-errored.
 }
 ```
 ```javascript
