@@ -54,50 +54,65 @@ Applications can now propose a list of subprotocols (similar to WebSockets), and
 
 ```javascript
 const wt = new WebTransport('https://example.com/wt', {
-  // Propose subprotocols to the server
-  protocols: ['v2.chat', 'v1.chat'], 
-  
-  // Fail the connection if only TCP/H2 is available
-  requireUnreliable: true 
+  protocols: ['v2.chat', 'v1.chat'], // Proposed to the server
+  requireUnreliable: true            // Fail if only H2/TCP available
 });
-
-const { protocol, responseHeaders } = await wt.ready;
-
-// The server-selected subprotocol
-console.log(`Negotiated protocol: ${wt.protocol}`); 
-
-// The transport mode used ("supports-unreliable" or "reliable-only")
-console.log(`Reliability mode: ${wt.reliability}`);
+await wt.ready;
+console.log(`The server selected ${wt.protocol || "no"} protocol`); 
+console.log(wt.reliability); // supports-unreliable
 ```
 
 ### 2. Connection with Headers and Cert Hashes
 
 ```javascript
+// Replace these two with real values from your server.
+const token = "dev-token-123";
+const certHash = new Uint8Array([
+  0xed, 0xb0, 0x3e, 0x3a, 0x0a, 0x5f, 0xbb, 0x4c, 0x1c, 0x8e, 0x62, 0xc8, 0xa0, 0xcf, 0x9c, 0x54,
+  0xc2, 0xe5, 0xa6, 0xd3, 0xb2, 0xb4, 0xa1, 0xc9, 0xd0, 0xe1, 0xf2, 0xa3, 0xb4, 0xc5, 0xd6, 0xe7,
+]);
+
 const wt = new WebTransport("https://127.0.0.1:4433/wt", {
-  serverCertificateHashes: [{
-    algorithm: "sha-256",
-    value: new Uint8Array([0xed, 0xb0, 0x3e, ...]) // For local dev
-  }],
-  headers: { 'Authorization': 'Bearer <token>' }
+  headers: { Authorization: `Bearer ${token}` },
+  serverCertificateHashes: [{ algorithm: "sha-256", value: certHash }],
 });
 await wt.ready;
-
 ```
 
 
 ### 3. Unidirectional and Bidirectional Streams
 
 ```javascript
-// Receiving a server-initiated unidirectional stream
-const reader = wt.incomingUnidirectionalStreams.getReader();
-const { value: stream } = await reader.read();
-const data = await new Response(stream).arrayBuffer();
+// Receive server-initiated unidirectional streams of data (may arrive out of order)
+for await (const readable of wt.incomingUnidirectionalStreams) consumeConcurrently(readable);
 
-// Creating a bidirectional stream
-const biStream = await wt.createBidirectionalStream();
-const biWriter = biStream.writable.getWriter();
-await biWriter.write(new TextEncoder().encode("Hello Server"));
-
+async function consumeConcurrently(readable) {
+  try {
+    for await (const bytes of readable) processTheData(bytes);
+  } catch (e) {
+    console.error(e);
+  }
+}
+```
+```javascript
+// Send a UTF-8 encoded stream
+const { writable, readable } = new TextEncoderStream();
+const writer = writable.getWriter();
+writer.write("Hello server").catch(() => {});
+writer.close();
+await readable.pipeTo(await wt.createUnidirectionalStream());
+```
+```javascript
+// Use bidirectional streams as a request/response pattern
+const { writable, readable } = new TextEncoderStream();
+const writer = writable.getWriter();
+writer.write("Hello server").catch(() => {});
+writer.close();
+for await (const message of readable
+    .pipeThrough(await wt.createBidirectionalStream())
+    .pipeThrough(new TextDecoderStream())) {
+  console.log(message); // "Hi client"
+}
 ```
 
 ### 4. Sending and Receiving Datagrams
@@ -105,56 +120,81 @@ await biWriter.write(new TextEncoder().encode("Hello Server"));
 Ideal for high-frequency, time-sensitive data.
 
 ```javascript
-async function handleDatagrams(wt) {
-  const writer = wt.datagrams.writable.getWriter();
-  await writer.write(new TextEncoder().encode("position: 10,20"));
-
-  const reader = wt.datagrams.readable.getReader();
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    console.log("Received datagram:", value);
-  }
+// Receive server-initiated utf-8 encoded datagrams
+const decoder = new TextDecoder();
+for await (const datagram of wt.datagrams.readable) {
+  console.log(decoder.decode(datagram));
 }
 
+// Send utf-8 encoded datagrams to the server
+const writable = wt.datagrams.createWritable();
+const writer = writable.getWriter();
+const encoder = new TextEncoder();
+for (const message of messages) {
+  const datagram = encoder.encode(message);
+  if (datagram.length > wt.datagrams.maxDatagramSize) throw;
+  await writer.ready;
+  writer.write(datagram).catch(() => {});
+}
 ```
 
-### 5. Managing Bandwidth with Send Groups
+### 5. Sending Real-time Video one Frame per Stream with Send Order
+
+As video frames tend to exceed the size of a datagram, a common way to send video is to use a stream per frame or segment. This ensures frames arrive whole without blocking on previous frames, allowing for frame loss. The streams can be assigned a send order to avoid them competing with one another. In this particular example, earlier frames are given a higher priority to preserve decode order. 
+```js
+let sendOrder = 0;
+for await (const encodedVideoChunk of realtimeEncodedVideoChunks.readable) {
+  const bytes = new Uint8Array(encodedVideoChunk.byteLength);
+  encodedVideoChunk.copyTo(bytes);
+  const writable = await wt.createUnidirectionalStream({ sendOrder: sendOrder-- });
+  const writer = writable.getWriter();
+  writer.write(bytes).catch(() => {});
+  writer.close();
+}
+```
+
+### 6. Managing Bandwidth with Send Groups
 
 In complex apps, different groups of related data might compete for bandwidth. **Send Groups** allow developers to group related streams and prioritize them individually within that group.
 
 ```javascript
-const audioGroup = wt.createSendGroup();
-const videoGroup = wt.createSendGroup();
+sendParticipant(encodedVideoChunksParticipantA, wt.createSendGroup());
+sendParticipant(encodedVideoChunksParticipantB, wt.createSendGroup());
 
-// Create a high-priority audio stream
-const audioStream = await wt.createUnidirectionalStream({
-  sendGroup: audioGroup,
-  sendOrder: 10 // Highest priority within its group
-});
-
-// The browser scheduler will now balance bandwidth between the audioGroup and videoGroup
-
+async function sendParticipant(realtimeEncodedVideoChunks, sendGroup) {
+  let sendOrder = 0;
+  for await (const encodedVideoChunk of realtimeEncodedVideoChunks.readable) {
+    const bytes = new Uint8Array(encodedVideoChunk.byteLength);
+    encodedVideoChunk.copyTo(bytes);
+    const writable = await wt.createUnidirectionalStream({ sendGroup, sendOrder: sendOrder-- });
+    const writer = writable.getWriter();
+    writer.write(bytes).catch(() => {});
+    writer.close();
+  }
+}
 ```
 
-### 6. Reliable Writes and Commits
+### 7. Transactional Writes and Reliable Reset
 
-WebTransport also supports transactional writes and reliable reset via the 'atomicWrite()' and `commit()` methods respectively. The former ensures that bytes only go out together, and the latter commits to sending what has been written up to this point even if the stream is later aborted.
+WebTransport also supports transactional writes and reliable reset via the `atomicWrite()` and `commit()` methods respectively. The former ensures that bytes only go out together, and the latter commits to sending what has been written up to this point even if the stream is later aborted.
 
 ```javascript
-const writer = stream.getWriter();
-
+const writable = await wt.createUnidirectionalStream();
+const writer = writable.getWriter();
 try {
-  // atomicWrite ensures the chunk fits in the current flow-control window
-  await writer.atomicWrite(importantMetadata);
-  writer.commit(); // Ensure this metadata arrives even if we reset the stream later
+  await writer.atomicWrite(bytes);
 } catch (e) {
-  if (e.name === 'AbortError') console.warn("Network buffer full");
+  if (e.name != "AbortError") throw e;
+  // Write prevented by flow control. The writable remains un-errored.
 }
-
+```
+```javascript
+const writable = await wt.createUnidirectionalStream();
+const writer = writable.getWriter();
+writer.write(bytes).then(() => writer.commit()).catch(() => {});
 ```
 
-### 7. Unreliable Datagrams with Aging
+### 8. Unreliable Datagrams with Aging
 
 For data like "player position," old updates are useless. Developers can now set an "expiration" on datagrams so the browser drops them rather than sending stale data.
 
@@ -167,9 +207,9 @@ await writer.write(new TextEncoder().encode("pos: 10,20"));
 
 ```
 
-### 8. Handling Session Draining
+### 9. Handling Session Draining
 
-Servers signal this during graceful restarts.
+Servers might signal this during graceful reset.
 
 ```javascript
 wt.draining.then(() => {
