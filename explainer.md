@@ -162,11 +162,11 @@ sendParticipant(encodedVideoChunksParticipantA, wt.createSendGroup());
 sendParticipant(encodedVideoChunksParticipantB, wt.createSendGroup());
 
 async function sendParticipant(realtimeEncodedVideoChunks, sendGroup) {
-  let frameCount = 0;
+  let sendOrder = 0;
   for await (const encodedVideoChunk of realtimeEncodedVideoChunks.readable) {
     const bytes = new Uint8Array(encodedVideoChunk.byteLength);
     encodedVideoChunk.copyTo(bytes);
-    const writable = await wt.createUnidirectionalStream({ sendGroup, sendOrder: frameCount++ });
+    const writable = await wt.createUnidirectionalStream({ sendGroup, sendOrder: sendOrder-- });
     const writer = writable.getWriter();
     writer.write(bytes).catch(() => {});
     writer.close();
