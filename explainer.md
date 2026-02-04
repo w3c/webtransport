@@ -142,11 +142,11 @@ for (const message of messages) {
 
 As video frames tend to exceed the size of a datagram, a common way to send video is to use a stream per frame or segment. This ensures frames arrive whole without blocking on previous frames, allowing for frame loss. The streams can be assigned a send order to avoid them competing with one another. In this particular example, earlier frames are given a higher priority to preserve decode order. 
 ```js
-let frameCount = 0;
+let sendOrder = 0;
 for await (const encodedVideoChunk of realtimeEncodedVideoChunks.readable) {
   const bytes = new Uint8Array(encodedVideoChunk.byteLength);
   encodedVideoChunk.copyTo(bytes);
-  const writable = await wt.createUnidirectionalStream({ sendOrder: frameCount++ });
+  const writable = await wt.createUnidirectionalStream({ sendOrder: sendOrder-- });
   const writer = writable.getWriter();
   writer.write(bytes).catch(() => {});
   writer.close();
