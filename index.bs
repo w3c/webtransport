@@ -480,7 +480,7 @@ interface WebTransportDatagramDuplexStream {
   readonly attribute unsigned long maxDatagramSize;
   attribute unrestricted double? incomingMaxAge;
   attribute unrestricted double? outgoingMaxAge;
-  attribute unrestricted double incomingHighWaterMark;
+  attribute unsigned long incomingMaxBufferedDatagrams;
   attribute unrestricted double outgoingHighWaterMark;
 };
 </pre>
@@ -523,9 +523,9 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
    <td class="non-normative">A promise set by [=pullDatagrams=], to wait for an incoming datagram.
   </tr>
   <tr>
-   <td><dfn>`[[IncomingDatagramsHighWaterMark]]`</dfn>
-   <td class="non-normative">An {{unrestricted double}} representing the
-   [=high water mark=] of the incoming datagrams.
+   <td><dfn>`[[IncomingMaxBufferedDatagrams]]`</dfn>
+   <td class="non-normative">An {{unsigned long}} representing the
+   depth of the incoming queue in number of datagrams.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsExpirationDuration]]`</dfn>
@@ -583,7 +583,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     :: an empty queue
     : {{[[IncomingDatagramsPullPromise]]}}
     :: null
-    : {{[[IncomingDatagramsHighWaterMark]]}}
+    : {{[[IncomingMaxBufferedDatagrams]]}}
     :: an [=implementation-defined=] value
     : {{[[IncomingDatagramsExpirationDuration]]}}
     :: null
@@ -651,13 +651,13 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. If |value| is `0`, set |value| to null.
      1. Set [=this=].{{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
 
-: <dfn for="WebTransportDatagramDuplexStream" attribute>incomingHighWaterMark</dfn>
+: <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxBufferedDatagrams</dfn>
 :: The getter steps are:
-     1. Return [=this=].{{[[IncomingDatagramsHighWaterMark]]}}.
+     1. Return [=this=].{{[[IncomingMaxBufferedDatagrams]]}}.
 :: The setter steps, given |value|, are:
      1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
      1. If |value| is < `1`, set |value| to `1`.
-     1. Set [=this=].{{[[IncomingDatagramsHighWaterMark]]}} to |value|.
+     1. Set [=this=].{{[[IncomingMaxBufferedDatagrams]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingHighWaterMark</dfn>
 :: The getter steps are:
@@ -707,7 +707,7 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
   1. Let |timestamp| be a timestamp representing now.
   1. Let |chunk| be a pair of |datagram| and |timestamp|.
   1. [=queue/Enqueue=] |chunk| to |queue|.
-1. Let |toBeRemoved| be the length of |queue| minus |datagrams|.{{[[IncomingDatagramsHighWaterMark]]}}.
+1. Let |toBeRemoved| be the length of |queue| minus |datagrams|.{{[[IncomingMaxBufferedDatagrams]]}}.
 1. If |toBeRemoved| is positive, repeat [=queue/dequeuing=] |queue| |toBeRemoved|
    ([rounded down](https://tc39.github.io/ecma262/#eqn-floor)) times.
 1. While |queue| is not empty:
