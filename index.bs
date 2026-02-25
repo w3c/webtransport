@@ -453,6 +453,11 @@ subset (determined by [=send-order rules=]) of its associated {{WebTransportData
 objects, and SHOULD do so as soon as reasonably possible whenever the
 algorithm can make progress.
 
+Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
+datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
+in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
+`"connected"`, it will start sending the queued datagrams.
+
 The <dfn>send-order rules</dfn> are that sending in general MAY be interleaved with
 sending of previously queued streams and datagrams, as well as streams and datagrams
 yet to be queued to be sent over this transport, except that sending MUST starve until
@@ -460,11 +465,6 @@ all bytes queued for sending on streams and datagrams with the same
 {{WebTransportDatagramsWritable/[[SendGroup]]}} and a higher
 {{WebTransportDatagramsWritable/[[SendOrder]]}}, that are neither
 [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been sent.
-
-Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
-datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
-in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
-`"connected"`, it will start sending the queued datagrams.
 
 Note: the default [=null sendGroup=] is a valid sendGroup.  
 
