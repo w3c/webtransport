@@ -525,7 +525,8 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>`[[IncomingMaxBufferedDatagrams]]`</dfn>
    <td class="non-normative">An {{unsigned long}} representing the
-   depth of the incoming queue in number of datagrams.
+   length of the incoming queue in number of datagrams, beyond which
+   datagrams are dropped from the head of the queue.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsExpirationDuration]]`</dfn>
@@ -655,7 +656,6 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 :: The getter steps are:
      1. Return [=this=].{{[[IncomingMaxBufferedDatagrams]]}}.
 :: The setter steps, given |value|, are:
-     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
      1. If |value| is < `1`, set |value| to `1`.
      1. Set [=this=].{{[[IncomingMaxBufferedDatagrams]]}} to |value|.
 
