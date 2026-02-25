@@ -466,6 +466,8 @@ datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarde
 in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
 `"connected"`, it will start sending the queued datagrams.
 
+Note: the default [=null sendGroup=] is a valid sendGroup.  
+
 # `WebTransportDatagramDuplexStream` Interface #  {#datagram-duplex-stream}
 
 A <dfn interface>WebTransportDatagramDuplexStream</dfn> is a generic duplex stream.
@@ -2277,10 +2279,11 @@ transmission of data spread across many individual
 (typically [=strict ordering|strictly ordered=])
 {{WebTransportSendStream}}s.
 
-{{WebTransportSendStream}}s can, at their creation or through assignment of
-their `sendGroup` attribute, be <dfn>grouped</dfn> under at most one
-{{WebTransportSendGroup}} at any time. By default, they are
-[=grouped|ungrouped=].
+{{WebTransportSendStream}}s and {{WebTransportDatagramWritable}}s, at their
+creation or through assignment of their `sendGroup` attribute, can be <dfn>grouped</dfn>
+under at most one {{WebTransportSendGroup}} or the <dfn>null sendGroup</dfn> at any time.
+By default, {{WebTransportSendStream}}s and {{WebTransportDatagramWritable}}s are assigned
+to the [=null sendGroup=].
 
 The user agent considers {{WebTransportSendGroup}}s as equals when allocating
 bandwidth for sending {{WebTransportSendStream}}s. Each {{WebTransportSendGroup}}
