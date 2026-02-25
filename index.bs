@@ -453,6 +453,11 @@ subset (determined by [=send-order rules=]) of its associated {{WebTransportData
 objects, and SHOULD do so as soon as reasonably possible whenever the
 algorithm can make progress.
 
+Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
+datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
+in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
+`"connected"`, it will start sending the queued datagrams.
+
 The <dfn>send-order rules</dfn> are that sending in general MAY be interleaved with
 sending of previously queued streams and datagrams, as well as streams and datagrams
 yet to be queued to be sent over this transport, except that sending MUST starve until
@@ -461,10 +466,7 @@ all bytes queued for sending on streams and datagrams with the same
 {{WebTransportDatagramsWritable/[[SendOrder]]}}, that are neither
 [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been sent.
 
-Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
-datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
-in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
-`"connected"`, it will start sending the queued datagrams.
+Note: the default [=null sendGroup=] is a valid sendGroup.  
 
 # `WebTransportDatagramDuplexStream` Interface #  {#datagram-duplex-stream}
 
@@ -2277,10 +2279,11 @@ transmission of data spread across many individual
 (typically [=strict ordering|strictly ordered=])
 {{WebTransportSendStream}}s.
 
-{{WebTransportSendStream}}s can, at their creation or through assignment of
-their `sendGroup` attribute, be <dfn>grouped</dfn> under at most one
-{{WebTransportSendGroup}} at any time. By default, they are
-[=grouped|ungrouped=].
+{{WebTransportSendStream}}s and {{WebTransportDatagramsWritable}}s, at their
+creation or through assignment of their `sendGroup` attribute, can be <dfn>grouped</dfn>
+under at most one {{WebTransportSendGroup}} or the <dfn>null sendGroup</dfn> at any time.
+By default, {{WebTransportSendStream}}s and {{WebTransportDatagramsWritable}}s are assigned
+to the [=null sendGroup=].
 
 The user agent considers {{WebTransportSendGroup}}s as equals when allocating
 bandwidth for sending {{WebTransportSendStream}}s. Each {{WebTransportSendGroup}}
