@@ -1356,7 +1356,8 @@ the application will receive the number of streams it anticipates.
          immediately available due to exhaustion, either wait for it to become
          available if |waitUntilAvailable| is true, or if |waitUntilAvailable| is false,
          abort these steps after [=queueing a network task=] with |transport| to [=reject=] |p|
-         with a {{QuotaExceededError}}.
+         with a {{QuotaExceededError}} whose [=QuotaExceededError/requested=] and [=QuotaExceededError/quota=]
+         are both null.
       1. Let |internalStream| be the result of [=creating a bidirectional stream=] with
            |transport|.{{[[Session]]}} and |streamId|.
       1. [=Queue a network task=] with |transport| to run the following steps:
