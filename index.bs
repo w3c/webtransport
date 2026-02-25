@@ -407,7 +407,7 @@ The <dfn>writeDatagrams</dfn> algorithm is given a |transport| and |writable| as
 1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
 1. Enqueue |chunk| to |writable|.{{[[OutgoingDatagramsQueue]]}}.
 1. If the length of |writable|.{{[[OutgoingDatagramsQueue]]}} is less than
-   |datagrams|.{{[[OutgoingDatagramsHighWaterMark]]}}, then [=resolve=] |promise| with undefined.
+   |datagrams|.{{[[OutgoingMaxBufferedDatagrams]]}}, then [=resolve=] |promise| with undefined.
 1. Return |promise|.
 
 Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
@@ -481,7 +481,7 @@ interface WebTransportDatagramDuplexStream {
   attribute unrestricted double? incomingMaxAge;
   attribute unrestricted double? outgoingMaxAge;
   attribute unrestricted double incomingHighWaterMark;
-  attribute unrestricted double outgoingHighWaterMark;
+  attribute unsigned long outgoingMaxBufferedDatagrams;
 };
 </pre>
 
@@ -533,9 +533,10 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
    expiration duration for incoming datagrams (in milliseconds), or null.
   </tr>
   <tr>
-   <td><dfn>`[[OutgoingDatagramsHighWaterMark]]`</dfn>
-   <td class="non-normative">An {{unrestricted double}} representing the
-   [=high water mark=] of the outgoing datagrams.
+   <td><dfn>`[[OutgoingMaxBufferedDatagrams]]`</dfn>
+   <td class="non-normative">An {{unsigned long}} representing the
+   length of the underlying sink's outgoing queue in number of datagrams,
+   beyond which backpressure is exerted.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsExpirationDuration]]`</dfn>
@@ -587,7 +588,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     :: an [=implementation-defined=] value
     : {{[[IncomingDatagramsExpirationDuration]]}}
     :: null
-    : {{[[OutgoingDatagramsHighWaterMark]]}}
+    : {{[[OutgoingMaxBufferedDatagrams]]}}
     :: an [=implementation-defined=] value
        <div class="note">
         <p>This implementation-defined value should be tuned to ensure decent throughput, without
@@ -659,13 +660,12 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. If |value| is < `1`, set |value| to `1`.
      1. Set [=this=].{{[[IncomingDatagramsHighWaterMark]]}} to |value|.
 
-: <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingHighWaterMark</dfn>
+: <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingMaxBufferedDatagrams</dfn>
 :: The getter steps are:
-     1. Return [=this=].{{[[OutgoingDatagramsHighWaterMark]]}}.
+     1. Return [=this=].{{[[OutgoingMaxBufferedDatagrams]]}}.
 :: The setter steps, given |value|, are:
-     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
      1. If |value| is < `1`, set |value| to `1`.
-     1. Set [=this=].{{[[OutgoingDatagramsHighWaterMark]]}} to |value|.
+     1. Set [=this=].{{[[OutgoingMaxBufferedDatagrams]]}} to |value|.
 
 ## Procedures ## {#datagram-duplex-stream-procedures}
 
