@@ -744,6 +744,7 @@ interface WebTransport {
   readonly attribute WebTransportCongestionControl congestionControl;
   attribute [EnforceRange] unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams;
   attribute [EnforceRange] unsigned short? anticipatedConcurrentIncomingBidirectionalStreams;
+  [SameObject] readonly attribute Headers? responseHeaders;
   readonly attribute DOMString protocol;
 
   readonly attribute Promise&lt;WebTransportCloseInfo&gt; closed;
@@ -839,6 +840,10 @@ A {{WebTransport}} object has the following internal slots.
    [=bidirectional=] streams the application anticipates the server creating, or null.
   </tr>
   <tr>
+   <td><dfn>`[[ResponseHeaders]]`</dfn>
+   <td class="non-normative">A {{Headers}} object or null. Initially null.
+  </tr>
+  <tr>
    <td><dfn>`[[Protocol]]`</dfn>
    <td class="non-normative">A string indicating the application-level protocol selected by the server,
    if any. Initially an empty string.
@@ -851,7 +856,7 @@ A {{WebTransport}} object has the following internal slots.
   <tr>
    <td><dfn>`[[Draining]]`</dfn>
    <td class="non-normative">A promise fulfilled when the associated [=WebTransport session=]
-   is [=session/draining|drained=].
+   starts [=session/draining=].
   </tr>
   <tr>
    <td><dfn>`[[Datagrams]]`</dfn>
@@ -932,6 +937,8 @@ agent MUST run the following steps:
     :: |anticipatedConcurrentIncomingUnidirectionalStreams|
     : {{[[AnticipatedConcurrentIncomingBidirectionalStreams]]}}
     :: |anticipatedConcurrentIncomingBidirectionalStreams|
+    : {{[[ResponseHeaders]]}}
+    :: null
     : {{[[Protocol]]}}
     :: an empty string
     : {{[[Closed]]}}
@@ -990,6 +997,19 @@ agent MUST run the following steps:
 
 1. Set |request|'s [=request/method=] to "`CONNECT`", and set the method's associated
    `:protocol` <dfn>pseudo-header</dfn> to `"webtransport"`.
+1. Let |headers| be a new {{Headers}} object [=Headers/filled=] with
+   {{WebTransport/constructor(url, options)/options}}["{{WebTransportOptions/headers}}"].
+1. Let |requestHeaders| be a new {{Headers}} object whose [=Headers/header list=] is
+   |request|'s [=request/header list=] and [=Headers/guard=] is "`request`".
+1. For each |header| of |headers|'s [=Headers/header list=]:
+    1. If [=ascii lowercase=] |header|'s [=header/name=] is "`wt-available-protocols`",
+       then throw a {{TypeError}}.
+    1. [=Headers/append=] |header| to |requestHeaders|.
+
+    Note: Headers are subject to Fetch’s
+    <a href="https://fetch.spec.whatwg.org/#forbidden-request-header">forbidden request-header</a>
+    restrictions.
+
 1. If |protocols| is not empty, [=header list/set a structured field value=] with
     (`WT-Available-Protocols`, a
     <a href="https://html.spec.whatwg.org/#http-structured-header-list">
@@ -999,7 +1019,7 @@ agent MUST run the following steps:
     [=header list=].
 1. [=Fetch=] |request|, with [=useParallelQueue=] set to true, and [=processResponse=]
    set to the following steps given a |response|:
-    1. [=Process a WebTransport fetch response=] with |response|, |origin|, |protocols|, and |congestionControl|.
+    1. [=Process a WebTransport fetch response=] with |response| and |transport|.
 1. Return |transport|.
 
 </div>
@@ -1040,7 +1060,8 @@ To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partiti
 </div>
 
 <div algorithm="process a WebTransport fetch response">
-To <dfn>process a WebTransport fetch response</dfn>, given a |response|, and |congestionControl|, run these steps:
+To <dfn>process a WebTransport fetch response</dfn>, given a [=/response=] |response| and a {{WebTransport}}
+|transport|, run these steps:
   1. If |response| is [=network error=], then abort the remaining steps and [=queue a network task=] with
      |transport| to run these steps:
     1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, then abort these steps.
@@ -1064,7 +1085,7 @@ To <dfn>process a WebTransport fetch response</dfn>, given a |response|, and |co
        {{WebTransportErrorOptions/source}} is `"session"`.
     1. [=Cleanup=] |transport| with |error|.
   1. If the user agent supports more than one congestion control algorithm, choose one
-     appropriate for |congestionControl| for sending of data on this |connection|.
+     appropriate for |transport|'s {{[[CongestionControl]]}} for sending of data on this |connection|.
   1. [=Queue a network task=] with |transport| to run these steps:
     1. Assert: [=this=]'s {{[[Datagrams]]}}'s {{[[OutgoingMaxDatagramSize]]}} is an integer.
     1. If |transport|.{{[[State]]}} is not `"connecting"`:
@@ -1072,6 +1093,10 @@ To <dfn>process a WebTransport fetch response</dfn>, given a |response|, and |co
       1. Abort these steps.
     1. Set |transport|.{{[[State]]}} to `"connected"`.
     1. Set |transport|.{{[[Session]]}} to |session|.
+    1. Let |responseHeaders| be a copy of |response|’s [=response/header list=].
+    1. [=header list/Delete=] "`wt-protocol`" from |responseHeaders|.
+    1. Set |transport|.{{[[ResponseHeaders]]}} to a new {{Headers}} object, whose
+       [=Headers/header list=] is |responseHeaders| and guard is "`immutable`".
     1. Set |transport|.{{[[Protocol]]}} to either the string value of the negotiated application
        protocol if present, following [[!WEB-TRANSPORT-OVERVIEW]]
        [Section 3.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-11/#section-3.1),
@@ -1203,6 +1228,11 @@ these steps.
 Note: Setting {{WebTransport/anticipatedConcurrentIncomingUnidirectionalStreams}} or
 {{WebTransport/anticipatedConcurrentIncomingBidirectionalStreams}} does not guarantee
 the application will receive the number of streams it anticipates.
+
+: <dfn for="WebTransport" attribute>responseHeaders</dfn>
+:: Once a [=WebTransport session=] has been established, holds the application-level
+   response headers set by the server, if any. Initially null.
+   The getter steps are to return [=this=]'s {{[[ResponseHeaders]]}}.
 
 : <dfn for="WebTransport" attribute>protocol</dfn>
 :: Once a [=WebTransport session=] has been established and the {{protocols}}
@@ -1548,6 +1578,7 @@ dictionary WebTransportHash {
 dictionary WebTransportOptions {
   boolean allowPooling = false;
   boolean requireUnreliable = false;
+  HeadersInit headers = {};
   sequence&lt;WebTransportHash&gt; serverCertificateHashes = [];
   WebTransportCongestionControl congestionControl = "default";
   [EnforceRange] unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams = null;
@@ -1573,6 +1604,11 @@ that determine how the [=WebTransport session=] is established and used.
 : <dfn for="WebTransportOptions" dict-member>requireUnreliable</dfn>
 :: When set to true, the [=WebTransport session=] cannot be established over an
    HTTP/2 [=connection=] if an HTTP/3 [=connection=] is not possible.
+
+: <dfn for="WebTransportOptions" dict-member>headers</dfn>
+:: Optionally, a {{Headers}} object, an object literal, or an array of two-item arrays
+   to set the [=request=] [=request/header list=] to use when [=session/establishing=]
+   a [=WebTransport session=].
 
 : <dfn for="WebTransportOptions" dict-member>serverCertificateHashes</dfn>
 :: This option is only supported for transports using dedicated connections.
@@ -2797,7 +2833,7 @@ not be immediate due to buffering.
     </thead>
     <tbody>
       <tr>
-        <td>Session [=session/draining|drained=]</td>
+        <td>Session starts [=session/draining=]</td>
         <td>await wt.{{WebTransport/draining}}</td>
       </tr>
     </tbody>
@@ -2931,7 +2967,7 @@ of [[WEB-TRANSPORT-HTTP3]].
     </thead>
     <tbody>
       <tr>
-        <td>Session [=session/draining|drained=]</td>
+        <td>Session starts [=session/draining=]</td>
         <td>await wt.{{WebTransport/draining}}</td>
       </tr>
     </tbody>
@@ -3028,7 +3064,7 @@ code does not need to be converted to an HTTP error code, and vice versa.
           [=ReadableStream/error|errors=] open streams</td>
       </tr>
       <tr>
-        <td>Session [=session/draining|drained=]</td>
+        <td>Session starts [=session/draining=]</td>
         <td>await wt.{{WebTransport/draining}}</td>
       </tr>
     </tbody>
