@@ -48,9 +48,19 @@ Additional use-cases are described in the [original use-cases](https://github.co
 
 ## Proposed Solution: Key Scenarios
 
-### 1. Connection, Reliability, and Subprotocol Negotiation
+### 1. Basic connection
 
-Applications can now propose a list of subprotocols (similar to WebSockets), and specify if they require the performance of an unreliable (UDP/QUIC) transport if a reliable-only (TCP/H2) fallback is undesirable. See the additional [explainer on Subprotocol negotiation](https://github.com/w3c/webtransport/blob/main/explainers/subprotocol_negotiation.md) for more detail and background.
+Applications open a connection to a WebTransport server as follows. This will be an HTTP/3 connection over UDP if possible. If not possible (no H3-only path to the server is found), then an HTTP/2 connection over TCP may be returned instead.
+
+```javascript
+const wt = new WebTransport('https://example.com/wt'}); // H3/UDP with fallback to H2/TCP
+await wt.ready;
+console.log(wt.reliability); // "supports-unreliable" (UDP QUIC) or "reliable-only" (TCP)
+```
+
+### 2. Connection, Reliability, and Subprotocol Negotiation
+
+Optionally, applications can propose a list of subprotocols (similar to WebSockets), and specify if they require the performance of an unreliable (UDP/QUIC) transport if a reliable-only (H2/TCP) fallback is undesirable. See the additional [explainer on Subprotocol negotiation](https://github.com/w3c/webtransport/blob/main/explainers/subprotocol_negotiation.md) for more detail and background.
 
 ```javascript
 const wt = new WebTransport('https://example.com/wt', {
@@ -58,12 +68,13 @@ const wt = new WebTransport('https://example.com/wt', {
   requireUnreliable: true            // Fail if only H2/TCP available
 });
 await wt.ready;
-console.log(`The server selected ${wt.protocol || "no"} protocol`); 
+console.log(`The server selected ${wt.protocol || "no"} protocol`); // e.g. "v2.chat"
 console.log(wt.reliability); // supports-unreliable
 ```
 
-### 2. Connection with Headers and Cert Hashes
+### 3. Connection with Headers and Cert Hashes
 
+Custom headers and even custom server certificates are also supported.
 ```javascript
 // Replace these two with real values from your server.
 const token = "dev-token-123";
@@ -80,7 +91,7 @@ await wt.ready;
 ```
 
 
-### 3. Unidirectional and Bidirectional Streams
+### 4. Unidirectional and Bidirectional Streams
 
 Here are examples of sending and receiving streams of data, following [best practices](https://streams.spec.whatwg.org/#example-manual-write-dont-await) in the streams spec.
 ```javascript
@@ -116,7 +127,7 @@ for await (const message of readable
 }
 ```
 
-### 4. Sending and Receiving Datagrams
+### 5. Sending and Receiving Datagrams
 
 Ideal for high-frequency, time-sensitive data.
 
@@ -140,7 +151,7 @@ for await (const datagram of wt.datagrams.readable) {
 }
 ```
 
-### 5. Sending Real-time Video one Frame per Stream with Send Order
+### 6. Sending Video one Stream per Frame or Segment with Send Order
 
 As video frames tend to exceed the size of a datagram, a common way to send video is to use a stream per frame or segment. This ensures frames arrive whole without blocking on previous frames, allowing for frame loss. The streams can be assigned a send order to avoid them competing with one another. In this particular example, earlier frames are given a higher priority to assist decode order. 
 ```js
@@ -154,16 +165,32 @@ for await (const encodedVideoChunk of realtimeEncodedVideoChunks.readable) {
   writer.close();
 }
 ```
+Note that sending a video in real-time might require additional effort, such as different priorities for I-frames versus P-frames, sendOrder++ and an age-based aborting scheme.
 
-### 6. Managing Bandwidth with Send Groups
+### 7. Sending Real-time Game Data per Stream with Send Order
+
+Similar to sending real-time video but without the I-frame/P-frame complexity, is sending real-time game data from a server. Here we use sendOrder++ which sends the latest data with the highest priority, and we age out old data.
+
+```js
+let sendOrder = 0;
+for await (const gameDataChunk of realtimeGameDataChunks.readable) {
+  const writable = await wt.createUnidirectionalStream({ sendOrder: sendOrder++});
+  const writer = writable.getWriter();
+  writer.write(gameDataChunk).catch(() => {});
+  writer.close();
+  setTimeout(() => writer.abort(), 500); // age-based abort
+}
+```
+
+### 8. Managing Bandwidth with Send Groups
 
 In complex apps, different groups of related data might compete for bandwidth. **Send Groups** allow developers to group related streams and prioritize them individually within that group.
 
 ```javascript
-sendParticipant(encodedVideoChunksParticipantA, wt.createSendGroup());
-sendParticipant(encodedVideoChunksParticipantB, wt.createSendGroup());
+sendVideoToParticipant(encodedVideoChunksParticipantA, wt.createSendGroup());
+sendVideoToParticipant(encodedVideoChunksParticipantB, wt.createSendGroup());
 
-async function sendParticipant(realtimeEncodedVideoChunks, sendGroup) {
+async function sendVideoToParticipant(realtimeEncodedVideoChunks, sendGroup) {
   let sendOrder = 0;
   for await (const encodedVideoChunk of realtimeEncodedVideoChunks.readable) {
     const bytes = new Uint8Array(encodedVideoChunk.byteLength);
@@ -176,7 +203,7 @@ async function sendParticipant(realtimeEncodedVideoChunks, sendGroup) {
 }
 ```
 
-### 7. Transactional Writes and Reliable Reset
+### 9. Transactional Writes and Reliable Reset
 
 WebTransport also supports transactional writes and reliable reset via the `atomicWrite()` and `commit()` methods respectively. The former ensures that bytes only go out together, and the latter commits to sending what has been written up to this point even if the stream is later aborted.
 
@@ -201,7 +228,7 @@ writer.write(bytes).then(async () => {
 });
 ```
 
-### 8. Unreliable Datagrams with Aging
+### 10. Unreliable Datagrams with Aging
 
 For data like "player position," old updates are useless. Developers can now set an "expiration" on datagrams so the browser drops them rather than sending stale data.
 
@@ -214,7 +241,7 @@ await writer.write(new TextEncoder().encode("pos: 10,20"));
 
 ```
 
-### 9. Handling Session Draining
+### 11. Handling Session Draining
 
 Servers might signal this during graceful reset.
 
