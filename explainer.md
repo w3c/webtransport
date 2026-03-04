@@ -50,7 +50,7 @@ Additional use-cases are described in the [original use-cases](https://github.co
 
 ### 1. Basic connection
 
-Applications open a connection to a WebTransport server as follows. This will be an HTTP/3 connection over UDP if possible. If not possible (no H3-only path to the server is found), then an HTTP/2 connection over TCP may be returned instead.
+Applications open a connection to a WebTransport server as follows. This will be an HTTP/3 connection over UDP if possible. If not possible (no H3-only path to the server is found), then an HTTP/2 connection over TCP might be returned instead.
 
 ```javascript
 const wt = new WebTransport('https://example.com/wt'}); // H3/UDP with fallback to H2/TCP
