@@ -2693,9 +2693,9 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
    always await atomic writes.
 
    When {{atomicWrite(chunk)}} is called, the user agent MUST run the following steps:
-   1. Let |stream| be [=this=].<a href="https://streams.spec.whatwg.org/#writablestreamdefaultwriter-stream">stream</a>.
+   1. Let |stream| be
+      [=this=].<a href="https://streams.spec.whatwg.org/#writablestreamdefaultwriter-stream">stream</a>.
    1. If |stream| is undefined, return [=a promise rejected with=] a {{TypeError}}.
-
    1. Set |stream|.{{WebTransportSendStream/[[InsideSynchronousAtomicWrite]]}} to true.
    1. Let |p| be the result of {{WritableStreamDefaultWriter/write(chunk)}}
        on {{WritableStreamDefaultWriter}} with |chunk|.
