@@ -2027,6 +2027,11 @@ A {{WebTransportSendStream}} has the following internal slots.
    write requests that are atomic among those queued to be processed by the underlying sink.
   </tr>
   <tr>
+   <td><dfn>`[[InsideSynchronousAtomicWrite]]`</dfn>
+   <td class="non-normative">A boolean set to true only while inside the synchronous part of
+   the {{atomicWrite}} method.
+  </tr>
+  <tr>
    <td><dfn>`[[BytesWritten]]`</dfn>
    <td class="non-normative">The number of bytes that have been written to the stream.
   </tr>
@@ -2060,7 +2065,9 @@ To <dfn export for="WebTransportSendStream" lt="create|creating">create</dfn> a
     : {{WebTransportSendStream/[[SendOrder]]}}
     :: |sendOrder|
     : {{WebTransportSendStream/[[AtomicWriteRequests]]}}
-    :: An empty [=ordered set=] of promises.
+    :: An empty [=ordered set=] of promises
+    : {{WebTransportSendStream/[[InsideSynchronousAtomicWrite]]}}
+    :: false
     : {{WebTransportSendStream/[[BytesWritten]]}}
     :: 0
     : {{WebTransportSendStream/[[CommittedOffset]]}}
@@ -2094,8 +2101,9 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 1. Set |stream|.{{[[PendingOperation]]}} to |promise|.
 1. Let |inFlightWriteRequest| be
    |stream|.<a href="https://streams.spec.whatwg.org/#writablestream-inflightwriterequest">inFlightWriteRequest</a>.
-1. Let |atomic| be true if [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}
-   [=list/contains=] |inFlightWriteRequest|, otherwise false.
+1. Let |atomic| be true if |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}
+   [=list/contains=] |inFlightWriteRequest| or
+   |stream|.{{WebTransportSendStream/[[InsideSynchronousAtomicWrite]]}} is true, otherwise false.
 1. Run the following steps [=in parallel=]:
   1. If |atomic| is true and the current [=flow control=] window is too small for |bytes| to be sent
      in its entirety, then abort the remaining steps and [=queue a network task=] with |transport|
@@ -2664,7 +2672,8 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
 
 ## Methods ##  {#web-transport-writer-methods}
 
-: <dfn for="WebTransportWriter" method>atomicWrite(chunk)</dfn>
+  <div algorithm>
+: <dfn for="WebTransportWriter" method>atomicWrite(|chunk|)</dfn>
 :: The {{atomicWrite}} method will reject if the |chunk| given to it
    could not be sent in its entirety within the [=flow control=] window that
    is current at the time of sending. This behavior is designed to satisfy niche
@@ -2683,15 +2692,21 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
    [=WritableStream/error=] the stream. Applications are therefore encouraged to
    always await atomic writes.
 
-   When {{atomicWrite}} is called, the user agent MUST run the following steps:
+   When {{atomicWrite(chunk)}} is called, the user agent MUST run the following steps:
+   1. Let |stream| be [=this=].<a href="https://streams.spec.whatwg.org/#writablestreamdefaultwriter-stream">stream</a>.
+   1. If |stream| is undefined, return [=a promise rejected with=] a {{TypeError}}.
+
+   1. Set |stream|.{{WebTransportSendStream/[[InsideSynchronousAtomicWrite]]}} to true.
    1. Let |p| be the result of {{WritableStreamDefaultWriter/write(chunk)}}
        on {{WritableStreamDefaultWriter}} with |chunk|.
+   1. Set |stream|.{{WebTransportSendStream/[[InsideSynchronousAtomicWrite]]}} to false.
    1. [=set/Append=] |p| to |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
    1. Return the result of [=reacting=] to |p| with the following steps:
       1. If |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} [=list/contains=] |p|,
          [=list/remove=] |p|.
       1. If |p| was rejected with reason |r|, then return [=a promise rejected with=] |r|.
       1. Return undefined.
+    </div>
 
 : <dfn for="WebTransportWriter" method>commit()</dfn>
 :: The {{commit}} method will update the {{WebTransportSendStream/[[CommittedOffset]]}} of a stream
