@@ -453,6 +453,11 @@ subset (determined by [=send-order rules=]) of its associated {{WebTransportData
 objects, and SHOULD do so as soon as reasonably possible whenever the
 algorithm can make progress.
 
+Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
+datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
+in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
+`"connected"`, it will start sending the queued datagrams.
+
 The <dfn>send-order rules</dfn> are that sending in general MAY be interleaved with
 sending of previously queued streams and datagrams, as well as streams and datagrams
 yet to be queued to be sent over this transport, except that sending MUST starve until
@@ -461,10 +466,7 @@ all bytes queued for sending on streams and datagrams with the same
 {{WebTransportDatagramsWritable/[[SendOrder]]}}, that are neither
 [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been sent.
 
-Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
-datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
-in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
-`"connected"`, it will start sending the queued datagrams.
+Note: the default [=null sendGroup=] is a valid sendGroup.  
 
 # `WebTransportDatagramDuplexStream` Interface #  {#datagram-duplex-stream}
 
@@ -480,7 +482,7 @@ interface WebTransportDatagramDuplexStream {
   readonly attribute unsigned long maxDatagramSize;
   attribute unrestricted double? incomingMaxAge;
   attribute unrestricted double? outgoingMaxAge;
-  attribute unrestricted double incomingHighWaterMark;
+  attribute unsigned long incomingMaxBufferedDatagrams;
   attribute unsigned long outgoingMaxBufferedDatagrams;
 };
 </pre>
@@ -523,9 +525,10 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
    <td class="non-normative">A promise set by [=pullDatagrams=], to wait for an incoming datagram.
   </tr>
   <tr>
-   <td><dfn>`[[IncomingDatagramsHighWaterMark]]`</dfn>
-   <td class="non-normative">An {{unrestricted double}} representing the
-   [=high water mark=] of the incoming datagrams.
+   <td><dfn>`[[IncomingMaxBufferedDatagrams]]`</dfn>
+   <td class="non-normative">An {{unsigned long}} representing the
+   length of the incoming queue in number of datagrams, beyond which
+   datagrams are dropped from the head of the queue.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsExpirationDuration]]`</dfn>
@@ -584,7 +587,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
     :: an empty queue
     : {{[[IncomingDatagramsPullPromise]]}}
     :: null
-    : {{[[IncomingDatagramsHighWaterMark]]}}
+    : {{[[IncomingMaxBufferedDatagrams]]}}
     :: an [=implementation-defined=] value
     : {{[[IncomingDatagramsExpirationDuration]]}}
     :: null
@@ -652,13 +655,12 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. If |value| is `0`, set |value| to null.
      1. Set [=this=].{{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
 
-: <dfn for="WebTransportDatagramDuplexStream" attribute>incomingHighWaterMark</dfn>
+: <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxBufferedDatagrams</dfn>
 :: The getter steps are:
-     1. Return [=this=].{{[[IncomingDatagramsHighWaterMark]]}}.
+     1. Return [=this=].{{[[IncomingMaxBufferedDatagrams]]}}.
 :: The setter steps, given |value|, are:
-     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
      1. If |value| is < `1`, set |value| to `1`.
-     1. Set [=this=].{{[[IncomingDatagramsHighWaterMark]]}} to |value|.
+     1. Set [=this=].{{[[IncomingMaxBufferedDatagrams]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingMaxBufferedDatagrams</dfn>
 :: The getter steps are:
@@ -707,7 +709,7 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
   1. Let |timestamp| be a timestamp representing now.
   1. Let |chunk| be a pair of |datagram| and |timestamp|.
   1. [=queue/Enqueue=] |chunk| to |queue|.
-1. Let |toBeRemoved| be the length of |queue| minus |datagrams|.{{[[IncomingDatagramsHighWaterMark]]}}.
+1. Let |toBeRemoved| be the length of |queue| minus |datagrams|.{{[[IncomingMaxBufferedDatagrams]]}}.
 1. If |toBeRemoved| is positive, repeat [=queue/dequeuing=] |queue| |toBeRemoved|
    ([rounded down](https://tc39.github.io/ecma262/#eqn-floor)) times.
 1. While |queue| is not empty:
@@ -2277,10 +2279,11 @@ transmission of data spread across many individual
 (typically [=strict ordering|strictly ordered=])
 {{WebTransportSendStream}}s.
 
-{{WebTransportSendStream}}s can, at their creation or through assignment of
-their `sendGroup` attribute, be <dfn>grouped</dfn> under at most one
-{{WebTransportSendGroup}} at any time. By default, they are
-[=grouped|ungrouped=].
+{{WebTransportSendStream}}s and {{WebTransportDatagramsWritable}}s, at their
+creation or through assignment of their `sendGroup` attribute, can be <dfn>grouped</dfn>
+under at most one {{WebTransportSendGroup}} or the <dfn>null sendGroup</dfn> at any time.
+By default, {{WebTransportSendStream}}s and {{WebTransportDatagramsWritable}}s are assigned
+to the [=null sendGroup=].
 
 The user agent considers {{WebTransportSendGroup}}s as equals when allocating
 bandwidth for sending {{WebTransportSendStream}}s. Each {{WebTransportSendGroup}}
