@@ -217,6 +217,23 @@ bytes on a [=WebTransport session=], as described in [[!WEB-TRANSPORT-OVERVIEW]]
 A [=WebTransport stream=] is one of <dfn for=stream>incoming unidirectional</dfn>,
 <dfn for=stream>outgoing unidirectional</dfn> or <dfn for=stream>bidirectional</dfn>.
 
+<div class=note>
+Data sent on a [=WebTransport stream | stream=] is delivered
+as an undifferentiated sequence of bytes.
+The number of bytes that are written at the sending end in a given write
+might not match the number of bytes that are read at the receiving end.
+Separate writes can be merged and delivered as a single byte sequence;
+a single write might be delivered separately.
+
+This includes {{WebTransportWriter/atomicWrite|atomic writes}},
+which exist to prevent flow control deadlocks,
+not to guarantee that data is delivered together.
+
+Applications that depend on having a message-based protocol
+that preserves message boundaries between sender and receiver
+need to add a framing layer so that messages can be reconstructed.
+</div>
+
 A [=WebTransport stream=] has the following capabilities:
 
 <table class="data" dfn-for="stream">
@@ -466,7 +483,7 @@ all bytes queued for sending on streams and datagrams with the same
 {{WebTransportDatagramsWritable/[[SendOrder]]}}, that are neither
 [=WritableStream/Error | errored=] nor blocked by [=flow control=], have been sent.
 
-Note: the default [=null sendGroup=] is a valid sendGroup.  
+Note: the default [=null sendGroup=] is a valid sendGroup.
 
 # `WebTransportDatagramDuplexStream` Interface #  {#datagram-duplex-stream}
 
@@ -2102,6 +2119,8 @@ To <dfn for="WebTransportSendStream">write</dfn> |chunk| to a {{WebTransportSend
 1. If |chunk| is not a {{BufferSource}}, return [=a promise rejected with=] a {{TypeError}}.
 1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of the [=byte sequence=] which |chunk| represents.
+1. If |bytes| [=byte sequence/length=] is 0,
+   [=resolve=] |promise| with undefined and return |promise|.
 1. Set |stream|.{{[[PendingOperation]]}} to |promise|.
 1. Let |inFlightWriteRequest| be
    |stream|.<a href="https://streams.spec.whatwg.org/#writablestream-inflightwriterequest">inFlightWriteRequest</a>.
