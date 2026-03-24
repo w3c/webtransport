@@ -29,10 +29,10 @@ feature, you can remove yourself with the above syntax.
 ### Notes on bikeshedding :bicyclist:
 To compile `index.bs` into `index.html` , I'm using the online compiler:
 ```
-curl https://api.csswg.org/bikeshed/ -F file=@index.bs -F force=1 > index.html
+curl https://www.w3.org/publications/spec-generator/ -F file=@index.bs -F type=bikeshed-spec -F die-on=nothing > index.html
 ```
 if the produced file has a strange size (i.e. zero, a few KBs), then something went terribly wrong; run instead:
 ```
-curl https://api.csswg.org/bikeshed/ -F file=@index.bs -F output=err
+curl https://www.w3.org/publications/spec-generator/ -F file=@index.bs -F type=bikeshed-spec -F output=messages
 ```
 and try to figure out why `bikeshed` did not like the `.bs` :'(
