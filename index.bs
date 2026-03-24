@@ -1984,11 +1984,13 @@ The {{WebTransportSendStream}}'s [=transfer steps=] and
            1. [=Resolve=] |p| with |stats|.
      1. Return |p|.
 
+<div algorithm>
 : <dfn for="WebTransportSendStream" method>getWriter()</dfn>
-:: This method must be implemented in the same manner as {{WritableStream/getWriter}}
-   inherited from {{WritableStream}}, except in place of creating a
-   {{WritableStreamDefaultWriter}}, it must instead
-   [=WebTransportWriter/create=] a {{WebTransportWriter}} with [=this=].
+:: Creates a {{WebTransportWriter}} for [=this=] stream.
+
+   When {{getWriter}} is called, return the result of
+   [=WebTransportWriter/creating=] a {{WebTransportWriter}} with [=this=].
+  </div>
 
 ## Internal Slots ## {#send-stream-internal-slots}
 
@@ -2692,8 +2694,7 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
       [=this=].<a href="https://streams.spec.whatwg.org/#writablestreamdefaultwriter-stream">stream</a>.
    1. If |stream| is undefined, return [=a promise rejected with=] a {{TypeError}}.
    1. Set |stream|.{{WebTransportSendStream/[[InsideSynchronousAtomicWrite]]}} to true.
-   1. Let |p| be the result of {{WritableStreamDefaultWriter/write(chunk)}}
-       on {{WritableStreamDefaultWriter}} with |chunk|.
+   1. Let |p| be the result of [=writing a chunk | writing=] |chunk| to [=this=].
    1. Set |stream|.{{WebTransportSendStream/[[InsideSynchronousAtomicWrite]]}} to false.
    1. [=set/Append=] |p| to |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
    1. Return the result of [=reacting=] to |p| with the following steps:
@@ -2726,8 +2727,7 @@ To <dfn export for="WebTransportWriter" lt="create|creating">create</dfn> a
 {{WebTransportWriter}}, with a {{WebTransportSendStream}} |stream|, run these
 steps:
 1. Let |writer| be a [=new=] {{WebTransportWriter}}.
-1. Run the [new WritableStreamDefaultWriter(stream)](https://streams.spec.whatwg.org/#default-writer-constructor)
-   constructor steps passing |writer| as this, and |stream| as the constructor argument.
+1. Perform [$SetUpWritableStreamDefaultWriter$](|writer|, |stream|).
 1. Return |writer|.
 
 </div>
