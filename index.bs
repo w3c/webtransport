@@ -2688,7 +2688,7 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
 
 ## Methods ##  {#web-transport-writer-methods}
 
-  <div algorithm>
+<div algorithm>
 : <dfn for="WebTransportWriter" method>atomicWrite(|chunk|)</dfn>
 :: The {{atomicWrite}} method will reject if the |chunk| given to it
    could not be sent in its entirety within the [=flow control=] window that
@@ -2721,8 +2721,10 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
          [=list/remove=] |p|.
       1. If |p| was rejected with reason |r|, then return [=a promise rejected with=] |r|.
       1. Return undefined.
-    </div>
 
+</div>
+
+<div algorithm>
 : <dfn for="WebTransportWriter" method>commit()</dfn>
 :: The {{commit}} method will update the {{WebTransportSendStream/[[CommittedOffset]]}} of a stream
    to match the number of bytes written to that stream ({{WebTransportSendStream/[[BytesWritten]]}}).
@@ -2734,9 +2736,10 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
    only when a stream has [=stream/abort sending|aborted sending=].
 
    When {{commit}} is called for |stream|, the user agent MUST run the following steps:
-   1. Let |transport| be |stream|.{{WebTransportSendStream/[[Transport]]}}.
    1. Set |stream|.{{WebTransportSendStream/[[CommittedOffset]]}}
       to the value of |stream|.{{WebTransportSendStream/[[BytesWritten]]}}.
+
+</div>
 
 ## Procedures ##  {#web-transport-writer-procedures}
 
