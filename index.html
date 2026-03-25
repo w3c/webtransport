@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version 0ef803fdf, updated Tue Jan 6 11:59:39 2026 -0800" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="aa34a3ccedfd0165c506bda02bac189b501bf9c8" name="revision">
+  <meta content="9e493e61a38741f9355eadee934da697eac3a04d" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -4280,24 +4280,25 @@ adds two methods.</p>
       </ol>
     </dl>
    </div>
-   <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportWriter" data-dfn-type="method" data-export id="dom-webtransportwriter-commit"><code>commit()</code></dfn>
-   <dd data-md>
-    <p>The <code class="idl"><a data-link-type="idl" href="#dom-webtransportwriter-commit" id="ref-for-dom-webtransportwriter-commit①">commit</a></code> method will update the <code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-committedoffset-slot" id="ref-for-dom-webtransportsendstream-committedoffset-slot②">[[CommittedOffset]]</a></code> of a stream
+   <div class="algorithm" data-algorithm="commit()" data-algorithm-for="WebTransportWriter">
+    <dl>
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportWriter" data-dfn-type="method" data-export id="dom-webtransportwriter-commit"><code>commit()</code></dfn>
+     <dd data-md>
+      <p>The <code class="idl"><a data-link-type="idl" href="#dom-webtransportwriter-commit" id="ref-for-dom-webtransportwriter-commit①">commit</a></code> method will update the <code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-committedoffset-slot" id="ref-for-dom-webtransportsendstream-committedoffset-slot②">[[CommittedOffset]]</a></code> of a stream
  to match the number of bytes written to that stream (<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-byteswritten-slot" id="ref-for-dom-webtransportsendstream-byteswritten-slot②">[[BytesWritten]]</a></code>).
  This ensures that those bytes will be delivered to a peer reliably,
  even after writing is <a data-link-type="dfn" href="#webtransportsendstream-abort" id="ref-for-webtransportsendstream-abort②">aborted</a>, causing the stream to <a data-link-type="dfn" href="#stream-abort-sending" id="ref-for-stream-abort-sending③">abort sending</a>.
  This uses the mechanism described in <a data-link-type="biblio" href="#biblio-reliable-reset" title="QUIC Stream Resets with Partial Delivery">[RELIABLE-RESET]</a>.</p>
-    <p class="note" role="note"><span class="marker">Note:</span> This does not guarantee delivery in the event that a connection fails,
+      <p class="note" role="note"><span class="marker">Note:</span> This does not guarantee delivery in the event that a connection fails,
  only when a stream has <a data-link-type="dfn" href="#stream-abort-sending" id="ref-for-stream-abort-sending④">aborted sending</a>.</p>
-    <p>When <code class="idl"><a data-link-type="idl" href="#dom-webtransportwriter-commit" id="ref-for-dom-webtransportwriter-commit②">commit</a></code> is called for <var>stream</var>, the user agent MUST run the following steps:</p>
-    <ol>
-     <li data-md>
-      <p>Let <var>transport</var> be <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-transport-slot" id="ref-for-dom-webtransportsendstream-transport-slot⑥">[[Transport]]</a></code>.</p>
-     <li data-md>
-      <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-committedoffset-slot" id="ref-for-dom-webtransportsendstream-committedoffset-slot③">[[CommittedOffset]]</a></code>
+      <p>When <code class="idl"><a data-link-type="idl" href="#dom-webtransportwriter-commit" id="ref-for-dom-webtransportwriter-commit②">commit</a></code> is called for <var>stream</var>, the user agent MUST run the following steps:</p>
+      <ol>
+       <li data-md>
+        <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-committedoffset-slot" id="ref-for-dom-webtransportsendstream-committedoffset-slot③">[[CommittedOffset]]</a></code>
   to the value of <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-byteswritten-slot" id="ref-for-dom-webtransportsendstream-byteswritten-slot③">[[BytesWritten]]</a></code>.</p>
-    </ol>
-   </dd>
+      </ol>
+    </dl>
+   </div>
    <h3 class="heading settled" data-level="11.2" id="web-transport-writer-procedures"><span class="secno">11.2. </span><span class="content">Procedures</span><a class="self-link" href="#web-transport-writer-procedures"></a></h3>
    <div class="algorithm" data-algorithm="create a writer">
     <p>To <dfn class="dfn-paneled" data-dfn-for="WebTransportWriter" data-dfn-type="dfn" data-export data-lt="create|creating" id="webtransportwriter-create">create</dfn> a
@@ -6494,7 +6495,7 @@ let dfnPanelData = {
 "dom-webtransportsendstream-sendgroup-slot": {"dfnID":"dom-webtransportsendstream-sendgroup-slot","dfnText":"[[SendGroup]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstream-sendgroup-slot"},{"id":"ref-for-dom-webtransportsendstream-sendgroup-slot\u2460"}],"title":"7.1. Attributes"},{"refs":[{"id":"ref-for-dom-webtransportsendstream-sendgroup-slot\u2461"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-dom-webtransportsendstream-sendgroup-slot\u2462"}],"title":"8.1. Methods"}],"url":"#dom-webtransportsendstream-sendgroup-slot"},
 "dom-webtransportsendstream-sendorder": {"dfnID":"dom-webtransportsendstream-sendorder","dfnText":"sendOrder","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstream-sendorder"}],"title":"7. Interface WebTransportSendStream"}],"url":"#dom-webtransportsendstream-sendorder"},
 "dom-webtransportsendstream-sendorder-slot": {"dfnID":"dom-webtransportsendstream-sendorder-slot","dfnText":"[[SendOrder]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstream-sendorder-slot"},{"id":"ref-for-dom-webtransportsendstream-sendorder-slot\u2460"}],"title":"7.1. Attributes"},{"refs":[{"id":"ref-for-dom-webtransportsendstream-sendorder-slot\u2461"},{"id":"ref-for-dom-webtransportsendstream-sendorder-slot\u2462"},{"id":"ref-for-dom-webtransportsendstream-sendorder-slot\u2463"}],"title":"7.4. Procedures"}],"url":"#dom-webtransportsendstream-sendorder-slot"},
-"dom-webtransportsendstream-transport-slot": {"dfnID":"dom-webtransportsendstream-transport-slot","dfnText":"[[Transport]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstream-transport-slot"}],"title":"7.1. Attributes"},{"refs":[{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2460"},{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2461"},{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2462"},{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2463"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2464"}],"title":"7.5. Receiving aborted signal coming from the server"},{"refs":[{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2465"}],"title":"11.1. Methods"}],"url":"#dom-webtransportsendstream-transport-slot"},
+"dom-webtransportsendstream-transport-slot": {"dfnID":"dom-webtransportsendstream-transport-slot","dfnText":"[[Transport]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstream-transport-slot"}],"title":"7.1. Attributes"},{"refs":[{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2460"},{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2461"},{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2462"},{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2463"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-dom-webtransportsendstream-transport-slot\u2464"}],"title":"7.5. Receiving aborted signal coming from the server"}],"url":"#dom-webtransportsendstream-transport-slot"},
 "dom-webtransportsendstreamoptions-waituntilavailable": {"dfnID":"dom-webtransportsendstreamoptions-waituntilavailable","dfnText":"waitUntilAvailable","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstreamoptions-waituntilavailable"},{"id":"ref-for-dom-webtransportsendstreamoptions-waituntilavailable\u2460"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-dom-webtransportsendstreamoptions-waituntilavailable\u2461"}],"title":"6.12. WebTransportSendStreamOptions Dictionary"}],"url":"#dom-webtransportsendstreamoptions-waituntilavailable"},
 "dom-webtransportsendstreamstats-bytesacknowledged": {"dfnID":"dom-webtransportsendstreamstats-bytesacknowledged","dfnText":"bytesAcknowledged","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstreamstats-bytesacknowledged"}],"title":"7.6. WebTransportSendStreamStats Dictionary"}],"url":"#dom-webtransportsendstreamstats-bytesacknowledged"},
 "dom-webtransportsendstreamstats-bytessent": {"dfnID":"dom-webtransportsendstreamstats-bytessent","dfnText":"bytesSent","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstreamstats-bytessent"},{"id":"ref-for-dom-webtransportsendstreamstats-bytessent\u2460"},{"id":"ref-for-dom-webtransportsendstreamstats-bytessent\u2461"}],"title":"7.6. WebTransportSendStreamStats Dictionary"}],"url":"#dom-webtransportsendstreamstats-bytessent"},
