@@ -5,9 +5,9 @@
   <title>WebTransport</title>
   <meta content="ED" name="w3c-status">
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
-  <meta content="Bikeshed version 0ef803fdf, updated Tue Jan 6 11:59:39 2026 -0800" name="generator">
+  <meta content="Bikeshed version 0a3d88311, updated Mon May 4 18:07:03 2026 +0000" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="c05f125de6049649da75a386f20b83276df71dd6" name="revision">
+  <meta content="3dc2f44ad2c0b1b779b31f7c0d5f3a6faf63aa1c" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -303,7 +303,7 @@ pre .property::before, pre .property::after {
 </style>
 <style>/* Boilerplate: style-counters */
 body {
-    counter-reset: example figure issue;
+    counter-reset: example figure issue table;
 }
 .issue {
     counter-increment: issue;
@@ -328,6 +328,13 @@ figcaption {
 }
 figcaption:not(.no-marker)::before {
     content: "Figure " counter(figure) " ";
+}
+
+figure.table figcaption {
+    counter-increment: table;
+}
+figure.table figcaption:not(.no-marker)::before {
+    content: "Table " counter(table) " ";
 }
 </style>
 <style>/* Boilerplate: style-dfn-panel */
@@ -690,6 +697,30 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     c-[vm] { color: #cb4b16 } /* Name.Variable.Magic */
     c-[il] { color: #657b83 } /* Literal.Number.Integer.Long */
 }
+
+@media print {
+    /* Darken colors for print that would otherwise print too faintly */
+    c-[c]  { color: #555555 } /* Comment */
+    c-[d]  { color: #555555 } /* Comment.Multiline */
+    c-[cp] { color: #555555 } /* Comment.Preproc */
+    c-[c1] { color: #555555 } /* Comment.Single */
+    c-[cs] { color: #555555 } /* Comment.Special */
+    c-[o]  { color: #222222 } /* Operator */
+    c-[p]  { color: #222222 } /* Punctuation */
+    c-[ow] { color: #222222 } /* Operator.Word */
+    c-[s]  { color: #664400 } /* Literal.String */
+    c-[t]  { color: #664400 } /* Literal.String.Single */
+    c-[u]  { color: #664400 } /* Literal.String.Double */
+    c-[sb] { color: #664400 } /* Literal.String.Backtick */
+    c-[sc] { color: #664400 } /* Literal.String.Char */
+    c-[sd] { color: #664400 } /* Literal.String.Doc */
+    c-[se] { color: #664400 } /* Literal.String.Escape */
+    c-[sh] { color: #664400 } /* Literal.String.Heredoc */
+    c-[si] { color: #664400 } /* Literal.String.Interpol */
+    c-[sx] { color: #664400 } /* Literal.String.Other */
+    c-[sr] { color: #664400 } /* Literal.String.Regex */
+    c-[ss] { color: #664400 } /* Literal.String.Symbol */
+}
 </style>
 <style>/* Boilerplate: style-var-click-highlighting */
 /*
@@ -742,7 +773,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
 </p>
    <h1 class="no-ref p-name" id="title">WebTransport</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#ED">Editor’s Draft</a>,
-    <time class="dt-updated" datetime="2026-04-01">1 April 2026</time></p>
+    <time class="dt-updated" datetime="2026-05-19">19 May 2026</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -944,7 +975,7 @@ developed by the IETF WEBTRANS Working Group.</p>
      <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
      <ol class="toc">
       <li><a href="#normative"><span class="secno"></span> <span class="content">Normative References</span></a>
-      <li><a href="#informative"><span class="secno"></span> <span class="content">Informative References</span></a>
+      <li><a href="#informative"><span class="secno"></span> <span class="content">Non-Normative References</span></a>
      </ol>
     <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL Index</span></a>
     <li><a href="#issues-index"><span class="secno"></span> <span class="content">Issues Index</span></a>
@@ -4306,7 +4337,7 @@ steps:</p>
      <li data-md>
       <p>Let <var>writer</var> be a <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#new" id="ref-for-new①④">new</a> <code class="idl"><a data-link-type="idl" href="#webtransportwriter" id="ref-for-webtransportwriter⑥">WebTransportWriter</a></code>.</p>
      <li data-md>
-      <p>Perform <a data-link-type="abstract-op" href="https://streams.spec.whatwg.org/#set-up-writable-stream-default-writer" id="ref-for-set-up-writable-stream-default-writer">SetUpWritableStreamDefaultWriter</a>(<var>writer</var>, <var>stream</var>).</p>
+      <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestreamdefaultwriter-set-up" id="ref-for-writablestreamdefaultwriter-set-up">Set up</a> <var>writer</var> for <var>stream</var>.</p>
      <li data-md>
       <p>Return <var>writer</var>.</p>
     </ol>
@@ -5605,7 +5636,6 @@ and has been adapted for use in this specification.</p>
     <ul>
      <li><span class="dfn-paneled" id="59ed4e57">ReadableStream</span>
      <li><span class="dfn-paneled" id="6b6cf5fd">ReadableStreamType</span>
-     <li><span class="dfn-paneled" id="9584d6c9">SetUpWritableStreamDefaultWriter</span>
      <li><span class="dfn-paneled" id="59dc45b5">WritableStream</span>
      <li><span class="dfn-paneled" id="4f848e3e">WritableStreamDefaultWriter</span>
      <li><span class="dfn-paneled" id="f990c537">abort() <small>(for WritableStream)</small></span>
@@ -5638,6 +5668,7 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="52296420">ready</span>
      <li><span class="dfn-paneled" id="d438bc09">set up <small>(for ReadableStream)</small></span>
      <li><span class="dfn-paneled" id="3dc81766">set up <small>(for WritableStream)</small></span>
+     <li><span class="dfn-paneled" id="8497500d">set up <small>(for WritableStreamDefaultWriter)</small></span>
      <li><span class="dfn-paneled" id="c0350ab0">set up with byte reading support</span>
      <li><span class="dfn-paneled" id="68d8cab8">write()</span>
      <li><span class="dfn-paneled" id="986a3b6c">write(chunk)</span>
@@ -5758,7 +5789,7 @@ and has been adapted for use in this specification.</p>
    <dt id="biblio-webidl">[WEBIDL]
    <dd>Edgar Chen; Timothy Gu. <a href="https://webidl.spec.whatwg.org/"><cite>Web IDL Standard</cite></a>. Living Standard. URL: <a href="https://webidl.spec.whatwg.org/">https://webidl.spec.whatwg.org/</a>
   </dl>
-  <h3 class="heading no-num no-ref settled" id="informative"><span class="content">Informative References</span><a class="self-link" href="#informative"></a></h3>
+  <h3 class="heading no-num no-ref settled" id="informative"><span class="content">Non-Normative References</span><a class="self-link" href="#informative"></a></h3>
   <dl>
    <dt id="biblio-reliable-reset">[RELIABLE-RESET]
    <dd>Marten Seemann; 奥一穂. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset"><cite>QUIC Stream Resets with Partial Delivery</cite></a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset">https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset</a>
@@ -6271,6 +6302,7 @@ let dfnPanelData = {
 "7f9469b5": {"dfnID":"7f9469b5","dfnText":"ASCII case-insensitive","external":true,"refSections":[{"refs":[{"id":"ref-for-ascii-case-insensitive"}],"title":"6.9. Configuration"}],"url":"https://infra.spec.whatwg.org/#ascii-case-insensitive"},
 "7fd25f21": {"dfnID":"7fd25f21","dfnText":"HeadersInit","external":true,"refSections":[{"refs":[{"id":"ref-for-typedefdef-headersinit"},{"id":"ref-for-typedefdef-headersinit\u2460"}],"title":"6.9. Configuration"}],"url":"https://fetch.spec.whatwg.org/#typedefdef-headersinit"},
 "82ca3efc": {"dfnID":"82ca3efc","dfnText":"TypeError","external":true,"refSections":[{"refs":[{"id":"ref-for-exceptiondef-typeerror"}],"title":"4.3. Procedures"},{"refs":[{"id":"ref-for-exceptiondef-typeerror\u2460"}],"title":"5.4. Procedures"},{"refs":[{"id":"ref-for-exceptiondef-typeerror\u2461"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-exceptiondef-typeerror\u2462"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-exceptiondef-typeerror\u2463"}],"title":"11.1. Methods"}],"url":"https://webidl.spec.whatwg.org/#exceptiondef-typeerror"},
+"8497500d": {"dfnID":"8497500d","dfnText":"set up (for WritableStreamDefaultWriter)","external":true,"refSections":[{"refs":[{"id":"ref-for-writablestreamdefaultwriter-set-up"}],"title":"11.2. Procedures"}],"url":"https://streams.spec.whatwg.org/#writablestreamdefaultwriter-set-up"},
 "857d5516": {"dfnID":"857d5516","dfnText":"client","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request-client"}],"title":"6.2. Constructor"}],"url":"https://fetch.spec.whatwg.org/#concept-request-client"},
 "860300d4": {"dfnID":"860300d4","dfnText":"implementation-defined","external":true,"refSections":[{"refs":[{"id":"ref-for-implementation-defined"}],"title":"4.3. Procedures"},{"refs":[{"id":"ref-for-implementation-defined\u2460"},{"id":"ref-for-implementation-defined\u2461"},{"id":"ref-for-implementation-defined\u2462"}],"title":"5.1. Internal slots"},{"refs":[{"id":"ref-for-implementation-defined\u2463"}],"title":"5.4. Procedures"},{"refs":[{"id":"ref-for-implementation-defined\u2464"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-implementation-defined\u2465"},{"id":"ref-for-implementation-defined\u2466"}],"title":"6.9. Configuration"},{"refs":[{"id":"ref-for-implementation-defined\u2467"}],"title":"6.11. WebTransportSendOptions Dictionary"},{"refs":[{"id":"ref-for-implementation-defined\u2468"},{"id":"ref-for-implementation-defined\u2460\u24ea"},{"id":"ref-for-implementation-defined\u2460\u2460"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-implementation-defined\u2460\u2461"}],"title":"9.3. Procedures"}],"url":"https://infra.spec.whatwg.org/#implementation-defined"},
 "86efadaf": {"dfnID":"86efadaf","dfnText":"policy container","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request-policy-container"}],"title":"6.2. Constructor"}],"url":"https://fetch.spec.whatwg.org/#concept-request-policy-container"},
@@ -6282,7 +6314,6 @@ let dfnPanelData = {
 "8e1fb11c": {"dfnID":"8e1fb11c","dfnText":"obtain a connection","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-connection-obtain"}],"title":"6.2. Constructor"}],"url":"https://fetch.spec.whatwg.org/#concept-connection-obtain"},
 "8f5c2179": {"dfnID":"8f5c2179","dfnText":"a promise resolved with","external":true,"refSections":[{"refs":[{"id":"ref-for-a-promise-resolved-with"}],"title":"4.3. Procedures"},{"refs":[{"id":"ref-for-a-promise-resolved-with\u2460"}],"title":"5.4. Procedures"}],"url":"https://webidl.spec.whatwg.org/#a-promise-resolved-with"},
 "902380f7": {"dfnID":"902380f7","dfnText":"credentials mode","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request-credentials-mode"}],"title":"6.2. Constructor"}],"url":"https://fetch.spec.whatwg.org/#concept-request-credentials-mode"},
-"9584d6c9": {"dfnID":"9584d6c9","dfnText":"SetUpWritableStreamDefaultWriter","external":true,"refSections":[{"refs":[{"id":"ref-for-set-up-writable-stream-default-writer"}],"title":"11.2. Procedures"}],"url":"https://streams.spec.whatwg.org/#set-up-writable-stream-default-writer"},
 "95d7775a": {"dfnID":"95d7775a","dfnText":"Uint8Array","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-Uint8Array"},{"id":"ref-for-idl-Uint8Array\u2460"}],"title":"5.4. Procedures"},{"refs":[{"id":"ref-for-idl-Uint8Array\u2461"}],"title":"6. WebTransport Interface"},{"refs":[{"id":"ref-for-idl-Uint8Array\u2462"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-idl-Uint8Array\u2463"}],"title":"7. Interface WebTransportSendStream"},{"refs":[{"id":"ref-for-idl-Uint8Array\u2464"}],"title":"9. Interface WebTransportReceiveStream"},{"refs":[{"id":"ref-for-idl-Uint8Array\u2465"}],"title":"9.3. Procedures"}],"url":"https://webidl.spec.whatwg.org/#idl-Uint8Array"},
 "986a3b6c": {"dfnID":"986a3b6c","dfnText":"write(chunk)","external":true,"refSections":[{"refs":[{"id":"ref-for-default-writer-write"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-default-writer-write\u2460"},{"id":"ref-for-default-writer-write\u2461"}],"title":"13. Protocol Mappings"}],"url":"https://streams.spec.whatwg.org/#default-writer-write"},
 "99c988d6": {"dfnID":"99c988d6","dfnText":"remove","external":true,"refSections":[{"refs":[{"id":"ref-for-list-remove"},{"id":"ref-for-list-remove\u2460"},{"id":"ref-for-list-remove\u2461"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-list-remove\u2462"}],"title":"7.5. Receiving aborted signal coming from the server"},{"refs":[{"id":"ref-for-list-remove\u2463"},{"id":"ref-for-list-remove\u2464"},{"id":"ref-for-list-remove\u2465"}],"title":"9.3. Procedures"},{"refs":[{"id":"ref-for-list-remove\u2466"}],"title":"9.4. Sending aborted signal coming from the server"},{"refs":[{"id":"ref-for-list-remove\u2467"}],"title":"11.1. Methods"}],"url":"https://infra.spec.whatwg.org/#list-remove"},
@@ -7308,7 +7339,6 @@ let refsData = {
 "https://streams.spec.whatwg.org/#readablestream-set-up-with-byte-reading-support-highwatermark": {"displayText":"highWaterMark","export":true,"for_":["ReadableStream/set up with byte reading support"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"highwatermark","type":"dfn","url":"https://streams.spec.whatwg.org/#readablestream-set-up-with-byte-reading-support-highwatermark"},
 "https://streams.spec.whatwg.org/#readablestream-set-up-with-byte-reading-support-pullalgorithm": {"displayText":"pullAlgorithm","export":true,"for_":["ReadableStream/set up with byte reading support"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"pullalgorithm","type":"dfn","url":"https://streams.spec.whatwg.org/#readablestream-set-up-with-byte-reading-support-pullalgorithm"},
 "https://streams.spec.whatwg.org/#rs-cancel": {"displayText":"cancel()","export":true,"for_":["ReadableStream"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"cancel()","type":"method","url":"https://streams.spec.whatwg.org/#rs-cancel"},
-"https://streams.spec.whatwg.org/#set-up-writable-stream-default-writer": {"displayText":"SetUpWritableStreamDefaultWriter","export":true,"for_":[],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"SetUpWritableStreamDefaultWriter","type":"abstract-op","url":"https://streams.spec.whatwg.org/#set-up-writable-stream-default-writer"},
 "https://streams.spec.whatwg.org/#writablestream": {"displayText":"WritableStream","export":true,"for_":[],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"WritableStream","type":"interface","url":"https://streams.spec.whatwg.org/#writablestream"},
 "https://streams.spec.whatwg.org/#writablestream-close": {"displayText":"close","export":true,"for_":["WritableStream"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"close","type":"dfn","url":"https://streams.spec.whatwg.org/#writablestream-close"},
 "https://streams.spec.whatwg.org/#writablestream-error": {"displayText":"error","export":true,"for_":["WritableStream"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"error","type":"dfn","url":"https://streams.spec.whatwg.org/#writablestream-error"},
@@ -7317,6 +7347,7 @@ let refsData = {
 "https://streams.spec.whatwg.org/#writablestream-set-up-closealgorithm": {"displayText":"closeAlgorithm","export":true,"for_":["WritableStream/set up"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"closealgorithm","type":"dfn","url":"https://streams.spec.whatwg.org/#writablestream-set-up-closealgorithm"},
 "https://streams.spec.whatwg.org/#writablestream-set-up-writealgorithm": {"displayText":"writeAlgorithm","export":true,"for_":["WritableStream/set up"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"writealgorithm","type":"dfn","url":"https://streams.spec.whatwg.org/#writablestream-set-up-writealgorithm"},
 "https://streams.spec.whatwg.org/#writablestreamdefaultwriter": {"displayText":"WritableStreamDefaultWriter","export":true,"for_":[],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"WritableStreamDefaultWriter","type":"interface","url":"https://streams.spec.whatwg.org/#writablestreamdefaultwriter"},
+"https://streams.spec.whatwg.org/#writablestreamdefaultwriter-set-up": {"displayText":"set up","export":true,"for_":["WritableStreamDefaultWriter"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"set up","type":"dfn","url":"https://streams.spec.whatwg.org/#writablestreamdefaultwriter-set-up"},
 "https://streams.spec.whatwg.org/#writablestreamdefaultwriter-write-a-chunk": {"displayText":"writing a chunk","export":true,"for_":["WritableStreamDefaultWriter"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"writing a chunk","type":"dfn","url":"https://streams.spec.whatwg.org/#writablestreamdefaultwriter-write-a-chunk"},
 "https://streams.spec.whatwg.org/#ws-abort": {"displayText":"abort()","export":true,"for_":["WritableStream"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"abort()","type":"method","url":"https://streams.spec.whatwg.org/#ws-abort"},
 "https://streams.spec.whatwg.org/#ws-close": {"displayText":"close()","export":true,"for_":["WritableStream"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"close()","type":"method","url":"https://streams.spec.whatwg.org/#ws-close"},
