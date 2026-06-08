@@ -77,6 +77,7 @@ spec:fetch; type:dfn; for:/; text:fetch
 spec:fetch; type:dfn; for:/; text:credentials
 spec:fetch; type:dfn; for:fetch record; text:request
 spec:fetch; type:dfn; for:request; text:header list
+spec:html; type:dfn; for:/; text:origin
 spec:url; type:dfn; text:scheme
 spec:url; type:dfn; text:fragment
 spec:infra; type:dfn; for:/; text:ASCII case-insensitive
@@ -1049,9 +1050,16 @@ To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partiti
   1. Let |transport| be the {{WebTransport}} object associated with |request|.
   1. Let |url| be |request|'s [=request/current URL=].
   1. Let |newConnection| be |transport|.{{[[NewConnection]]}}.
-  1. If |newConnection| is "`no`" and |networkPartitionKey|[1] is null or a value that
-     is not unique to |request|'s [=request/origin=], then set |newConnection| to
-     "`yes-and-dedicated`".
+  1. If |newConnection| is "`no`" and |networkPartitionKey|[1] is not unique to
+     |request|'s [=request/origin=], then set |newConnection| to "`yes-and-dedicated`".
+
+     Note: The [=network partition key=]'s second key is [=implementation-defined=].
+     It is <em>unique to</em> an [=origin=] only when the user agent guarantees that
+     no two [=requests=] with different [=request/origins=] are ever given the same
+     value, which is what prevents [=connections=] from being pooled across
+     origins. A null or otherwise constant value is not unique to any origin. See
+     <a href="https://www.github.com/whatwg/fetch/issues/1035">whatwg/fetch#1035</a> and
+     <a href="https://www.github.com/whatwg/fetch/issues/1926">whatwg/fetch#1926</a>.
   1. Let |requireUnreliable| be |transport|.{{[[RequireUnreliable]]}}.
   1. Let |webTransportHashes| be the values in |request|'s [=request/WebTransport-hash list=].
   1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
