@@ -1285,6 +1285,7 @@ the application will receive the number of streams it anticipates.
 
 </div>
 
+<div algorithm>
 : <dfn for="WebTransport" method>getStats()</dfn>
 :: Gathers stats for this {{WebTransport}}'s [=underlying connection=]
    and reports the result asynchronously.
@@ -1307,6 +1308,8 @@ the application will receive the number of streams it anticipates.
             [=underlying connection=] needed to populate the
             [=dictionary members=] of {{WebTransportConnectionStats}} and
             {{WebTransportDatagramStats}} accurately.
+         1. If |transport|.{{[[NewConnection]]}} is "`no`", then remove from
+            |gatheredStats| all stats not marked as [=pooled connection stats=].
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportConnectionStats}} object.
            1. Let |datagramStats| be a [=new=] {{WebTransportDatagramStats}} object.
@@ -1317,6 +1320,8 @@ the application will receive the number of streams it anticipates.
                the corresponding [=map/entries|entry=] in |gatheredStats|.
            1. [=Resolve=] |p| with |stats|.
      1. Return |p|.
+
+</div>
 
 : <dfn for="WebTransport" method>exportKeyingMaterial(BufferSource label, BufferSource context, unsigned long outputLength)</dfn>
 :: Exports keying material from a [TLS Keying Material Exporter](https://www.rfc-editor.org/rfc/rfc8446#section-7.3)
@@ -1811,9 +1816,13 @@ The dictionary SHALL have the following attributes:
 ## `WebTransportConnectionStats` Dictionary ##  {#web-transport-connection-stats}
 
 The <dfn dictionary>WebTransportConnectionStats</dfn> dictionary includes information
-on WebTransport-specific stats about the [=WebTransport session=]'s [=underlying connection=].
+about the [=WebTransport session=]'s [=underlying connection=]. Members of
+{{WebTransportConnectionStats}} that are not marked as a
+<dfn>pooled connection stat</dfn> are [=map/exists|absent=] for
+[=underlying connections=] that are subject to pooling.
 
-Note: When pooling is used, multiple [=WebTransport sessions=] pooled
+Note: When pooling is allowed, only [=pooled connection stats=] are revealed,
+and multiple [=WebTransport sessions=] pooled
 on the same [=connection=] all receive the same information, i.e. the information
 is disclosed across pooled [=WebTransport sessions | sessions=] holding the
 same [[fetch#network-partition-keys|network partition key]].
@@ -1875,13 +1884,16 @@ The dictionary SHALL have the following attributes:
 : <dfn for="WebTransportConnectionStats" dict-member>smoothedRtt</dfn>
 :: The smoothed round-trip time (RTT) currently observed on the connection, as defined
    in [[!RFC9002]] [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
+   This is a [=pooled connection stat=].
 : <dfn for="WebTransportConnectionStats" dict-member>rttVariation</dfn>
 :: The mean variation in round-trip time samples currently observed on the
    connection, as defined in [[!RFC9002]]
    [Section 5.3](https://www.rfc-editor.org/rfc/rfc9002#section-5.3).
+   This is a [=pooled connection stat=].
 : <dfn for="WebTransportConnectionStats" dict-member>minRtt</dfn>
 :: The minimum round-trip time observed on the entire connection, as defined in
    [[!RFC9002]] [Section 5.2](https://www.rfc-editor.org/rfc/rfc9002#section-5.2).
+   This is a [=pooled connection stat=].
 : <dfn for="WebTransportConnectionStats" dict-member>estimatedSendRate</dfn>
 :: The estimated rate at which queued data will be sent by the user agent, in bits per second.
    This rate applies to all streams and datagrams that share a [=WebTransport session=]
@@ -1890,6 +1902,7 @@ The dictionary SHALL have the following attributes:
    represents the rate at which an application payload might be sent. If the user agent
    does not currently have an estimate, the member MUST be the `null` value.
    The member can be `null` even if it was not `null` in previous results.
+   This is a [=pooled connection stat=].
 : <dfn for="WebTransportConnectionStats" dict-member>atSendCapacity</dfn>
 :: A value of false indicates the {{estimatedSendRate}} might be application limited,
    meaning the application is sending significantly less data than the congestion
@@ -1905,6 +1918,7 @@ The dictionary SHALL have the following attributes:
    to network conditions. However, {{estimatedSendRate}} is allowed to be `null` while
    {{atSendCapacity}} is true.
    </div>
+   This is a [=pooled connection stat=].
 
 ## `WebTransportDatagramStats` Dictionary ##  {#web-transport-datagram-stats}
 
