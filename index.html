@@ -5,9 +5,9 @@
   <title>WebTransport</title>
   <meta content="ED" name="w3c-status">
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
-  <meta content="Bikeshed version cfb78d9c0, updated Tue Jun 2 16:21:00 2026 -0700" name="generator">
+  <meta content="Bikeshed version d113b2e81, updated Tue Jun 9 14:57:55 2026 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="826fe296271fbdb68871cc08a263d50aab2c3a40" name="revision">
+  <meta content="a26cf38fd58607e3236fd9ad6331cfd6d4469e8f" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -773,7 +773,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
 </p>
    <h1 class="no-ref p-name" id="title">WebTransport</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#ED">Editor’s Draft</a>,
-    <time class="dt-updated" datetime="2026-06-04">4 June 2026</time></p>
+    <time class="dt-updated" datetime="2026-06-16">16 June 2026</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -2534,60 +2534,67 @@ the application will receive the number of streams it anticipates.</p>
       </ol>
     </dl>
    </div>
-   <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="method" data-export id="dom-webtransport-getstats"><code>getStats()</code></dfn>
-    <dd data-md>
-     <p>Gathers stats for this <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②①">WebTransport</a></code>’s <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection">underlying connection</a>
+   <div class="algorithm" data-algorithm="getStats()" data-algorithm-for="WebTransport">
+    <dl>
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="method" data-export id="dom-webtransport-getstats"><code>getStats()</code></dfn>
+     <dd data-md>
+      <p>Gathers stats for this <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②①">WebTransport</a></code>’s <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection">underlying connection</a>
  and reports the result asynchronously.</p>
-     <p>When getStats is called, the user agent MUST run the following steps:</p>
-     <ol>
-      <li data-md>
-       <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this③④">this</a>.</p>
-      <li data-md>
-       <p>Let <var>p</var> be a new promise.</p>
-      <li data-md>
-       <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⑧">[[State]]</a></code> is <code>"failed"</code>, <a data-link-type="dfn" data-refhint-key="c597a1f1" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑨">reject</a> <var>p</var> with an
+      <p>When getStats is called, the user agent MUST run the following steps:</p>
+      <ol>
+       <li data-md>
+        <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this③④">this</a>.</p>
+       <li data-md>
+        <p>Let <var>p</var> be a new promise.</p>
+       <li data-md>
+        <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⑧">[[State]]</a></code> is <code>"failed"</code>, <a data-link-type="dfn" data-refhint-key="c597a1f1" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑨">reject</a> <var>p</var> with an
   <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror⑤">InvalidStateError</a></code> and abort these steps.</p>
-      <li data-md>
-       <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑤">in parallel</a>:</p>
-       <ol>
-        <li data-md>
-         <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⑨">[[State]]</a></code> is <code>"connecting"</code>, wait until it changes.</p>
-        <li data-md>
-         <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②⓪">[[State]]</a></code> is <code>"failed"</code>, abort these steps after
+       <li data-md>
+        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑤">in parallel</a>:</p>
+        <ol>
+         <li data-md>
+          <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⑨">[[State]]</a></code> is <code>"connecting"</code>, wait until it changes.</p>
+         <li data-md>
+          <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②⓪">[[State]]</a></code> is <code>"failed"</code>, abort these steps after
   <a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task⑨">queueing a network task</a> with <var>transport</var> to <a data-link-type="dfn" data-refhint-key="c597a1f1" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⓪">reject</a> <var>p</var> with an
   <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror⑥">InvalidStateError</a></code>.</p>
-        <li data-md>
-         <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②①">[[State]]</a></code> is <code>"closed"</code>, abort these steps after
+         <li data-md>
+          <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②①">[[State]]</a></code> is <code>"closed"</code>, abort these steps after
   <a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①⓪">queueing a network task</a> with <var>transport</var> to <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①①">resolve</a> <var>p</var> with
   the most recent stats available for the connection. The exact point
   at which those stats are collected is <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined⑤">implementation-defined</a>.</p>
-        <li data-md>
-         <p>Let <var>gatheredStats</var> be the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list">list</a> of stats specific to the
+         <li data-md>
+          <p>Let <var>gatheredStats</var> be the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list">list</a> of stats specific to the
   <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①">underlying connection</a> needed to populate the
   <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-dictionary-member" id="ref-for-dfn-dictionary-member">dictionary members</a> of <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportconnectionstats" id="ref-for-dictdef-webtransportconnectionstats①">WebTransportConnectionStats</a></code> and
   <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportdatagramstats" id="ref-for-dictdef-webtransportdatagramstats">WebTransportDatagramStats</a></code> accurately.</p>
-        <li data-md>
-         <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①①">Queue a network task</a> with <var>transport</var> to run the following steps:</p>
-         <ol>
-          <li data-md>
-           <p>Let <var>stats</var> be a <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#new" id="ref-for-new③">new</a> <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportconnectionstats" id="ref-for-dictdef-webtransportconnectionstats②">WebTransportConnectionStats</a></code> object.</p>
-          <li data-md>
-           <p>Let <var>datagramStats</var> be a <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#new" id="ref-for-new④">new</a> <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportdatagramstats" id="ref-for-dictdef-webtransportdatagramstats①">WebTransportDatagramStats</a></code> object.</p>
-          <li data-md>
-           <p>Set <var>stats</var>["<code class="idl"><a data-link-type="idl" href="#dom-webtransportconnectionstats-datagrams" id="ref-for-dom-webtransportconnectionstats-datagrams">datagrams</a></code>"] to <var>datagramStats</var>.</p>
-          <li data-md>
-           <p>For each <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-dictionary-member" id="ref-for-dfn-dictionary-member①">member</a> <var>member</var> of <var>stats</var> and
+         <li data-md>
+          <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-newconnection-slot" id="ref-for-dom-webtransport-newconnection-slot②">[[NewConnection]]</a></code> is "<code>no</code>", then remove from
+  <var>gatheredStats</var> all stats not marked as <a data-link-type="dfn" href="#pooled-connection-stat" id="ref-for-pooled-connection-stat">pooled connection stats</a>.</p>
+         <li data-md>
+          <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①①">Queue a network task</a> with <var>transport</var> to run the following steps:</p>
+          <ol>
+           <li data-md>
+            <p>Let <var>stats</var> be a <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#new" id="ref-for-new③">new</a> <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportconnectionstats" id="ref-for-dictdef-webtransportconnectionstats②">WebTransportConnectionStats</a></code> object.</p>
+           <li data-md>
+            <p>Let <var>datagramStats</var> be a <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#new" id="ref-for-new④">new</a> <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportdatagramstats" id="ref-for-dictdef-webtransportdatagramstats①">WebTransportDatagramStats</a></code> object.</p>
+           <li data-md>
+            <p>Set <var>stats</var>["<code class="idl"><a data-link-type="idl" href="#dom-webtransportconnectionstats-datagrams" id="ref-for-dom-webtransportconnectionstats-datagrams">datagrams</a></code>"] to <var>datagramStats</var>.</p>
+           <li data-md>
+            <p>For each <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-dictionary-member" id="ref-for-dfn-dictionary-member①">member</a> <var>member</var> of <var>stats</var> and
    <var>datagramStats</var> that the user agent wishes to expose,
    <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-set" id="ref-for-map-set">set</a> <var>member</var> to the
    the corresponding <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-entry" id="ref-for-map-entry">entry</a> in <var>gatheredStats</var>.</p>
-          <li data-md>
-           <p><a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①②">Resolve</a> <var>p</var> with <var>stats</var>.</p>
-         </ol>
-       </ol>
-      <li data-md>
-       <p>Return <var>p</var>.</p>
-     </ol>
+           <li data-md>
+            <p><a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①②">Resolve</a> <var>p</var> with <var>stats</var>.</p>
+          </ol>
+        </ol>
+       <li data-md>
+        <p>Return <var>p</var>.</p>
+      </ol>
+    </dl>
+   </div>
+   <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="method" data-export data-lt="exportKeyingMaterial(label, context, outputLength)" id="dom-webtransport-exportkeyingmaterial"><code>exportKeyingMaterial(BufferSource label, BufferSource context, unsigned long outputLength)</code></dfn>
     <dd data-md>
      <p>Exports keying material from a <a href="https://www.rfc-editor.org/rfc/rfc8446#section-7.3">TLS Keying Material Exporter</a>
@@ -3198,13 +3205,17 @@ dictionary of parameters that affect how <code class="idl"><a data-link-type="id
    </dl>
    <h3 class="heading settled" data-level="6.13" id="web-transport-connection-stats"><span class="secno">6.13. </span><span class="content"><code>WebTransportConnectionStats</code> Dictionary</span><a class="self-link" href="#web-transport-connection-stats"></a></h3>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-webtransportconnectionstats"><code>WebTransportConnectionStats</code></dfn> dictionary includes information
-on WebTransport-specific stats about the <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session②③">WebTransport session</a>’s <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection⑦">underlying connection</a>.</p>
-   <p class="note" role="note"><span class="marker">Note:</span> When pooling is used, multiple <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session②④">WebTransport sessions</a> pooled
+about the <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session②③">WebTransport session</a>’s <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection⑦">underlying connection</a>. Members of
+<code class="idl"><a data-link-type="idl" href="#dictdef-webtransportconnectionstats" id="ref-for-dictdef-webtransportconnectionstats③">WebTransportConnectionStats</a></code> that are not marked as a
+<dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="pooled-connection-stat">pooled connection stat</dfn> are <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists">absent</a> for
+<a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection⑧">underlying connections</a> that are subject to pooling.</p>
+   <p class="note" role="note"><span class="marker">Note:</span> When pooling is allowed, only <a data-link-type="dfn" href="#pooled-connection-stat" id="ref-for-pooled-connection-stat①">pooled connection stats</a> are revealed,
+and multiple <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session②④">WebTransport sessions</a> pooled
 on the same <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-connection" id="ref-for-concept-connection⑤">connection</a> all receive the same information, i.e. the information
 is disclosed across pooled <a data-link-type="dfn" href="#protocol-webtransport-session" id="ref-for-protocol-webtransport-session②⑤"> sessions</a> holding the
 same <a href="https://fetch.spec.whatwg.org/#network-partition-keys">network partition key</a>.</p>
-   <p class="note" role="note"><span class="marker">Note:</span> Any unavailable stats will be <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists">absent</a> from the <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportconnectionstats" id="ref-for-dictdef-webtransportconnectionstats③">WebTransportConnectionStats</a></code> dictionary.</p>
-<pre class="def highlight idl"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-webtransportconnectionstats" id="ref-for-dictdef-webtransportconnectionstats④"><c- g>WebTransportConnectionStats</c-></a> {
+   <p class="note" role="note"><span class="marker">Note:</span> Any unavailable stats will be <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists①">absent</a> from the <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportconnectionstats" id="ref-for-dictdef-webtransportconnectionstats④">WebTransportConnectionStats</a></code> dictionary.</p>
+<pre class="def highlight idl"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-webtransportconnectionstats" id="ref-for-dictdef-webtransportconnectionstats⑤"><c- g>WebTransportConnectionStats</c-></a> {
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long" href="#dom-webtransportconnectionstats-bytessent" id="ref-for-dom-webtransportconnectionstats-bytessent"><c- g>bytesSent</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long" href="#dom-webtransportconnectionstats-bytessentoverhead" id="ref-for-dom-webtransportconnectionstats-bytessentoverhead"><c- g>bytesSentOverhead</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long②"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long" href="#dom-webtransportconnectionstats-bytesacknowledged" id="ref-for-dom-webtransportconnectionstats-bytesacknowledged"><c- g>bytesAcknowledged</c-></a>;
@@ -3225,53 +3236,56 @@ same <a href="https://fetch.spec.whatwg.org/#network-partition-keys">network par
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-bytessent"><code>bytesSent</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑨">unsigned long long</a></span>
     <dd data-md>
-     <p>The number of payload bytes sent over the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection⑧">underlying connection</a>, excluding any framing
+     <p>The number of payload bytes sent over the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection⑨">underlying connection</a>, excluding any framing
  overhead or retransmissions.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-bytessentoverhead"><code>bytesSentOverhead</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①⓪">unsigned long long</a></span>
     <dd data-md>
      <p>The framing and retransmission overhead in bytes of sending
  <code class="idl"><a data-link-type="idl" href="#dom-webtransportconnectionstats-bytessent" id="ref-for-dom-webtransportconnectionstats-bytessent①">bytesSent</a></code> number of payload bytes on the
- <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection⑨">underlying connection</a>.</p>
+ <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⓪">underlying connection</a>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-bytesacknowledged"><code>bytesAcknowledged</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①①">unsigned long long</a></span>
     <dd data-md>
      <p>The number of payload bytes acknowledged as received by the server using
- QUIC’s ACK mechanism on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⓪">underlying connection</a>. Excludes any framing.</p>
+ QUIC’s ACK mechanism on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①①">underlying connection</a>. Excludes any framing.</p>
      <p class="note" role="note"><span class="marker">Note:</span> Typically trails <code class="idl"><a data-link-type="idl" href="#dom-webtransportconnectionstats-bytessent" id="ref-for-dom-webtransportconnectionstats-bytessent②">bytesSent</a></code> but can be permanently less due to packet loss.</p>
      <div class="atrisk issue" id="issue-6431e51e"><a class="self-link" href="#issue-6431e51e"></a>
-   <code class="idl"><a data-link-type="idl" href="#dom-webtransportconnectionstats-bytesacknowledged" id="ref-for-dom-webtransportconnectionstats-bytesacknowledged①">bytesAcknowledged</a></code> on <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportconnectionstats" id="ref-for-dictdef-webtransportconnectionstats⑤">WebTransportConnectionStats</a></code> has been identified
+   <code class="idl"><a data-link-type="idl" href="#dom-webtransportconnectionstats-bytesacknowledged" id="ref-for-dom-webtransportconnectionstats-bytesacknowledged①">bytesAcknowledged</a></code> on <code class="idl"><a data-link-type="idl" href="#dictdef-webtransportconnectionstats" id="ref-for-dictdef-webtransportconnectionstats⑥">WebTransportConnectionStats</a></code> has been identified
    by the Working Group as a feature at risk due to concerns over implementability.
  </div>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-packetssent"><code>packetsSent</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①②">unsigned long long</a></span>
     <dd data-md>
-     <p>The number of packets sent on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①①">underlying connection</a>, including those that are determined to have been lost.</p>
+     <p>The number of packets sent on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①②">underlying connection</a>, including those that are determined to have been lost.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-byteslost"><code>bytesLost</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①③">unsigned long long</a></span>
     <dd data-md>
-     <p>The number of bytes lost on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①②">underlying connection</a> (does not monotonically increase, because packets that are declared lost can subsequently be received).
+     <p>The number of bytes lost on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①③">underlying connection</a> (does not monotonically increase, because packets that are declared lost can subsequently be received).
  Does not include UDP or any other outer framing.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-packetslost"><code>packetsLost</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①④">unsigned long long</a></span>
     <dd data-md>
-     <p>The number of packets lost on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①③">underlying connection</a> (does not monotonically increase, because packets that are declared lost can subsequently be received).</p>
+     <p>The number of packets lost on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①④">underlying connection</a> (does not monotonically increase, because packets that are declared lost can subsequently be received).</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-bytesreceived"><code>bytesReceived</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①⑤">unsigned long long</a></span>
     <dd data-md>
-     <p>The number of total bytes received on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①④">underlying connection</a>, including
+     <p>The number of total bytes received on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑤">underlying connection</a>, including
  duplicate data for streams. Does not include UDP or any other outer framing.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-packetsreceived"><code>packetsReceived</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①⑥">unsigned long long</a></span>
     <dd data-md>
-     <p>The number of total packets received on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑤">underlying connection</a>, including
+     <p>The number of total packets received on the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑥">underlying connection</a>, including
  packets that were not processable.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-smoothedrtt"><code>smoothedRtt</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://w3c.github.io/hr-time/#typedefdef-domhighrestimestamp" id="ref-for-typedefdef-domhighrestimestamp③">DOMHighResTimeStamp</a></span>
     <dd data-md>
      <p>The smoothed round-trip time (RTT) currently observed on the connection, as defined
- in <a data-link-type="biblio" href="#biblio-rfc9002" title="QUIC Loss Detection and Congestion Control">[RFC9002]</a> <a href="https://www.rfc-editor.org/rfc/rfc9002#section-5.3">Section 5.3</a>.</p>
+ in <a data-link-type="biblio" href="#biblio-rfc9002" title="QUIC Loss Detection and Congestion Control">[RFC9002]</a> <a href="https://www.rfc-editor.org/rfc/rfc9002#section-5.3">Section 5.3</a>.
+ This is a <a data-link-type="dfn" href="#pooled-connection-stat" id="ref-for-pooled-connection-stat②">pooled connection stat</a>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-rttvariation"><code>rttVariation</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://w3c.github.io/hr-time/#typedefdef-domhighrestimestamp" id="ref-for-typedefdef-domhighrestimestamp④">DOMHighResTimeStamp</a></span>
     <dd data-md>
      <p>The mean variation in round-trip time samples currently observed on the
  connection, as defined in <a data-link-type="biblio" href="#biblio-rfc9002" title="QUIC Loss Detection and Congestion Control">[RFC9002]</a>
- <a href="https://www.rfc-editor.org/rfc/rfc9002#section-5.3">Section 5.3</a>.</p>
+ <a href="https://www.rfc-editor.org/rfc/rfc9002#section-5.3">Section 5.3</a>.
+ This is a <a data-link-type="dfn" href="#pooled-connection-stat" id="ref-for-pooled-connection-stat③">pooled connection stat</a>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-minrtt"><code>minRtt</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://w3c.github.io/hr-time/#typedefdef-domhighrestimestamp" id="ref-for-typedefdef-domhighrestimestamp⑤">DOMHighResTimeStamp</a></span>
     <dd data-md>
      <p>The minimum round-trip time observed on the entire connection, as defined in
- <a data-link-type="biblio" href="#biblio-rfc9002" title="QUIC Loss Detection and Congestion Control">[RFC9002]</a> <a href="https://www.rfc-editor.org/rfc/rfc9002#section-5.2">Section 5.2</a>.</p>
+ <a data-link-type="biblio" href="#biblio-rfc9002" title="QUIC Loss Detection and Congestion Control">[RFC9002]</a> <a href="https://www.rfc-editor.org/rfc/rfc9002#section-5.2">Section 5.2</a>.
+ This is a <a data-link-type="dfn" href="#pooled-connection-stat" id="ref-for-pooled-connection-stat④">pooled connection stat</a>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-estimatedsendrate"><code>estimatedSendRate</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①⑦">unsigned long long</a>, nullable, defaulting to <code>null</code></span>
     <dd data-md>
      <p>The estimated rate at which queued data will be sent by the user agent, in bits per second.
@@ -3280,7 +3294,8 @@ same <a href="https://fetch.spec.whatwg.org/#network-partition-keys">network par
  <code class="idl"><a data-link-type="idl" href="#dom-webtransport-congestioncontrol" id="ref-for-dom-webtransport-congestioncontrol①">congestionControl</a></code>). This estimate excludes any framing overhead and
  represents the rate at which an application payload might be sent. If the user agent
  does not currently have an estimate, the member MUST be the <code>null</code> value.
- The member can be <code>null</code> even if it was not <code>null</code> in previous results.</p>
+ The member can be <code>null</code> even if it was not <code>null</code> in previous results.
+ This is a <a data-link-type="dfn" href="#pooled-connection-stat" id="ref-for-pooled-connection-stat⑤">pooled connection stat</a>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportConnectionStats" data-dfn-type="dict-member" data-export id="dom-webtransportconnectionstats-atsendcapacity"><code>atSendCapacity</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-boolean" id="ref-for-idl-boolean⑨">boolean</a>, defaulting to <code>false</code></span>
     <dd data-md>
      <p>A value of false indicates the <code class="idl"><a data-link-type="idl" href="#dom-webtransportconnectionstats-estimatedsendrate" id="ref-for-dom-webtransportconnectionstats-estimatedsendrate①">estimatedSendRate</a></code> might be application limited,
@@ -3296,10 +3311,13 @@ same <a href="https://fetch.spec.whatwg.org/#network-partition-keys">network par
  to network conditions. However, <code class="idl"><a data-link-type="idl" href="#dom-webtransportconnectionstats-estimatedsendrate" id="ref-for-dom-webtransportconnectionstats-estimatedsendrate⑤">estimatedSendRate</a></code> is allowed to be <code>null</code> while
  <code class="idl"><a data-link-type="idl" href="#dom-webtransportconnectionstats-atsendcapacity" id="ref-for-dom-webtransportconnectionstats-atsendcapacity②">atSendCapacity</a></code> is true.
  </div>
+     
+ This is a <a data-link-type="dfn" href="#pooled-connection-stat" id="ref-for-pooled-connection-stat⑥">pooled connection stat</a>.
+
    </dl>
    <h3 class="heading settled" data-level="6.14" id="web-transport-datagram-stats"><span class="secno">6.14. </span><span class="content"><code>WebTransportDatagramStats</code> Dictionary</span><a class="self-link" href="#web-transport-datagram-stats"></a></h3>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-webtransportdatagramstats"><code>WebTransportDatagramStats</code></dfn> dictionary includes statistics
-on datagram transmission over the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑥">underlying connection</a>.</p>
+on datagram transmission over the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑦">underlying connection</a>.</p>
 <pre class="def highlight idl"><c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="#dictdef-webtransportdatagramstats" id="ref-for-dictdef-webtransportdatagramstats③"><c- g>WebTransportDatagramStats</c-></a> {
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①⑧"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long" href="#dom-webtransportdatagramstats-droppedincoming" id="ref-for-dom-webtransportdatagramstats-droppedincoming"><c- g>droppedIncoming</c-></a>;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①⑨"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="unsigned long long" href="#dom-webtransportdatagramstats-expiredincoming" id="ref-for-dom-webtransportdatagramstats-expiredincoming"><c- g>expiredIncoming</c-></a>;
@@ -3698,7 +3716,7 @@ To <dfn class="dfn-paneled" data-dfn-for="WebTransportSendStream" data-dfn-type=
       <p>If <var>code</var> > 4294967295, then set <var>code</var> to 4294967295.</p>
      <li data-md>
       <p>Let <var>committedOffset</var> be <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-committedoffset-slot" id="ref-for-dom-webtransportsendstream-committedoffset-slot①">[[CommittedOffset]]</a></code>.</p>
-      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑦">underlying connection</a> is
+      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑧">underlying connection</a> is
  using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
  <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
@@ -3747,7 +3765,7 @@ Whenever a <a data-link-type="dfn" href="#protocol-webtransport-stream" id="ref-
       <p>Let <var>transport</var> be <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-transport-slot" id="ref-for-dom-webtransportsendstream-transport-slot⑤">[[Transport]]</a></code>.</p>
      <li data-md>
       <p>Let <var>code</var> be the application protocol error code attached to the <a data-link-type="dfn" href="#stream-signal-receiving-aborted" id="ref-for-stream-signal-receiving-aborted①">receiving aborted</a> signal.</p>
-      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑧">underlying connection</a> is
+      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑨">underlying connection</a> is
  using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
  <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
@@ -4096,7 +4114,7 @@ steps.</p>
       <p>If <var>code</var> &lt; 0, then set <var>code</var> to 0.</p>
      <li data-md>
       <p>If <var>code</var> > 4294967295, then set <var>code</var> to 4294967295.</p>
-      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection①⑨">underlying connection</a> is
+      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②⓪">underlying connection</a> is
  using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
  <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
@@ -4133,7 +4151,7 @@ Whenever a <a data-link-type="dfn" href="#protocol-webtransport-stream" id="ref-
       <p>Let <var>transport</var> be <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportreceivestream-transport-slot" id="ref-for-dom-webtransportreceivestream-transport-slot③">[[Transport]]</a></code>.</p>
      <li data-md>
       <p>Let <var>code</var> be the application protocol error code attached to the <a data-link-type="dfn" href="#stream-signal-sending-aborted" id="ref-for-stream-signal-sending-aborted①">sending aborted</a> signal.</p>
-      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②⓪">underlying connection</a> is
+      <p class="note" role="note"><span class="marker">Note:</span> Valid values of <var>code</var> are from 0 to 4294967295 inclusive. If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②①">underlying connection</a> is
  using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
  <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
@@ -4462,7 +4480,7 @@ not be immediate due to buffering.</p>
       <td>Session starts <a data-link-type="dfn" href="#session-draining" id="ref-for-session-draining①">draining</a>
       <td>await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-draining" id="ref-for-dom-webtransport-draining③">draining</a></code>
    </table>
-   <p>If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②①">underlying connection</a> is using HTTP/3, the following protocol behaviors
+   <p>If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②②">underlying connection</a> is using HTTP/3, the following protocol behaviors
 from <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a> apply.</p>
    <p>The application <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode" id="ref-for-dom-webtransporterror-streamerrorcode①">streamErrorCode</a></code> in the <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror①③">WebTransportError</a></code> error is
 converted to an httpErrorCode, and vice versa, as specified in <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>
@@ -4575,7 +4593,7 @@ of <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTrans
       <td>Session starts <a data-link-type="dfn" href="#session-draining" id="ref-for-session-draining②">draining</a>
       <td>await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-draining" id="ref-for-dom-webtransport-draining④">draining</a></code>
    </table>
-   <p>If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②②">underlying connection</a> is using HTTP/2, the following protocol behaviors
+   <p>If the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②③">underlying connection</a> is using HTTP/2, the following protocol behaviors
 from <a data-link-type="biblio" href="#biblio-web-transport-http2" title="WebTransport over HTTP/2">[WEB-TRANSPORT-HTTP2]</a> apply. Note that, unlike for HTTP/3, the stream error
 code does not need to be converted to an HTTP error code, and vice versa.</p>
    <table class="data">
@@ -5018,7 +5036,7 @@ entirely without blocking on <a data-link-type="dfn" href="#stream-signal-flow-c
    <p>A WebTransport session can override the default trust evaluation performed by
 the client with a check against the hash of the certificate provided to the
 server. In the example below, <code>hashValue</code> is a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#BufferSource" id="ref-for-BufferSource⑤">BufferSource</a></code> containing the
-SHA-256 hash of a server certificate that the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②③">underlying connection</a> should
+SHA-256 hash of a server certificate that the <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②④">underlying connection</a> should
 consider to be valid.</p>
 <pre class="example highlight" id="example-ae6f59b0"><a class="self-link" href="#example-ae6f59b0"></a><c- a>const</c-> wt <c- o>=</c-> <c- ow>new</c-> WebTransport<c- p>(</c->url<c- p>,</c-> <c- p>{</c->
   serverCertificateHashes<c- o>:</c-> <c- p>[</c->
@@ -5355,6 +5373,7 @@ and has been adapted for use in this specification.</p>
    <li><a href="#dom-webtransportconnectionstats-packetssent">packetsSent</a><span>, in § 6.13</span>
    <li><a href="#dom-webtransportreliabilitymode-pending">"pending"</a><span>, in § 6</span>
    <li><a href="#dom-webtransportsendstream-pendingoperation-slot">[[PendingOperation]]</a><span>, in § 7.3</span>
+   <li><a href="#pooled-connection-stat">pooled connection stat</a><span>, in § 6.13</span>
    <li><a href="#process-a-webtransport-fetch-response">process a WebTransport fetch response</a><span>, in § 6.2</span>
    <li><a href="#dom-webtransport-protocol-slot">[[Protocol]]</a><span>, in § 6.1</span>
    <li><a href="#dom-webtransport-protocol">protocol</a><span>, in § 6.3</span>
@@ -6231,7 +6250,7 @@ let dfnPanelData = {
 "109985b9": {"dfnID":"109985b9","dfnText":"BYOB reader","external":true,"refSections":[{"refs":[{"id":"ref-for-byob-reader"}],"title":"9. Interface WebTransportReceiveStream"},{"refs":[{"id":"ref-for-byob-reader\u2460"}],"title":"15.4. Receiving datagrams with a BYOB reader"},{"refs":[{"id":"ref-for-byob-reader\u2461"}],"title":"15.7. Receiving a stream with a BYOB reader"}],"url":"https://streams.spec.whatwg.org/#byob-reader"},
 "116848ac": {"dfnID":"116848ac","dfnText":"reacting","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-perform-steps-once-promise-is-settled"}],"title":"11.1. Methods"}],"url":"https://webidl.spec.whatwg.org/#dfn-perform-steps-once-promise-is-settled"},
 "11e0b87f": {"dfnID":"11e0b87f","dfnText":"unrestricted double","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-unrestricted-double"},{"id":"ref-for-idl-unrestricted-double\u2460"}],"title":"5. WebTransportDatagramDuplexStream Interface"},{"refs":[{"id":"ref-for-idl-unrestricted-double\u2461"},{"id":"ref-for-idl-unrestricted-double\u2462"}],"title":"5.1. Internal slots"},{"refs":[{"id":"ref-for-idl-unrestricted-double\u2463"},{"id":"ref-for-idl-unrestricted-double\u2464"}],"title":"5.3. Attributes"}],"url":"https://webidl.spec.whatwg.org/#idl-unrestricted-double"},
-"1243a891": {"dfnID":"1243a891","dfnText":"exist","external":true,"refSections":[{"refs":[{"id":"ref-for-map-exists"}],"title":"6.13. WebTransportConnectionStats Dictionary"}],"url":"https://infra.spec.whatwg.org/#map-exists"},
+"1243a891": {"dfnID":"1243a891","dfnText":"exist","external":true,"refSections":[{"refs":[{"id":"ref-for-map-exists"},{"id":"ref-for-map-exists\u2460"}],"title":"6.13. WebTransportConnectionStats Dictionary"}],"url":"https://infra.spec.whatwg.org/#map-exists"},
 "15e48c39": {"dfnID":"15e48c39","dfnText":"set","external":true,"refSections":[{"refs":[{"id":"ref-for-ordered-set"},{"id":"ref-for-ordered-set\u2460"}],"title":"5.1. Internal slots"},{"refs":[{"id":"ref-for-ordered-set\u2461"},{"id":"ref-for-ordered-set\u2462"}],"title":"6.1. Internal slots"},{"refs":[{"id":"ref-for-ordered-set\u2463"},{"id":"ref-for-ordered-set\u2464"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-ordered-set\u2465"},{"id":"ref-for-ordered-set\u2466"}],"title":"6.5. Procedures"},{"refs":[{"id":"ref-for-ordered-set\u2467"}],"title":"7.3. Internal Slots"},{"refs":[{"id":"ref-for-ordered-set\u2468"}],"title":"7.4. Procedures"}],"url":"https://infra.spec.whatwg.org/#ordered-set"},
 "16b1470a": {"dfnID":"16b1470a","dfnText":"isomorphic encode","external":true,"refSections":[{"refs":[{"id":"ref-for-isomorphic-encode"}],"title":"6.2. Constructor"}],"url":"https://infra.spec.whatwg.org/#isomorphic-encode"},
 "16d07e10": {"dfnID":"16d07e10","dfnText":"for each","external":true,"refSections":[{"refs":[{"id":"ref-for-list-iterate"},{"id":"ref-for-list-iterate\u2460"}],"title":"6.5. Procedures"},{"refs":[{"id":"ref-for-list-iterate\u2461"},{"id":"ref-for-list-iterate\u2462"}],"title":"7.4. Procedures"}],"url":"https://infra.spec.whatwg.org/#list-iterate"},
@@ -6389,7 +6408,7 @@ let dfnPanelData = {
 "dca2de17": {"dfnID":"dca2de17","dfnText":"DOMException","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-DOMException"},{"id":"ref-for-idl-DOMException\u2460"}],"title":"12. WebTransportError Interface"},{"refs":[{"id":"ref-for-idl-DOMException\u2461"},{"id":"ref-for-idl-DOMException\u2462"}],"title":"12.4. Serialization"}],"url":"https://webidl.spec.whatwg.org/#idl-DOMException"},
 "ddf444bb": {"dfnID":"ddf444bb","dfnText":"origin","external":true,"refSections":[{"refs":[{"id":"ref-for-http-origin"}],"title":"14.3. Protocol Security"}],"url":"https://fetch.spec.whatwg.org/#http-origin"},
 "dictdef-webtransportcloseinfo": {"dfnID":"dictdef-webtransportcloseinfo","dfnText":"WebTransportCloseInfo","external":false,"refSections":[{"refs":[{"id":"ref-for-dictdef-webtransportcloseinfo"},{"id":"ref-for-dictdef-webtransportcloseinfo\u2460"}],"title":"6. WebTransport Interface"},{"refs":[{"id":"ref-for-dictdef-webtransportcloseinfo\u2461"}],"title":"6.3. Attributes"},{"refs":[{"id":"ref-for-dictdef-webtransportcloseinfo\u2462"}],"title":"6.6. Session termination not initiated by the client"},{"refs":[{"id":"ref-for-dictdef-webtransportcloseinfo\u2463"}],"title":"6.10. WebTransportCloseInfo Dictionary"}],"url":"#dictdef-webtransportcloseinfo"},
-"dictdef-webtransportconnectionstats": {"dfnID":"dictdef-webtransportconnectionstats","dfnText":"WebTransportConnectionStats","external":false,"refSections":[{"refs":[{"id":"ref-for-dictdef-webtransportconnectionstats"}],"title":"6. WebTransport Interface"},{"refs":[{"id":"ref-for-dictdef-webtransportconnectionstats\u2460"},{"id":"ref-for-dictdef-webtransportconnectionstats\u2461"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-dictdef-webtransportconnectionstats\u2462"},{"id":"ref-for-dictdef-webtransportconnectionstats\u2463"},{"id":"ref-for-dictdef-webtransportconnectionstats\u2464"}],"title":"6.13. WebTransportConnectionStats Dictionary"}],"url":"#dictdef-webtransportconnectionstats"},
+"dictdef-webtransportconnectionstats": {"dfnID":"dictdef-webtransportconnectionstats","dfnText":"WebTransportConnectionStats","external":false,"refSections":[{"refs":[{"id":"ref-for-dictdef-webtransportconnectionstats"}],"title":"6. WebTransport Interface"},{"refs":[{"id":"ref-for-dictdef-webtransportconnectionstats\u2460"},{"id":"ref-for-dictdef-webtransportconnectionstats\u2461"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-dictdef-webtransportconnectionstats\u2462"},{"id":"ref-for-dictdef-webtransportconnectionstats\u2463"},{"id":"ref-for-dictdef-webtransportconnectionstats\u2464"},{"id":"ref-for-dictdef-webtransportconnectionstats\u2465"}],"title":"6.13. WebTransportConnectionStats Dictionary"}],"url":"#dictdef-webtransportconnectionstats"},
 "dictdef-webtransportdatagramstats": {"dfnID":"dictdef-webtransportdatagramstats","dfnText":"WebTransportDatagramStats","external":false,"refSections":[{"refs":[{"id":"ref-for-dictdef-webtransportdatagramstats"},{"id":"ref-for-dictdef-webtransportdatagramstats\u2460"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-dictdef-webtransportdatagramstats\u2461"}],"title":"6.13. WebTransportConnectionStats Dictionary"},{"refs":[{"id":"ref-for-dictdef-webtransportdatagramstats\u2462"}],"title":"6.14. WebTransportDatagramStats Dictionary"}],"url":"#dictdef-webtransportdatagramstats"},
 "dictdef-webtransporterroroptions": {"dfnID":"dictdef-webtransporterroroptions","dfnText":"WebTransportErrorOptions","external":false,"refSections":[{"refs":[{"id":"ref-for-dictdef-webtransporterroroptions"}],"title":"12. WebTransportError Interface"}],"url":"#dictdef-webtransporterroroptions"},
 "dictdef-webtransporthash": {"dfnID":"dictdef-webtransporthash","dfnText":"WebTransportHash","external":false,"refSections":[{"refs":[{"id":"ref-for-dictdef-webtransporthash"},{"id":"ref-for-dictdef-webtransporthash\u2460"}],"title":"6.9. Configuration"}],"url":"#dictdef-webtransporthash"},
@@ -6426,7 +6445,7 @@ let dfnPanelData = {
 "dom-webtransport-incomingbidirectionalstreams-slot": {"dfnID":"dom-webtransport-incomingbidirectionalstreams-slot","dfnText":"[[IncomingBidirectionalStreams]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransport-incomingbidirectionalstreams-slot"},{"id":"ref-for-dom-webtransport-incomingbidirectionalstreams-slot\u2460"},{"id":"ref-for-dom-webtransport-incomingbidirectionalstreams-slot\u2461"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-dom-webtransport-incomingbidirectionalstreams-slot\u2462"}],"title":"6.3. Attributes"},{"refs":[{"id":"ref-for-dom-webtransport-incomingbidirectionalstreams-slot\u2463"}],"title":"6.5. Procedures"},{"refs":[{"id":"ref-for-dom-webtransport-incomingbidirectionalstreams-slot\u2464"},{"id":"ref-for-dom-webtransport-incomingbidirectionalstreams-slot\u2465"},{"id":"ref-for-dom-webtransport-incomingbidirectionalstreams-slot\u2466"}],"title":"6.8. Garbage Collection"}],"url":"#dom-webtransport-incomingbidirectionalstreams-slot"},
 "dom-webtransport-incomingunidirectionalstreams": {"dfnID":"dom-webtransport-incomingunidirectionalstreams","dfnText":"incomingUnidirectionalStreams","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransport-incomingunidirectionalstreams"}],"title":"6. WebTransport Interface"},{"refs":[{"id":"ref-for-dom-webtransport-incomingunidirectionalstreams\u2460"}],"title":"15.6. Receiving incoming streams"}],"url":"#dom-webtransport-incomingunidirectionalstreams"},
 "dom-webtransport-incomingunidirectionalstreams-slot": {"dfnID":"dom-webtransport-incomingunidirectionalstreams-slot","dfnText":"[[IncomingUnidirectionalStreams]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransport-incomingunidirectionalstreams-slot"},{"id":"ref-for-dom-webtransport-incomingunidirectionalstreams-slot\u2460"},{"id":"ref-for-dom-webtransport-incomingunidirectionalstreams-slot\u2461"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-dom-webtransport-incomingunidirectionalstreams-slot\u2462"}],"title":"6.3. Attributes"},{"refs":[{"id":"ref-for-dom-webtransport-incomingunidirectionalstreams-slot\u2463"}],"title":"6.5. Procedures"},{"refs":[{"id":"ref-for-dom-webtransport-incomingunidirectionalstreams-slot\u2464"},{"id":"ref-for-dom-webtransport-incomingunidirectionalstreams-slot\u2465"},{"id":"ref-for-dom-webtransport-incomingunidirectionalstreams-slot\u2466"}],"title":"6.8. Garbage Collection"}],"url":"#dom-webtransport-incomingunidirectionalstreams-slot"},
-"dom-webtransport-newconnection-slot": {"dfnID":"dom-webtransport-newconnection-slot","dfnText":"[[NewConnection]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransport-newconnection-slot"},{"id":"ref-for-dom-webtransport-newconnection-slot\u2460"}],"title":"6.2. Constructor"}],"url":"#dom-webtransport-newconnection-slot"},
+"dom-webtransport-newconnection-slot": {"dfnID":"dom-webtransport-newconnection-slot","dfnText":"[[NewConnection]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransport-newconnection-slot"},{"id":"ref-for-dom-webtransport-newconnection-slot\u2460"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-dom-webtransport-newconnection-slot\u2461"}],"title":"6.4. Methods"}],"url":"#dom-webtransport-newconnection-slot"},
 "dom-webtransport-protocol": {"dfnID":"dom-webtransport-protocol","dfnText":"protocol","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransport-protocol"}],"title":"6. WebTransport Interface"}],"url":"#dom-webtransport-protocol"},
 "dom-webtransport-protocol-slot": {"dfnID":"dom-webtransport-protocol-slot","dfnText":"[[Protocol]]","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransport-protocol-slot"},{"id":"ref-for-dom-webtransport-protocol-slot\u2460"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-dom-webtransport-protocol-slot\u2461"}],"title":"6.3. Attributes"}],"url":"#dom-webtransport-protocol-slot"},
 "dom-webtransport-ready": {"dfnID":"dom-webtransport-ready","dfnText":"ready","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransport-ready"}],"title":"6. WebTransport Interface"},{"refs":[{"id":"ref-for-dom-webtransport-ready\u2460"}],"title":"6.8. Garbage Collection"}],"url":"#dom-webtransport-ready"},
@@ -6579,6 +6598,7 @@ let dfnPanelData = {
 "grouped": {"dfnID":"grouped","dfnText":"grouped","external":false,"refSections":[{"refs":[{"id":"ref-for-grouped"}],"title":"6.11. WebTransportSendOptions Dictionary"},{"refs":[{"id":"ref-for-grouped\u2460"}],"title":"8.1. Methods"}],"url":"#grouped"},
 "null-sendgroup": {"dfnID":"null-sendgroup","dfnText":"null sendGroup","external":false,"refSections":[{"refs":[{"id":"ref-for-null-sendgroup"}],"title":"4.3. Procedures"},{"refs":[{"id":"ref-for-null-sendgroup\u2460"}],"title":"8. Interface WebTransportSendGroup"}],"url":"#null-sendgroup"},
 "obtain-a-webtransport-connection": {"dfnID":"obtain-a-webtransport-connection","dfnText":"obtain a WebTransport connection","external":false,"refSections":[],"url":"#obtain-a-webtransport-connection"},
+"pooled-connection-stat": {"dfnID":"pooled-connection-stat","dfnText":"pooled connection stat","external":false,"refSections":[{"refs":[{"id":"ref-for-pooled-connection-stat"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-pooled-connection-stat\u2460"},{"id":"ref-for-pooled-connection-stat\u2461"},{"id":"ref-for-pooled-connection-stat\u2462"},{"id":"ref-for-pooled-connection-stat\u2463"},{"id":"ref-for-pooled-connection-stat\u2464"},{"id":"ref-for-pooled-connection-stat\u2465"}],"title":"6.13. WebTransportConnectionStats Dictionary"}],"url":"#pooled-connection-stat"},
 "process-a-webtransport-fetch-response": {"dfnID":"process-a-webtransport-fetch-response","dfnText":"process a WebTransport fetch response","external":false,"refSections":[{"refs":[{"id":"ref-for-process-a-webtransport-fetch-response"}],"title":"6.2. Constructor"}],"url":"#process-a-webtransport-fetch-response"},
 "protocol-names": {"dfnID":"protocol-names","dfnText":"protocol names","external":false,"refSections":[{"refs":[{"id":"ref-for-protocol-names"}],"title":"3. Protocol concepts"}],"url":"#protocol-names"},
 "protocol-webtransport-session": {"dfnID":"protocol-webtransport-session","dfnText":"WebTransport session","external":false,"refSections":[{"refs":[{"id":"ref-for-protocol-webtransport-session"}],"title":"3. Protocol concepts"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2460"},{"id":"ref-for-protocol-webtransport-session\u2461"},{"id":"ref-for-protocol-webtransport-session\u2462"},{"id":"ref-for-protocol-webtransport-session\u2463"},{"id":"ref-for-protocol-webtransport-session\u2464"}],"title":"3.1. WebTransport session"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2465"}],"title":"3.2. WebTransport stream"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2466"},{"id":"ref-for-protocol-webtransport-session\u2467"},{"id":"ref-for-protocol-webtransport-session\u2468"}],"title":"6.1. Internal slots"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2460\u24ea"},{"id":"ref-for-protocol-webtransport-session\u2460\u2460"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2460\u2461"},{"id":"ref-for-protocol-webtransport-session\u2460\u2462"},{"id":"ref-for-protocol-webtransport-session\u2460\u2463"}],"title":"6.3. Attributes"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2460\u2464"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2460\u2465"}],"title":"6.6. Session termination not initiated by the client"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2460\u2466"}],"title":"6.8. Garbage Collection"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2460\u2467"},{"id":"ref-for-protocol-webtransport-session\u2460\u2468"},{"id":"ref-for-protocol-webtransport-session\u2461\u24ea"},{"id":"ref-for-protocol-webtransport-session\u2461\u2460"}],"title":"6.9. Configuration"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2461\u2461"}],"title":"6.10. WebTransportCloseInfo Dictionary"},{"refs":[{"id":"ref-for-protocol-webtransport-session\u2461\u2462"},{"id":"ref-for-protocol-webtransport-session\u2461\u2463"},{"id":"ref-for-protocol-webtransport-session\u2461\u2464"},{"id":"ref-for-protocol-webtransport-session\u2461\u2465"}],"title":"6.13. WebTransportConnectionStats Dictionary"}],"url":"#protocol-webtransport-session"},
@@ -6611,7 +6631,7 @@ let dfnPanelData = {
 "stream-signal-receiving-aborted": {"dfnID":"stream-signal-receiving-aborted","dfnText":"receiving aborted","external":false,"refSections":[{"refs":[{"id":"ref-for-stream-signal-receiving-aborted"},{"id":"ref-for-stream-signal-receiving-aborted\u2460"}],"title":"7.5. Receiving aborted signal coming from the server"},{"refs":[{"id":"ref-for-stream-signal-receiving-aborted\u2461"},{"id":"ref-for-stream-signal-receiving-aborted\u2462"}],"title":"13. Protocol Mappings"}],"url":"#stream-signal-receiving-aborted"},
 "stream-signal-sending-aborted": {"dfnID":"stream-signal-sending-aborted","dfnText":"sending aborted","external":false,"refSections":[{"refs":[{"id":"ref-for-stream-signal-sending-aborted"},{"id":"ref-for-stream-signal-sending-aborted\u2460"}],"title":"9.4. Sending aborted signal coming from the server"},{"refs":[{"id":"ref-for-stream-signal-sending-aborted\u2461"},{"id":"ref-for-stream-signal-sending-aborted\u2462"}],"title":"13. Protocol Mappings"}],"url":"#stream-signal-sending-aborted"},
 "strict-ordering": {"dfnID":"strict-ordering","dfnText":"strict ordering","external":false,"refSections":[{"refs":[{"id":"ref-for-strict-ordering"},{"id":"ref-for-strict-ordering\u2460"}],"title":"6.11. WebTransportSendOptions Dictionary"},{"refs":[{"id":"ref-for-strict-ordering\u2461"}],"title":"8. Interface WebTransportSendGroup"}],"url":"#strict-ordering"},
-"underlying-connection": {"dfnID":"underlying-connection","dfnText":"underlying connection","external":false,"refSections":[{"refs":[{"id":"ref-for-underlying-connection"},{"id":"ref-for-underlying-connection\u2460"},{"id":"ref-for-underlying-connection\u2461"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-underlying-connection\u2462"}],"title":"6.6. Session termination not initiated by the client"},{"refs":[{"id":"ref-for-underlying-connection\u2463"}],"title":"6.8. Garbage Collection"},{"refs":[{"id":"ref-for-underlying-connection\u2464"}],"title":"6.9. Configuration"},{"refs":[{"id":"ref-for-underlying-connection\u2465"}],"title":"6.12. WebTransportSendStreamOptions Dictionary"},{"refs":[{"id":"ref-for-underlying-connection\u2466"},{"id":"ref-for-underlying-connection\u2467"},{"id":"ref-for-underlying-connection\u2468"},{"id":"ref-for-underlying-connection\u2460\u24ea"},{"id":"ref-for-underlying-connection\u2460\u2460"},{"id":"ref-for-underlying-connection\u2460\u2461"},{"id":"ref-for-underlying-connection\u2460\u2462"},{"id":"ref-for-underlying-connection\u2460\u2463"},{"id":"ref-for-underlying-connection\u2460\u2464"}],"title":"6.13. WebTransportConnectionStats Dictionary"},{"refs":[{"id":"ref-for-underlying-connection\u2460\u2465"}],"title":"6.14. WebTransportDatagramStats Dictionary"},{"refs":[{"id":"ref-for-underlying-connection\u2460\u2466"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-underlying-connection\u2460\u2467"}],"title":"7.5. Receiving aborted signal coming from the server"},{"refs":[{"id":"ref-for-underlying-connection\u2460\u2468"}],"title":"9.3. Procedures"},{"refs":[{"id":"ref-for-underlying-connection\u2461\u24ea"}],"title":"9.4. Sending aborted signal coming from the server"},{"refs":[{"id":"ref-for-underlying-connection\u2461\u2460"},{"id":"ref-for-underlying-connection\u2461\u2461"}],"title":"13. Protocol Mappings"},{"refs":[{"id":"ref-for-underlying-connection\u2461\u2462"}],"title":"15.9. Using a server certificate hash"}],"url":"#underlying-connection"},
+"underlying-connection": {"dfnID":"underlying-connection","dfnText":"underlying connection","external":false,"refSections":[{"refs":[{"id":"ref-for-underlying-connection"},{"id":"ref-for-underlying-connection\u2460"},{"id":"ref-for-underlying-connection\u2461"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-underlying-connection\u2462"}],"title":"6.6. Session termination not initiated by the client"},{"refs":[{"id":"ref-for-underlying-connection\u2463"}],"title":"6.8. Garbage Collection"},{"refs":[{"id":"ref-for-underlying-connection\u2464"}],"title":"6.9. Configuration"},{"refs":[{"id":"ref-for-underlying-connection\u2465"}],"title":"6.12. WebTransportSendStreamOptions Dictionary"},{"refs":[{"id":"ref-for-underlying-connection\u2466"},{"id":"ref-for-underlying-connection\u2467"},{"id":"ref-for-underlying-connection\u2468"},{"id":"ref-for-underlying-connection\u2460\u24ea"},{"id":"ref-for-underlying-connection\u2460\u2460"},{"id":"ref-for-underlying-connection\u2460\u2461"},{"id":"ref-for-underlying-connection\u2460\u2462"},{"id":"ref-for-underlying-connection\u2460\u2463"},{"id":"ref-for-underlying-connection\u2460\u2464"},{"id":"ref-for-underlying-connection\u2460\u2465"}],"title":"6.13. WebTransportConnectionStats Dictionary"},{"refs":[{"id":"ref-for-underlying-connection\u2460\u2466"}],"title":"6.14. WebTransportDatagramStats Dictionary"},{"refs":[{"id":"ref-for-underlying-connection\u2460\u2467"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-underlying-connection\u2460\u2468"}],"title":"7.5. Receiving aborted signal coming from the server"},{"refs":[{"id":"ref-for-underlying-connection\u2461\u24ea"}],"title":"9.3. Procedures"},{"refs":[{"id":"ref-for-underlying-connection\u2461\u2460"}],"title":"9.4. Sending aborted signal coming from the server"},{"refs":[{"id":"ref-for-underlying-connection\u2461\u2461"},{"id":"ref-for-underlying-connection\u2461\u2462"}],"title":"13. Protocol Mappings"},{"refs":[{"id":"ref-for-underlying-connection\u2461\u2463"}],"title":"15.9. Using a server certificate hash"}],"url":"#underlying-connection"},
 "verify-a-certificate-hash": {"dfnID":"verify-a-certificate-hash","dfnText":"verify a certificate hash","external":false,"refSections":[{"refs":[{"id":"ref-for-verify-a-certificate-hash"}],"title":"6.9. Configuration"}],"url":"#verify-a-certificate-hash"},
 "webtransport": {"dfnID":"webtransport","dfnText":"WebTransport","external":false,"refSections":[{"refs":[{"id":"ref-for-webtransport"},{"id":"ref-for-webtransport\u2460"}],"title":"4.1. Internal slots"},{"refs":[{"id":"ref-for-webtransport\u2461"},{"id":"ref-for-webtransport\u2462"}],"title":"4.3. Procedures"},{"refs":[{"id":"ref-for-webtransport\u2463"},{"id":"ref-for-webtransport\u2464"},{"id":"ref-for-webtransport\u2465"}],"title":"5.1. Internal slots"},{"refs":[{"id":"ref-for-webtransport\u2466"}],"title":"5.2. Methods"},{"refs":[{"id":"ref-for-webtransport\u2467"},{"id":"ref-for-webtransport\u2468"},{"id":"ref-for-webtransport\u2460\u24ea"}],"title":"5.4. Procedures"},{"refs":[{"id":"ref-for-webtransport\u2460\u2460"},{"id":"ref-for-webtransport\u2460\u2461"},{"id":"ref-for-webtransport\u2460\u2462"},{"id":"ref-for-webtransport\u2460\u2463"},{"id":"ref-for-webtransport\u2460\u2464"}],"title":"6.1. Internal slots"},{"refs":[{"id":"ref-for-webtransport\u2460\u2465"},{"id":"ref-for-webtransport\u2460\u2466"},{"id":"ref-for-webtransport\u2460\u2467"},{"id":"ref-for-webtransport\u2460\u2468"},{"id":"ref-for-webtransport\u2461\u24ea"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-webtransport\u2461\u2460"},{"id":"ref-for-webtransport\u2461\u2461"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-webtransport\u2461\u2462"},{"id":"ref-for-webtransport\u2461\u2463"}],"title":"6.5. Procedures"},{"refs":[{"id":"ref-for-webtransport\u2461\u2464"},{"id":"ref-for-webtransport\u2461\u2465"}],"title":"6.6. Session termination not initiated by the client"},{"refs":[{"id":"ref-for-webtransport\u2461\u2466"}],"title":"6.7. Context cleanup steps"},{"refs":[{"id":"ref-for-webtransport\u2461\u2467"},{"id":"ref-for-webtransport\u2461\u2468"},{"id":"ref-for-webtransport\u2462\u24ea"},{"id":"ref-for-webtransport\u2462\u2460"},{"id":"ref-for-webtransport\u2462\u2461"}],"title":"6.8. Garbage Collection"},{"refs":[{"id":"ref-for-webtransport\u2462\u2462"}],"title":"6.10. WebTransportCloseInfo Dictionary"},{"refs":[{"id":"ref-for-webtransport\u2462\u2463"}],"title":"7.3. Internal Slots"},{"refs":[{"id":"ref-for-webtransport\u2462\u2464"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-webtransport\u2462\u2465"}],"title":"8.2. Internal Slots"},{"refs":[{"id":"ref-for-webtransport\u2462\u2466"}],"title":"8.3. Procedures"},{"refs":[{"id":"ref-for-webtransport\u2462\u2467"}],"title":"9.2. Internal Slots"},{"refs":[{"id":"ref-for-webtransport\u2462\u2468"}],"title":"9.3. Procedures"},{"refs":[{"id":"ref-for-webtransport\u2463\u24ea"}],"title":"10.1. Internal slots"},{"refs":[{"id":"ref-for-webtransport\u2463\u2460"}],"title":"10.3. Procedures"},{"refs":[{"id":"ref-for-webtransport\u2463\u2461"}],"title":"16. Acknowledgements"}],"url":"#webtransport"},
 "webtransport-cleanup": {"dfnID":"webtransport-cleanup","dfnText":"cleanup","external":false,"refSections":[{"refs":[{"id":"ref-for-webtransport-cleanup"},{"id":"ref-for-webtransport-cleanup\u2460"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-webtransport-cleanup\u2461"},{"id":"ref-for-webtransport-cleanup\u2462"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-webtransport-cleanup\u2463"},{"id":"ref-for-webtransport-cleanup\u2464"}],"title":"6.6. Session termination not initiated by the client"},{"refs":[{"id":"ref-for-webtransport-cleanup\u2465"}],"title":"6.7. Context cleanup steps"}],"url":"#webtransport-cleanup"},
@@ -7183,6 +7203,7 @@ let refsData = {
 "#enumdef-webtransportreliabilitymode": {"displayText":"WebTransportReliabilityMode","export":true,"for_":[],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"WebTransportReliabilityMode","type":"enum","url":"#enumdef-webtransportreliabilitymode"},
 "#grouped": {"displayText":"grouped","export":true,"for_":[],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"grouped","type":"dfn","url":"#grouped"},
 "#null-sendgroup": {"displayText":"null sendgroup","export":true,"for_":[],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"null sendgroup","type":"dfn","url":"#null-sendgroup"},
+"#pooled-connection-stat": {"displayText":"pooled connection stat","export":true,"for_":[],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"pooled connection stat","type":"dfn","url":"#pooled-connection-stat"},
 "#process-a-webtransport-fetch-response": {"displayText":"process a webtransport fetch response","export":true,"for_":[],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"process a webtransport fetch response","type":"dfn","url":"#process-a-webtransport-fetch-response"},
 "#protocol-names": {"displayText":"protocol names","export":true,"for_":[],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"protocol names","type":"dfn","url":"#protocol-names"},
 "#protocol-webtransport-session": {"displayText":"webtransport session","export":true,"for_":["protocol"],"level":"","normative":true,"shortname":"webtransport","spec":"webtransport","status":"local","text":"webtransport session","type":"dfn","url":"#protocol-webtransport-session"},
