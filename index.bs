@@ -1338,7 +1338,8 @@ the application will receive the number of streams it anticipates.
    1. If |outputLength| is 0 or more than an [=implementation-defined=] value--
        which [=must=] be at least 4096--
        return [=a promise rejected with=] a {{RangeError}}.
-   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`, return a [=a promise rejected with=] an {{InvalidStateError}}. 
+   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+     return a [=a promise rejected with=] an {{InvalidStateError}}. 
    1. Let |p| be a new promise.
    1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
