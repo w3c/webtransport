@@ -1329,6 +1329,8 @@ the application will receive the number of streams it anticipates.
 
    When `exportKeyingMaterial` is called, the user agent MUST run the following steps:
 
+   1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+     return a [=a promise rejected with=] an {{InvalidStateError}}. 
    1. Let |transport| be [=this=].
    1. Let |labelLength| be |label|.[=BufferSource/byte length=].
    1. If |labelLength| is more than 255, return [=a promise rejected with=] a {{RangeError}}.
