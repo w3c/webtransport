@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version d113b2e81, updated Tue Jun 9 14:57:55 2026 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="f4285785afef5cf5df3877ab904759d48889bffe" name="revision">
+  <meta content="6207baff4a8760190bea73f75848dd096e32ccb4" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -773,7 +773,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
 </p>
    <h1 class="no-ref p-name" id="title">WebTransport</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#ED">Editor’s Draft</a>,
-    <time class="dt-updated" datetime="2026-07-03">3 July 2026</time></p>
+    <time class="dt-updated" datetime="2026-07-22">22 July 2026</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -2593,7 +2593,7 @@ the application will receive the number of streams it anticipates.</p>
     <dl>
      <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransport" data-dfn-type="method" data-export data-lt="exportKeyingMaterial(label, context, outputLength)" id="dom-webtransport-exportkeyingmaterial"><code>exportKeyingMaterial(BufferSource <var>label</var>, BufferSource <var>context</var>, unsigned long <var>outputLength</var>)</code></dfn>
      <dd data-md>
-      <p>Exports keying material from a <a href="https://www.rfc-editor.org/rfc/rfc8446#section-7.3">TLS Keying Material Exporter</a>
+      <p>Exports keying material from a <a href="https://www.rfc-editor.org/rfc/rfc9846#section-7.3">TLS Keying Material Exporter</a>
  for the TLS session uniquely associated with this <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②②">WebTransport</a></code>’s <a data-link-type="dfn" href="#underlying-connection" id="ref-for-underlying-connection②">underlying connection</a>.
  When called, the user agent MUST run these steps:</p>
       <ol>
@@ -3126,7 +3126,7 @@ period MUST NOT exceed two weeks.  The user agent MAY impose additional
    <p>The exact list of <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="allowed-public-key-algorithms">allowed public key algorithms</dfn> used in the Subject
 Public Key Info field (and, as a consequence, in the TLS CertificateVerify
 message) is <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined⑧">implementation-defined</a>; however, it MUST include ECDSA with the
-secp256r1 (NIST P-256) named group (<a data-link-type="biblio" href="#biblio-rfc3279" title="Algorithms and Identifiers for the Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile">[RFC3279]</a>, Section 2.3.5; <a data-link-type="biblio" href="#biblio-rfc8422" title="Elliptic Curve Cryptography (ECC) Cipher Suites for Transport Layer Security (TLS) Versions 1.2 and Earlier">[RFC8422]</a>)
+secp256r1 (NIST P-256) named group (<a data-link-type="biblio" href="#biblio-rfc3279" title="Algorithms and Identifiers for the Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile">[RFC3279]</a>, Section 2.3.5; <a data-link-type="biblio" href="#biblio-rfc9846" title="The Transport Layer Security (TLS) Protocol Version 1.3">[RFC9846]</a>)
 to provide an interoperable default.  It MUST NOT contain RSA keys
 (<a data-link-type="biblio" href="#biblio-rfc3279" title="Algorithms and Identifiers for the Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile">[RFC3279]</a>, Section 2.3.1).</p>
    <h3 class="heading settled" data-level="6.10" id="web-transport-close-info"><span class="secno">6.10. </span><span class="content"><code>WebTransportCloseInfo</code> Dictionary</span><a class="self-link" href="#web-transport-close-info"></a></h3>
@@ -4688,7 +4688,7 @@ summarizes information already present in other parts of the specification.</p>
    <p>The fact that communication is taking place cannot be hidden from adversaries
 that can observe the network, so this has to be regarded as public information.</p>
    <p>All of the transport protocols described in this document use either TLS
-<a data-link-type="biblio" href="#biblio-rfc8446" title="The Transport Layer Security (TLS) Protocol Version 1.3">[RFC8446]</a> or a semantically equivalent protocol, thus providing all of the
+<a data-link-type="biblio" href="#biblio-rfc9846" title="The Transport Layer Security (TLS) Protocol Version 1.3">[RFC9846]</a> or a semantically equivalent protocol, thus providing all of the
 security properties of TLS, including confidentiality and integrity of the
 traffic. WebTransport over HTTP uses the same certificate verification
 mechanism as outbound HTTP requests, thus relying on the same public key
@@ -5809,8 +5809,6 @@ and has been adapted for use in this specification.</p>
    <dd>D. Cooper; et al. <a href="https://www.rfc-editor.org/info/rfc5280/"><cite>Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile</cite></a>. May 2008. Proposed Standard. URL: <a href="https://www.rfc-editor.org/info/rfc5280/">https://www.rfc-editor.org/info/rfc5280/</a>
    <dt id="biblio-rfc8174">[RFC8174]
    <dd>B. Leiba. <a href="https://www.rfc-editor.org/info/rfc8174/"><cite>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</cite></a>. May 2017. Best Current Practice. URL: <a href="https://www.rfc-editor.org/info/rfc8174/">https://www.rfc-editor.org/info/rfc8174/</a>
-   <dt id="biblio-rfc8422">[RFC8422]
-   <dd>Y. Nir; S. Josefsson; M. Pegourie-Gonnard. <a href="https://www.rfc-editor.org/info/rfc8422/"><cite>Elliptic Curve Cryptography (ECC) Cipher Suites for Transport Layer Security (TLS) Versions 1.2 and Earlier</cite></a>. August 2018. Proposed Standard. URL: <a href="https://www.rfc-editor.org/info/rfc8422/">https://www.rfc-editor.org/info/rfc8422/</a>
    <dt id="biblio-rfc8441">[RFC8441]
    <dd>P. McManus. <a href="https://httpwg.org/specs/rfc8441.html"><cite>Bootstrapping WebSockets with HTTP/2</cite></a>. September 2018. Proposed Standard. URL: <a href="https://httpwg.org/specs/rfc8441.html">https://httpwg.org/specs/rfc8441.html</a>
    <dt id="biblio-rfc9002">[RFC9002]
@@ -5819,6 +5817,8 @@ and has been adapted for use in this specification.</p>
    <dd>R. Hamilton. <a href="https://httpwg.org/specs/rfc9220.html"><cite>Bootstrapping WebSockets with HTTP/3</cite></a>. June 2022. Proposed Standard. URL: <a href="https://httpwg.org/specs/rfc9220.html">https://httpwg.org/specs/rfc9220.html</a>
    <dt id="biblio-rfc9525">[RFC9525]
    <dd>P. Saint-Andre; R. Salz. <a href="https://www.rfc-editor.org/info/rfc9525/"><cite>Service Identity in TLS</cite></a>. November 2023. Proposed Standard. URL: <a href="https://www.rfc-editor.org/info/rfc9525/">https://www.rfc-editor.org/info/rfc9525/</a>
+   <dt id="biblio-rfc9846">[RFC9846]
+   <dd>E. Rescorla. <a href="https://www.rfc-editor.org/info/rfc9846/"><cite>The Transport Layer Security (TLS) Protocol Version 1.3</cite></a>. July 2026. Proposed Standard. URL: <a href="https://www.rfc-editor.org/info/rfc9846/">https://www.rfc-editor.org/info/rfc9846/</a>
    <dt id="biblio-streams">[STREAMS]
    <dd>Adam Rice; et al. <a href="https://streams.spec.whatwg.org/"><cite>Streams Standard</cite></a>. Living Standard. URL: <a href="https://streams.spec.whatwg.org/">https://streams.spec.whatwg.org/</a>
    <dt id="biblio-url">[URL]
@@ -5840,8 +5840,6 @@ and has been adapted for use in this specification.</p>
    <dd>Marten Seemann; 奥一穂. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset"><cite>QUIC Stream Resets with Partial Delivery</cite></a>. Internet-Draft. URL: <a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset">https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset</a>
    <dt id="biblio-rfc7301">[RFC7301]
    <dd>S. Friedl; et al. <a href="https://www.rfc-editor.org/info/rfc7301/"><cite>Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension</cite></a>. July 2014. Proposed Standard. URL: <a href="https://www.rfc-editor.org/info/rfc7301/">https://www.rfc-editor.org/info/rfc7301/</a>
-   <dt id="biblio-rfc8446">[RFC8446]
-   <dd>E. Rescorla. <a href="https://www.rfc-editor.org/info/rfc8446/"><cite>The Transport Layer Security (TLS) Protocol Version 1.3</cite></a>. August 2018. Proposed Standard. URL: <a href="https://www.rfc-editor.org/info/rfc8446/">https://www.rfc-editor.org/info/rfc8446/</a>
    <dt id="biblio-rfc9308">[RFC9308]
    <dd>M. Kühlewind; B. Trammell. <a href="https://www.rfc-editor.org/info/rfc9308/"><cite>Applicability of the QUIC Transport Protocol</cite></a>. September 2022. Informational. URL: <a href="https://www.rfc-editor.org/info/rfc9308/">https://www.rfc-editor.org/info/rfc9308/</a>
    <dt id="biblio-unsanctioned-tracking">[UNSANCTIONED-TRACKING]
