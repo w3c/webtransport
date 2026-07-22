@@ -1324,7 +1324,7 @@ the application will receive the number of streams it anticipates.
 <div algorithm="exportKeyingMaterial(label, context, outputLength)">
 
 : <dfn for="WebTransport" method>exportKeyingMaterial(BufferSource |label|, BufferSource |context|, unsigned long |outputLength|)</dfn>
-:: Exports keying material from a [TLS Keying Material Exporter](https://www.rfc-editor.org/rfc/rfc8446#section-7.3)
+:: Exports keying material from a [TLS Keying Material Exporter](https://www.rfc-editor.org/rfc/rfc9846#section-7.3)
    for the TLS session uniquely associated with this {{WebTransport}}'s [=underlying connection=].
    When called, the user agent MUST run these steps:
 
@@ -1729,7 +1729,7 @@ period MUST NOT exceed two weeks.  The user agent MAY impose additional
 The exact list of <dfn>allowed public key algorithms</dfn> used in the Subject
 Public Key Info field (and, as a consequence, in the TLS CertificateVerify
 message) is [=implementation-defined=]; however, it MUST include ECDSA with the
-secp256r1 (NIST P-256) named group ([[!RFC3279]], Section 2.3.5; [[!RFC8422]])
+secp256r1 (NIST P-256) named group ([[!RFC3279]], Section 2.3.5; [[!RFC9846]])
 to provide an interoperable default.  It MUST NOT contain RSA keys
 ([[!RFC3279]], Section 2.3.1).
 
@@ -3141,7 +3141,7 @@ The fact that communication is taking place cannot be hidden from adversaries
 that can observe the network, so this has to be regarded as public information.
 
 All of the transport protocols described in this document use either TLS
-[[RFC8446]] or a semantically equivalent protocol, thus providing all of the
+[[RFC9846]] or a semantically equivalent protocol, thus providing all of the
 security properties of TLS, including confidentiality and integrity of the
 traffic. WebTransport over HTTP uses the same certificate verification
 mechanism as outbound HTTP requests, thus relying on the same public key
