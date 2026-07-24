@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version d113b2e81, updated Tue Jun 9 14:57:55 2026 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="c47f1f7176fff467d75b5dc7a9b1fb3af6148a22" name="revision">
+  <meta content="61b5cdae67c7442911cdb29c65bbff61301f46ca" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -773,7 +773,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
 </p>
    <h1 class="no-ref p-name" id="title">WebTransport</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#ED">Editor’s Draft</a>,
-    <time class="dt-updated" datetime="2026-07-23">23 July 2026</time></p>
+    <time class="dt-updated" datetime="2026-07-24">24 July 2026</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -2094,7 +2094,7 @@ agent MUST run the following steps:
       <p>Let <var>pullDatagramsAlgorithm</var> be an action that runs <a data-link-type="dfn" href="#pulldatagrams" id="ref-for-pulldatagrams①">pullDatagrams</a> with <var>transport</var>.</p>
       <p class="note" role="note"><span class="marker">Note:</span> Using 64 kibibytes buffers with datagrams is recommended because the effective
   maximum WebTransport datagram frame size has an upper bound of the QUIC maximum datagram frame size
-  which is recommended to be 64 kibibytes (See <a data-link-type="biblio" href="#biblio-quic-datagram" title="An Unreliable Datagram Extension to QUIC">[QUIC-DATAGRAM]</a> <a href="https://datatracker.ietf.org/doc/html/rfc9221#section-3">Section 3</a>).
+  which is recommended to be 64 kibibytes (See <a data-link-type="biblio" href="#biblio-quic-datagram" title="An Unreliable Datagram Extension to QUIC">[QUIC-DATAGRAM]</a> <a href="https://www.rfc-editor.org/info/rfc9221/#section-3">Section 3</a>).
   This will ensure the stream is not errored due to a datagram being larger than the buffer.</p>
      <li data-md>
       <p>If <var>datagramsReadableType</var> is <code>"bytes"</code>, <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-set-up-with-byte-reading-support" id="ref-for-readablestream-set-up-with-byte-reading-support">set up with byte reading support</a>
@@ -2668,7 +2668,7 @@ the application will receive the number of streams it anticipates.</p>
          <li data-md>
           <p>Let <var>streamId</var> be a new stream ID that is valid and unique for
  <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-session-slot" id="ref-for-dom-webtransport-session-slot⑦">[[Session]]</a></code>, as defined in <a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a>
- <a href="https://www.rfc-editor.org/rfc/rfc9000#section-19.11">Section 19.11</a>. If one is not
+ <a href="https://www.rfc-editor.org/info/rfc9000/#section-19.11">Section 19.11</a>. If one is not
  immediately available due to exhaustion, either wait for it to become
  available if <var>waitUntilAvailable</var> is true, or if <var>waitUntilAvailable</var> is false,
  abort these steps after <a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①⑤">queueing a network task</a> with <var>transport</var> to <a data-link-type="dfn" data-refhint-key="c597a1f1" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑥">reject</a> <var>p</var>
@@ -2733,7 +2733,7 @@ the application will receive the number of streams it anticipates.</p>
          <li data-md>
           <p>Let <var>streamId</var> be a new stream ID that is valid and unique for
  <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-session-slot" id="ref-for-dom-webtransport-session-slot⑨">[[Session]]</a></code>, as defined in <a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a>
- <a href="https://www.rfc-editor.org/rfc/rfc9000#section-19.11">Section 19.11</a>. If one is not
+ <a href="https://www.rfc-editor.org/info/rfc9000/#section-19.11">Section 19.11</a>. If one is not
  immediately available due to exhaustion, either wait for it to become
  available if <var>waitUntilAvailable</var> is true, or if <var>waitUntilAvailable</var> is false,
  abort these steps after <a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①⑧">queueing a network task</a> with <var>transport</var> to <a data-link-type="dfn" data-refhint-key="c597a1f1" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects②⓪">reject</a> <var>p</var>
@@ -4573,7 +4573,7 @@ converted to an httpErrorCode, and vice versa, as specified in <a data-link-type
       <td>(await wt.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-closed" id="ref-for-dom-webtransport-closed⑤">closed</a></code>) rejects, and
           <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-error" id="ref-for-readablestream-error⑧">errors</a> open streams
    </table>
-   <p class="note" role="note"><span class="marker">Note:</span> As discussed in <a href="https://www.rfc-editor.org/rfc/rfc9000#section-3.2">Section 3.2</a> of <a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a>,
+   <p class="note" role="note"><span class="marker">Note:</span> As discussed in <a href="https://www.rfc-editor.org/info/rfc9000/#section-3.2">Section 3.2</a> of <a data-link-type="biblio" href="#biblio-quic" title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</a>,
 receipt of a RESET_STREAM frame or RESET_STREAM_AT frame (<a data-link-type="biblio" href="#biblio-reliable-reset" title="QUIC Stream Resets with Partial Delivery">[RELIABLE-RESET]</a>)
 is not always indicated to the application.
 Receipt of the reset can be signaled immediately,
@@ -5798,9 +5798,9 @@ and has been adapted for use in this specification.</p>
    <dt id="biblio-infra">[INFRA]
    <dd>Anne van Kesteren; Domenic Denicola. <a href="https://infra.spec.whatwg.org/"><cite>Infra Standard</cite></a>. Living Standard. URL: <a href="https://infra.spec.whatwg.org/">https://infra.spec.whatwg.org/</a>
    <dt id="biblio-quic">[QUIC]
-   <dd>Jana Iyengar; Martin Thomson. <a href="https://www.rfc-editor.org/rfc/rfc9000"><cite>QUIC: A UDP-Based Multiplexed and Secure Transport</cite></a>. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>
+   <dd>Jana Iyengar; Martin Thomson. <a href="https://www.rfc-editor.org/info/rfc9000/"><cite>QUIC: A UDP-Based Multiplexed and Secure Transport</cite></a>. Proposed Standard. URL: <a href="https://www.rfc-editor.org/info/rfc9000/">https://www.rfc-editor.org/info/rfc9000/</a>
    <dt id="biblio-quic-datagram">[QUIC-DATAGRAM]
-   <dd>Tommy Pauly; Eric Kinnear; David Schinazi. <a href="https://www.rfc-editor.org/rfc/rfc9221"><cite>An Unreliable Datagram Extension to QUIC</cite></a>. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc9221">https://www.rfc-editor.org/rfc/rfc9221</a>
+   <dd>Tommy Pauly; Eric Kinnear; David Schinazi. <a href="https://www.rfc-editor.org/info/rfc9221/"><cite>An Unreliable Datagram Extension to QUIC</cite></a>. Proposed Standard. URL: <a href="https://www.rfc-editor.org/info/rfc9221/">https://www.rfc-editor.org/info/rfc9221/</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
    <dt id="biblio-rfc3279">[RFC3279]
