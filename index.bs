@@ -755,7 +755,8 @@ interface WebTransport {
   constructor(USVString url, optional WebTransportOptions options = {});
 
   Promise&lt;WebTransportConnectionStats&gt; getStats();
-  [NewObject] Promise&lt;Uint8Array&gt; exportKeyingMaterial(BufferSource label, BufferSource context, unsigned long outputLength);
+  [NewObject] Promise&lt;Uint8Array&gt; exportKeyingMaterial(
+      BufferSource label, BufferSource context, unsigned long outputLength);
   readonly attribute Promise&lt;undefined&gt; ready;
   readonly attribute WebTransportReliabilityMode reliability;
   readonly attribute WebTransportCongestionControl congestionControl;
