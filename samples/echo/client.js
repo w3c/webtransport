@@ -33,7 +33,7 @@ async function connect() {
   currentTransport = transport;
   streamNumber = 1;
   try {
-    currentTransportDatagramWriter = transport.datagrams.writable.getWriter();
+    currentTransportDatagramWriter = transport.datagrams.createWritable().getWriter();
     addToEventLog('Datagram writer ready.');
   } catch (e) {
     addToEventLog('Sending datagrams not supported: ' + e, 'error');
