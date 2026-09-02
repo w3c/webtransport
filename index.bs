@@ -671,14 +671,26 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. Set [=this=].{{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxBufferedDatagrams</dfn>
-:: The getter steps are:
+:: The length of the incoming datagrams queue in number of datagrams, beyond which
+   datagrams are dropped from the head of the queue.
+
+   Note: This differs from [=ReadableStream/set up/highWaterMark=] in that this queue,
+   when full, causes datagrams to drop rather than back pressure being exerted.
+
+   The getter steps are:
      1. Return [=this=].{{[[IncomingMaxBufferedDatagrams]]}}.
 :: The setter steps, given |value|, are:
      1. If |value| is < `1`, set |value| to `1`.
      1. Set [=this=].{{[[IncomingMaxBufferedDatagrams]]}} to |value|.
 
 : <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingMaxBufferedDatagrams</dfn>
-:: The getter steps are:
+:: The length of the datagrams send queue in the underlying sink.
+
+   Note: This differs from [=WritableStream/set up/highWaterMark=] in that this queue
+   resides in the underlying sink and can thus be optimized to be in another process for
+   max throughput.
+
+   The getter steps are:
      1. Return [=this=].{{[[OutgoingMaxBufferedDatagrams]]}}.
 :: The setter steps, given |value|, are:
      1. If |value| is < `1`, set |value| to `1`.
