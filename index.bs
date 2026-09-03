@@ -2726,7 +2726,7 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
    Note: {{atomicWrite}} can still reject after sending some data. Though it
    provides atomicity with respect to flow control, other network errors could
    cause the write to fail.
-   Nor does {{atomicWrite}} prevent data from being split between packets
+   Furthermore, {{atomicWrite}} does not prevent data from being split between packets
    or being interleaved with other data.
 
    Note: Atomic writes can still block if queued behind non-atomic writes. If
