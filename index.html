@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version ac92c2f0d, updated Fri Aug 21 16:01:29 2026 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="681b52023b345eb3ef5ea77437d986bff0deb95c" name="revision">
+  <meta content="8f6a709613d6c84f1a1f71653e368d698538cba5" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -773,7 +773,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
 </p>
    <h1 class="no-ref p-name" id="title">WebTransport</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#ED">Editor’s Draft</a>,
-    <time class="dt-updated" datetime="2026-09-02">2 September 2026</time></p>
+    <time class="dt-updated" datetime="2026-09-08">8 September 2026</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -4308,15 +4308,15 @@ adds two methods.</p>
  transactional applications sensitive to <a data-link-type="dfn" href="#stream-signal-flow-control" id="ref-for-stream-signal-flow-control④">flow control</a> deadlocks (<a data-link-type="biblio" href="#biblio-rfc9308" title="Applicability of the QUIC Transport Protocol">[RFC9308]</a>
  <a href="https://datatracker.ietf.org/doc/html/rfc9308#section-4.4">Section 4.4</a>).</p>
       <p class="note" role="note"><span class="marker">Note:</span> <code class="idl"><a data-link-type="idl" href="#dom-webtransportwriter-atomicwrite" id="ref-for-dom-webtransportwriter-atomicwrite④">atomicWrite</a></code> can still reject after sending some data. Though it
- provides atomicity with respect to flow control, other errors may occur.
- <code class="idl"><a data-link-type="idl" href="#dom-webtransportwriter-atomicwrite" id="ref-for-dom-webtransportwriter-atomicwrite⑤">atomicWrite</a></code> does not prevent data from being split between packets
- or being interleaved with other data. Only the sender learns if
- <code class="idl"><a data-link-type="idl" href="#dom-webtransportwriter-atomicwrite" id="ref-for-dom-webtransportwriter-atomicwrite⑥">atomicWrite</a></code> fails due to lack of available flow control credit.</p>
+ provides atomicity with respect to flow control, other network errors could
+ cause the write to fail.
+ Furthermore, <code class="idl"><a data-link-type="idl" href="#dom-webtransportwriter-atomicwrite" id="ref-for-dom-webtransportwriter-atomicwrite⑤">atomicWrite</a></code> does not prevent data from being split between packets
+ or being interleaved with other data.</p>
       <p class="note" role="note"><span class="marker">Note:</span> Atomic writes can still block if queued behind non-atomic writes. If
  the atomic write is rejected, everything queued behind it at that moment
  will be rejected as well. Any non-atomic writes rejected in this way will
  <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-error" id="ref-for-writablestream-error⑥">error</a> the stream. Applications are therefore encouraged to
- always await atomic writes.</p>
+ always await an atomic write before attempting subsequent writes to the same stream.</p>
       <p>When called, the user agent MUST run these steps:</p>
       <ol>
        <li data-md>
@@ -6584,7 +6584,7 @@ let dfnPanelData = {
 "dom-webtransportsendstreamstats-bytesacknowledged": {"dfnID":"dom-webtransportsendstreamstats-bytesacknowledged","dfnText":"bytesAcknowledged","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstreamstats-bytesacknowledged"}],"title":"7.6. WebTransportSendStreamStats Dictionary"}],"url":"#dom-webtransportsendstreamstats-bytesacknowledged"},
 "dom-webtransportsendstreamstats-bytessent": {"dfnID":"dom-webtransportsendstreamstats-bytessent","dfnText":"bytesSent","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstreamstats-bytessent"},{"id":"ref-for-dom-webtransportsendstreamstats-bytessent\u2460"},{"id":"ref-for-dom-webtransportsendstreamstats-bytessent\u2461"}],"title":"7.6. WebTransportSendStreamStats Dictionary"}],"url":"#dom-webtransportsendstreamstats-bytessent"},
 "dom-webtransportsendstreamstats-byteswritten": {"dfnID":"dom-webtransportsendstreamstats-byteswritten","dfnText":"bytesWritten","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportsendstreamstats-byteswritten"},{"id":"ref-for-dom-webtransportsendstreamstats-byteswritten\u2460"}],"title":"7.6. WebTransportSendStreamStats Dictionary"}],"url":"#dom-webtransportsendstreamstats-byteswritten"},
-"dom-webtransportwriter-atomicwrite": {"dfnID":"dom-webtransportwriter-atomicwrite","dfnText":"atomicWrite(chunk)","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportwriter-atomicwrite"}],"title":"3.2. WebTransport stream"},{"refs":[{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2460"}],"title":"7.3. Internal Slots"},{"refs":[{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2461"}],"title":"11. WebTransportWriter Interface"},{"refs":[{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2462"},{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2463"},{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2464"},{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2465"}],"title":"11.1. Methods"}],"url":"#dom-webtransportwriter-atomicwrite"},
+"dom-webtransportwriter-atomicwrite": {"dfnID":"dom-webtransportwriter-atomicwrite","dfnText":"atomicWrite(chunk)","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportwriter-atomicwrite"}],"title":"3.2. WebTransport stream"},{"refs":[{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2460"}],"title":"7.3. Internal Slots"},{"refs":[{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2461"}],"title":"11. WebTransportWriter Interface"},{"refs":[{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2462"},{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2463"},{"id":"ref-for-dom-webtransportwriter-atomicwrite\u2464"}],"title":"11.1. Methods"}],"url":"#dom-webtransportwriter-atomicwrite"},
 "dom-webtransportwriter-atomicwrite-chunk-chunk": {"dfnID":"dom-webtransportwriter-atomicwrite-chunk-chunk","dfnText":"chunk","external":false,"refSections":[],"url":"#dom-webtransportwriter-atomicwrite-chunk-chunk"},
 "dom-webtransportwriter-commit": {"dfnID":"dom-webtransportwriter-commit","dfnText":"commit()","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-webtransportwriter-commit"}],"title":"11. WebTransportWriter Interface"},{"refs":[{"id":"ref-for-dom-webtransportwriter-commit\u2460"},{"id":"ref-for-dom-webtransportwriter-commit\u2461"}],"title":"11.1. Methods"}],"url":"#dom-webtransportwriter-commit"},
 "e2b69bfa": {"dfnID":"e2b69bfa","dfnText":"highWaterMark (for ReadableStream/set up)","external":true,"refSections":[{"refs":[{"id":"ref-for-readablestream-set-up-highwatermark"}],"title":"5.3. Attributes"},{"refs":[{"id":"ref-for-readablestream-set-up-highwatermark\u2460"},{"id":"ref-for-readablestream-set-up-highwatermark\u2461"},{"id":"ref-for-readablestream-set-up-highwatermark\u2462"}],"title":"6.2. Constructor"}],"url":"https://streams.spec.whatwg.org/#readablestream-set-up-highwatermark"},
