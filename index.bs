@@ -349,7 +349,7 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
  <tbody>
   <tr>
    <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
-   <td class="non-normative">A queue of tuples of an outgoing datagram, a timestamp and a promise
+   <td class="non-normative">A queue of [=tuples=] of an outgoing datagram, a timestamp and a promise
    which is resolved when the datagram is sent or discarded.
   </tr>
   <tr>
@@ -391,6 +391,7 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
 
 ## Attributes ##  {#datagram-writable-attributes}
 
+<div algorithm>
 : <dfn for="WebTransportDatagramsWritable" attribute>sendGroup</dfn>
 :: The getter steps are:
      1. Return [=this=]'s {{WebTransportDatagramsWritable/[[SendGroup]]}}.
@@ -401,11 +402,16 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
         an {{InvalidStateError}}.
      1. Set [=this=].{{WebTransportDatagramsWritable/[[SendGroup]]}} to |value|.
 
+</div>
+
+<div algorithm>
 : <dfn for="WebTransportDatagramsWritable" attribute>sendOrder</dfn>
 :: The getter steps are:
      1. Return [=this=]'s {{WebTransportDatagramsWritable/[[SendOrder]]}}.
 :: The setter steps, given |value|, are:
      1. Set [=this=].{{WebTransportDatagramsWritable/[[SendOrder]]}} to |value|.
+
+</div>
 
 ## Procedures ## {#datagram-writable-procedures}
 
@@ -421,7 +427,7 @@ The <dfn>writeDatagrams</dfn> algorithm is given a |transport| and |writable| as
    [=a promise resolved with=] undefined.
 1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of bytes which |data| represents.
-1. Let |chunk| be a tuple of |bytes|, |timestamp| and |promise|.
+1. Let |chunk| be (|bytes|, |timestamp|, |promise|).
 1. Enqueue |chunk| to |writable|.{{[[OutgoingDatagramsQueue]]}}.
 1. If the length of |writable|.{{[[OutgoingDatagramsQueue]]}} is less than
    |datagrams|.{{[[OutgoingMaxBufferedDatagrams]]}}, then [=resolve=] |promise| with undefined.
@@ -535,7 +541,7 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsQueue]]`</dfn>
-   <td class="non-normative">A queue of pairs of an incoming datagram and a timestamp.
+   <td class="non-normative">A queue of [=tuples=] of an incoming datagram and a timestamp.
   </tr>
   <tr>
    <td><dfn>`[[IncomingDatagramsPullPromise]]`</dfn>
@@ -650,6 +656,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 :: The getter steps are:
      1. Return [=this=].{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 
+<div algorithm>
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxAge</dfn>
 :: The getter steps are:
      1. Return [=this=].{{[[IncomingDatagramsExpirationDuration]]}}.
@@ -658,6 +665,8 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. If |value| is `0`, set |value| to null.
      1. Set [=this=].{{[[IncomingDatagramsExpirationDuration]]}} to |value|.
 
+</div>
+<div algorithm="maxDatagramSize">
 : <dfn for="WebTransportDatagramDuplexStream" attribute>maxDatagramSize</dfn>
 :: The maximum size data that may be passed to a {{WebTransportDatagramsWritable}}.
    The getter steps are to return [=this=].{{[[OutgoingMaxDatagramSize]]}}.
@@ -670,6 +679,8 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. If |value| is `0`, set |value| to null.
      1. Set [=this=].{{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
 
+</div>
+<div algorithm>
 : <dfn for="WebTransportDatagramDuplexStream" attribute>incomingMaxBufferedDatagrams</dfn>
 :: The length of the incoming datagrams queue in number of datagrams, beyond which
    datagrams are dropped from the head of the queue.
@@ -683,6 +694,8 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. If |value| is < `1`, set |value| to `1`.
      1. Set [=this=].{{[[IncomingMaxBufferedDatagrams]]}} to |value|.
 
+</div>
+<div algorithm>
 : <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingMaxBufferedDatagrams</dfn>
 :: The length of the datagrams send queue in the underlying sink.
 
@@ -696,8 +709,11 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. If |value| is < `1`, set |value| to `1`.
      1. Set [=this=].{{[[OutgoingMaxBufferedDatagrams]]}} to |value|.
 
+</div>
+
 ## Procedures ## {#datagram-duplex-stream-procedures}
 
+<div algorithm>
 To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
 1. Let |datagrams| be |transport|.{{[[Datagrams]]}}.
 1. Assert: |datagrams|.{{[[IncomingDatagramsPullPromise]]}} is null.
@@ -705,7 +721,8 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 1. If |queue| is empty, then:
   1. Set |datagrams|.{{[[IncomingDatagramsPullPromise]]}} to a new promise.
   1. Return |datagrams|.{{[[IncomingDatagramsPullPromise]]}}.
-1. Let |datagram| and |timestamp| be the result of [=dequeuing=] |queue|.
+1. Let |incoming| be the result of [=dequeuing=] |queue|.
+1. Let |datagram| be |incoming|[0].
 1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[ReadableType]]}} is `"bytes"`, then:
   1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
     [=ReadableStream/current BYOB request view=] is not null, then:
@@ -725,6 +742,9 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
      |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
 1. Return [=a promise resolved with=] undefined.
 
+</div>
+
+<div algorithm>
 To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run these steps:
 1. Let |timestamp| be a timestamp representing now.
 1. Let |queue| be |datagrams|.{{[[IncomingDatagramsQueue]]}}.
@@ -734,7 +754,7 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
 1. While there are [=session/receive a datagram|available incoming datagrams=] on |session|:
   1. Let |datagram| be the result of [=session/receiving a datagram=] with |session|.
   1. Let |timestamp| be a timestamp representing now.
-  1. Let |chunk| be a pair of |datagram| and |timestamp|.
+  1. Let |chunk| be a (|datagram|, |timestamp|).
   1. [=queue/Enqueue=] |chunk| to |queue|.
 1. Let |toBeRemoved| be the length of |queue| minus |datagrams|.{{[[IncomingMaxBufferedDatagrams]]}}.
 1. If |toBeRemoved| is positive, repeat [=queue/dequeuing=] |queue| |toBeRemoved|
@@ -751,6 +771,8 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
     1. Let |chunk| be a new {{Uint8Array}} object representing |bytes|.
     1. [=ReadableStream/Enqueue=] |chunk| to |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}.
     1. [=Resolve=] |promise| with undefined.
+
+</div>
 
 The user agent SHOULD run [=receiveDatagrams=] for any {{WebTransport}} object whose
 {{[[State]]}} is `"connected"` as soon as reasonably possible whenever the algorithm can make
@@ -1563,6 +1585,7 @@ run these steps:
 
 ## Context cleanup steps ##  {#web-transport-context-cleanup-steps}
 
+<div algorithm>
 This specification defines <dfn export>context cleanup steps</dfn> as the following steps, given
 {{WebTransport}} |transport|:
 
@@ -1579,6 +1602,8 @@ This specification defines <dfn export>context cleanup steps</dfn> as the follow
   Issue: This needs to be done in workers too. See
   <a href="https://www.github.com/w3c/webtransport/issues/127">#127</a> and
   <a href="https://www.github.com/whatwg/html/issues/6831">whatwg/html#6731</a>.
+
+</div>
 
 ## Garbage Collection ## {#web-transport-gc}
 
@@ -1993,6 +2018,7 @@ The {{WebTransportSendStream}}'s [=transfer steps=] and
 
 ## Attributes ##  {#send-stream-attributes}
 
+<div algorithm>
 : <dfn for="WebTransportSendStream" attribute>sendGroup</dfn>
 :: The getter steps are:
      1. Return [=this=]'s {{WebTransportSendStream/[[SendGroup]]}}.
@@ -2003,11 +2029,15 @@ The {{WebTransportSendStream}}'s [=transfer steps=] and
         an {{InvalidStateError}}.
      1. Set [=this=].{{WebTransportSendStream/[[SendGroup]]}} to |value|.
 
+</div>
+<div algorithm>
 : <dfn for="WebTransportSendStream" attribute>sendOrder</dfn>
 :: The getter steps are:
      1. Return [=this=]'s {{WebTransportSendStream/[[SendOrder]]}}.
 :: The setter steps, given |value|, are:
      1. Set [=this=].{{WebTransportSendStream/[[SendOrder]]}} to |value|.
+
+</div>
 
 ## Methods ##  {#send-stream-methods}
 
@@ -2852,9 +2882,9 @@ The <dfn constructor for="WebTransportError"
 lt="WebTransportError(message, options)">new WebTransportError(|message|, |options|)</dfn>
 constructor steps are:
 
-1. Set |this|'s [=DOMException/name=] to `"WebTransportError"`.
-1. Set |this|'s [=DOMException/message=] to |message|.
-1. Set |this|'s internal slots as follows:
+1. Set [=this=]'s [=DOMException/name=] to `"WebTransportError"`.
+1. Set [=this=]'s [=DOMException/message=] to |message|.
+1. Set [=this=]'s internal slots as follows:
     : {{WebTransportError/[[Source]]}}
     :: |options|.{{WebTransportErrorOptions/source}}
     : {{WebTransportError/[[StreamErrorCode]]}}
@@ -2875,17 +2905,22 @@ constructor steps are:
 ## Serialization ## {#web-transport-error-serialization}
 
 {{WebTransportError}} objects are [=serializable objects=].
+<div algorithm="serialization">
 Their [=serialization steps=], given |value| and |serialized|, are:
 
 1. Run the {{DOMException}} [=serialization steps=] given |value| and |serialized|.
 1. Set |serialized|.`[[Source]]` to |value|.{{WebTransportError/[[Source]]}}.
 1. Set |serialized|.`[[StreamErrorCode]]` to |value|.{{WebTransportError/[[StreamErrorCode]]}}.
 
+</div>
+<div algorithm="deserialization">
 Their [=deserialization steps=], given |serialized| and |value|, are:
 
 1. Run the {{DOMException}} [=deserialization steps=] given |serialized| and |value|.
 1. Set |value|.{{WebTransportError/[[Source]]}} to |serialized|.`[[Source]]`.
 1. Set |value|.{{WebTransportError/[[StreamErrorCode]]}} |serialized|.`[[StreamErrorCode]]`.
+
+</div>
 
 # Protocol Mappings # {#protocol-mapping}
 
