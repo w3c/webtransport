@@ -2736,16 +2736,16 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
    [Section 4.4](https://datatracker.ietf.org/doc/html/rfc9308#section-4.4)).
 
    Note: {{atomicWrite}} can still reject after sending some data. Though it
-   provides atomicity with respect to flow control, other errors may occur.
-   {{atomicWrite}} does not prevent data from being split between packets
-   or being interleaved with other data. Only the sender learns if
-   {{atomicWrite}} fails due to lack of available flow control credit.
+   provides atomicity with respect to flow control, other network errors could
+   cause the write to fail.
+   Furthermore, {{atomicWrite}} does not prevent data from being split between packets
+   or being interleaved with other data.
 
    Note: Atomic writes can still block if queued behind non-atomic writes. If
    the atomic write is rejected, everything queued behind it at that moment
    will be rejected as well. Any non-atomic writes rejected in this way will
    [=WritableStream/error=] the stream. Applications are therefore encouraged to
-   always await atomic writes.
+   always await an atomic write before attempting subsequent writes to the same stream.
 
    When called, the user agent MUST run these steps:
    1. Let |stream| be
