@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version ac92c2f0d, updated Fri Aug 21 16:01:29 2026 -0700" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="258cbc3dfe578d9eb915b4109bf5e4f905ae13ba" name="revision">
+  <meta content="a41c53d271b76df97f74c3a959436afead1a76b8" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -1233,7 +1233,7 @@ features to <a data-link-type="dfn" href="#session-send-a-datagram" id="ref-for-
      <tr>
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramsWritable" data-dfn-type="attribute" data-export id="dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot"><code>[[OutgoingDatagramsQueue]]</code></dfn>
    
-      <td class="non-normative">A queue of tuples of an outgoing datagram, a timestamp and a promise
+      <td class="non-normative">A queue of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#tuple" id="ref-for-tuple">tuples</a> of an outgoing datagram, a timestamp and a promise
    which is resolved when the datagram is sent or discarded.
   
      <tr>
@@ -1287,39 +1287,45 @@ features to <a data-link-type="dfn" href="#session-send-a-datagram" id="ref-for-
     </ol>
    </div>
    <h3 class="heading settled" data-level="4.2" id="datagram-writable-attributes"><span class="secno">4.2. </span><span class="content">Attributes</span><a class="self-link" href="#datagram-writable-attributes"></a></h3>
-   <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramsWritable" data-dfn-type="attribute" data-export id="dom-webtransportdatagramswritable-sendgroup"><code>sendGroup</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransportsendgroup" id="ref-for-webtransportsendgroup②">WebTransportSendGroup</a>, nullable</span>
-    <dd data-md>
-     <p>The getter steps are:</p>
-     <ol>
-      <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-sendgroup-slot" id="ref-for-dom-webtransportdatagramswritable-sendgroup-slot①">[[SendGroup]]</a></code>.</p>
-     </ol>
-    <dd data-md>
-     <p>The setter steps, given <var>value</var>, are:</p>
-     <ol>
-      <li data-md>
-       <p>If <var>value</var> is non-null, and
+   <div class="algorithm" data-algorithm="sendGroup" data-algorithm-for="WebTransportDatagramsWritable">
+    <dl>
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramsWritable" data-dfn-type="attribute" data-export id="dom-webtransportdatagramswritable-sendgroup"><code>sendGroup</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransportsendgroup" id="ref-for-webtransportsendgroup②">WebTransportSendGroup</a>, nullable</span>
+     <dd data-md>
+      <p>The getter steps are:</p>
+      <ol>
+       <li data-md>
+        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-sendgroup-slot" id="ref-for-dom-webtransportdatagramswritable-sendgroup-slot①">[[SendGroup]]</a></code>.</p>
+      </ol>
+     <dd data-md>
+      <p>The setter steps, given <var>value</var>, are:</p>
+      <ol>
+       <li data-md>
+        <p>If <var>value</var> is non-null, and
   <var>value</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendgroup-transport-slot" id="ref-for-dom-webtransportsendgroup-transport-slot">[[Transport]]</a></code> is not
   <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-transport-slot" id="ref-for-dom-webtransportdatagramswritable-transport-slot①">[[Transport]]</a></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-throw" id="ref-for-dfn-throw">throw</a>
   an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror">InvalidStateError</a></code>.</p>
-      <li data-md>
-       <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-sendgroup-slot" id="ref-for-dom-webtransportdatagramswritable-sendgroup-slot②">[[SendGroup]]</a></code> to <var>value</var>.</p>
-     </ol>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramsWritable" data-dfn-type="attribute" data-export id="dom-webtransportdatagramswritable-sendorder"><code>sendOrder</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-long-long" id="ref-for-idl-long-long①">long long</a></span>
-    <dd data-md>
-     <p>The getter steps are:</p>
-     <ol>
-      <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this③">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-sendorder-slot" id="ref-for-dom-webtransportdatagramswritable-sendorder-slot①">[[SendOrder]]</a></code>.</p>
-     </ol>
-    <dd data-md>
-     <p>The setter steps, given <var>value</var>, are:</p>
-     <ol>
-      <li data-md>
-       <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-sendorder-slot" id="ref-for-dom-webtransportdatagramswritable-sendorder-slot②">[[SendOrder]]</a></code> to <var>value</var>.</p>
-     </ol>
-   </dl>
+       <li data-md>
+        <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-sendgroup-slot" id="ref-for-dom-webtransportdatagramswritable-sendgroup-slot②">[[SendGroup]]</a></code> to <var>value</var>.</p>
+      </ol>
+    </dl>
+   </div>
+   <div class="algorithm" data-algorithm="sendOrder" data-algorithm-for="WebTransportDatagramsWritable">
+    <dl>
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramsWritable" data-dfn-type="attribute" data-export id="dom-webtransportdatagramswritable-sendorder"><code>sendOrder</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-long-long" id="ref-for-idl-long-long①">long long</a></span>
+     <dd data-md>
+      <p>The getter steps are:</p>
+      <ol>
+       <li data-md>
+        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this③">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-sendorder-slot" id="ref-for-dom-webtransportdatagramswritable-sendorder-slot①">[[SendOrder]]</a></code>.</p>
+      </ol>
+     <dd data-md>
+      <p>The setter steps, given <var>value</var>, are:</p>
+      <ol>
+       <li data-md>
+        <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-sendorder-slot" id="ref-for-dom-webtransportdatagramswritable-sendorder-slot②">[[SendOrder]]</a></code> to <var>value</var>.</p>
+      </ol>
+    </dl>
+   </div>
    <h3 class="heading settled" data-level="4.3" id="datagram-writable-procedures"><span class="secno">4.3. </span><span class="content">Procedures</span><a class="self-link" href="#datagram-writable-procedures"></a></h3>
    <div class="algorithm" data-algorithm="writeDatagrams">
     <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="writedatagrams">writeDatagrams</dfn> algorithm is given a <var>transport</var> and <var>writable</var> as parameters and
@@ -1339,7 +1345,7 @@ features to <a data-link-type="dfn" href="#session-send-a-datagram" id="ref-for-
      <li data-md>
       <p>Let <var>bytes</var> be a copy of bytes which <var>data</var> represents.</p>
      <li data-md>
-      <p>Let <var>chunk</var> be a tuple of <var>bytes</var>, <var>timestamp</var> and <var>promise</var>.</p>
+      <p>Let <var>chunk</var> be (<var>bytes</var>, <var>timestamp</var>, <var>promise</var>).</p>
      <li data-md>
       <p>Enqueue <var>chunk</var> to <var>writable</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramswritable-outgoingdatagramsqueue-slot①">[[OutgoingDatagramsQueue]]</a></code>.</p>
      <li data-md>
@@ -1475,7 +1481,7 @@ all bytes queued for sending on streams and datagrams with the same
      <tr>
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot"><code>[[IncomingDatagramsQueue]]</code></dfn>
    
-      <td class="non-normative">A queue of pairs of an incoming datagram and a timestamp.
+      <td class="non-normative">A queue of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#tuple" id="ref-for-tuple①">tuples</a> of an incoming datagram and a timestamp.
   
      <tr>
       <td><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot"><code>[[IncomingDatagramsPullPromise]]</code></dfn>
@@ -1622,198 +1628,224 @@ all bytes queued for sending on streams and datagrams with the same
       <li data-md>
        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑦">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readable-slot" id="ref-for-dom-webtransportdatagramduplexstream-readable-slot①">[[Readable]]</a></code>.</p>
      </ol>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-incomingmaxage"><code>incomingMaxAge</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unrestricted-double" id="ref-for-idl-unrestricted-double④">unrestricted double</a>, nullable</span>
-    <dd data-md>
-     <p>The getter steps are:</p>
-     <ol>
-      <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑧">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot①">[[IncomingDatagramsExpirationDuration]]</a></code>.</p>
-     </ol>
-    <dd data-md>
-     <p>The setter steps, given <var>value</var>, are:</p>
-     <ol>
-      <li data-md>
-       <p>If <var>value</var> is negative or NaN, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-throw" id="ref-for-dfn-throw③">throw</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-rangeerror" id="ref-for-exceptiondef-rangeerror">RangeError</a></code>.</p>
-      <li data-md>
-       <p>If <var>value</var> is <code>0</code>, set <var>value</var> to null.</p>
-      <li data-md>
-       <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑨">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot②">[[IncomingDatagramsExpirationDuration]]</a></code> to <var>value</var>.</p>
-     </ol>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-maxdatagramsize"><code>maxDatagramSize</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑤">unsigned long</a>, readonly</span>
-    <dd data-md>
-     <p>The maximum size data that may be passed to a <code class="idl"><a data-link-type="idl" href="#webtransportdatagramswritable" id="ref-for-webtransportdatagramswritable①①">WebTransportDatagramsWritable</a></code>.
+   </dl>
+   <div class="algorithm" data-algorithm="incomingMaxAge" data-algorithm-for="WebTransportDatagramDuplexStream">
+    <dl>
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-incomingmaxage"><code>incomingMaxAge</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unrestricted-double" id="ref-for-idl-unrestricted-double④">unrestricted double</a>, nullable</span>
+     <dd data-md>
+      <p>The getter steps are:</p>
+      <ol>
+       <li data-md>
+        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑧">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot①">[[IncomingDatagramsExpirationDuration]]</a></code>.</p>
+      </ol>
+     <dd data-md>
+      <p>The setter steps, given <var>value</var>, are:</p>
+      <ol>
+       <li data-md>
+        <p>If <var>value</var> is negative or NaN, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-throw" id="ref-for-dfn-throw③">throw</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-rangeerror" id="ref-for-exceptiondef-rangeerror">RangeError</a></code>.</p>
+       <li data-md>
+        <p>If <var>value</var> is <code>0</code>, set <var>value</var> to null.</p>
+       <li data-md>
+        <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑨">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot②">[[IncomingDatagramsExpirationDuration]]</a></code> to <var>value</var>.</p>
+      </ol>
+    </dl>
+   </div>
+   <div class="algorithm" data-algorithm="maxDatagramSize">
+    <dl>
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-maxdatagramsize"><code>maxDatagramSize</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑤">unsigned long</a>, readonly</span>
+     <dd data-md>
+      <p>The maximum size data that may be passed to a <code class="idl"><a data-link-type="idl" href="#webtransportdatagramswritable" id="ref-for-webtransportdatagramswritable①①">WebTransportDatagramsWritable</a></code>.
  The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⓪">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-outgoingmaxdatagramsize-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingmaxdatagramsize-slot④">[[OutgoingMaxDatagramSize]]</a></code>.</p>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-outgoingmaxage"><code>outgoingMaxAge</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unrestricted-double" id="ref-for-idl-unrestricted-double⑤">unrestricted double</a>, nullable</span>
-    <dd data-md>
-     <p>The getter steps are:</p>
-     <ol>
-      <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①①">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-outgoingdatagramsexpirationduration-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsexpirationduration-slot②">[[OutgoingDatagramsExpirationDuration]]</a></code>.</p>
-     </ol>
-    <dd data-md>
-     <p>The setter steps, given <var>value</var>, are:</p>
-     <ol>
-      <li data-md>
-       <p>If <var>value</var> is negative or NaN, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-throw" id="ref-for-dfn-throw④">throw</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-rangeerror" id="ref-for-exceptiondef-rangeerror①">RangeError</a></code>.</p>
-      <li data-md>
-       <p>If <var>value</var> is <code>0</code>, set <var>value</var> to null.</p>
-      <li data-md>
-       <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①②">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-outgoingdatagramsexpirationduration-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsexpirationduration-slot③">[[OutgoingDatagramsExpirationDuration]]</a></code> to <var>value</var>.</p>
-     </ol>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams"><code>incomingMaxBufferedDatagrams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑥">unsigned long</a></span>
-    <dd data-md>
-     <p>The length of the incoming datagrams queue in number of datagrams, beyond which
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-outgoingmaxage"><code>outgoingMaxAge</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unrestricted-double" id="ref-for-idl-unrestricted-double⑤">unrestricted double</a>, nullable</span>
+     <dd data-md>
+      <p>The getter steps are:</p>
+      <ol>
+       <li data-md>
+        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①①">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-outgoingdatagramsexpirationduration-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsexpirationduration-slot②">[[OutgoingDatagramsExpirationDuration]]</a></code>.</p>
+      </ol>
+     <dd data-md>
+      <p>The setter steps, given <var>value</var>, are:</p>
+      <ol>
+       <li data-md>
+        <p>If <var>value</var> is negative or NaN, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-throw" id="ref-for-dfn-throw④">throw</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-rangeerror" id="ref-for-exceptiondef-rangeerror①">RangeError</a></code>.</p>
+       <li data-md>
+        <p>If <var>value</var> is <code>0</code>, set <var>value</var> to null.</p>
+       <li data-md>
+        <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①②">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-outgoingdatagramsexpirationduration-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingdatagramsexpirationduration-slot③">[[OutgoingDatagramsExpirationDuration]]</a></code> to <var>value</var>.</p>
+      </ol>
+    </dl>
+   </div>
+   <div class="algorithm" data-algorithm="incomingMaxBufferedDatagrams" data-algorithm-for="WebTransportDatagramDuplexStream">
+    <dl>
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams"><code>incomingMaxBufferedDatagrams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑥">unsigned long</a></span>
+     <dd data-md>
+      <p>The length of the incoming datagrams queue in number of datagrams, beyond which
  datagrams are dropped from the head of the queue.</p>
-     <p class="note" role="note"><span class="marker">Note:</span> This differs from <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-set-up-highwatermark" id="ref-for-readablestream-set-up-highwatermark">highWaterMark</a> in that this queue,
+      <p class="note" role="note"><span class="marker">Note:</span> This differs from <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-set-up-highwatermark" id="ref-for-readablestream-set-up-highwatermark">highWaterMark</a> in that this queue,
  when full, causes datagrams to drop rather than back pressure being exerted.</p>
-     <p>The getter steps are:</p>
-     <ol>
-      <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①③">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot①">[[IncomingMaxBufferedDatagrams]]</a></code>.</p>
-     </ol>
-    <dd data-md>
-     <p>The setter steps, given <var>value</var>, are:</p>
-     <ol>
-      <li data-md>
-       <p>If <var>value</var> is &lt; <code>1</code>, set <var>value</var> to <code>1</code>.</p>
-      <li data-md>
-       <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①④">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot②">[[IncomingMaxBufferedDatagrams]]</a></code> to <var>value</var>.</p>
-     </ol>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams"><code>outgoingMaxBufferedDatagrams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑦">unsigned long</a></span>
-    <dd data-md>
-     <p>The length of the datagrams send queue in the underlying sink.</p>
-     <p class="note" role="note"><span class="marker">Note:</span> This differs from <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-set-up-highwatermark" id="ref-for-writablestream-set-up-highwatermark">highWaterMark</a> in that this queue
+      <p>The getter steps are:</p>
+      <ol>
+       <li data-md>
+        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①③">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot①">[[IncomingMaxBufferedDatagrams]]</a></code>.</p>
+      </ol>
+     <dd data-md>
+      <p>The setter steps, given <var>value</var>, are:</p>
+      <ol>
+       <li data-md>
+        <p>If <var>value</var> is &lt; <code>1</code>, set <var>value</var> to <code>1</code>.</p>
+       <li data-md>
+        <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①④">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot②">[[IncomingMaxBufferedDatagrams]]</a></code> to <var>value</var>.</p>
+      </ol>
+    </dl>
+   </div>
+   <div class="algorithm" data-algorithm="outgoingMaxBufferedDatagrams" data-algorithm-for="WebTransportDatagramDuplexStream">
+    <dl>
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportDatagramDuplexStream" data-dfn-type="attribute" data-export id="dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams"><code>outgoingMaxBufferedDatagrams</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long" id="ref-for-idl-unsigned-long⑦">unsigned long</a></span>
+     <dd data-md>
+      <p>The length of the datagrams send queue in the underlying sink.</p>
+      <p class="note" role="note"><span class="marker">Note:</span> This differs from <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#writablestream-set-up-highwatermark" id="ref-for-writablestream-set-up-highwatermark">highWaterMark</a> in that this queue
  resides in the underlying sink and can thus be optimized to be in another process for
  max throughput.</p>
-     <p>The getter steps are:</p>
-     <ol>
-      <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑤">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams-slot②">[[OutgoingMaxBufferedDatagrams]]</a></code>.</p>
-     </ol>
-    <dd data-md>
-     <p>The setter steps, given <var>value</var>, are:</p>
-     <ol>
-      <li data-md>
-       <p>If <var>value</var> is &lt; <code>1</code>, set <var>value</var> to <code>1</code>.</p>
-      <li data-md>
-       <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑥">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams-slot③">[[OutgoingMaxBufferedDatagrams]]</a></code> to <var>value</var>.</p>
-     </ol>
-   </dl>
+      <p>The getter steps are:</p>
+      <ol>
+       <li data-md>
+        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑤">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams-slot②">[[OutgoingMaxBufferedDatagrams]]</a></code>.</p>
+      </ol>
+     <dd data-md>
+      <p>The setter steps, given <var>value</var>, are:</p>
+      <ol>
+       <li data-md>
+        <p>If <var>value</var> is &lt; <code>1</code>, set <var>value</var> to <code>1</code>.</p>
+       <li data-md>
+        <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①⑥">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams-slot" id="ref-for-dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams-slot③">[[OutgoingMaxBufferedDatagrams]]</a></code> to <var>value</var>.</p>
+      </ol>
+    </dl>
+   </div>
    <h3 class="heading settled" data-level="5.4" id="datagram-duplex-stream-procedures"><span class="secno">5.4. </span><span class="content">Procedures</span><a class="self-link" href="#datagram-duplex-stream-procedures"></a></h3>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="pulldatagrams">pullDatagrams</dfn>, given a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑧">WebTransport</a></code> object <var>transport</var>, run these steps:</p>
-   <ol>
-    <li data-md>
-     <p>Let <var>datagrams</var> be <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot③">[[Datagrams]]</a></code>.</p>
-    <li data-md>
-     <p class="assertion">Assert: <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot①">[[IncomingDatagramsPullPromise]]</a></code> is null.</p>
-    <li data-md>
-     <p>Let <var>queue</var> be <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot①">[[IncomingDatagramsQueue]]</a></code>.</p>
-    <li data-md>
-     <p>If <var>queue</var> is empty, then:</p>
-     <ol>
-      <li data-md>
-       <p>Set <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot②">[[IncomingDatagramsPullPromise]]</a></code> to a new promise.</p>
-      <li data-md>
-       <p>Return <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot③">[[IncomingDatagramsPullPromise]]</a></code>.</p>
-     </ol>
-    <li data-md>
-     <p>Let <var>datagram</var> and <var>timestamp</var> be the result of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-dequeue" id="ref-for-queue-dequeue">dequeuing</a> <var>queue</var>.</p>
-    <li data-md>
-     <p>If <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readabletype-slot" id="ref-for-dom-webtransportdatagramduplexstream-readabletype-slot①">[[ReadableType]]</a></code> is <code>"bytes"</code>, then:</p>
-     <ol>
-      <li data-md>
-       <p>If <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readable-slot" id="ref-for-dom-webtransportdatagramduplexstream-readable-slot②">[[Readable]]</a></code>’s
+   <div class="algorithm" data-algorithm="pullDatagrams">
+    
+To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="pulldatagrams">pullDatagrams</dfn>, given a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑧">WebTransport</a></code> object <var>transport</var>, run these steps:
+
+    <ol>
+     <li data-md>
+      <p>Let <var>datagrams</var> be <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot③">[[Datagrams]]</a></code>.</p>
+     <li data-md>
+      <p class="assertion">Assert: <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot①">[[IncomingDatagramsPullPromise]]</a></code> is null.</p>
+     <li data-md>
+      <p>Let <var>queue</var> be <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot①">[[IncomingDatagramsQueue]]</a></code>.</p>
+     <li data-md>
+      <p>If <var>queue</var> is empty, then:</p>
+      <ol>
+       <li data-md>
+        <p>Set <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot②">[[IncomingDatagramsPullPromise]]</a></code> to a new promise.</p>
+       <li data-md>
+        <p>Return <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot③">[[IncomingDatagramsPullPromise]]</a></code>.</p>
+      </ol>
+     <li data-md>
+      <p>Let <var>incoming</var> be the result of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-dequeue" id="ref-for-queue-dequeue">dequeuing</a> <var>queue</var>.</p>
+     <li data-md>
+      <p>Let <var>datagram</var> be <var>incoming</var>[0].</p>
+     <li data-md>
+      <p>If <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readabletype-slot" id="ref-for-dom-webtransportdatagramduplexstream-readabletype-slot①">[[ReadableType]]</a></code> is <code>"bytes"</code>, then:</p>
+      <ol>
+       <li data-md>
+        <p>If <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readable-slot" id="ref-for-dom-webtransportdatagramduplexstream-readable-slot②">[[Readable]]</a></code>’s
 <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-current-byob-request-view" id="ref-for-readablestream-current-byob-request-view">current BYOB request view</a> is not null, then:</p>
-       <ol>
-        <li data-md>
-         <p>Let <var>view</var> be <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readable-slot" id="ref-for-dom-webtransportdatagramduplexstream-readable-slot③">[[Readable]]</a></code>’s
+        <ol>
+         <li data-md>
+          <p>Let <var>view</var> be <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readable-slot" id="ref-for-dom-webtransportdatagramduplexstream-readable-slot③">[[Readable]]</a></code>’s
 <a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-current-byob-request-view" id="ref-for-readablestream-current-byob-request-view①">current BYOB request view</a>.</p>
-        <li data-md>
-         <p>If <var>view</var>’s <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#buffersource-byte-length" id="ref-for-buffersource-byte-length">byte length</a> is less than the size of <var>datagram</var>, return
+         <li data-md>
+          <p>If <var>view</var>’s <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#buffersource-byte-length" id="ref-for-buffersource-byte-length">byte length</a> is less than the size of <var>datagram</var>, return
 <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-rangeerror" id="ref-for-exceptiondef-rangeerror②">RangeError</a></code>.</p>
-        <li data-md>
-         <p>Let <var>elementSize</var> be the element size specified in <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#table-49" id="ref-for-table-49">the typed array constructors table</a> for
+         <li data-md>
+          <p>Let <var>elementSize</var> be the element size specified in <a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#table-49" id="ref-for-table-49">the typed array constructors table</a> for
 <var>view</var>.[[TypedArrayName]]. If <var>view</var> does not have a [[TypedArrayName]] internal slot
 (i.e. it is a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DataView" id="ref-for-idl-DataView">DataView</a></code>), let <var>elementSize</var> be 0.</p>
-        <li data-md>
-         <p>If <var>elementSize</var> is not 1, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with②">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror②">TypeError</a></code>.</p>
-       </ol>
-      <li data-md>
-       <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-pull-from-bytes" id="ref-for-readablestream-pull-from-bytes">Pull from bytes</a> <var>datagram</var> into
+         <li data-md>
+          <p>If <var>elementSize</var> is not 1, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with②">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror②">TypeError</a></code>.</p>
+        </ol>
+       <li data-md>
+        <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-pull-from-bytes" id="ref-for-readablestream-pull-from-bytes">Pull from bytes</a> <var>datagram</var> into
  <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readable-slot" id="ref-for-dom-webtransportdatagramduplexstream-readable-slot④">[[Readable]]</a></code>.</p>
-     </ol>
-    <li data-md>
-     <p>Otherwise:</p>
-     <ol>
-      <li data-md>
-       <p>Let <var>chunk</var> be a new <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-Uint8Array" id="ref-for-idl-Uint8Array">Uint8Array</a></code> object representing <var>datagram</var>.</p>
-      <li data-md>
-       <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-enqueue" id="ref-for-readablestream-enqueue">Enqueue</a> <var>chunk</var> to
+      </ol>
+     <li data-md>
+      <p>Otherwise:</p>
+      <ol>
+       <li data-md>
+        <p>Let <var>chunk</var> be a new <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-Uint8Array" id="ref-for-idl-Uint8Array">Uint8Array</a></code> object representing <var>datagram</var>.</p>
+       <li data-md>
+        <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-enqueue" id="ref-for-readablestream-enqueue">Enqueue</a> <var>chunk</var> to
  <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-datagrams-slot" id="ref-for-dom-webtransport-datagrams-slot④">[[Datagrams]]</a></code>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readable-slot" id="ref-for-dom-webtransportdatagramduplexstream-readable-slot⑤">[[Readable]]</a></code>.</p>
-     </ol>
-    <li data-md>
-     <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-resolved-with" id="ref-for-a-promise-resolved-with①">a promise resolved with</a> undefined.</p>
-   </ol>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="receivedatagrams">receiveDatagrams</dfn>, given a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑨">WebTransport</a></code> object <var>transport</var>, run these steps:</p>
-   <ol>
-    <li data-md>
-     <p>Let <var>timestamp</var> be a timestamp representing now.</p>
-    <li data-md>
-     <p>Let <var>queue</var> be <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot②">[[IncomingDatagramsQueue]]</a></code>.</p>
-    <li data-md>
-     <p>Let <var>duration</var> be <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot③">[[IncomingDatagramsExpirationDuration]]</a></code>.</p>
-    <li data-md>
-     <p>If <var>duration</var> is null, then set <var>duration</var> to an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined④">implementation-defined</a> value.</p>
-    <li data-md>
-     <p>Let <var>session</var> be <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-session-slot" id="ref-for-dom-webtransport-session-slot①">[[Session]]</a></code>.</p>
-    <li data-md>
-     <p>While there are <a data-link-type="dfn" href="#session-receive-a-datagram" id="ref-for-session-receive-a-datagram">available incoming datagrams</a> on <var>session</var>:</p>
-     <ol>
-      <li data-md>
-       <p>Let <var>datagram</var> be the result of <a data-link-type="dfn" href="#session-receive-a-datagram" id="ref-for-session-receive-a-datagram①">receiving a datagram</a> with <var>session</var>.</p>
-      <li data-md>
-       <p>Let <var>timestamp</var> be a timestamp representing now.</p>
-      <li data-md>
-       <p>Let <var>chunk</var> be a pair of <var>datagram</var> and <var>timestamp</var>.</p>
-      <li data-md>
-       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-enqueue" id="ref-for-queue-enqueue">Enqueue</a> <var>chunk</var> to <var>queue</var>.</p>
-     </ol>
-    <li data-md>
-     <p>Let <var>toBeRemoved</var> be the length of <var>queue</var> minus <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot③">[[IncomingMaxBufferedDatagrams]]</a></code>.</p>
-    <li data-md>
-     <p>If <var>toBeRemoved</var> is positive, repeat <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-dequeue" id="ref-for-queue-dequeue①">dequeuing</a> <var>queue</var> <var>toBeRemoved</var>
+      </ol>
+     <li data-md>
+      <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-resolved-with" id="ref-for-a-promise-resolved-with①">a promise resolved with</a> undefined.</p>
+    </ol>
+   </div>
+   <div class="algorithm" data-algorithm="receiveDatagrams">
+    
+To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="receivedatagrams">receiveDatagrams</dfn>, given a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport⑨">WebTransport</a></code> object <var>transport</var>, run these steps:
+
+    <ol>
+     <li data-md>
+      <p>Let <var>timestamp</var> be a timestamp representing now.</p>
+     <li data-md>
+      <p>Let <var>queue</var> be <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsqueue-slot②">[[IncomingDatagramsQueue]]</a></code>.</p>
+     <li data-md>
+      <p>Let <var>duration</var> be <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramsexpirationduration-slot③">[[IncomingDatagramsExpirationDuration]]</a></code>.</p>
+     <li data-md>
+      <p>If <var>duration</var> is null, then set <var>duration</var> to an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined④">implementation-defined</a> value.</p>
+     <li data-md>
+      <p>Let <var>session</var> be <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-session-slot" id="ref-for-dom-webtransport-session-slot①">[[Session]]</a></code>.</p>
+     <li data-md>
+      <p>While there are <a data-link-type="dfn" href="#session-receive-a-datagram" id="ref-for-session-receive-a-datagram">available incoming datagrams</a> on <var>session</var>:</p>
+      <ol>
+       <li data-md>
+        <p>Let <var>datagram</var> be the result of <a data-link-type="dfn" href="#session-receive-a-datagram" id="ref-for-session-receive-a-datagram①">receiving a datagram</a> with <var>session</var>.</p>
+       <li data-md>
+        <p>Let <var>timestamp</var> be a timestamp representing now.</p>
+       <li data-md>
+        <p>Let <var>chunk</var> be a (<var>datagram</var>, <var>timestamp</var>).</p>
+       <li data-md>
+        <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-enqueue" id="ref-for-queue-enqueue">Enqueue</a> <var>chunk</var> to <var>queue</var>.</p>
+      </ol>
+     <li data-md>
+      <p>Let <var>toBeRemoved</var> be the length of <var>queue</var> minus <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams-slot③">[[IncomingMaxBufferedDatagrams]]</a></code>.</p>
+     <li data-md>
+      <p>If <var>toBeRemoved</var> is positive, repeat <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-dequeue" id="ref-for-queue-dequeue①">dequeuing</a> <var>queue</var> <var>toBeRemoved</var>
  (<a href="https://tc39.github.io/ecma262/#eqn-floor">rounded down</a>) times.</p>
-    <li data-md>
-     <p>While <var>queue</var> is not empty:</p>
-     <ol>
-      <li data-md>
-       <p>Let <var>bytes</var> and <var>timestamp</var> be <var>queue</var>’s first element.</p>
-      <li data-md>
-       <p>If more than <var>duration</var> milliseconds have passed since <var>timestamp</var>, then <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-dequeue" id="ref-for-queue-dequeue②">dequeue</a> <var>queue</var>.</p>
-      <li data-md>
-       <p>Otherwise, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-break" id="ref-for-iteration-break">break</a> this loop.</p>
-     </ol>
-    <li data-md>
-     <p>If <var>queue</var> is not empty and <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot④">[[IncomingDatagramsPullPromise]]</a></code> is non-null, then:</p>
-     <ol>
-      <li data-md>
-       <p>Let <var>bytes</var> and <var>timestamp</var> be the result of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-dequeue" id="ref-for-queue-dequeue③">dequeuing</a> <var>queue</var>.</p>
-      <li data-md>
-       <p>Let <var>promise</var> be <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot⑤">[[IncomingDatagramsPullPromise]]</a></code>.</p>
-      <li data-md>
-       <p>Set <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot⑥">[[IncomingDatagramsPullPromise]]</a></code> to null.</p>
-      <li data-md>
-       <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task③">Queue a network task</a> with <var>transport</var> to run the following steps:</p>
-       <ol>
-        <li data-md>
-         <p>Let <var>chunk</var> be a new <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-Uint8Array" id="ref-for-idl-Uint8Array①">Uint8Array</a></code> object representing <var>bytes</var>.</p>
-        <li data-md>
-         <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-enqueue" id="ref-for-readablestream-enqueue①">Enqueue</a> <var>chunk</var> to <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readable-slot" id="ref-for-dom-webtransportdatagramduplexstream-readable-slot⑥">[[Readable]]</a></code>.</p>
-        <li data-md>
-         <p><a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③">Resolve</a> <var>promise</var> with undefined.</p>
-       </ol>
-     </ol>
-   </ol>
+     <li data-md>
+      <p>While <var>queue</var> is not empty:</p>
+      <ol>
+       <li data-md>
+        <p>Let <var>bytes</var> and <var>timestamp</var> be <var>queue</var>’s first element.</p>
+       <li data-md>
+        <p>If more than <var>duration</var> milliseconds have passed since <var>timestamp</var>, then <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-dequeue" id="ref-for-queue-dequeue②">dequeue</a> <var>queue</var>.</p>
+       <li data-md>
+        <p>Otherwise, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-break" id="ref-for-iteration-break">break</a> this loop.</p>
+      </ol>
+     <li data-md>
+      <p>If <var>queue</var> is not empty and <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot④">[[IncomingDatagramsPullPromise]]</a></code> is non-null, then:</p>
+      <ol>
+       <li data-md>
+        <p>Let <var>bytes</var> and <var>timestamp</var> be the result of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-dequeue" id="ref-for-queue-dequeue③">dequeuing</a> <var>queue</var>.</p>
+       <li data-md>
+        <p>Let <var>promise</var> be <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot⑤">[[IncomingDatagramsPullPromise]]</a></code>.</p>
+       <li data-md>
+        <p>Set <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot" id="ref-for-dom-webtransportdatagramduplexstream-incomingdatagramspullpromise-slot⑥">[[IncomingDatagramsPullPromise]]</a></code> to null.</p>
+       <li data-md>
+        <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task③">Queue a network task</a> with <var>transport</var> to run the following steps:</p>
+        <ol>
+         <li data-md>
+          <p>Let <var>chunk</var> be a new <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-Uint8Array" id="ref-for-idl-Uint8Array①">Uint8Array</a></code> object representing <var>bytes</var>.</p>
+         <li data-md>
+          <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-enqueue" id="ref-for-readablestream-enqueue①">Enqueue</a> <var>chunk</var> to <var>datagrams</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportdatagramduplexstream-readable-slot" id="ref-for-dom-webtransportdatagramduplexstream-readable-slot⑥">[[Readable]]</a></code>.</p>
+         <li data-md>
+          <p><a data-link-type="dfn" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③">Resolve</a> <var>promise</var> with undefined.</p>
+        </ol>
+      </ol>
+    </ol>
+   </div>
    <p>The user agent SHOULD run <a data-link-type="dfn" href="#receivedatagrams" id="ref-for-receivedatagrams">receiveDatagrams</a> for any <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport①⓪">WebTransport</a></code> object whose
 <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot⑥">[[State]]</a></code> is <code>"connected"</code> as soon as reasonably possible whenever the algorithm can make
 progress.</p>
@@ -2936,33 +2968,38 @@ run these steps:
     </ol>
    </div>
    <h3 class="heading settled" data-level="6.7" id="web-transport-context-cleanup-steps"><span class="secno">6.7. </span><span class="content">Context cleanup steps</span><a class="self-link" href="#web-transport-context-cleanup-steps"></a></h3>
-   <p>This specification defines <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="context-cleanup-steps">context cleanup steps</dfn> as the following steps, given
-<code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②⑦">WebTransport</a></code> <var>transport</var>:</p>
-   <ol>
-    <li data-md>
-     <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③⑤">[[State]]</a></code> is <code>"connected"</code>, then:</p>
-     <ol>
-      <li data-md>
-       <p>Set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③⑥">[[State]]</a></code> to <code>"failed"</code>.</p>
-      <li data-md>
-       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑨">In parallel</a>, <a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate②">terminate</a> <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-session-slot" id="ref-for-dom-webtransport-session-slot①①">[[Session]]</a></code>.</p>
-      <li data-md>
-       <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task②②">Queue a network task</a> with <var>transport</var> to run the following steps:</p>
-       <ol>
-        <li data-md>
-         <p>Let <var>error</var> be a newly <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-create-exception" id="ref-for-dfn-create-exception⑤">created</a> <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑤">WebTransportError</a></code> whose
+   <div class="algorithm" data-algorithm="context cleanup steps">
+    
+This specification defines <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="context-cleanup-steps">context cleanup steps</dfn> as the following steps, given
+<code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②⑦">WebTransport</a></code> <var>transport</var>:
+
+
+    <ol>
+     <li data-md>
+      <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③⑤">[[State]]</a></code> is <code>"connected"</code>, then:</p>
+      <ol>
+       <li data-md>
+        <p>Set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③⑥">[[State]]</a></code> to <code>"failed"</code>.</p>
+       <li data-md>
+        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑨">In parallel</a>, <a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate②">terminate</a> <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-session-slot" id="ref-for-dom-webtransport-session-slot①①">[[Session]]</a></code>.</p>
+       <li data-md>
+        <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task②②">Queue a network task</a> with <var>transport</var> to run the following steps:</p>
+        <ol>
+         <li data-md>
+          <p>Let <var>error</var> be a newly <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-create-exception" id="ref-for-dfn-create-exception⑤">created</a> <code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror⑤">WebTransportError</a></code> whose
  <code class="idl"><a data-link-type="idl" href="#dom-webtransporterroroptions-source" id="ref-for-dom-webtransporterroroptions-source⑤">source</a></code> is <code>"session"</code>.</p>
-        <li data-md>
-         <p><a data-link-type="dfn" href="#webtransport-cleanup" id="ref-for-webtransport-cleanup⑥">Cleanup</a> <var>transport</var> with <var>error</var>.</p>
-       </ol>
-     </ol>
-    <li data-md>
-     <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③⑦">[[State]]</a></code> is <code>"connecting"</code>, set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③⑧">[[State]]</a></code> to
+         <li data-md>
+          <p><a data-link-type="dfn" href="#webtransport-cleanup" id="ref-for-webtransport-cleanup⑥">Cleanup</a> <var>transport</var> with <var>error</var>.</p>
+        </ol>
+      </ol>
+     <li data-md>
+      <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③⑦">[[State]]</a></code> is <code>"connecting"</code>, set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③⑧">[[State]]</a></code> to
  <code>"failed"</code>.</p>
-     <p class="issue" id="issue-c18b6608"><a class="self-link" href="#issue-c18b6608"></a> This needs to be done in workers too. See
+      <p class="issue" id="issue-c18b6608"><a class="self-link" href="#issue-c18b6608"></a> This needs to be done in workers too. See
 <a href="https://www.github.com/w3c/webtransport/issues/127">#127</a> and
 <a href="https://www.github.com/whatwg/html/issues/6831">whatwg/html#6731</a>.</p>
-   </ol>
+    </ol>
+   </div>
    <h3 class="heading settled" data-level="6.8" id="web-transport-gc"><span class="secno">6.8. </span><span class="content">Garbage Collection</span><a class="self-link" href="#web-transport-gc"></a></h3>
    <p>A <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport②⑧">WebTransport</a></code> object whose <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③⑨">[[State]]</a></code> is <code>"connecting"</code> must not be garbage collected if
 <code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingbidirectionalstreams-slot" id="ref-for-dom-webtransport-incomingbidirectionalstreams-slot⑤">[[IncomingBidirectionalStreams]]</a></code>, <code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingunidirectionalstreams-slot" id="ref-for-dom-webtransport-incomingunidirectionalstreams-slot⑤">[[IncomingUnidirectionalStreams]]</a></code>, any
@@ -3372,39 +3409,45 @@ data to the server.</p>
 <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#transfer-receiving-steps" id="ref-for-transfer-receiving-steps">transfer-receiving steps</a> are
 <a href="https://streams.spec.whatwg.org/#ws-transfer">those of</a> <code class="idl"><a data-link-type="idl" href="https://streams.spec.whatwg.org/#writablestream" id="ref-for-writablestream⑥">WritableStream</a></code>.</p>
    <h3 class="heading settled" data-level="7.1" id="send-stream-attributes"><span class="secno">7.1. </span><span class="content">Attributes</span><a class="self-link" href="#send-stream-attributes"></a></h3>
-   <dl>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportSendStream" data-dfn-type="attribute" data-export id="dom-webtransportsendstream-sendgroup"><code>sendGroup</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransportsendgroup" id="ref-for-webtransportsendgroup①⓪">WebTransportSendGroup</a>, nullable</span>
-    <dd data-md>
-     <p>The getter steps are:</p>
-     <ol>
-      <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④⑤">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendgroup-slot" id="ref-for-dom-webtransportsendstream-sendgroup-slot">[[SendGroup]]</a></code>.</p>
-     </ol>
-    <dd data-md>
-     <p>The setter steps, given <var>value</var>, are:</p>
-     <ol>
-      <li data-md>
-       <p>If <var>value</var> is non-null, and
+   <div class="algorithm" data-algorithm="sendGroup" data-algorithm-for="WebTransportSendStream">
+    <dl>
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportSendStream" data-dfn-type="attribute" data-export id="dom-webtransportsendstream-sendgroup"><code>sendGroup</code></dfn>, <span> of type <a data-link-type="idl-name" href="#webtransportsendgroup" id="ref-for-webtransportsendgroup①⓪">WebTransportSendGroup</a>, nullable</span>
+     <dd data-md>
+      <p>The getter steps are:</p>
+      <ol>
+       <li data-md>
+        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④⑤">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendgroup-slot" id="ref-for-dom-webtransportsendstream-sendgroup-slot">[[SendGroup]]</a></code>.</p>
+      </ol>
+     <dd data-md>
+      <p>The setter steps, given <var>value</var>, are:</p>
+      <ol>
+       <li data-md>
+        <p>If <var>value</var> is non-null, and
   <var>value</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendgroup-transport-slot" id="ref-for-dom-webtransportsendgroup-transport-slot④">[[Transport]]</a></code> is not
   <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④⑥">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-transport-slot" id="ref-for-dom-webtransportsendstream-transport-slot">[[Transport]]</a></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-throw" id="ref-for-dfn-throw①①">throw</a>
   an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror①⑤">InvalidStateError</a></code>.</p>
-      <li data-md>
-       <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④⑦">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendgroup-slot" id="ref-for-dom-webtransportsendstream-sendgroup-slot①">[[SendGroup]]</a></code> to <var>value</var>.</p>
-     </ol>
-    <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportSendStream" data-dfn-type="attribute" data-export id="dom-webtransportsendstream-sendorder"><code>sendOrder</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-long-long" id="ref-for-idl-long-long⑤">long long</a></span>
-    <dd data-md>
-     <p>The getter steps are:</p>
-     <ol>
-      <li data-md>
-       <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④⑧">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendorder-slot" id="ref-for-dom-webtransportsendstream-sendorder-slot">[[SendOrder]]</a></code>.</p>
-     </ol>
-    <dd data-md>
-     <p>The setter steps, given <var>value</var>, are:</p>
-     <ol>
-      <li data-md>
-       <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④⑨">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendorder-slot" id="ref-for-dom-webtransportsendstream-sendorder-slot①">[[SendOrder]]</a></code> to <var>value</var>.</p>
-     </ol>
-   </dl>
+       <li data-md>
+        <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④⑦">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendgroup-slot" id="ref-for-dom-webtransportsendstream-sendgroup-slot①">[[SendGroup]]</a></code> to <var>value</var>.</p>
+      </ol>
+    </dl>
+   </div>
+   <div class="algorithm" data-algorithm="sendOrder" data-algorithm-for="WebTransportSendStream">
+    <dl>
+     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportSendStream" data-dfn-type="attribute" data-export id="dom-webtransportsendstream-sendorder"><code>sendOrder</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-long-long" id="ref-for-idl-long-long⑤">long long</a></span>
+     <dd data-md>
+      <p>The getter steps are:</p>
+      <ol>
+       <li data-md>
+        <p>Return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④⑧">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendorder-slot" id="ref-for-dom-webtransportsendstream-sendorder-slot">[[SendOrder]]</a></code>.</p>
+      </ol>
+     <dd data-md>
+      <p>The setter steps, given <var>value</var>, are:</p>
+      <ol>
+       <li data-md>
+        <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④⑨">this</a>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendorder-slot" id="ref-for-dom-webtransportsendstream-sendorder-slot①">[[SendOrder]]</a></code> to <var>value</var>.</p>
+      </ol>
+    </dl>
+   </div>
    <h3 class="heading settled" data-level="7.2" id="send-stream-methods"><span class="secno">7.2. </span><span class="content">Methods</span><a class="self-link" href="#send-stream-methods"></a></h3>
    <div class="algorithm" data-algorithm="getStats()" data-algorithm-for="WebTransportSendStream">
     <dl>
@@ -4433,11 +4476,11 @@ steps:</p>
 constructor steps are:</p>
     <ol>
      <li data-md>
-      <p>Set <var>this</var>’s <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#domexception-name" id="ref-for-domexception-name">name</a> to <code>"WebTransportError"</code>.</p>
+      <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑥③">this</a>’s <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#domexception-name" id="ref-for-domexception-name">name</a> to <code>"WebTransportError"</code>.</p>
      <li data-md>
-      <p>Set <var>this</var>’s <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#domexception-message" id="ref-for-domexception-message">message</a> to <var>message</var>.</p>
+      <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑥④">this</a>’s <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#domexception-message" id="ref-for-domexception-message">message</a> to <var>message</var>.</p>
      <li data-md>
-      <p>Set <var>this</var>’s internal slots as follows:</p>
+      <p>Set <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑥⑤">this</a>’s internal slots as follows:</p>
       <dl>
        <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot">[[Source]]</a></code>
        <dd data-md>
@@ -4446,7 +4489,7 @@ constructor steps are:</p>
        <dd data-md>
         <p><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterroroptions-streamerrorcode" id="ref-for-dom-webtransporterroroptions-streamerrorcode②">streamErrorCode</a></code></p>
       </dl>
-      <p class="note" role="note"><span class="marker">Note:</span> This name does not have a mapping to a legacy code, so <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑥③">this</a>’s <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#dom-domexception-code" id="ref-for-dom-domexception-code">code</a></code>
+      <p class="note" role="note"><span class="marker">Note:</span> This name does not have a mapping to a legacy code, so <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑥⑥">this</a>’s <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#dom-domexception-code" id="ref-for-dom-domexception-code">code</a></code>
  is 0.</p>
     </ol>
    </div>
@@ -4454,31 +4497,41 @@ constructor steps are:</p>
    <dl>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportError" data-dfn-type="attribute" data-export id="dom-webtransporterror-source"><code>source</code></dfn>, <span> of type <a data-link-type="idl-name" href="#enumdef-webtransporterrorsource" id="ref-for-enumdef-webtransporterrorsource③">WebTransportErrorSource</a>, readonly</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑥④">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot①">[[Source]]</a></code>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑥⑦">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot①">[[Source]]</a></code>.</p>
     <dt data-md><dfn class="dfn-paneled idl-code" data-dfn-for="WebTransportError" data-dfn-type="attribute" data-export id="dom-webtransporterror-streamerrorcode"><code>streamErrorCode</code></dfn>, <span> of type <a data-link-type="idl-name" href="https://webidl.spec.whatwg.org/#idl-unsigned-long" id="ref-for-idl-unsigned-long①③">unsigned long</a>, readonly, nullable</span>
     <dd data-md>
-     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑥⑤">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode-slot" id="ref-for-dom-webtransporterror-streamerrorcode-slot⑤">[[StreamErrorCode]]</a></code>.</p>
+     <p>The getter steps are to return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑥⑧">this</a>’s <code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode-slot" id="ref-for-dom-webtransporterror-streamerrorcode-slot⑤">[[StreamErrorCode]]</a></code>.</p>
    </dl>
    <h3 class="heading settled" data-level="12.4" id="web-transport-error-serialization"><span class="secno">12.4. </span><span class="content">Serialization</span><a class="self-link" href="#web-transport-error-serialization"></a></h3>
-   <p><code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror①②">WebTransportError</a></code> objects are <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#serializable-objects" id="ref-for-serializable-objects">serializable objects</a>.
-Their <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#serialization-steps" id="ref-for-serialization-steps">serialization steps</a>, given <var>value</var> and <var>serialized</var>, are:</p>
-   <ol>
-    <li data-md>
-     <p>Run the <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException②">DOMException</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#serialization-steps" id="ref-for-serialization-steps①">serialization steps</a> given <var>value</var> and <var>serialized</var>.</p>
-    <li data-md>
-     <p>Set <var>serialized</var>.<code>[[Source]]</code> to <var>value</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot②">[[Source]]</a></code>.</p>
-    <li data-md>
-     <p>Set <var>serialized</var>.<code>[[StreamErrorCode]]</code> to <var>value</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode-slot" id="ref-for-dom-webtransporterror-streamerrorcode-slot⑥">[[StreamErrorCode]]</a></code>.</p>
-   </ol>
-   <p>Their <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#deserialization-steps" id="ref-for-deserialization-steps">deserialization steps</a>, given <var>serialized</var> and <var>value</var>, are:</p>
-   <ol>
-    <li data-md>
-     <p>Run the <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException③">DOMException</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#deserialization-steps" id="ref-for-deserialization-steps①">deserialization steps</a> given <var>serialized</var> and <var>value</var>.</p>
-    <li data-md>
-     <p>Set <var>value</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot③">[[Source]]</a></code> to <var>serialized</var>.<code>[[Source]]</code>.</p>
-    <li data-md>
-     <p>Set <var>value</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode-slot" id="ref-for-dom-webtransporterror-streamerrorcode-slot⑦">[[StreamErrorCode]]</a></code> <var>serialized</var>.<code>[[StreamErrorCode]]</code>.</p>
-   </ol>
+   <p><code class="idl"><a data-link-type="idl" href="#webtransporterror" id="ref-for-webtransporterror①②">WebTransportError</a></code> objects are <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#serializable-objects" id="ref-for-serializable-objects">serializable objects</a>.</p>
+   <div class="algorithm" data-algorithm="serialization">
+    
+Their <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#serialization-steps" id="ref-for-serialization-steps">serialization steps</a>, given <var>value</var> and <var>serialized</var>, are:
+
+
+    <ol>
+     <li data-md>
+      <p>Run the <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException②">DOMException</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#serialization-steps" id="ref-for-serialization-steps①">serialization steps</a> given <var>value</var> and <var>serialized</var>.</p>
+     <li data-md>
+      <p>Set <var>serialized</var>.<code>[[Source]]</code> to <var>value</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot②">[[Source]]</a></code>.</p>
+     <li data-md>
+      <p>Set <var>serialized</var>.<code>[[StreamErrorCode]]</code> to <var>value</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode-slot" id="ref-for-dom-webtransporterror-streamerrorcode-slot⑥">[[StreamErrorCode]]</a></code>.</p>
+    </ol>
+   </div>
+   <div class="algorithm" data-algorithm="deserialization">
+    
+Their <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#deserialization-steps" id="ref-for-deserialization-steps">deserialization steps</a>, given <var>serialized</var> and <var>value</var>, are:
+
+
+    <ol>
+     <li data-md>
+      <p>Run the <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException③">DOMException</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/structured-data.html#deserialization-steps" id="ref-for-deserialization-steps①">deserialization steps</a> given <var>serialized</var> and <var>value</var>.</p>
+     <li data-md>
+      <p>Set <var>value</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-source-slot" id="ref-for-dom-webtransporterror-source-slot③">[[Source]]</a></code> to <var>serialized</var>.<code>[[Source]]</code>.</p>
+     <li data-md>
+      <p>Set <var>value</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransporterror-streamerrorcode-slot" id="ref-for-dom-webtransporterror-streamerrorcode-slot⑦">[[StreamErrorCode]]</a></code> <var>serialized</var>.<code>[[StreamErrorCode]]</code>.</p>
+    </ol>
+   </div>
    <h2 class="heading settled" data-level="13" id="protocol-mapping"><span class="secno">13. </span><span class="content">Protocol Mappings</span><a class="self-link" href="#protocol-mapping"></a></h2>
    <p><em>This section is non-normative.</em></p>
    <p>This section describes the underlying protocol behavior of methods defined
@@ -5675,6 +5728,7 @@ and has been adapted for use in this specification.</p>
      <li><span class="dfn-paneled" id="99c988d6">remove</span>
      <li><span class="dfn-paneled" id="15e48c39">set</span>
      <li><span class="dfn-paneled" id="0e6b2056">set <small>(for map)</small></span>
+     <li><span class="dfn-paneled" id="0e8de730">tuple</span>
     </ul>
    <li>
     <a data-link-type="biblio">[STREAMS]</a> defines the following terms:
@@ -6265,6 +6319,7 @@ let dfnPanelData = {
 "074b486c": {"dfnID":"074b486c","dfnText":"quota","external":true,"refSections":[{"refs":[{"id":"ref-for-quotaexceedederror-quota"}],"title":"6.4. Methods"}],"url":"https://webidl.spec.whatwg.org/#quotaexceedederror-quota"},
 "0a422d04": {"dfnID":"0a422d04","dfnText":"serializable object","external":true,"refSections":[{"refs":[{"id":"ref-for-serializable-objects"}],"title":"12.4. Serialization"}],"url":"https://html.spec.whatwg.org/multipage/structured-data.html#serializable-objects"},
 "0e6b2056": {"dfnID":"0e6b2056","dfnText":"set (for map)","external":true,"refSections":[{"refs":[{"id":"ref-for-map-set"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-map-set\u2460"}],"title":"7.2. Methods"},{"refs":[{"id":"ref-for-map-set\u2461"}],"title":"8.1. Methods"},{"refs":[{"id":"ref-for-map-set\u2462"}],"title":"9.1. Methods"}],"url":"https://infra.spec.whatwg.org/#map-set"},
+"0e8de730": {"dfnID":"0e8de730","dfnText":"tuple","external":true,"refSections":[{"refs":[{"id":"ref-for-tuple"}],"title":"4.1. Internal slots"},{"refs":[{"id":"ref-for-tuple\u2460"}],"title":"5.1. Internal slots"}],"url":"https://infra.spec.whatwg.org/#tuple"},
 "109985b9": {"dfnID":"109985b9","dfnText":"BYOB reader","external":true,"refSections":[{"refs":[{"id":"ref-for-byob-reader"}],"title":"9. Interface WebTransportReceiveStream"},{"refs":[{"id":"ref-for-byob-reader\u2460"}],"title":"15.4. Receiving datagrams with a BYOB reader"},{"refs":[{"id":"ref-for-byob-reader\u2461"}],"title":"15.7. Receiving a stream with a BYOB reader"}],"url":"https://streams.spec.whatwg.org/#byob-reader"},
 "116848ac": {"dfnID":"116848ac","dfnText":"reacting","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-perform-steps-once-promise-is-settled"}],"title":"11.1. Methods"}],"url":"https://webidl.spec.whatwg.org/#dfn-perform-steps-once-promise-is-settled"},
 "11e0b87f": {"dfnID":"11e0b87f","dfnText":"unrestricted double","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-unrestricted-double"},{"id":"ref-for-idl-unrestricted-double\u2460"}],"title":"5. WebTransportDatagramDuplexStream Interface"},{"refs":[{"id":"ref-for-idl-unrestricted-double\u2461"},{"id":"ref-for-idl-unrestricted-double\u2462"}],"title":"5.1. Internal slots"},{"refs":[{"id":"ref-for-idl-unrestricted-double\u2463"},{"id":"ref-for-idl-unrestricted-double\u2464"}],"title":"5.3. Attributes"}],"url":"https://webidl.spec.whatwg.org/#idl-unrestricted-double"},
@@ -6299,7 +6354,7 @@ let dfnPanelData = {
 "3dc81766": {"dfnID":"3dc81766","dfnText":"set up (for WritableStream)","external":true,"refSections":[{"refs":[{"id":"ref-for-writablestream-set-up"}],"title":"4.1. Internal slots"},{"refs":[{"id":"ref-for-writablestream-set-up\u2460"}],"title":"7.4. Procedures"}],"url":"https://streams.spec.whatwg.org/#writablestream-set-up"},
 "3de9e659": {"dfnID":"3de9e659","dfnText":"byte sequence","external":true,"refSections":[{"refs":[{"id":"ref-for-byte-sequence"},{"id":"ref-for-byte-sequence\u2460"}],"title":"3.1. WebTransport session"},{"refs":[{"id":"ref-for-byte-sequence\u2461"}],"title":"7.4. Procedures"}],"url":"https://infra.spec.whatwg.org/#byte-sequence"},
 "3f2ca4de": {"dfnID":"3f2ca4de","dfnText":"current URL","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request-current-url"}],"title":"6.2. Constructor"}],"url":"https://fetch.spec.whatwg.org/#concept-request-current-url"},
-"4013a022": {"dfnID":"4013a022","dfnText":"this","external":true,"refSections":[{"refs":[{"id":"ref-for-this"},{"id":"ref-for-this\u2460"},{"id":"ref-for-this\u2461"},{"id":"ref-for-this\u2462"},{"id":"ref-for-this\u2463"}],"title":"4.2. Attributes"},{"refs":[{"id":"ref-for-this\u2464"},{"id":"ref-for-this\u2465"}],"title":"5.2. Methods"},{"refs":[{"id":"ref-for-this\u2466"},{"id":"ref-for-this\u2467"},{"id":"ref-for-this\u2468"},{"id":"ref-for-this\u2460\u24ea"},{"id":"ref-for-this\u2460\u2460"},{"id":"ref-for-this\u2460\u2461"},{"id":"ref-for-this\u2460\u2462"},{"id":"ref-for-this\u2460\u2463"},{"id":"ref-for-this\u2460\u2464"},{"id":"ref-for-this\u2460\u2465"}],"title":"5.3. Attributes"},{"refs":[{"id":"ref-for-this\u2460\u2466"},{"id":"ref-for-this\u2460\u2467"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-this\u2460\u2468"},{"id":"ref-for-this\u2461\u24ea"},{"id":"ref-for-this\u2461\u2460"},{"id":"ref-for-this\u2461\u2461"},{"id":"ref-for-this\u2461\u2462"},{"id":"ref-for-this\u2461\u2463"},{"id":"ref-for-this\u2461\u2464"},{"id":"ref-for-this\u2461\u2465"},{"id":"ref-for-this\u2461\u2466"},{"id":"ref-for-this\u2461\u2467"},{"id":"ref-for-this\u2461\u2468"},{"id":"ref-for-this\u2462\u24ea"},{"id":"ref-for-this\u2462\u2460"},{"id":"ref-for-this\u2462\u2461"}],"title":"6.3. Attributes"},{"refs":[{"id":"ref-for-this\u2462\u2462"},{"id":"ref-for-this\u2462\u2463"},{"id":"ref-for-this\u2462\u2464"},{"id":"ref-for-this\u2462\u2465"},{"id":"ref-for-this\u2462\u2466"},{"id":"ref-for-this\u2462\u2467"},{"id":"ref-for-this\u2462\u2468"},{"id":"ref-for-this\u2463\u24ea"},{"id":"ref-for-this\u2463\u2460"},{"id":"ref-for-this\u2463\u2461"},{"id":"ref-for-this\u2463\u2462"},{"id":"ref-for-this\u2463\u2463"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-this\u2463\u2464"},{"id":"ref-for-this\u2463\u2465"},{"id":"ref-for-this\u2463\u2466"},{"id":"ref-for-this\u2463\u2467"},{"id":"ref-for-this\u2463\u2468"}],"title":"7.1. Attributes"},{"refs":[{"id":"ref-for-this\u2464\u24ea"},{"id":"ref-for-this\u2464\u2460"},{"id":"ref-for-this\u2464\u2461"},{"id":"ref-for-this\u2464\u2462"}],"title":"7.2. Methods"},{"refs":[{"id":"ref-for-this\u2464\u2463"},{"id":"ref-for-this\u2464\u2464"},{"id":"ref-for-this\u2464\u2465"}],"title":"8.1. Methods"},{"refs":[{"id":"ref-for-this\u2464\u2466"},{"id":"ref-for-this\u2464\u2467"}],"title":"9.1. Methods"},{"refs":[{"id":"ref-for-this\u2464\u2468"},{"id":"ref-for-this\u2465\u24ea"}],"title":"10.2. Attributes"},{"refs":[{"id":"ref-for-this\u2465\u2460"},{"id":"ref-for-this\u2465\u2461"}],"title":"11.1. Methods"},{"refs":[{"id":"ref-for-this\u2465\u2462"}],"title":"12.2. Constructor"},{"refs":[{"id":"ref-for-this\u2465\u2463"},{"id":"ref-for-this\u2465\u2464"}],"title":"12.3. Attributes"}],"url":"https://webidl.spec.whatwg.org/#this"},
+"4013a022": {"dfnID":"4013a022","dfnText":"this","external":true,"refSections":[{"refs":[{"id":"ref-for-this"},{"id":"ref-for-this\u2460"},{"id":"ref-for-this\u2461"},{"id":"ref-for-this\u2462"},{"id":"ref-for-this\u2463"}],"title":"4.2. Attributes"},{"refs":[{"id":"ref-for-this\u2464"},{"id":"ref-for-this\u2465"}],"title":"5.2. Methods"},{"refs":[{"id":"ref-for-this\u2466"},{"id":"ref-for-this\u2467"},{"id":"ref-for-this\u2468"},{"id":"ref-for-this\u2460\u24ea"},{"id":"ref-for-this\u2460\u2460"},{"id":"ref-for-this\u2460\u2461"},{"id":"ref-for-this\u2460\u2462"},{"id":"ref-for-this\u2460\u2463"},{"id":"ref-for-this\u2460\u2464"},{"id":"ref-for-this\u2460\u2465"}],"title":"5.3. Attributes"},{"refs":[{"id":"ref-for-this\u2460\u2466"},{"id":"ref-for-this\u2460\u2467"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-this\u2460\u2468"},{"id":"ref-for-this\u2461\u24ea"},{"id":"ref-for-this\u2461\u2460"},{"id":"ref-for-this\u2461\u2461"},{"id":"ref-for-this\u2461\u2462"},{"id":"ref-for-this\u2461\u2463"},{"id":"ref-for-this\u2461\u2464"},{"id":"ref-for-this\u2461\u2465"},{"id":"ref-for-this\u2461\u2466"},{"id":"ref-for-this\u2461\u2467"},{"id":"ref-for-this\u2461\u2468"},{"id":"ref-for-this\u2462\u24ea"},{"id":"ref-for-this\u2462\u2460"},{"id":"ref-for-this\u2462\u2461"}],"title":"6.3. Attributes"},{"refs":[{"id":"ref-for-this\u2462\u2462"},{"id":"ref-for-this\u2462\u2463"},{"id":"ref-for-this\u2462\u2464"},{"id":"ref-for-this\u2462\u2465"},{"id":"ref-for-this\u2462\u2466"},{"id":"ref-for-this\u2462\u2467"},{"id":"ref-for-this\u2462\u2468"},{"id":"ref-for-this\u2463\u24ea"},{"id":"ref-for-this\u2463\u2460"},{"id":"ref-for-this\u2463\u2461"},{"id":"ref-for-this\u2463\u2462"},{"id":"ref-for-this\u2463\u2463"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-this\u2463\u2464"},{"id":"ref-for-this\u2463\u2465"},{"id":"ref-for-this\u2463\u2466"},{"id":"ref-for-this\u2463\u2467"},{"id":"ref-for-this\u2463\u2468"}],"title":"7.1. Attributes"},{"refs":[{"id":"ref-for-this\u2464\u24ea"},{"id":"ref-for-this\u2464\u2460"},{"id":"ref-for-this\u2464\u2461"},{"id":"ref-for-this\u2464\u2462"}],"title":"7.2. Methods"},{"refs":[{"id":"ref-for-this\u2464\u2463"},{"id":"ref-for-this\u2464\u2464"},{"id":"ref-for-this\u2464\u2465"}],"title":"8.1. Methods"},{"refs":[{"id":"ref-for-this\u2464\u2466"},{"id":"ref-for-this\u2464\u2467"}],"title":"9.1. Methods"},{"refs":[{"id":"ref-for-this\u2464\u2468"},{"id":"ref-for-this\u2465\u24ea"}],"title":"10.2. Attributes"},{"refs":[{"id":"ref-for-this\u2465\u2460"},{"id":"ref-for-this\u2465\u2461"}],"title":"11.1. Methods"},{"refs":[{"id":"ref-for-this\u2465\u2462"},{"id":"ref-for-this\u2465\u2463"},{"id":"ref-for-this\u2465\u2464"},{"id":"ref-for-this\u2465\u2465"}],"title":"12.2. Constructor"},{"refs":[{"id":"ref-for-this\u2465\u2466"},{"id":"ref-for-this\u2465\u2467"}],"title":"12.3. Attributes"}],"url":"https://webidl.spec.whatwg.org/#this"},
 "41499aca": {"dfnID":"41499aca","dfnText":"requested","external":true,"refSections":[{"refs":[{"id":"ref-for-quotaexceedederror-requested"}],"title":"6.4. Methods"}],"url":"https://webidl.spec.whatwg.org/#quotaexceedederror-requested"},
 "417f81da": {"dfnID":"417f81da","dfnText":"TextEncoderStream","external":true,"refSections":[{"refs":[{"id":"ref-for-textencoderstream"}],"title":"15.5. Sending a stream"}],"url":"https://encoding.spec.whatwg.org/#textencoderstream"},
 "42f97769": {"dfnID":"42f97769","dfnText":"pullAlgorithm (for ReadableStream/set up)","external":true,"refSections":[{"refs":[{"id":"ref-for-readablestream-set-up-pullalgorithm"},{"id":"ref-for-readablestream-set-up-pullalgorithm\u2460"},{"id":"ref-for-readablestream-set-up-pullalgorithm\u2461"}],"title":"6.2. Constructor"}],"url":"https://streams.spec.whatwg.org/#readablestream-set-up-pullalgorithm"},
@@ -7366,6 +7421,7 @@ let refsData = {
 "https://infra.spec.whatwg.org/#queue-dequeue": {"displayText":"dequeue","export":true,"for_":["queue"],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"dequeue","type":"dfn","url":"https://infra.spec.whatwg.org/#queue-dequeue"},
 "https://infra.spec.whatwg.org/#queue-enqueue": {"displayText":"enqueue","export":true,"for_":["queue"],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"enqueue","type":"dfn","url":"https://infra.spec.whatwg.org/#queue-enqueue"},
 "https://infra.spec.whatwg.org/#set-append": {"displayText":"append","export":true,"for_":["set"],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"append","type":"dfn","url":"https://infra.spec.whatwg.org/#set-append"},
+"https://infra.spec.whatwg.org/#tuple": {"displayText":"tuple","export":true,"for_":[],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"tuple","type":"dfn","url":"https://infra.spec.whatwg.org/#tuple"},
 "https://streams.spec.whatwg.org/#byob-reader": {"displayText":"BYOB reader","export":true,"for_":[],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"byob reader","type":"dfn","url":"https://streams.spec.whatwg.org/#byob-reader"},
 "https://streams.spec.whatwg.org/#default-reader": {"displayText":"default reader","export":true,"for_":[],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"default reader","type":"dfn","url":"https://streams.spec.whatwg.org/#default-reader"},
 "https://streams.spec.whatwg.org/#default-reader-read": {"displayText":"read()","export":true,"for_":["ReadableStreamDefaultReader"],"level":"1","normative":true,"shortname":"streams","spec":"streams","status":"current","text":"read()","type":"method","url":"https://streams.spec.whatwg.org/#default-reader-read"},
