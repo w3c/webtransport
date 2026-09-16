@@ -1360,7 +1360,8 @@ the application will receive the number of streams it anticipates.
 
 : <dfn for="WebTransport" method>exportKeyingMaterial(BufferSource |label|, BufferSource |context|, unsigned long |outputLength|)</dfn>
 :: Exports keying material from a [TLS Keying Material Exporter](https://www.rfc-editor.org/rfc/rfc9846#section-7.3)
-   for the TLS session uniquely associated with this {{WebTransport}}'s [=underlying connection=].
+   that is derived from the TLS connection
+   and uniquely associated with this {{WebTransport}} [=WebTransport session|session=].
    When called, the user agent MUST run these steps:
 
    1. Let |labelLength| be |label|.[=BufferSource/byte length=].
@@ -1377,9 +1378,20 @@ the application will receive the number of streams it anticipates.
    1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
       [=queue a network task=] with |transport| to [=reject=] |p| with an {{InvalidStateError}}:
-     1. Let |keyingMaterial| be a {{Uint8Array}} that is produced by invoking a TLS key exporter, as defined
-        in [[!WEB-TRANSPORT-OVERVIEW]] [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview#section-4.1),
-        with |label|, |context|, and |outputLength|.
+     1. Let |keyingMaterial| be a {{Uint8Array}} that is produced by invoking a TLS key exporter,
+        following the process defined
+        in [[!WEB-TRANSPORT-OVERVIEW]] [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview#section-4.1)
+        and the WebTransport protocol binding in use,
+        passing |label|, |context|, and |outputLength|.
+
+        Note: The process for generating the context
+        that is passed to the TLS exporter interface
+        could vary based on the HTTP version.
+        HTTP/3 connections ([Section 4.8](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/#section-4.8) of [[!WEB-TRANSPORT-HTTP3]])
+        and HTTP/2 connections ([Section 5.3](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http2/#section-5.3) of [[!WEB-TRANSPORT-HTTP2]])
+        happen to use an identical construction,
+        with only minor differences in how sessions are identified.
+        Other WebTransport mappings could define a different process.
      1. [=Queue a network task=] with |transport| to [=resolve=] |p| with |keyingMaterial|.
    1. Return |p|.
 
