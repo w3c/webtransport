@@ -1540,8 +1540,11 @@ optionally |closeInfo|, run these steps:
 1. Let |incomingUnidirectionalStreams| be |transport|.{{[[IncomingUnidirectionalStreams]]}}.
 1. Set |transport|.{{[[SendStreams]]}} to an empty [=set=].
 1. Set |transport|.{{[[ReceiveStreams]]}} to an empty [=set=].
-1. [=For each=] |writable| in |outgoingDatagramWritables|, set
-   |writable|.{{WebTransportDatagramsWritable/[[OutgoingDatagramsQueue]]}} to an empty [=queue=].
+1. [=For each=] |writable| in |outgoingDatagramWritables|:
+  1. Set |writable|.{{WebTransportDatagramsWritable/[[OutgoingDatagramsQueue]]}} to an
+     empty [=queue=].
+  1. [=Resolve=] |writable|.{{WebTransportDatagramsWritable/[[BackpressurePromise]]}}
+     with undefined.
 1. Set |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[IncomingDatagramsQueue]]}}
    to an empty [=queue=].
 1. If |closeInfo| is given, then set |transport|.{{[[State]]}} to `"closed"`.
