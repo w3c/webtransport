@@ -484,23 +484,31 @@ with |transport| to run the following steps:
   1. Let |count| be 0.
   1. While |datagrams| [=queue/is not empty=]:
     1. Let |bytes| and |timestamp| be |datagrams|[0].
-    1. If more than |duration| milliseconds have passed since |timestamp|, then:
-       1. [=queue/Dequeue=] |datagrams|.
-       1. Set |count| to |count| + 1.
-    1. Otherwise, [=iteration/break=] this loop.
-  1. If |count| is greater than 0, then [=dequeue outgoing datagrams=] with |transport|,
-     |writable| and |count|.
+    1. If |duration| milliseconds or less have passed since |timestamp|, then
+        [=iteration/break=] this loop.
+    1. [=queue/Dequeue=] |datagrams|.
+    1. Set |count| to |count| + 1.
+  1. If |count| is greater than 0, then the user agent MAY
+     [=dequeue outgoing datagrams=] with |transport|, |writable| and |count|,
+     and if it does, set |count| to 0.
   1. While |connected| is true and |datagrams| [=queue/is not empty=]:
     1. Let |bytes| and |timestamp| be |datagrams|[0].
-    1. If |bytes|'s length ≤ |maxSize|:
-      1. If it is not possible to send |bytes| to the network immediately, then
-         [=iteration/break=] this loop.
-      1. [=Dequeue outgoing datagrams=] with |transport|, |writable| and 1.
-      1. [=session/Send a datagram=], with |transport|.{{[[Session]]}} and |bytes|.
-    1. Otherwise, [=dequeue outgoing datagrams=] with |transport|, |writable| and 1.
+    1. If |bytes|'s length ≤ |maxSize| and it is not possible to send |bytes| to the network
+       immediately, then [=iteration/break=] this loop.
     1. [=queue/Dequeue=] |datagrams|.
+    1. Set |count| to |count| + 1.
+    1. The user agent MAY [=dequeue outgoing datagrams=] with |transport|,
+       |writable| and |count|, and if it does, set |count| to 0.
+    1. If |bytes|'s length ≤ |maxSize|, then [=session/send a datagram=], with
+       |transport|.{{[[Session]]}} and |bytes|.
+  1. If |count| is greater than 0, then [=dequeue outgoing datagrams=] with
+     |transport|, |writable| and |count|.
 
 </div>
+
+Note: [=Dequeue outgoing datagrams=] is what makes room for more datagrams. The longer these calls
+are batched, the more the send queue drains before the {{WritableStream}} is asked to refill it.
+Batch only as much as tuning requires.
 
 The user agent MUST, for any {{WebTransport}} object whose
 {{[[State]]}} is `"connecting"` or `"connected"`, run [=sendDatagrams=] on a
