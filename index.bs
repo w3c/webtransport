@@ -349,8 +349,12 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
  <tbody>
   <tr>
    <td><dfn>`[[OutgoingDatagramsQueue]]`</dfn>
-   <td class="non-normative">A queue of [=tuples=] of an outgoing datagram, a timestamp and a promise
-   which is resolved when the datagram is sent or discarded.
+   <td class="non-normative">A queue of [=tuples=] of an outgoing datagram and a timestamp.
+  </tr>
+  <tr>
+   <td><dfn>`[[BackpressurePromise]]`</dfn>
+   <td class="non-normative">A promise which is resolved once
+   {{WebTransportDatagramsWritable/[[OutgoingDatagramsQueue]]}} has room for another datagram.
   </tr>
   <tr>
    <td><dfn>`[[Transport]]`</dfn>
@@ -375,6 +379,8 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
  1. Let |stream| be a [=new=] {{WebTransportDatagramsWritable}}, with:
     : {{WebTransportDatagramsWritable/[[OutgoingDatagramsQueue]]}}
     :: an empty queue
+    : {{WebTransportDatagramsWritable/[[BackpressurePromise]]}}
+    :: [=a promise resolved with=] undefined
     : {{WebTransportDatagramsWritable/[[Transport]]}}
     :: |transport|
     : {{WebTransportDatagramsWritable/[[SendGroup]]}}
@@ -422,21 +428,39 @@ The <dfn>writeDatagrams</dfn> algorithm is given a |transport| and |writable| as
 
 1. Let |timestamp| be a timestamp representing now.
 1. If |data| is not a {{BufferSource}} object, then return [=a promise rejected with=] a {{TypeError}}.
-1. Let |datagrams| be |transport|.{{[[Datagrams]]}}.
-1. If |datagrams|.{{[[OutgoingMaxDatagramSize]]}} is less than |data|'s \[[ByteLength]], return
+1. Let |duplex| be |transport|.{{[[Datagrams]]}}.
+1. If |duplex|.{{[[OutgoingMaxDatagramSize]]}} is less than |data|'s \[[ByteLength]], return
    [=a promise resolved with=] undefined.
-1. Let |promise| be a new promise.
 1. Let |bytes| be a copy of bytes which |data| represents.
-1. Let |chunk| be (|bytes|, |timestamp|, |promise|).
-1. Enqueue |chunk| to |writable|.{{[[OutgoingDatagramsQueue]]}}.
-1. If the length of |writable|.{{[[OutgoingDatagramsQueue]]}} is less than
-   |datagrams|.{{[[OutgoingMaxBufferedDatagrams]]}}, then [=resolve=] |promise| with undefined.
-1. Return |promise|.
+1. Let |chunk| be (|bytes|, |timestamp|).
+1. [=queue/Enqueue=] |chunk| to |writable|.{{[[OutgoingDatagramsQueue]]}}.
+1. If the length of |writable|.{{[[OutgoingDatagramsQueue]]}} is not less than
+   |duplex|.{{[[OutgoingMaxBufferedDatagrams]]}}, then set
+   |writable|.{{[[BackpressurePromise]]}} to a new promise.
+1. Return |writable|.{{[[BackpressurePromise]]}}.
 
-Note: The associated {{WritableStream}} calls [=writeDatagrams=] only when all the promises that
-have been returned by [=writeDatagrams=] for that stream have been resolved. Hence the
+Note: The promise returned from the sink signals room in the send queue, not delivery.
+It resolves as soon as {{[[OutgoingDatagramsQueue]]}} has room for another datagram,
+which keeps that queue full.
+
+Note: The associated {{WritableStream}} calls [=writeDatagrams=] again only when the promise
+returned by the previous [=writeDatagrams=] for that stream has been resolved. Hence the
 timestamp and the expiration duration work well only when the web developer pays attention to
 {{WritableStreamDefaultWriter/ready|WritableStreamDefaultWriter.ready}}.
+
+</div>
+
+<div algorithm>
+
+To <dfn>dequeue outgoing datagrams</dfn>, given a {{WebTransport}} object |transport|, a
+{{WebTransportDatagramsWritable}} object |writable| and a |count|, [=queue a network task=]
+with |transport| to run these steps:
+1. Let |n| be the minimum of |count| and the length of
+   |writable|.{{[[OutgoingDatagramsQueue]]}}.
+1. Repeat [=queue/dequeuing=] |writable|.{{[[OutgoingDatagramsQueue]]}} |n| times.
+1. If the length of |writable|.{{[[OutgoingDatagramsQueue]]}} is less than
+   |transport|.{{[[Datagrams]]}}.{{[[OutgoingMaxBufferedDatagrams]]}}, then [=resolve=]
+   |writable|.{{[[BackpressurePromise]]}} with undefined.
 
 </div>
 
@@ -445,30 +469,46 @@ timestamp and the expiration duration work well only when the web developer pays
 To <dfn>sendDatagrams</dfn>, given a {{WebTransport}} object |transport| and a
 {{WebTransportDatagramsWritable}} object |writable|, [=queue a network task=]
 with |transport| to run the following steps:
-1. Let |queue| be a copy of |writable|.{{[[OutgoingDatagramsQueue]]}}.
+1. Let |datagrams| be a copy of |writable|.{{[[OutgoingDatagramsQueue]]}}.
 
-   Note: The above copy, as well as the queueing of a network task to run these steps, can be optimized.
+   Note: |datagrams| is a copy because the steps below run [=in parallel=], whereas
+   |writable|.{{[[OutgoingDatagramsQueue]]}} is only ever touched by
+   [=dequeue outgoing datagrams=], which queues a network task to do so. The copy, as well as
+   the queueing of a network task to run these steps, can be optimized.
 
 1. Let |maxSize| be |transport|.{{[[Datagrams]]}}.{{[[OutgoingMaxDatagramSize]]}}.
 1. Let |duration| be |transport|.{{[[Datagrams]]}}.{{[[OutgoingDatagramsExpirationDuration]]}}.
 1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
+1. Let |connected| be true if |transport|.{{[[State]]}} is `"connected"`, and false otherwise.
 1. Run the following steps [=in parallel=]:
-  1. While |queue| is not empty:
-    1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-    1. If more than |duration| milliseconds have passed since |timestamp|, then:
-       1. Remove the first element from |queue|.
-       1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
-    1. Otherwise, break this loop.
-  1. If |transport|.{{[[State]]}} is not `"connected"`, then return.
-  1. While |queue| is not empty:
-    1. Let |bytes|, |timestamp| and |promise| be |queue|'s first element.
-    1. If |bytes|'s length ≤ |maxSize|:
-      1. If it is not possible to send |bytes| to the network immediately, then break this loop.
-      1. [=session/Send a datagram=], with |transport|.{{[[Session]]}} and |bytes|.
-    1. Remove the first element from |queue|.
-    1. [=Queue a network task=] with |transport| to [=resolve=] |promise| with undefined.
+  1. Let |count| be 0.
+  1. While |datagrams| [=queue/is not empty=]:
+    1. Let |bytes| and |timestamp| be |datagrams|[0].
+    1. If |duration| milliseconds or less have passed since |timestamp|, then
+        [=iteration/break=] this loop.
+    1. [=queue/Dequeue=] |datagrams|.
+    1. Set |count| to |count| + 1.
+  1. If |count| is greater than 0, then the user agent MAY
+     [=dequeue outgoing datagrams=] with |transport|, |writable| and |count|,
+     and if it does, set |count| to 0.
+  1. While |connected| is true and |datagrams| [=queue/is not empty=]:
+    1. Let |bytes| and |timestamp| be |datagrams|[0].
+    1. If |bytes|'s length ≤ |maxSize| and it is not possible to send |bytes| to the network
+       immediately, then [=iteration/break=] this loop.
+    1. [=queue/Dequeue=] |datagrams|.
+    1. Set |count| to |count| + 1.
+    1. The user agent MAY [=dequeue outgoing datagrams=] with |transport|,
+       |writable| and |count|, and if it does, set |count| to 0.
+    1. If |bytes|'s length ≤ |maxSize|, then [=session/send a datagram=], with
+       |transport|.{{[[Session]]}} and |bytes|.
+  1. If |count| is greater than 0, then [=dequeue outgoing datagrams=] with
+     |transport|, |writable| and |count|.
 
 </div>
+
+Note: [=Dequeue outgoing datagrams=] is what makes room for more datagrams. The longer these calls
+are batched, the more the send queue drains before the {{WritableStream}} is asked to refill it.
+Batch only as much as tuning requires.
 
 The user agent MUST, for any {{WebTransport}} object whose
 {{[[State]]}} is `"connecting"` or `"connected"`, run [=sendDatagrams=] on a
@@ -708,6 +748,10 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 :: The setter steps, given |value|, are:
      1. If |value| is < `1`, set |value| to `1`.
      1. Set [=this=].{{[[OutgoingMaxBufferedDatagrams]]}} to |value|.
+     1. [=For each=] |writable| in [=this=].{{WebTransportDatagramDuplexStream/[[Writables]]}}, if
+        the length of |writable|.{{WebTransportDatagramsWritable/[[OutgoingDatagramsQueue]]}} is
+        less than |value|, then [=resolve=]
+        |writable|.{{WebTransportDatagramsWritable/[[BackpressurePromise]]}} with undefined.
 
 </div>
 
@@ -1504,8 +1548,11 @@ optionally |closeInfo|, run these steps:
 1. Let |incomingUnidirectionalStreams| be |transport|.{{[[IncomingUnidirectionalStreams]]}}.
 1. Set |transport|.{{[[SendStreams]]}} to an empty [=set=].
 1. Set |transport|.{{[[ReceiveStreams]]}} to an empty [=set=].
-1. [=For each=] |writable| in |outgoingDatagramWritables|, set
-   |writable|.{{WebTransportDatagramsWritable/[[OutgoingDatagramsQueue]]}} to an empty [=queue=].
+1. [=For each=] |writable| in |outgoingDatagramWritables|:
+  1. Set |writable|.{{WebTransportDatagramsWritable/[[OutgoingDatagramsQueue]]}} to an
+     empty [=queue=].
+  1. [=Resolve=] |writable|.{{WebTransportDatagramsWritable/[[BackpressurePromise]]}}
+     with undefined.
 1. Set |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[IncomingDatagramsQueue]]}}
    to an empty [=queue=].
 1. If |closeInfo| is given, then set |transport|.{{[[State]]}} to `"closed"`.
