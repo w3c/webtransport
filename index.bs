@@ -726,6 +726,8 @@ To <dfn>pullDatagrams</dfn>, given a {{WebTransport}} object |transport|, run th
 1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[ReadableType]]}} is `"bytes"`, then:
   1. If |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
     [=ReadableStream/current BYOB request view=] is not null, then:
+    1. If the size of |datagram| is 0, then return the result of running
+      [=pullDatagrams=] with |transport|.
     1. Let |view| be |datagrams|.{{WebTransportDatagramDuplexStream/[[Readable]]}}'s
       [=ReadableStream/current BYOB request view=].
     1. If |view|'s [=BufferSource/byte length=] is less than the size of |datagram|, return
@@ -1729,7 +1731,7 @@ that determine how the [=WebTransport session=] is established and used.
    Note: While [=readable stream=] is compatible with datagram semantics,
    [=readable byte stream=] is not. Datagrams are differentiated messages
    of zero or more bytes, that can arrive out of order, not an undifferentiated
-   byte sequence. Empty datagrams are lost, and
+   byte sequence. A {{ReadableStreamBYOBReader|BYOB reader}} omits empty datagrams, and
    {{ReadableStreamBYOBReaderReadOptions/min}} loses message delineation.
 
 
