@@ -391,6 +391,8 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
     |transport| and |stream|.
  1. [=WritableStream/Set up=] |stream| with [=WritableStream/set up/writeAlgorithm=]
     set to |writeDatagramsAlgorithm|.
+ 1. [=set/Append=] |stream| to
+    |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Writables]]}}.
  1. Return |stream|.
 
 </div>
@@ -1548,6 +1550,8 @@ optionally |closeInfo|, run these steps:
 1. Let |incomingUnidirectionalStreams| be |transport|.{{[[IncomingUnidirectionalStreams]]}}.
 1. Set |transport|.{{[[SendStreams]]}} to an empty [=set=].
 1. Set |transport|.{{[[ReceiveStreams]]}} to an empty [=set=].
+1. Set |transport|.{{[[Datagrams]]}}.{{WebTransportDatagramDuplexStream/[[Writables]]}}
+   to an empty [=set=].
 1. [=For each=] |writable| in |outgoingDatagramWritables|:
   1. Set |writable|.{{WebTransportDatagramsWritable/[[OutgoingDatagramsQueue]]}} to an
      empty [=queue=].
