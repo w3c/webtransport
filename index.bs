@@ -1516,6 +1516,8 @@ optionally |closeInfo|, run these steps:
   1. [=WritableStream/Error=] |stream| with |error|.
 1. [=For each=] |stream| in |receiveStreams|, [=ReadableStream/error=] |stream|
    with |error|.
+1. [=For each=] |writable| in |outgoingDatagramWritables|, [=WritableStream/error=] |writable|
+   with |error|.
 
   Note: Script authors can inject code which runs in Promise resolution synchronously. Hence
   from here, do not touch |transport| as it may be mutated by scripts in an unpredictable way.
@@ -1526,7 +1528,6 @@ optionally |closeInfo|, run these steps:
   1. Assert: |ready| is [=settled=].
   1. [=ReadableStream/Close=] |incomingBidirectionalStreams|.
   1. [=ReadableStream/Close=] |incomingUnidirectionalStreams|.
-  1. For each |writable| in |outgoingDatagramWritables|, [=WritableStream/close=] |writable|.
   1. [=ReadableStream/Close=] |incomingDatagrams|.
 1. Otherwise:
   1. [=Reject=] |closed| with |error|.
@@ -1535,7 +1536,6 @@ optionally |closeInfo|, run these steps:
   1. Set |ready|.`[[PromiseIsHandled]]` to true.
   1. [=ReadableStream/Error=] |incomingBidirectionalStreams| with |error|.
   1. [=ReadableStream/Error=] |incomingUnidirectionalStreams| with |error|.
-  1. For each |writable| in |outgoingDatagramWritables|, [=WritableStream/error=] |writable| with |error|.
   1. [=ReadableStream/Error=] |incomingDatagrams| with |error|.
 
 </div>
