@@ -1128,6 +1128,11 @@ To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partiti
   1. Let |transport| be the {{WebTransport}} object associated with |request|.
   1. Let |url| be |request|'s [=request/current URL=].
   1. Let |newConnection| be |transport|.{{[[NewConnection]]}}.
+  1. Assert: |newConnection| is not "`no`", or |networkPartitionKey|[1] is neither
+     null nor a fixed value.
+
+     Issue: Fetch currently allows |networkPartitionKey|[1] to be null. See
+     <a href="https://github.com/whatwg/fetch/issues/1926">whatwg/fetch#1926</a>.
   1. Let |requireUnreliable| be |transport|.{{[[RequireUnreliable]]}}.
   1. Let |webTransportHashes| be the values in |request|'s [=request/WebTransport-hash list=].
   1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
