@@ -480,7 +480,6 @@ with |transport| to run the following steps:
 
 1. Let |maxSize| be |transport|.{{[[Datagrams]]}}.{{[[OutgoingMaxDatagramSize]]}}.
 1. Let |duration| be |transport|.{{[[Datagrams]]}}.{{[[OutgoingDatagramsExpirationDuration]]}}.
-1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
 1. Let |connected| be true if |transport|.{{[[State]]}} is `"connected"`, and false otherwise.
 1. Run the following steps [=in parallel=]:
   1. Let |count| be 0.
@@ -546,7 +545,7 @@ interface WebTransportDatagramDuplexStream {
 
   readonly attribute unsigned long maxDatagramSize;
   attribute unrestricted double? incomingMaxAge;
-  attribute unrestricted double? outgoingMaxAge;
+  attribute unrestricted double outgoingMaxAge;
   attribute unsigned long incomingMaxBufferedDatagrams;
   attribute unsigned long outgoingMaxBufferedDatagrams;
 };
@@ -609,7 +608,7 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>`[[OutgoingDatagramsExpirationDuration]]`</dfn>
    <td class="non-normative">An {{unrestricted double}} value representing the
-   expiration duration for outgoing datagrams (in milliseconds), or null.
+   expiration duration for outgoing datagrams (in milliseconds).
   </tr>
   <tr>
    <td><dfn>`[[OutgoingMaxDatagramSize]]`</dfn>
@@ -663,7 +662,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
            jeopardizing the timeliness of transmitted data.</p>
        </div>
     : {{[[OutgoingDatagramsExpirationDuration]]}}
-    :: null
+    :: `Infinity`
     : {{[[OutgoingMaxDatagramSize]]}}
     :: an [=implementation-defined=] integer.
  1. Return |stream|.
@@ -717,8 +716,7 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 :: The getter steps are:
      1. Return [=this=]'s {{[[OutgoingDatagramsExpirationDuration]]}}.
 :: The setter steps, given |value|, are:
-     1. If |value| is negative or NaN, [=throw=] a {{RangeError}}.
-     1. If |value| is `0`, set |value| to null.
+     1. If |value| is negative, `0`, or NaN, [=throw=] a {{RangeError}}.
      1. Set [=this=].{{[[OutgoingDatagramsExpirationDuration]]}} to |value|.
 
 </div>
