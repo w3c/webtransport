@@ -798,7 +798,7 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
 1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
 1. Let |session| be |transport|.{{[[Session]]}}.
 1. While there are [=session/receive a datagram|available incoming datagrams=] on |session|:
-  1. Let |datagram| be the result of [=session/receiving a datagram=] with |session|.
+  1. Let |datagram| be the result of [=session/receiving a datagram=] with |session| [=in parallel=].
   1. Let |timestamp| be a timestamp representing now.
   1. Let |chunk| be a (|datagram|, |timestamp|).
   1. [=queue/Enqueue=] |chunk| to |queue|.
