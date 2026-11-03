@@ -1394,7 +1394,7 @@ the application will receive the number of streams it anticipates.
            1. Let |datagramStats| be a [=new=] {{WebTransportDatagramStats}} object.
            1. Set |stats|["{{WebTransportConnectionStats/datagrams}}"] to |datagramStats|.
            1. For each [=dictionary members|member=] |member| of |stats| and
-               |datagramStats| that the user agent wishes to expose,
+               |datagramStats| that the user agent [=categorically exposes=],
                [=map/set=] |member| to
                the corresponding [=map/entries|entry=] in |gatheredStats|.
            1. [=Resolve=] |p| with |stats|.
@@ -1910,6 +1910,11 @@ about the [=WebTransport session=]'s [=underlying connection=]. Members of
 <dfn>pooled connection stat</dfn> are [=map/exists|absent=] for
 [=underlying connections=] that are subject to pooling.
 
+A user agent can withhold stats members, e.g. for privacy. It
+<dfn>categorically exposes</dfn> a stats [=dictionary member=] if it makes this
+choice once per [=WebTransport session=], not per call. So a member present in
+one `getStats()` result won't disappear from later results in the same session.
+
 Note: When pooling is allowed, only [=pooled connection stats=] are revealed,
 and multiple [=WebTransport sessions=] pooled
 on the same [=connection=] all receive the same information, i.e. the information
@@ -2106,7 +2111,7 @@ The {{WebTransportSendStream}}'s [=transfer steps=] and
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportSendStreamStats}} object.
            1. For each [=dictionary members|member=] |member| of |stats| that
-               the user agent wishes to expose, [=map/set=] |member| to
+               the user agent [=categorically exposes=], [=map/set=] |member| to
                the corresponding [=map/entries|entry=] in |gatheredStats|.
            1. [=Resolve=] |p| with |stats|.
      1. Return |p|.
@@ -2453,7 +2458,7 @@ A {{WebTransportSendGroup}} is always created by the
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportSendStreamStats}} object.
            1. For each [=dictionary members|member=] |member| of |stats| that
-               the user agent wishes to expose, [=map/set=] |member| to
+               the user agent [=categorically exposes=], [=map/set=] |member| to
                the corresponding [=map/entries|entry=] in |gatheredStats|.
            1. [=Resolve=] |p| with |stats|.
      1. Return |p|.
@@ -2536,7 +2541,7 @@ The {{WebTransportReceiveStream}}'s [=transfer steps=] and
          1. [=Queue a network task=] with |transport| to run the following steps:
            1. Let |stats| be a [=new=] {{WebTransportReceiveStreamStats}} object.
            1. For each [=dictionary members|member=] |member| of |stats| that
-               the user agent wishes to expose, [=map/set=] |member| to
+               the user agent [=categorically exposes=], [=map/set=] |member| to
                the corresponding [=map/entries|entry=] in |gatheredStats|.
            1. [=Resolve=] |p| with |stats|.
      1. Return |p|.
