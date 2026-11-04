@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version e0b165ae4, updated Mon Nov 2 15:16:49 2026 -0800" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="3294f966714bdbdc94910d0c3aa14f7728ffbfde" name="revision">
+  <meta content="b37d9698bf6d55f88b9e5a8c3fa81f64804491ca" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -1858,7 +1858,7 @@ To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="receivedatagra
       <p>While there are <a data-link-type="dfn" href="#session-receive-a-datagram" id="ref-for-session-receive-a-datagram">available incoming datagrams</a> on <var>session</var>:</p>
       <ol>
        <li data-md>
-        <p>Let <var>datagram</var> be the result of <a data-link-type="dfn" href="#session-receive-a-datagram" id="ref-for-session-receive-a-datagram①">receiving a datagram</a> with <var>session</var>.</p>
+        <p>Let <var>datagram</var> be the result of <a data-link-type="dfn" href="#session-receive-a-datagram" id="ref-for-session-receive-a-datagram①">receiving a datagram</a> with <var>session</var> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel②">in parallel</a>.</p>
        <li data-md>
         <p>Let <var>timestamp</var> be a timestamp representing now.</p>
        <li data-md>
@@ -2378,7 +2378,7 @@ To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="process-a-webt
         <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⓪">[[State]]</a></code> is not <code>"connecting"</code>:</p>
         <ol>
          <li data-md>
-          <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel②">In parallel</a>, <a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate">terminate</a> <var>session</var>.</p>
+          <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel③">In parallel</a>, <a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate">terminate</a> <var>session</var>.</p>
          <li data-md>
           <p>Abort these steps.</p>
         </ol>
@@ -2429,7 +2429,7 @@ these steps.
      <li data-md>
       <p>Let <var>p</var> be a new promise.</p>
      <li data-md>
-      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel③">in parallel</a>:</p>
+      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel④">in parallel</a>:</p>
       <ol>
        <li data-md>
         <p>Wait until there is an <a data-link-type="dfn" href="#session-receive-a-bidirectional-stream" id="ref-for-session-receive-a-bidirectional-stream">available incoming bidirectional
@@ -2474,7 +2474,7 @@ these steps.
      <li data-md>
       <p>Let <var>p</var> be a new promise.</p>
      <li data-md>
-      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel④">in parallel</a>:</p>
+      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑤">in parallel</a>:</p>
       <ol>
        <li data-md>
         <p>Wait until there is an
@@ -2624,7 +2624,7 @@ the application will receive the number of streams it anticipates.</p>
        <li data-md>
         <p>Let <var>reason</var> be <var>reasonString</var>, <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-encode" id="ref-for-utf-8-encode①">UTF-8 encoded</a>.</p>
        <li data-md>
-        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑤">In parallel</a>, <a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate①">terminate</a> <var>session</var> with <var>code</var> and <var>reason</var>.</p>
+        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑥">In parallel</a>, <a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate①">terminate</a> <var>session</var> with <var>code</var> and <var>reason</var>.</p>
         <p class="note" role="note"><span class="marker">Note:</span> This also <a data-link-type="dfn" href="#stream-abort-sending" id="ref-for-stream-abort-sending">aborts sending</a> or <a data-link-type="dfn" href="#stream-abort-receiving" id="ref-for-stream-abort-receiving">aborts receiving</a> on <a data-link-type="dfn" href="#protocol-webtransport-stream" id="ref-for-protocol-webtransport-stream⑦">WebTransport streams</a> contained in
  <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-sendstreams-slot" id="ref-for-dom-webtransport-sendstreams-slot①">[[SendStreams]]</a></code> and <code class="idl"><a data-link-type="idl" href="#dom-webtransport-receivestreams-slot" id="ref-for-dom-webtransport-receivestreams-slot①">[[ReceiveStreams]]</a></code>.</p>
        <li data-md>
@@ -2648,7 +2648,7 @@ the application will receive the number of streams it anticipates.</p>
         <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⑧">[[State]]</a></code> is <code>"failed"</code>, <a data-link-type="dfn" data-refhint-key="c597a1f1" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects⑧">reject</a> <var>p</var> with an
   <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror④">InvalidStateError</a></code> and abort these steps.</p>
        <li data-md>
-        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑥">in parallel</a>:</p>
+        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑦">in parallel</a>:</p>
         <ol>
          <li data-md>
           <p>If <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot①⑨">[[State]]</a></code> is <code>"connecting"</code>, wait until it changes.</p>
@@ -2719,7 +2719,7 @@ the application will receive the number of streams it anticipates.</p>
        <li data-md>
         <p>Let <var>p</var> be a new promise.</p>
        <li data-md>
-        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑦">in parallel</a>, but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when">abort when</a> <var>transport</var>’s
+        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑧">in parallel</a>, but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when">abort when</a> <var>transport</var>’s
   <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②③">[[State]]</a></code> becomes <code>"closed"</code> or <code>"failed"</code>, and instead
   <a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①①">queue a network task</a> with <var>transport</var> to <a data-link-type="dfn" data-refhint-key="c597a1f1" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①②">reject</a> <var>p</var> with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror⑦">InvalidStateError</a></code>:</p>
         <ol>
@@ -2775,7 +2775,7 @@ the application will receive the number of streams it anticipates.</p>
        <li data-md>
         <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④⓪">this</a>.</p>
        <li data-md>
-        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑧">in parallel</a>, but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when①">abort when</a> <var>transport</var>’s
+        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑨">in parallel</a>, but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when①">abort when</a> <var>transport</var>’s
   <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②⑤">[[State]]</a></code> becomes <code>"closed"</code> or <code>"failed"</code>, and instead
   <a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①③">queue a network task</a> with <var>transport</var> to <a data-link-type="dfn" data-refhint-key="c597a1f1" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①④">reject</a> <var>p</var> with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror⑨">InvalidStateError</a></code>:</p>
         <ol>
@@ -2840,7 +2840,7 @@ the application will receive the number of streams it anticipates.</p>
        <li data-md>
         <p>Let <var>transport</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this④③">this</a>.</p>
        <li data-md>
-        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑨">in parallel</a>, but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when②">abort when</a> <var>transport</var>’s
+        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⓪">in parallel</a>, but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when②">abort when</a> <var>transport</var>’s
   <code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot②⑧">[[State]]</a></code> becomes <code>"closed"</code> or <code>"failed"</code>, and instead
   <a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task①⑥">queue a network task</a> with <var>transport</var> to <a data-link-type="dfn" data-refhint-key="c597a1f1" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects①⑧">reject</a> <var>p</var> with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror①②">InvalidStateError</a></code>:</p>
         <ol>
@@ -3063,7 +3063,7 @@ This specification defines <dfn class="dfn-paneled" data-dfn-type="dfn" data-exp
        <li data-md>
         <p>Set <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-state-slot" id="ref-for-dom-webtransport-state-slot③⑥">[[State]]</a></code> to <code>"failed"</code>.</p>
        <li data-md>
-        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⓪">In parallel</a>, <a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate②">terminate</a> <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-session-slot" id="ref-for-dom-webtransport-session-slot①①">[[Session]]</a></code>.</p>
+        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①①">In parallel</a>, <a data-link-type="dfn" href="#session-terminate" id="ref-for-session-terminate②">terminate</a> <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-session-slot" id="ref-for-dom-webtransport-session-slot①①">[[Session]]</a></code>.</p>
        <li data-md>
         <p><a data-link-type="dfn" href="#webtransport-queue-a-network-task" id="ref-for-webtransport-queue-a-network-task②①">Queue a network task</a> with <var>transport</var> to run the following steps:</p>
         <ol>
@@ -3543,7 +3543,7 @@ data to the server.</p>
        <li data-md>
         <p>Let <var>p</var> be a new promise.</p>
        <li data-md>
-        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①①">in parallel</a>:</p>
+        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①②">in parallel</a>:</p>
         <ol>
          <li data-md>
           <p>Let <var>gatheredStats</var> be the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list①">list</a> of stats specific to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑤②">this</a>
@@ -3737,7 +3737,7 @@ To <dfn class="dfn-paneled" data-dfn-for="WebTransportSendStream" data-dfn-type=
  <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain" id="ref-for-list-contain">contains</a> <var>inFlightWriteRequest</var> or
  <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-insidesynchronousatomicwrite-slot" id="ref-for-dom-webtransportsendstream-insidesynchronousatomicwrite-slot①">[[InsideSynchronousAtomicWrite]]</a></code> is true, otherwise false.</p>
      <li data-md>
-      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①②">in parallel</a>:</p>
+      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①③">in parallel</a>:</p>
       <ol>
        <li data-md>
         <p>If <var>atomic</var> is true and the current <a data-link-type="dfn" href="#stream-signal-flow-control" id="ref-for-stream-signal-flow-control①">flow control</a> window is too small for <var>bytes</var> to be sent
@@ -3756,7 +3756,7 @@ To <dfn class="dfn-paneled" data-dfn-for="WebTransportSendStream" data-dfn-type=
         <p>The user-agent MAY have a buffer to improve the transfer performance. Such a buffer
  SHOULD have a fixed upper limit, to carry the backpressure information to the user of the
  <code class="idl"><a data-link-type="idl" href="#webtransportsendstream" id="ref-for-webtransportsendstream①⑤">WebTransportSendStream</a></code>.</p>
-        <p>We access <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendorder-slot" id="ref-for-dom-webtransportsendstream-sendorder-slot③">[[SendOrder]]</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①③">in parallel</a> here.
+        <p>We access <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendorder-slot" id="ref-for-dom-webtransportsendstream-sendorder-slot③">[[SendOrder]]</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①④">in parallel</a> here.
  User agents SHOULD respond to live updates of these values during sending, though
  the details are <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined①⓪">implementation-defined</a>.</p>
         <p class="note" role="note"><span class="marker">Note:</span> Ordering of retransmissions is <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined①①">implementation-defined</a>,
@@ -3807,7 +3807,7 @@ To <dfn class="dfn-paneled" data-dfn-for="WebTransportSendStream" data-dfn-type=
      <li data-md>
       <p>Set <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-pendingoperation-slot" id="ref-for-dom-webtransportsendstream-pendingoperation-slot⑨">[[PendingOperation]]</a></code> to <var>promise</var>.</p>
      <li data-md>
-      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①④">in parallel</a>:</p>
+      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑤">in parallel</a>:</p>
       <ol>
        <li data-md>
         <p><a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send①">Send</a> FIN on <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-internalstream-slot" id="ref-for-dom-webtransportsendstream-internalstream-slot②">[[InternalStream]]</a></code> and wait for the operation to
@@ -3854,7 +3854,7 @@ To <dfn class="dfn-paneled" data-dfn-for="WebTransportSendStream" data-dfn-type=
  using HTTP/3, the code will be encoded to a number in [0x52e4a40fa8db, 0x52e5ac983162] as decribed in
  <a data-link-type="biblio" href="#biblio-web-transport-http3" title="WebTransport over HTTP/3">[WEB-TRANSPORT-HTTP3]</a>.</p>
      <li data-md>
-      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑤">in parallel</a>:</p>
+      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑥">in parallel</a>:</p>
       <ol>
        <li data-md>
         <p><a data-link-type="dfn" href="#stream-abort-sending" id="ref-for-stream-abort-sending②">Abort sending</a> on <var>stream</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-internalstream-slot" id="ref-for-dom-webtransportsendstream-internalstream-slot④">[[InternalStream]]</a></code> with <var>code</var> and <var>committedOffset</var>.</p>
@@ -3883,7 +3883,7 @@ To <dfn class="dfn-paneled" data-dfn-for="WebTransportSendStream" data-dfn-type=
      <li data-md>
       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate⑤">For each</a> <var>promise</var> in <var>requestsToAbort</var>, <a data-link-type="dfn" data-refhint-key="c597a1f1" href="http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise-objects" id="ref-for-sec-promise-objects③⑥">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#aborterror" id="ref-for-aborterror②">AbortError</a></code>.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑥">In parallel</a>, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate⑥">for each</a> <var>promise</var> in <var>requestsToAbort</var>, abort the
+      <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑦">In parallel</a>, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate⑥">for each</a> <var>promise</var> in <var>requestsToAbort</var>, abort the
  <a data-link-type="dfn" href="#stream-send" id="ref-for-stream-send②">sending</a> of bytes associated with <var>promise</var>.</p>
     </ol>
    </div>
@@ -3993,7 +3993,7 @@ also establishes a separate numberspace for evaluating
         <p>Let <var>streams</var> be all <code class="idl"><a data-link-type="idl" href="#webtransportsendstream" id="ref-for-webtransportsendstream②⑨">WebTransportSendStream</a></code>s whose
  <code class="idl"><a data-link-type="idl" href="#dom-webtransportsendstream-sendgroup-slot" id="ref-for-dom-webtransportsendstream-sendgroup-slot③">[[SendGroup]]</a></code> is <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑤⑦">this</a>.</p>
        <li data-md>
-        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑦">in parallel</a>:</p>
+        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑧">in parallel</a>:</p>
         <ol>
          <li data-md>
           <p>Let <var>gatheredStats</var> be the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list②">list</a> of aggregated stats from all
@@ -4082,7 +4082,7 @@ its consumers to use a <a data-link-type="dfn" href="https://streams.spec.whatwg
        <li data-md>
         <p>Let <var>p</var> be a new promise.</p>
        <li data-md>
-        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑧">in parallel</a>:</p>
+        <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑨">in parallel</a>:</p>
         <ol>
          <li data-md>
           <p>Let <var>gatheredStats</var> be the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list③">list</a> of stats specific to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this⑤⑨">this</a>
@@ -4194,7 +4194,7 @@ its consumers to use a <a data-link-type="dfn" href="https://streams.spec.whatwg
  <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-ArrayBuffer" id="ref-for-idl-ArrayBuffer①">ArrayBuffer</a></code> fails, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①②">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-rangeerror" id="ref-for-exceptiondef-rangeerror⑥">RangeError</a></code>.</p>
       </ol>
      <li data-md>
-      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑨">in parallel</a>:</p>
+      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel②⓪">in parallel</a>:</p>
       <ol>
        <li data-md>
         <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#arraybuffer-write" id="ref-for-arraybuffer-write">Write</a> the bytes that area <a data-link-type="dfn" href="#stream-receive" id="ref-for-stream-receive">read</a> from <var>internalStream</var> into
@@ -4262,7 +4262,7 @@ steps.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-remove" id="ref-for-list-remove⑤">Remove</a> <var>stream</var> from <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-sendstreams-slot" id="ref-for-dom-webtransport-sendstreams-slot⑧">[[SendStreams]]</a></code>.</p>
      <li data-md>
-      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel②⓪">in parallel</a>:</p>
+      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel②①">in parallel</a>:</p>
       <ol>
        <li data-md>
         <p><a data-link-type="dfn" href="#stream-abort-receiving" id="ref-for-stream-abort-receiving①">Abort receiving</a> on <var>internalStream</var> with <var>code</var>.</p>
@@ -6520,7 +6520,7 @@ let dfnPanelData = {
 "a33db89a": {"dfnID":"a33db89a","dfnText":"fetch","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-fetch"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-concept-fetch\u2460"}],"title":"6.9. Configuration"}],"url":"https://fetch.spec.whatwg.org/#concept-fetch"},
 "a3b18719": {"dfnID":"a3b18719","dfnText":"append","external":true,"refSections":[{"refs":[{"id":"ref-for-set-append"}],"title":"4.1. Internal slots"},{"refs":[{"id":"ref-for-set-append\u2460"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-set-append\u2461"}],"title":"9.3. Procedures"},{"refs":[{"id":"ref-for-set-append\u2462"}],"title":"11.1. Methods"}],"url":"https://infra.spec.whatwg.org/#set-append"},
 "a48627d0": {"dfnID":"a48627d0","dfnText":"highWaterMark (for ReadableStream/set up with byte reading support)","external":true,"refSections":[{"refs":[{"id":"ref-for-readablestream-set-up-with-byte-reading-support-highwatermark"}],"title":"6.2. Constructor"}],"url":"https://streams.spec.whatwg.org/#readablestream-set-up-with-byte-reading-support-highwatermark"},
-"a72449dd": {"dfnID":"a72449dd","dfnText":"in parallel","external":true,"refSections":[{"refs":[{"id":"ref-for-in-parallel"},{"id":"ref-for-in-parallel\u2460"}],"title":"4.3. Procedures"},{"refs":[{"id":"ref-for-in-parallel\u2461"},{"id":"ref-for-in-parallel\u2462"},{"id":"ref-for-in-parallel\u2463"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-in-parallel\u2464"},{"id":"ref-for-in-parallel\u2465"},{"id":"ref-for-in-parallel\u2466"},{"id":"ref-for-in-parallel\u2467"},{"id":"ref-for-in-parallel\u2468"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-in-parallel\u2460\u24ea"}],"title":"6.7. Context cleanup steps"},{"refs":[{"id":"ref-for-in-parallel\u2460\u2460"}],"title":"7.2. Methods"},{"refs":[{"id":"ref-for-in-parallel\u2460\u2461"},{"id":"ref-for-in-parallel\u2460\u2462"},{"id":"ref-for-in-parallel\u2460\u2463"},{"id":"ref-for-in-parallel\u2460\u2464"},{"id":"ref-for-in-parallel\u2460\u2465"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-in-parallel\u2460\u2466"}],"title":"8.1. Methods"},{"refs":[{"id":"ref-for-in-parallel\u2460\u2467"}],"title":"9.1. Methods"},{"refs":[{"id":"ref-for-in-parallel\u2460\u2468"},{"id":"ref-for-in-parallel\u2461\u24ea"}],"title":"9.3. Procedures"}],"url":"https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel"},
+"a72449dd": {"dfnID":"a72449dd","dfnText":"in parallel","external":true,"refSections":[{"refs":[{"id":"ref-for-in-parallel"},{"id":"ref-for-in-parallel\u2460"}],"title":"4.3. Procedures"},{"refs":[{"id":"ref-for-in-parallel\u2461"}],"title":"5.4. Procedures"},{"refs":[{"id":"ref-for-in-parallel\u2462"},{"id":"ref-for-in-parallel\u2463"},{"id":"ref-for-in-parallel\u2464"}],"title":"6.2. Constructor"},{"refs":[{"id":"ref-for-in-parallel\u2465"},{"id":"ref-for-in-parallel\u2466"},{"id":"ref-for-in-parallel\u2467"},{"id":"ref-for-in-parallel\u2468"},{"id":"ref-for-in-parallel\u2460\u24ea"}],"title":"6.4. Methods"},{"refs":[{"id":"ref-for-in-parallel\u2460\u2460"}],"title":"6.7. Context cleanup steps"},{"refs":[{"id":"ref-for-in-parallel\u2460\u2461"}],"title":"7.2. Methods"},{"refs":[{"id":"ref-for-in-parallel\u2460\u2462"},{"id":"ref-for-in-parallel\u2460\u2463"},{"id":"ref-for-in-parallel\u2460\u2464"},{"id":"ref-for-in-parallel\u2460\u2465"},{"id":"ref-for-in-parallel\u2460\u2466"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-in-parallel\u2460\u2467"}],"title":"8.1. Methods"},{"refs":[{"id":"ref-for-in-parallel\u2460\u2468"}],"title":"9.1. Methods"},{"refs":[{"id":"ref-for-in-parallel\u2461\u24ea"},{"id":"ref-for-in-parallel\u2461\u2460"}],"title":"9.3. Procedures"}],"url":"https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel"},
 "a8c7461b": {"dfnID":"a8c7461b","dfnText":"URL record","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-url"}],"title":"6.2. Constructor"}],"url":"https://url.spec.whatwg.org/#concept-url"},
 "ae4fa7f2": {"dfnID":"ae4fa7f2","dfnText":"cross-site recognition","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-cross-site-recognition"}],"title":"14.5.2. Shared Networking"}],"url":"https://www.w3.org/TR/2025/STMT-privacy-principles-20250515/#dfn-cross-site-recognition"},
 "ae8def21": {"dfnID":"ae8def21","dfnText":"contain","external":true,"refSections":[{"refs":[{"id":"ref-for-list-contain"},{"id":"ref-for-list-contain\u2460"},{"id":"ref-for-list-contain\u2461"}],"title":"7.4. Procedures"},{"refs":[{"id":"ref-for-list-contain\u2462"}],"title":"11.1. Methods"}],"url":"https://infra.spec.whatwg.org/#list-contain"},
