@@ -436,8 +436,7 @@ The <dfn>writeDatagrams</dfn> algorithm is given a |transport| and |writable| as
 1. Let |bytes| be a copy of bytes which |data| represents.
 1. Let |chunk| be (|bytes|, |timestamp|).
 1. [=queue/Enqueue=] |chunk| to |writable|.{{[[OutgoingDatagramsQueue]]}}.
-1. If the length of |writable|.{{[[OutgoingDatagramsQueue]]}} is not less than
-   |duplex|.{{[[OutgoingMaxBufferedDatagrams]]}}, then set
+1. If |writable|'s [=WebTransportDatagramsWritable/send queue is full=], then set
    |writable|.{{[[BackpressurePromise]]}} to a new promise.
 1. Return |writable|.{{[[BackpressurePromise]]}}.
 
@@ -460,9 +459,25 @@ with |transport| to run these steps:
 1. Let |n| be the minimum of |count| and the length of
    |writable|.{{[[OutgoingDatagramsQueue]]}}.
 1. Repeat [=queue/dequeuing=] |writable|.{{[[OutgoingDatagramsQueue]]}} |n| times.
-1. If the length of |writable|.{{[[OutgoingDatagramsQueue]]}} is less than
-   |transport|.{{[[Datagrams]]}}.{{[[OutgoingMaxBufferedDatagrams]]}}, then [=resolve=]
-   |writable|.{{[[BackpressurePromise]]}} with undefined.
+1. If |writable|'s [=WebTransportDatagramsWritable/send queue is full|send queue is not full=],
+   then [=resolve=] |writable|.{{[[BackpressurePromise]]}} with undefined.
+
+</div>
+
+<div algorithm>
+
+A {{WebTransportDatagramsWritable}} |writable|'s
+<dfn for="WebTransportDatagramsWritable">send queue is full</dfn> if either of the following is
+true:
+
+* The length of |writable|.{{[[OutgoingDatagramsQueue]]}} is not less than
+  |writable|.{{WebTransportDatagramsWritable/[[Transport]]}}.{{[[Datagrams]]}}.{{[[OutgoingMaxBufferedDatagrams]]}}.
+* The total byte length of the datagrams in |writable|.{{[[OutgoingDatagramsQueue]]}} is greater
+  than an [=implementation-defined=] positive byte limit.
+
+Note: The byte limit lets the user agent cap memory in the underlying sink, regardless of
+{{WebTransportDatagramDuplexStream/outgoingMaxBufferedDatagrams}}. Datagrams beyond it wait in the
+{{WritableStream}}'s queue instead. Tune the limit to keep throughput high.
 
 </div>
 
@@ -602,8 +617,8 @@ A {{WebTransportDatagramDuplexStream}} object has the following internal slots.
   <tr>
    <td><dfn>`[[OutgoingMaxBufferedDatagrams]]`</dfn>
    <td class="non-normative">An {{unsigned long}} representing the
-   length of the underlying sink's outgoing queue in number of datagrams,
-   beyond which backpressure is exerted.
+   maximum length of the underlying sink's outgoing queue in number of datagrams,
+   beyond which backpressure is exerted. A byte limit can exert it sooner.
   </tr>
   <tr>
    <td><dfn>`[[OutgoingDatagramsExpirationDuration]]`</dfn>
@@ -737,7 +752,8 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
 </div>
 <div algorithm>
 : <dfn for="WebTransportDatagramDuplexStream" attribute>outgoingMaxBufferedDatagrams</dfn>
-:: The length of the datagrams send queue in the underlying sink.
+:: The maximum length of the datagrams send queue in the underlying sink. The user agent can
+   also limit this queue by byte length. See [=WebTransportDatagramsWritable/send queue is full=].
 
    Note: This differs from [=WritableStream/set up/highWaterMark=] in that this queue
    resides in the underlying sink and can thus be optimized to be in another process for
@@ -749,8 +765,8 @@ The user agent MAY update {{[[OutgoingMaxDatagramSize]]}} for any {{WebTransport
      1. If |value| is < `1`, set |value| to `1`.
      1. Set [=this=].{{[[OutgoingMaxBufferedDatagrams]]}} to |value|.
      1. [=For each=] |writable| in [=this=].{{WebTransportDatagramDuplexStream/[[Writables]]}}, if
-        the length of |writable|.{{WebTransportDatagramsWritable/[[OutgoingDatagramsQueue]]}} is
-        less than |value|, then [=resolve=]
+        |writable|'s [=WebTransportDatagramsWritable/send queue is full|send queue is not full=],
+        then [=resolve=]
         |writable|.{{WebTransportDatagramsWritable/[[BackpressurePromise]]}} with undefined.
 
 </div>
