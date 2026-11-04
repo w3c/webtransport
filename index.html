@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version e0b165ae4, updated Mon Nov 2 15:16:49 2026 -0800" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="36098591d8772ff81b7fb237888038175bf0b326" name="revision">
+  <meta content="3294f966714bdbdc94910d0c3aa14f7728ffbfde" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -2284,6 +2284,11 @@ To <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="obtain-a-webtran
       <p>Let <var>url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url">current URL</a>.</p>
      <li data-md>
       <p>Let <var>newConnection</var> be <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-newconnection-slot" id="ref-for-dom-webtransport-newconnection-slot①">[[NewConnection]]</a></code>.</p>
+     <li data-md>
+      <p class="assertion">Assert: <var>newConnection</var> is not "<code>no</code>", or <var>networkPartitionKey</var>[1] is neither
+ null nor a fixed value.</p>
+      <p class="issue" id="issue-51f6fb74"><a class="self-link" href="#issue-51f6fb74"></a> Fetch currently allows <var>networkPartitionKey</var>[1] to be null. See
+ <a href="https://github.com/whatwg/fetch/issues/1926">whatwg/fetch#1926</a>.</p>
      <li data-md>
       <p>Let <var>requireUnreliable</var> be <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-requireunreliable-slot" id="ref-for-dom-webtransport-requireunreliable-slot①">[[RequireUnreliable]]</a></code>.</p>
      <li data-md>
@@ -6171,6 +6176,8 @@ and has been adapted for use in this specification.</p>
 </pre>
   <h2 class="heading no-num no-ref settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
+   <div class="issue"> Fetch currently allows <var>networkPartitionKey</var>[1] to be null. See
+ <a href="https://github.com/whatwg/fetch/issues/1926">whatwg/fetch#1926</a>. <a class="issue-return" href="#issue-51f6fb74" title="Jump to section">↵</a></div>
    <div class="issue"> This needs to be done in workers too. See
 <a href="https://www.github.com/w3c/webtransport/issues/127">#127</a> and
 <a href="https://www.github.com/whatwg/html/issues/6831">whatwg/html#6731</a>. <a class="issue-return" href="#issue-c18b6608" title="Jump to section">↵</a></div>
