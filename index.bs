@@ -2372,10 +2372,10 @@ To <dfn for="WebTransportSendStream">abort</dfn> a {{WebTransportSendStream}} |s
 To <dfn for="WebTransportSendStream">abort all atomic write requests</dfn> on a {{WebTransportSendStream}} |stream|, run these steps:
   1. Let |writeRequests| be
      |stream|.<a href="https://streams.spec.whatwg.org/#writablestream-writerequests">writeRequests</a>.
-  1. Let |requestsToAbort| be [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
+  1. Let |requestsToAbort| be |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
   1. If |writeRequests| [=list/contains=] a promise not in |requestsToAbort|, then
      [=WritableStream/error=] |stream| with {{AbortError}}, and abort these steps.
-  1. [=list/Empty=] [=stream=].{{WebTransportSendStream/[[AtomicWriteRequests]]}}.
+  1. Set |stream|.{{WebTransportSendStream/[[AtomicWriteRequests]]}} to an empty [=ordered set=].
   1. [=For each=] |promise| in |requestsToAbort|, [=reject=] |promise| with {{AbortError}}.
   1. [=In parallel=], [=for each=] |promise| in |requestsToAbort|, abort the
      [=stream/send|sending=] of bytes associated with |promise|.
