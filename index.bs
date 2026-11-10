@@ -1441,6 +1441,10 @@ the application will receive the number of streams it anticipates.
    1. If [=this=].{{[[State]]}} is `"closed"` or `"failed"`,
       return [=a promise rejected with=] an {{InvalidStateError}}.
    1. Let |transport| be [=this=].
+   1. Let |labelBytes| be the result of [=get a copy of the bytes held by the buffer source|getting a copy of the bytes held by the buffer source=]
+      |label|.
+   1. Let |contextBytes| be the result of [=get a copy of the bytes held by the buffer source|getting a copy of the bytes held by the buffer source=]
+      |context|.
    1. Let |p| be a new promise.
    1. Run the following steps [=in parallel=], but [=abort when=] |transport|'s
       {{[[State]]}} becomes `"closed"` or `"failed"`, and instead
@@ -1449,7 +1453,7 @@ the application will receive the number of streams it anticipates.
         following the process defined
         in [[!WEB-TRANSPORT-OVERVIEW]] [Section 4.1](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview#section-4.1)
         and the WebTransport protocol binding in use,
-        passing |label|, |context|, and |outputLength|.
+        passing |labelBytes|, |contextBytes|, and |outputLength|.
 
         Note: The process for generating the context
         that is passed to the TLS exporter interface
