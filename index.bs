@@ -1394,7 +1394,7 @@ the application will receive the number of streams it anticipates.
      1. Let |transport| be [=this=].
      1. Let |p| be a new promise.
      1. If |transport|.{{[[State]]}} is `"failed"`, [=reject=] |p| with an
-        {{InvalidStateError}} and abort these steps.
+        {{InvalidStateError}} and return |p|.
      1. Run the following steps [=in parallel=]:
          1. If |transport|.{{[[State]]}} is `"connecting"`, wait until it changes.
          1. If |transport|.{{[[State]]}} is `"failed"`, abort these steps after
