@@ -1239,6 +1239,8 @@ these steps.
      stream=] in |session|.
   1. Let |internalStream| be the result of [=session/receiving a bidirectional stream=] from |session|.
   1. [=Queue a network task=] with |transport| to run these steps:
+    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+       [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
     1. Let |stream| be the result of [=BidirectionalStream/creating=] a
        {{WebTransportBidirectionalStream}} with |internalStream| and |transport|.
     1. [=ReadableStream/Enqueue=] |stream| to |transport|.{{[[IncomingBidirectionalStreams]]}}.
@@ -1263,6 +1265,8 @@ these steps.
      [=session/receive an incoming unidirectional stream|available incoming unidirectional stream=] in |session|.
   1. Let |internalStream| be the result of [=session/receiving an incoming unidirectional stream=] from |session|.
   1. [=Queue a network task=] with |transport| to run these steps:
+    1. If |transport|.{{[[State]]}} is `"closed"` or `"failed"`,
+       [=reject=] |p| with an {{InvalidStateError}} and abort these steps.
     1. Let |stream| be the result of [=WebTransportReceiveStream/creating=] a {{WebTransportReceiveStream}} with
        |internalStream| and |transport|.
     1. [=ReadableStream/Enqueue=] |stream| to |transport|.{{[[IncomingUnidirectionalStreams]]}}.
