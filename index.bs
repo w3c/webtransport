@@ -387,8 +387,8 @@ A {{WebTransportDatagramsWritable}} object has the following internal slot.
     :: |sendGroup|
     : {{WebTransportDatagramsWritable/[[SendOrder]]}}
     :: |sendOrder|
- 1. Let |writeDatagramsAlgorithm| be an action that runs [=writeDatagrams=] with
-    |transport| and |stream|.
+ 1. Let |writeDatagramsAlgorithm| be an action that, given |data|, returns the result of running
+    [=writeDatagrams=] with |transport| and |stream| as parameters and |data| as input.
  1. [=WritableStream/Set up=] |stream| with [=WritableStream/set up/writeAlgorithm=]
     set to |writeDatagramsAlgorithm|.
  1. [=set/Append=] |stream| to
