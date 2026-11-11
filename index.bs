@@ -532,6 +532,10 @@ subset (determined by [=send-order rules=]) of its associated {{WebTransportData
 objects, and SHOULD do so as soon as reasonably possible whenever the
 algorithm can make progress.
 
+For each writable, the user agent MUST complete an invocation's parallel steps and
+all of its queued [=dequeue outgoing datagrams=] tasks before starting another
+invocation of [=sendDatagrams=] for that writable.
+
 Note: Writing datagrams while the transport's {{[[State]]}} is `"connecting"` is allowed. The
 datagrams are stored in {{[[OutgoingDatagramsQueue]]}}, and they can be discarded
 in the same manner as when in the `"connected"` state. Once the transport's {{[[State]]}} becomes
