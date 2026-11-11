@@ -1116,8 +1116,8 @@ agent MUST run the following steps:
 1. Let |requestHeaders| be a new {{Headers}} object whose [=Headers/header list=] is
    |request|'s [=request/header list=] and [=Headers/guard=] is "`request`".
 1. For each |header| of |headers|'s [=Headers/header list=]:
-    1. If [=ascii lowercase=] |header|'s [=header/name=] is "`wt-available-protocols`",
-       then throw a {{TypeError}}.
+    1. If |header|'s [=header/name=] is a [=byte-case-insensitive=] match for
+       `WT-Available-Protocols`, then throw a {{TypeError}}.
     1. [=Headers/append=] |header| to |requestHeaders|.
 
     Note: Headers are subject to Fetch’s
