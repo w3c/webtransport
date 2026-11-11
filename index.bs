@@ -1203,7 +1203,7 @@ To <dfn>process a WebTransport fetch response</dfn>, given a [=/response=] |resp
   1. If the user agent supports more than one congestion control algorithm, choose one
      appropriate for |transport|'s {{[[CongestionControl]]}} for sending of data on this |connection|.
   1. [=Queue a network task=] with |transport| to run these steps:
-    1. Assert: [=this=]'s {{[[Datagrams]]}}'s {{[[OutgoingMaxDatagramSize]]}} is an integer.
+    1. Assert: |transport|.{{[[Datagrams]]}}.{{[[OutgoingMaxDatagramSize]]}} is an integer.
     1. If |transport|.{{[[State]]}} is not `"connecting"`:
       1. [=In parallel=], [=session/terminate=] |session|.
       1. Abort these steps.
