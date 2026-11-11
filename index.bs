@@ -1142,7 +1142,7 @@ agent MUST run the following steps:
 To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partition key=]
 |networkPartitionKey|, and a [=request=] |request|:
   1. Let |transport| be the {{WebTransport}} object associated with |request|.
-  1. Let |url| be |request|'s [=request/current URL=].
+  1. Let |origin| be |request|'s [=request/current URL=]'s [=url/origin=].
   1. Let |newConnection| be |transport|.{{[[NewConnection]]}}.
   1. Assert: |newConnection| is not "`no`", or |networkPartitionKey|[1] is neither
      null nor a fixed value.
@@ -1152,7 +1152,7 @@ To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partiti
   1. Let |requireUnreliable| be |transport|.{{[[RequireUnreliable]]}}.
   1. Let |webTransportHashes| be the values in |request|'s [=request/WebTransport-hash list=].
   1. Let |connection| be the result of [=obtain a connection|obtaining a connection=] with
-     |networkPartitionKey|, |url|, false, |newConnection|, |requireUnreliable| and
+     |networkPartitionKey|, |origin|, false, |newConnection|, |requireUnreliable| and
      |webTransportHashes|.
   1. If |connection| is failure, return failure.
   1. Wait for |connection| to receive the first SETTINGS frame, and let |settings| be a dictionary
