@@ -1240,7 +1240,7 @@ these steps.
   1. Let |internalStream| be the result of [=session/receiving a bidirectional stream=] from |session|.
   1. [=Queue a network task=] with |transport| to run these steps:
     1. Let |stream| be the result of [=BidirectionalStream/creating=] a
-       {{WebTransportBidirectionalStream}} with |internalStream| and |transport|.
+       {{WebTransportBidirectionalStream}} with |internalStream|, |transport|, null, and 0.
     1. [=ReadableStream/Enqueue=] |stream| to |transport|.{{[[IncomingBidirectionalStreams]]}}.
     1. [=Resolve=] |p| with undefined.
 1. Return |p|.
@@ -2811,12 +2811,12 @@ A {{WebTransportBidirectionalStream}} has the following internal slots.
 <div algorithm="create a BidirectionalStream">
 To <dfn for=BidirectionalStream>create</dfn> a {{WebTransportBidirectionalStream}} with a
 [=bidirectional=] [=WebTransport stream=] |internalStream|, a {{WebTransport}}
-object |transport|, and a |sendOrder|, run these steps.
+object |transport|, a |sendGroup|, and a |sendOrder|, run these steps.
 
 1. Let |readable| be the result of [=WebTransportReceiveStream/creating=] a {{WebTransportReceiveStream}} with
    |internalStream| and |transport|.
 1. Let |writable| be the result of [=WebTransportSendStream/creating=] a {{WebTransportSendStream}} with
-   |internalStream|, |transport|, and |sendOrder|.
+   |internalStream|, |transport|, |sendGroup|, and |sendOrder|.
 1. Let |stream| be a [=new=] {{WebTransportBidirectionalStream}}, with:
     : {{WebTransportBidirectionalStream/[[Readable]]}}
     :: |readable|
