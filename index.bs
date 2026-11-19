@@ -2893,7 +2893,10 @@ interface WebTransportWriter : WritableStreamDefaultWriter {
    Note: This does not guarantee delivery in the event that a connection fails,
    only when a stream has [=stream/abort sending|aborted sending=].
 
-   When {{commit}} is called for |stream|, the user agent MUST run the following steps:
+   When {{commit}} is called, the user agent MUST run the following steps:
+   1. Let |stream| be
+      [=this=].<a href="https://streams.spec.whatwg.org/#writablestreamdefaultwriter-stream">stream</a>.
+   1. If |stream| is undefined, [=throw=] a {{TypeError}}.
    1. Set |stream|.{{WebTransportSendStream/[[CommittedOffset]]}}
       to the value of |stream|.{{WebTransportSendStream/[[BytesWritten]]}}.
 
