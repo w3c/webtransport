@@ -431,7 +431,7 @@ The <dfn>writeDatagrams</dfn> algorithm is given a |transport| and |writable| as
 1. Let |timestamp| be a timestamp representing now.
 1. If |data| is not a {{BufferSource}} object, then return [=a promise rejected with=] a {{TypeError}}.
 1. Let |duplex| be |transport|.{{[[Datagrams]]}}.
-1. If |duplex|.{{[[OutgoingMaxDatagramSize]]}} is less than |data|'s \[[ByteLength]], return
+1. If |duplex|.{{[[OutgoingMaxDatagramSize]]}} is less than |data|'s [=BufferSource/byte length=], return
    [=a promise resolved with=] undefined.
 1. Let |bytes| be a copy of bytes which |data| represents.
 1. Let |chunk| be (|bytes|, |timestamp|).
