@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED" rel="stylesheet">
   <meta content="Bikeshed version e0b165ae4, updated Mon Nov 2 15:16:49 2026 -0800" name="generator">
   <link href="https://www.w3.org/TR/webtransport/" rel="canonical">
-  <meta content="478e56f240f464de6f1474068250573bdc07f3d6" name="revision">
+  <meta content="bde68eb06f78012f7b88942087f4bac1aafdc647" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -2457,7 +2457,7 @@ these steps.
         <ol>
          <li data-md>
           <p>Let <var>stream</var> be the result of <a data-link-type="dfn" href="#bidirectionalstream-create" id="ref-for-bidirectionalstream-create">creating</a> a
- <code class="idl"><a data-link-type="idl" href="#webtransportbidirectionalstream" id="ref-for-webtransportbidirectionalstream②">WebTransportBidirectionalStream</a></code> with <var>internalStream</var> and <var>transport</var>.</p>
+ <code class="idl"><a data-link-type="idl" href="#webtransportbidirectionalstream" id="ref-for-webtransportbidirectionalstream②">WebTransportBidirectionalStream</a></code> with <var>internalStream</var>, <var>transport</var>, null, and 0.</p>
          <li data-md>
           <p><a data-link-type="dfn" href="https://streams.spec.whatwg.org/#readablestream-enqueue" id="ref-for-readablestream-enqueue②">Enqueue</a> <var>stream</var> to <var>transport</var>.<code class="idl"><a data-link-type="idl" href="#dom-webtransport-incomingbidirectionalstreams-slot" id="ref-for-dom-webtransport-incomingbidirectionalstreams-slot②">[[IncomingBidirectionalStreams]]</a></code>.</p>
          <li data-md>
@@ -4404,7 +4404,7 @@ information on stats specific to one <code class="idl"><a data-link-type="idl" h
     
 To <dfn class="dfn-paneled" data-dfn-for="BidirectionalStream" data-dfn-type="dfn" data-noexport id="bidirectionalstream-create">create</dfn> a <code class="idl"><a data-link-type="idl" href="#webtransportbidirectionalstream" id="ref-for-webtransportbidirectionalstream⑧">WebTransportBidirectionalStream</a></code> with a
 <a data-link-type="dfn" href="#stream-bidirectional" id="ref-for-stream-bidirectional①④">bidirectional</a> <a data-link-type="dfn" href="#protocol-webtransport-stream" id="ref-for-protocol-webtransport-stream①⑥">WebTransport stream</a> <var>internalStream</var>, a <code class="idl"><a data-link-type="idl" href="#webtransport" id="ref-for-webtransport④⓪">WebTransport</a></code>
-object <var>transport</var>, and a <var>sendOrder</var>, run these steps.
+object <var>transport</var>, a <var>sendGroup</var>, and a <var>sendOrder</var>, run these steps.
 
 
     <ol>
@@ -4413,7 +4413,7 @@ object <var>transport</var>, and a <var>sendOrder</var>, run these steps.
  <var>internalStream</var> and <var>transport</var>.</p>
      <li data-md>
       <p>Let <var>writable</var> be the result of <a data-link-type="dfn" href="#webtransportsendstream-create" id="ref-for-webtransportsendstream-create②">creating</a> a <code class="idl"><a data-link-type="idl" href="#webtransportsendstream" id="ref-for-webtransportsendstream③③">WebTransportSendStream</a></code> with
- <var>internalStream</var>, <var>transport</var>, and <var>sendOrder</var>.</p>
+ <var>internalStream</var>, <var>transport</var>, <var>sendGroup</var>, and <var>sendOrder</var>.</p>
      <li data-md>
       <p>Let <var>stream</var> be a <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#new" id="ref-for-new①③">new</a> <code class="idl"><a data-link-type="idl" href="#webtransportbidirectionalstream" id="ref-for-webtransportbidirectionalstream⑨">WebTransportBidirectionalStream</a></code>, with:</p>
       <dl>
