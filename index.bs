@@ -992,6 +992,9 @@ A {{WebTransport}} object has the following internal slots.
 
 ## Constructor ##  {#webtransport-constructor}
 
+A [=/request=] has an associated <dfn for="request">WebTransport object</dfn>, which is null
+unless set by the {{WebTransport/constructor()}} constructor.
+
 <div algorithm="webtransport-contructor">
 When the {{WebTransport/constructor()}} constructor is invoked, the user
 agent MUST run the following steps:
@@ -1030,7 +1033,8 @@ agent MUST run the following steps:
 1. Let |datagramsReadableType| be {{WebTransport/constructor(url, options)/options}}'s
    {{WebTransportOptions/datagramsReadableType}}.
 1. Let |incomingDatagrams| be a [=new=] {{ReadableStream}}.
-1. Let |transport| be a newly constructed {{WebTransport}} object, with:
+1. Let |transport| be [=this=].
+1. Initialize |transport|'s internal slots as follows:
     : {{[[SendStreams]]}}
     :: an empty [=ordered set=]
     : {{[[ReceiveStreams]]}}
@@ -1102,7 +1106,8 @@ agent MUST run the following steps:
    [=request/policy container=] is |client|'s
    [=environment settings object/policy container=], [=request/destination=] is "",
    [=request/origin=] is |origin|, [=request/WebTransport-hash list=] is
-   |serverCertificateHashes| and [=request/redirect mode=] is "error".
+   |serverCertificateHashes|, [=request/redirect mode=] is "error", and its
+   [=request/WebTransport object=] is |transport|.
 
    Note: Redirects are not followed. Network errors caused by redirection are intentionally
    indistinguishable from other network errors.  In cross-origin contexts, this would reveal
@@ -1134,14 +1139,14 @@ agent MUST run the following steps:
 1. [=Fetch=] |request|, with [=useParallelQueue=] set to true, and [=processResponse=]
    set to the following steps given a |response|:
     1. [=Process a WebTransport fetch response=] with |response| and |transport|.
-1. Return |transport|.
 
 </div>
 
 <div algorithm="obtain a WebTransport connection">
 To <dfn export>obtain a WebTransport connection</dfn>, given a [=network partition key=]
 |networkPartitionKey|, and a [=request=] |request|:
-  1. Let |transport| be the {{WebTransport}} object associated with |request|.
+  1. Let |transport| be |request|'s [=request/WebTransport object=].
+  1. [=Assert=]: |transport| is not null.
   1. Let |url| be |request|'s [=request/current URL=].
   1. Let |newConnection| be |transport|.{{[[NewConnection]]}}.
   1. Assert: |newConnection| is not "`no`", or |networkPartitionKey|[1] is neither
