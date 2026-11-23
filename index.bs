@@ -141,8 +141,9 @@ specification uses that specification and terminology.
 
 # Protocol concepts # {#protocol-concepts}
 
-There are two main protocol concepts for WebTransport: sessions and streams. Each [=WebTransport
-session=] can contain multiple [=WebTransport streams=].
+There are three main protocol concepts for WebTransport: sessions, streams, and datagrams.
+Each [=WebTransport session=] can contain multiple [=WebTransport streams=] and
+[=WebTransport datagrams=].
 
 These should not be confused with [=protocol names=] which is an application-level API construct.
 
@@ -162,16 +163,6 @@ A [=WebTransport session=] has the following capabilities defined in [[!WEB-TRAN
   </tr>
  </thead>
  <tbody>
-  <tr>
-   <td><dfn>send a [datagram](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-11#name-datagrams)</dfn>
-   <td>[[!WEB-TRANSPORT-OVERVIEW]]
-   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-11#section-4.2-6.2.1)
-  </tr>
-  <tr>
-   <td><dfn>receive a [datagram](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-11#name-datagrams)</dfn>
-   <td>[[!WEB-TRANSPORT-OVERVIEW]]
-   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-11#section-4.2-6.4.1)
-  </tr>
   <tr>
    <td><dfn>create an [=stream/outgoing unidirectional=] stream</dfn>
    <td>[[!WEB-TRANSPORT-OVERVIEW]]
@@ -322,10 +313,45 @@ A [=WebTransport stream=] has the following signals:
  </tbody>
 </table>
 
+## WebTransport datagram ## {#webtransport-datagram}
+
+A <dfn for="protocol">WebTransport datagram</dfn> is a concept for an unreliable, size-limited
+message on a [=WebTransport session=], as described in [[!WEB-TRANSPORT-OVERVIEW]]
+[Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-11#section-4.2).
+
+<div class=note>
+Unlike [=WebTransport stream | streams=], datagrams preserve message boundaries:
+each datagram arrives whole or not at all.
+Datagrams might be lost or arrive out of order, and aren't retransmitted.
+</div>
+
+A [=WebTransport datagram=] has the following capabilities:
+
+<table class="data" dfn-for="datagram">
+ <thead>
+  <tr>
+   <th>capability
+   <th>definition
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><dfn>send</dfn> a datagram on a [=WebTransport session=]
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-11#section-4.2-6.2.1)
+  </tr>
+  <tr>
+   <td><dfn>receive</dfn> a datagram on a [=WebTransport session=]
+   <td>[[!WEB-TRANSPORT-OVERVIEW]]
+   [Section 4.2](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-11#section-4.2-6.4.1)
+  </tr>
+ </tbody>
+</table>
+
 # `WebTransportDatagramsWritable` Interface #  {#datagram-writable}
 
 A <dfn interface>WebTransportDatagramsWritable</dfn> is a {{WritableStream}} providing outgoing streaming
-features to [=send a datagram | send datagrams=].
+features to [=datagram/send=] datagrams.
 
 <pre class="idl">
 [Exposed=(Window,Worker), SecureContext, Transferable]
@@ -515,7 +541,7 @@ with |transport| to run the following steps:
     1. Set |count| to |count| + 1.
     1. The user agent MAY [=dequeue outgoing datagrams=] with |transport|,
        |writable| and |count|, and if it does, set |count| to 0.
-    1. If |bytes|'s length ≤ |maxSize|, then [=session/send a datagram=], with
+    1. If |bytes|'s length ≤ |maxSize|, then [=datagram/send=] a datagram, with
        |transport|.{{[[Session]]}} and |bytes|.
   1. If |count| is greater than 0, then [=dequeue outgoing datagrams=] with
      |transport|, |writable| and |count|.
@@ -813,8 +839,8 @@ To <dfn>receiveDatagrams</dfn>, given a {{WebTransport}} object |transport|, run
 1. Let |duration| be |datagrams|.{{[[IncomingDatagramsExpirationDuration]]}}.
 1. If |duration| is null, then set |duration| to an [=implementation-defined=] value.
 1. Let |session| be |transport|.{{[[Session]]}}.
-1. While there are [=session/receive a datagram|available incoming datagrams=] on |session|:
-  1. Let |datagram| be the result of [=session/receiving a datagram=] with |session| [=in parallel=].
+1. While there are [=datagram/receive|available incoming datagrams=] on |session|:
+  1. Let |datagram| be the result of [=datagram/receiving=] a datagram with |session| [=in parallel=].
   1. Let |timestamp| be a timestamp representing now.
   1. Let |chunk| be a (|datagram|, |timestamp|).
   1. [=queue/Enqueue=] |chunk| to |queue|.
